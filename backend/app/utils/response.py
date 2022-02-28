@@ -1,4 +1,4 @@
-def Response(data, message):
+def response(data, message):
     return {
         "data": [data],
         "code": 200,
@@ -6,5 +6,5 @@ def Response(data, message):
     }
 
 
-def ErrorResponse(error, code, message):
+def errorresponse(error, code, message):
     return {"error": error, "code": code, "message": message}
