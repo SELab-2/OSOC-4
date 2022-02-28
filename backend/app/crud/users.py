@@ -3,6 +3,7 @@ from ..database import user_collection
 from ..utils.cryptography import get_password_hash
 from ..models.user import User
 
+
 async def retrieve_users() -> List[User]:
     """retrieve_users
 
@@ -15,6 +16,7 @@ async def retrieve_users() -> List[User]:
         users.append(user)
 
     return users
+
 
 async def add_user(user_data: dict) -> User:
     """add_user this adds a new user to the database
@@ -33,7 +35,7 @@ async def add_user(user_data: dict) -> User:
     return new_user
 
 
-async def get_user_by_username(username:str) -> Optional[User]:
+async def get_user_by_username(username: str) -> Optional[User]:
     """get_user_by_username this function returns the user with username
 
     :param username: the username of the user
