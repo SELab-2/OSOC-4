@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from ..database import user_collection
 from ..utils.cryptography import get_password_hash
 from ..models.user import User
@@ -33,7 +33,7 @@ async def add_user(user_data: dict) -> User:
     return new_user
 
 
-async def get_user_by_username(username:str) -> User:
+async def get_user_by_username(username:str) -> Optional(User):
     """get_user_by_username this function returns the user with username
 
     :param username: the username of the user
