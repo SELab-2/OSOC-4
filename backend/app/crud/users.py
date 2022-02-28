@@ -33,7 +33,7 @@ async def add_user(user_data: dict) -> User:
     return new_user
 
 
-async def get_user_by_username(username:str) -> Optional(User):
+async def get_user_by_username(username:str) -> Optional[User]:
     """get_user_by_username this function returns the user with username
 
     :param username: the username of the user
