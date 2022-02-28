@@ -1,4 +1,4 @@
-% Use-cases
+# Use-cases
 ## Aanmaken van een project
 Korte beschrijving: Een admin maakt een nieuw project aan. \
 Precondities: De gebruiker moet een admin zijn, er moet een partner gevonden zijn voor het project. \
