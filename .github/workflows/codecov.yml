@@ -9,7 +9,7 @@ jobs:
       - name: Test
         run: |
           gcc -ftest-coverage -fprofile-arcs -O0 -o test test.c lib.c
-          ./test
+          ./backend/test
           gcov -abcfu lib.c
       - name: Upload
         uses: codecov/codecov-action@v1
