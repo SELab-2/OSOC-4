@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import users, auth
+from .routers import users, auth, tally
 from fastapi.openapi.utils import get_openapi
 import inspect
 import re
@@ -9,6 +9,7 @@ app = FastAPI()
 
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(tally.router)
 
 
 def custom_openapi():

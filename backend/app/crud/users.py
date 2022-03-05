@@ -1,5 +1,5 @@
 from typing import List, Optional
-from ..database import user_collection
+from ..database import engine
 from ..utils.cryptography import get_password_hash
 from ..models.user import User
 
@@ -11,14 +11,14 @@ async def retrieve_users() -> List[User]:
     :rtype: List[User]
     """
     users = []
-    async for user in user_collection.find():
+    async for user in engine.find(User):
         user = User(**user)
         users.append(user)
 
     return users
 
 
-async def add_user(user_data: dict) -> User:
+async def add_user(user: User) -> User:
     """add_user this adds a new user to the database
 
     :param user_data: user data to create a new user
@@ -27,12 +27,10 @@ async def add_user(user_data: dict) -> User:
     :rtype: User
     """
     # replace the plain password with the hashed one
-    user_data['password'] = get_password_hash(user_data['password'])
+    user.password = get_password_hash(user.password)
 
-    user = await user_collection.insert_one(user_data)
-    new_user = await user_collection.find_one({"_id": user.inserted_id})
-    new_user = User(**new_user)
-    return new_user
+    user = await engine.save(user)
+    return user
 
 
 async def get_user_by_username(username: str) -> Optional[User]:
@@ -43,7 +41,7 @@ async def get_user_by_username(username: str) -> Optional[User]:
     :return: The user with the given username or None if the user doesn't exist
     :rtype: User
     """
-    user = await user_collection.find_one({"username": username})
+    user = await engine.find_one(User, User.username == username)
     if user:
-        return User(**user)
+        return user
     return None
