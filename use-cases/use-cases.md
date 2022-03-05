@@ -19,15 +19,15 @@ Alternatieve flow 1: wanneer het systeem vraagt om bevestiging om een nieuwe ver
  
 ## Rollen veranderen 
 Korte omschrijving: Een admin past de rol aan van gebruikers. \
-Precondities: De gebruiker die de rollen verandert moet een admin zijn. \
+Precondities: De gebruiker die de rollen wil veranderen moet een admin zijn. \
 Postcondities: Er moet nog minstens één administrator zijn in het systeem. \
 Actoren: Een administrator. \
 Gedetailleerde beschrijving van de stappen: Een admin zoekt een bepaalde gebruiker, selecteert de gebruiker, de admin past die gebruiker zijn/haar rol aan (admin/coach/disabled). 
 
-## Coaches toevoegen aan tool
+## Coach toevoegen aan tool
 Korte omschrijving: Een admin voegt coaches toe aan de tool.\
-Precondities: Een admin en coaches om toe te voegen.\
-Postcondities: Coaches werden toegevoegd aan tool.\
+Precondities: Er moet een admin zijn en een coach om toe te voegen.\
+Postcondities: Coach werden toegevoegd aan tool.\
 Actoren: Admin.\
 Gedetailleerde beschrijving van de stappen: Een coach wordt uitgenodigd om zich aan te melden, daarna wordt die coach door de admin toegelaten tot de tool.
 
@@ -41,7 +41,7 @@ De coaches kennen "Yes, Maybe, No" toe aan de studenten.
 
 ## Toekennen van studenten aan projecten
 Korte omschrijving: Studenten worden definitief toegekend aan project.\
-Precondities: Een admin, studenten die nog niet toegekend zijn en projecten die nog studenten te kort hebben. \
+Precondities: Er is een admin, studenten die nog niet toegekend zijn en projecten die nog studenten te kort hebben. \
 Postcondities: Studenten werden toegekend of niet toegekend.\
 Actoren: Een admin. \
 Gedetailleerde beschrijving van de stappen: De admin beslist definitief welke studenten welk project krijgen op basis van de suggesties van de coaches en beschikbare projecten. Conflicten waarbij studenten tot 2 projecten worden gematcht worden opgelost. \
@@ -49,7 +49,7 @@ Alternatieve flow 1: Er is nood aan een specifiek profiel: er wordt teruggegaan 
 
 ## Communicatie naar studenten (toegekend)
 Korte omschrijving: Studenten worden op de hoogte gebracht dat ze zijn toegekend aan een project. \
-Precondities: Een admin en studenten (die is toegekend aan een project) die nog geen mail ontvangen hebben.\
+Precondities: Er is een admin en studenten (die is toegekend aan een project) die nog geen mail ontvangen hebben.\
 Postcondities: Alle studenten die zijn toegekend aan een project moeten een mail ontvangen hebben.\
 Actoren: Een admin. \
 Gedetailleerde beschrijving van de stappen: De studenten worden via mail op de hoogte gebracht dat ze mogen deelnemen aan OSOC. De studenten ondertekenen hun contract. Daarna wordt er praktische info met hen gedeeld en ten slotte worden de studenten voor de eerste keer geïntroduceerd met het project, hun coach en de partner. \
@@ -58,7 +58,7 @@ Alternatieve flow 2: Een student kan op het laatste momentent toch niet meer mee
 
 ## Communicatie naar studenten (niet toegekend)
 Korte omschrijving: Studenten worden op de hoogte gebracht dat ze niet zijn toegekend aan een project. \
-Precondities: Een admin en studenten (die niet is toegekend aan een project) die nog geen mail ontvangen hebben.\
+Precondities: Er is een admin en studenten (die niet is toegekend aan een project) die nog geen mail ontvangen hebben.\
 Postcondities: Alle studenten die niet zijn toegekend aan een project moeten een mail ontvangen hebben.\
 Actoren: Een admin. \
 Gedetailleerde beschrijving van de stappen: De studenten worden via mail op de hoogte gebracht dat ze niet mogen deelnemen aan OSOC. 
