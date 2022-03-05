@@ -29,7 +29,7 @@ Korte omschrijving: Een admin voegt coaches toe aan de tool.\
 Precondities: Een admin en coaches om toe te voegen.\
 Postcondities: Coaches werden toegevoegd aan tool.\
 Actoren: Admin.\
-Gedetailleerde beschrijving van de stappen: Een coach wordt uitgenodigd om zich aan te melden, daarna coach wordt door de admin toegevoegd aan de tool. \
+Gedetailleerde beschrijving van de stappen: Een coach wordt uitgenodigd om zich aan te melden, daarna coach wordt door de admin toegevoegd aan de tool.
 
 ## Aanraden van studenten
 Korte omschrijving: Een admin maken samen met coaches een eerste selectie van de studenten. \
@@ -45,7 +45,7 @@ Precondities: Een admin, studenten die nog niet toegekend zijn en projecten die 
 Postcondities: Studenten werden toegekend of niet toegekend.\
 Actoren: Een admin. \
 Gedetailleerde beschrijving van de stappen: De admin beslist definitief welke studenten welk project krijgen op basis van de suggesties van de coaches en beschikbare projecten. Conflicten waarbij studenten tot 2 projecten worden gematcht worden opgelost. \
-Alternatieve flow 1: Er is nood aan een specifiek profiel: er wordt teruggegaan naar het aanraden van studenten.\
+Alternatieve flow 1: Er is nood aan een specifiek profiel: er wordt teruggegaan naar het aanraden van studenten.
 
 ## Communicatie naar studenten (toegekend)
 Korte omschrijving: Studenten worden op de hoogte gebracht dat ze zijn toegekend aan een project. \
@@ -54,11 +54,11 @@ Postcondities: Alle studenten die zijn toegekend aan een project moeten een mail
 Actoren: Een admin. \
 Gedetailleerde beschrijving van de stappen: De studenten worden via mail op de hoogte gebracht dat ze mogen deelnemen aan OSOC. De studenten ondertekenen hun contract. Daarna wordt er praktische info met hen gedeeld en ten slotte worden de studenten voor de eerste keer geïntroduceerd met het project, hun coach en de partner. \
 Alternatieve flow 1: Een student ondertekent het contract niet, er wordt een herinneringmail gestuurd. \
-Alternatieve flow 2: Een student kan op het laatste momentent toch niet meer meedoen, er wordt teruggegaan naar de use-case "aanraden van studenten".\
+Alternatieve flow 2: Een student kan op het laatste momentent toch niet meer meedoen, er wordt teruggegaan naar de use-case "aanraden van studenten".
 
 ## Communicatie naar studenten (niet toegekend)
 Korte omschrijving: Studenten worden op de hoogte gebracht dat ze niet zijn toegekend aan een project. \
 Precondities: Een admin en studenten (die niet is toegekend aan een project) die nog geen mail ontvangen hebben.\
 Postcondities: Alle studenten die niet zijn toegekend aan een project moeten een mail ontvangen hebben.\
 Actoren: Een admin. \
-Gedetailleerde beschrijving van de stappen: De studenten worden via mail op de hoogte gebracht dat ze niet mogen deelnemen aan OSOC. \
+Gedetailleerde beschrijving van de stappen: De studenten worden via mail op de hoogte gebracht dat ze niet mogen deelnemen aan OSOC. 
