@@ -40,13 +40,7 @@ async def process_tally(data):
             studentform.questions.append(QuestionAnswer(
                 question=question.id, answer=answers))
 
-        elif question.type == "CHECKBOXES":
-            a = Answer(questionid=question.id, text=field["value"])
-            answer = await add_get_answer(a)
-            studentform.questions.append(QuestionAnswer(
-                question=question.id, answer=[answer.id]))
-
-        elif question.type in ["TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_LINK"] and field["value"] is not None:
+        elif question.type in ["CHECKBOXES", "TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_LINK"] and field["value"] is not None:
             a = Answer(questionid=question.id,
                        text=field["value"])
             answer = await add_get_answer(a)
