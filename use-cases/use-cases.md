@@ -29,7 +29,7 @@ Korte omschrijving: Een admin voegt coaches toe aan de tool.\
 Precondities: Een admin en coaches om toe te voegen.\
 Postcondities: Coaches werden toegevoegd aan tool.\
 Actoren: Admin.\
-Gedetailleerde beschrijving van de stappen: Een coach wordt uitgenodigd om zich aan te melden, daarna coach wordt door de admin toegevoegd aan de tool.
+Gedetailleerde beschrijving van de stappen: Een coach wordt uitgenodigd om zich aan te melden, daarna wordt die coach door de admin toegelaten tot de tool.
 
 ## Aanraden van studenten
 Korte omschrijving: Een admin maken samen met coaches een eerste selectie van de studenten. \
