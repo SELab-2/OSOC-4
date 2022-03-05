@@ -6,5 +6,4 @@ from odmantic.bson import ObjectId
 
 class Answer(Model):
     questionid: ObjectId
-    field_id: str
     text: str

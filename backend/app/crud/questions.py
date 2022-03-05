@@ -4,12 +4,19 @@ from ..models.question import Question
 from odmantic.bson import ObjectId
 
 
+async def add_get_question(question: Question) -> Question:
+    q = await get_question(question)
+    if not q:
+        q = await add_question(question)
+    return q
+
+
 async def add_question(question: Question) -> Question:
     await engine.save(question)
     return question
 
 
-async def question_exists(question: Question) -> Question:
+async def get_question(question: Question) -> Question:
     q = await engine.find_one(Question, Question.question == question.question, Question.field_id == question.field_id)
     if q:
         return q
