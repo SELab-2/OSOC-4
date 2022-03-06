@@ -15,7 +15,7 @@ async def process_tally(data):
     """
 
     studentform = StudentForm(
-        email="", phonenumber="", questions=[])
+        birthname="", lastname="", email="", phonenumber="", questions=[])
 
     for field in data["data"]["fields"]:
 
@@ -39,6 +39,14 @@ async def process_tally(data):
                     answers.append(answer.id)
             studentform.questions.append(QuestionAnswer(
                 question=question.id, answer=answers))
+
+        # Extract the birth and last name
+        elif question.type == "INPUT_TEXT" and "name" in question.question:
+            if question.question.lower() == "birth name":
+                studentform.birthname = field["value"]
+
+            if question.question.lower() == "last name":
+                studentform.lastname = field["value"]
 
         elif question.type in ["CHECKBOXES", "TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_LINK", "FILE_UPLOAD"] and field["value"] is not None:
             a = Answer(questionid=question.id,

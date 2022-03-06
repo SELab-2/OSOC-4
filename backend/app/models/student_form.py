@@ -6,6 +6,8 @@ from odmantic import Model
 
 
 class StudentForm(Model):
+    birthname: str
+    lastname: str
     email: str
     phonenumber: str
     questions: List[QuestionAnswer]
