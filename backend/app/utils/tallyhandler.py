@@ -56,6 +56,7 @@ async def process_tally(data):
             studentform.questions.append(QuestionAnswer(
                 question=question.id, answer=[answer.id]))
 
+        # Extract email
         elif question.type == "INPUT_EMAIL":
             studentform.email = field["value"]
 
