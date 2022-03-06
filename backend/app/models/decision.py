@@ -19,8 +19,14 @@ class Decision(Model):
     project: Optional[ObjectId]
     student_form: StudentForm = Reference()
     decided_by: Coach = Reference()
+    confirmed: bool
 
     @validator("decision")
     def check_project_not_null_if_yes(cls, field_value, values, field, config):
-        if field_value == 2 and values["project"] is None:
+        if values["confirmed"] and field_value == DecisionOption.YES and values["project"] is None:
             raise ValueError("Accepted student, but no project found")
+
+    @validator("confirmed")
+    def check_confirmed_by_admin(cls, field_value, values, field, config):
+        if field_value and not values["decided_by"].is_admin:
+            raise ValueError("Only admins can confirm a decision")

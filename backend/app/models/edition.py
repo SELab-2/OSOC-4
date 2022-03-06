@@ -1,9 +1,6 @@
 from odmantic import Model, Field
 from typing import List
-from pydantic import root_validator
 from bson import ObjectId
-from app.database import engine
-from app.models.user import User
 
 
 class Edition(Model):
