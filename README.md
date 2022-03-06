@@ -39,3 +39,9 @@ When only one service must be restarted use one of the following commands:
 When changes are made to the api, the docker image needs to be rebuild and the api container needs to be recreated.
 
 `docker-compose up -d --build`
+
+# Accessing API docs
+
+Use the following URL to access the Swagger API docs. Change the port if needed.
+
+`http://localhost:8000/docs`
