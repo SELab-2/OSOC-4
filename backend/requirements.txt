@@ -2,3 +2,7 @@ fastapi
 uvicorn
 motor
 passlib
+autopep8
+fastapi_jwt_auth
+redis
+odmantic
