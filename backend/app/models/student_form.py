@@ -11,12 +11,21 @@ class StudentForm(Model):
     lastname: str
     email: str
     phonenumber: str
+    nickname: str
     questions: List[QuestionAnswer]
+    roles: List[ObjectId]
+    # edition: Edition = Reference()
+
+    # birthname: str
+    # lastname: str
+    # email: str
+    # phonenumber: str
+    # questions: List[QuestionAnswer]
 
 
 class StudentFormOut(BaseModel):
     id: str
-    birthname: str
-    lastname: str
+    name: str
     email: str
     phonenumber: str
+    nickname: str

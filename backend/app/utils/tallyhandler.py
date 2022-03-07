@@ -1,5 +1,7 @@
 from app.crud.student_forms import add_studentform
+from app.crud.studentroles import add_get_role
 from app.models.question_answers import QuestionAnswer
+from app.models.role import Role
 from app.models.student_form import StudentForm
 from app.models.question import Question
 from app.models.answer import Answer
@@ -15,7 +17,7 @@ async def process_tally(data):
     """
 
     studentform = StudentForm(
-        birthname="", lastname="", email="", phonenumber="", questions=[])
+        birthname="", lastname="", email="", phonenumber="", nickname="", questions=[], roles=[])
 
     for field in data["data"]["fields"]:
 
@@ -24,8 +26,19 @@ async def process_tally(data):
                      field_id=field["key"], type=field["type"])
         question = await add_get_question(q)
 
+        if question.type == "CHECKBOXES" and "options" in field and "role" in field["label"] and "applying" in field["label"]:
+            options = field["options"]
+
+            for option in options:
+                a = Role(role=option["text"])
+
+                role = await add_get_role(a)
+
+                if field["value"] != None and (option["id"] == field["value"] or option["id"] in field["value"]):
+                    studentform.roles.append(role.id)
+
         # handle mulitple choice
-        if question.type in ["CHECKBOXES", "MULTIPLE_CHOICE"] and "options" in field:
+        elif question.type in ["CHECKBOXES", "MULTIPLE_CHOICE"] and "options" in field:
             options = field["options"]
 
             answers = []
@@ -60,6 +73,7 @@ async def process_tally(data):
         elif question.type == "INPUT_EMAIL":
             studentform.email = field["value"]
 
+        # Extract phonenumber
         elif question.type == "INPUT_PHONE_NUMBER":
             studentform.phonenumber = field["value"]
 
