@@ -7,6 +7,8 @@ import ssl
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_SSL_PORT = os.getenv('SMTP_SSL_PORT')
 SENDER_EMAIL = os.getenv('SENDER_EMAIL')

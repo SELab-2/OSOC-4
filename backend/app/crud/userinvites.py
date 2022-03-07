@@ -3,8 +3,14 @@ from app.models.user import User
 import string
 import random
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
 
-invite_expires: int = timedelta(days=1)
+load_dotenv()
+
+INVITE_EXPIRE = os.getenv('INVITE_EXPIRE')
+
+invite_expires: int = timedelta(minutes=int(INVITE_EXPIRE))
 
 
 def create_invite(user: User) -> str:

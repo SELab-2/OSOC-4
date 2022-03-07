@@ -70,17 +70,17 @@ async def set_user_password(user: User, password: str) -> User:
     return new_user
 
 
-async def set_user_valid(user: User, valid: bool) -> User:
-    """set_user_valid this turns on or off the valid field of the user
+async def set_user_active(user: User, active: bool) -> User:
+    """set_user_active this turns on or off the active field of the user
 
     :param user: the user object
     :type user: User
-    :param valid: boolean if user must be valid or not
-    :type valid: bool
-    :return: the user with the new valid field
+    :param active: boolean if user must be active or not
+    :type active: bool
+    :return: the user with the new active field
     :rtype: User
     """
-    user.valid = valid
+    user.active = active
     new_user = await engine.save(user)
     return new_user
 

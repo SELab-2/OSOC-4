@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body
-from app.crud.users import get_user_by_id, set_user_password, set_user_valid
+from app.crud.users import get_user_by_id, set_user_password, set_user_active
 from app.models.user import User, UserCreate, UserInvite, UserOut
 from fastapi.encoders import jsonable_encoder
 from app.utils.response import response, errorresponse
@@ -25,13 +25,13 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
 
     if invite_exists(invitekey):
 
-        user = get_user_by_id(invitekey.split("_")[1])
+        user = await get_user_by_id(invitekey.split("_")[1])
 
         if user.active:
             return errorresponse(None, 400, "account already active")
 
-        user = set_user_password(user, userinvite.password)
-        user = set_user_valid(user, True)
+        user = await set_user_password(user, userinvite.password)
+        user = await set_user_active(user, True)
         delete_invite(invitekey)
 
         return response(None, "User created successfully")
