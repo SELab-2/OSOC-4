@@ -1,4 +1,4 @@
-from app.crud.student_forms import add_studentform
+from app.crud.studentforms import add_studentform
 from app.crud.studentroles import add_get_role
 from app.models.question_answers import QuestionAnswer
 from app.models.role import Role
@@ -26,11 +26,12 @@ async def process_tally(data):
                      field_id=field["key"], type=field["type"])
         question = await add_get_question(q)
 
+        # handle the student roles
         if question.type == "CHECKBOXES" and "options" in field and "role" in field["label"] and "applying" in field["label"]:
             options = field["options"]
 
             for option in options:
-                a = Role(role=option["text"])
+                a = Role(name=option["text"])
 
                 role = await add_get_role(a)
 

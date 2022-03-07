@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import studentforms, users, auth
+from .routers import studentforms, users, auth, studentroles
 from fastapi.openapi.utils import get_openapi
 import inspect
 import re
@@ -10,6 +10,7 @@ app = FastAPI()
 app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(studentforms.router)
+app.include_router(studentroles.router)
 
 
 def custom_openapi():

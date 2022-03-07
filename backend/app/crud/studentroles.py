@@ -1,4 +1,6 @@
 from typing import List, Optional
+
+from odmantic import ObjectId
 from ..database import engine
 from ..models.role import Role
 
@@ -20,3 +22,8 @@ async def get_role(role: Role) -> Optional[Role]:
     if a:
         return a
     return None
+
+
+async def get_all_roles() -> List[Role]:
+    res = await engine.find(Role, sort=Role.name.asc())
+    return res
