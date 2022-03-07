@@ -74,7 +74,7 @@ async def approve_user(user_id: str):
     user = await get_user_by_id(user_id)
 
     if not user.active:
-        return errorresponse(None, 400, "The user is nog activated")
+        return errorresponse(None, 400, "The user is not activated")
     if user.approved:
         return errorresponse(None, 400, "The user is already approved")
 
