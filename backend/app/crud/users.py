@@ -1,4 +1,6 @@
 from typing import List, Optional
+
+from odmantic import ObjectId
 from app.utils.cryptography import get_password_hash
 from app.models.user import User
 from app.database import engine
@@ -29,6 +31,18 @@ async def add_user(user: User) -> User:
     return new_user
 
 
+async def get_user_by_id(id: str) -> Optional[User]:
+    """get_user_by_id this function returns the user with id
+
+    :param id: the id of the user
+    :type id: str
+    :return: The user with the given id or None if the user doesn't exist
+    :rtype: User
+    """
+    user = await engine.find_one(User, User.id == ObjectId(id))
+    return user
+
+
 async def get_user_by_email(email: str) -> Optional[User]:
     """get_user_by_email this function returns the user with email
 
@@ -39,3 +53,33 @@ async def get_user_by_email(email: str) -> Optional[User]:
     """
     user = await engine.find_one(User, User.email == email)
     return user
+
+
+async def set_user_password(user: User, password: str) -> User:
+    """set_user_password this function set the user password hashed
+
+    :param user: the user object
+    :type user: User
+    :param password: the new password
+    :type password: str
+    :return: the user object with the new password
+    :rtype: User
+    """
+    user.password = get_password_hash(password)
+    new_user = await engine.save(user)
+    return new_user
+
+
+async def set_user_valid(user: User, valid: bool) -> User:
+    """set_user_valid this turns on or off the valid field of the user
+
+    :param user: the user object
+    :type user: User
+    :param valid: boolean if user must be valid or not
+    :type valid: bool
+    :return: the user with the new valid field
+    :rtype: User
+    """
+    user.valid = valid
+    new_user = await engine.save(user)
+    return new_user

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter
 from app.models.user import User, UserCreate, UserOut
-from fastapi.encoders import jsonable_encoder
 from app.utils.response import response, errorresponse
-from app.crud.users import add_user, retrieve_users, get_user_by_email
+from app.crud.users import add_user, get_user_by_id, retrieve_users, get_user_by_email
+from app.crud.userinvites import create_invite
+from app.utils.mailsender import send_invite
 
 router = APIRouter(prefix="/users")
 
@@ -35,7 +36,27 @@ async def get_users():
     users = await retrieve_users()
     out_users = []
     for user in users:
-        out_users.append(UserOut.parse_obj(user))
+        out_users.append(UserOut.parse_raw(user.json()))
     if out_users:
         return response(out_users, "Users retrieved successfully")
     return response(out_users, "Empty list returned")
+
+
+@router.post("/{id}/invite")
+async def invite_user(id: str):
+    """invite_user this functions invites a user
+
+    :param id: the user id
+    :type id: str
+    :return: response
+    :rtype: success or error
+    """
+    user = await get_user_by_id(id)
+
+    if user.active:
+        return errorresponse(None, 400, "The user is already active")
+
+    invitekey = create_invite(user)
+
+    send_invite(user.email, invitekey)
+    return response(None, "Invite sent succesfull")
