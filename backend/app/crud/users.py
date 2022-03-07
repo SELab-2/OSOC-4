@@ -83,3 +83,18 @@ async def set_user_valid(user: User, valid: bool) -> User:
     user.valid = valid
     new_user = await engine.save(user)
     return new_user
+
+
+async def set_user_approved(user: User, approved: bool = True) -> User:
+    """set_user_approved this approves a user
+
+    :param user: the user object
+    :type user: User
+    :param approved: value to set to, defaults to True
+    :type approved: bool, optional
+    :return: the new user object
+    :rtype: User
+    """
+    user.approved = approved
+    new_user = await engine.save(user)
+    return new_user

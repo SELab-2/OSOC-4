@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.models.user import User, UserCreate, UserOut
 from app.utils.response import response, errorresponse
-from app.crud.users import add_user, get_user_by_id, retrieve_users, get_user_by_email
+from app.crud.users import add_user, get_user_by_id, retrieve_users, get_user_by_email, set_user_approved
 from app.crud.userinvites import create_invite
 from app.utils.mailsender import send_invite
 
@@ -60,3 +60,23 @@ async def invite_user(id: str):
 
     send_invite(user.email, invitekey)
     return response(None, "Invite sent succesfull")
+
+
+@router.post("/{user_id}/approve")
+async def approve_user(user_id: str):
+    """approve_user this approves the user if the user account is activated
+
+    :param user_id: the id of the user
+    :type user_id: str
+    :return: response
+    :rtype: _type_
+    """
+    user = await get_user_by_id(user_id)
+
+    if not user.active:
+        return errorresponse(None, 400, "The user is nog activated")
+    if user.approved:
+        return errorresponse(None, 400, "The user is already approved")
+
+    newuser = await set_user_approved(user, True)
+    return response(None, "Approved the user successfully")
