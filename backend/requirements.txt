@@ -4,3 +4,4 @@ motor
 passlib
 fastapi_jwt_auth
 redis
+python-dotenv
