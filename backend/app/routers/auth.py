@@ -1,11 +1,12 @@
 from pydantic import BaseModel
 from fastapi_jwt_auth import AuthJWT
 from fastapi import APIRouter, Depends, status
-from ..models.user import UserLogin
-from ..crud.users import get_user_by_username
+from app.models.user import UserLogin
+from app.crud.users import get_user_by_username
 from fastapi.exceptions import HTTPException
 from datetime import timedelta
 from redis import Redis
+import os
 
 
 class Settings(BaseModel):
@@ -23,8 +24,12 @@ class Settings(BaseModel):
 settings = Settings()
 router = APIRouter(prefix="")
 
-redis_conn = Redis(host='192.168.0.102', port=6379, db=0,
-                   decode_responses=True, password="justapassword")
+REDIS_URL = os.environ.get('REDIS_URL')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
+
+redis_conn = Redis(host=REDIS_URL, port=REDIS_PORT, db=0,
+                   decode_responses=True, password=REDIS_PASSWORD)
 
 
 @AuthJWT.load_config
