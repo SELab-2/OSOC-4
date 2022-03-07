@@ -6,3 +6,4 @@ autopep8
 fastapi_jwt_auth
 redis
 odmantic
+python-dotenv

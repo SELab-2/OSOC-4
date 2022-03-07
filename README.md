@@ -40,6 +40,20 @@ When changes are made to the api, the docker image needs to be rebuild and the a
 
 `docker-compose up -d --build`
 
+# Development
+
+While developing you can use your own environment variables by using a .env file in the backend directory of the application.
+
+```
+MONGO_URL=192.168.0.102
+MONGO_PORT=27017
+MONGO_USER=root
+MONGO_PASSWORD=justapassword
+REDIS_URL=192.168.0.102
+REDIS_PORT=6379
+REDIS_PASSWORD=justapassword
+```
+
 # Accessing API docs
 
 Use the following URL to access the Swagger API docs. Change the port if needed.

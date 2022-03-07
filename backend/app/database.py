@@ -1,11 +1,14 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from odmantic import AIOEngine
 import os
+from dotenv import load_dotenv
 
-MONGO_URL = os.environ.get('MONGO_URL')
-MONGO_PORT = os.environ.get('MONGO_PORT')
-MONGO_USER = os.environ.get('MONGO_USER')
-MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')
+load_dotenv()
+
+MONGO_URL = os.getenv('MONGO_URL')
+MONGO_PORT = os.getenv('MONGO_PORT')
+MONGO_USER = os.getenv('MONGO_USER')
+MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
 
 MONGO_DETAILS = f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_URL}:{MONGO_PORT}"
 

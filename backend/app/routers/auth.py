@@ -7,6 +7,7 @@ from fastapi.exceptions import HTTPException
 from datetime import timedelta
 from redis import Redis
 import os
+from dotenv import load_dotenv
 
 
 class Settings(BaseModel):
@@ -23,10 +24,11 @@ class Settings(BaseModel):
 
 settings = Settings()
 router = APIRouter(prefix="")
+load_dotenv()
 
-REDIS_URL = os.environ.get('REDIS_URL')
-REDIS_PORT = os.environ.get('REDIS_PORT')
-REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
+REDIS_URL = os.getenv('REDIS_URL')
+REDIS_PORT = os.getenv('REDIS_PORT')
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 
 redis_conn = Redis(host=REDIS_URL, port=REDIS_PORT, db=0,
                    decode_responses=True, password=REDIS_PASSWORD)
