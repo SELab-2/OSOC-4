@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Body
-from ..models.user import User, UserCreate, UserOut
+from app.models.user import User, UserCreate, UserOut
 from fastapi.encoders import jsonable_encoder
-from ..utils.response import response, errorresponse
-from ..crud.users import add_user, retrieve_users, get_user_by_email
+from app.utils.response import response, errorresponse
+from app.crud.users import add_user, retrieve_users, get_user_by_email
 
 router = APIRouter(prefix="/users")
 
