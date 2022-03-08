@@ -1,13 +1,23 @@
 from fastapi import APIRouter
 from odmantic import ObjectId
 
-from app.crud.base_crud import read_by_key_value
+from app.crud.base_crud import read_by_key_value, read_all
 from app.crud.userinvites import delete_invite, invite_exists
 from app.crud.users import set_user_password, set_user_active
-from app.models.user import UserInvite, User
+from app.models.user import UserInvite, User, UserOut
 from app.utils.response import response, errorresponse
 
 router = APIRouter(prefix="/invite")
+
+
+@router.get("/")
+async def get_invites():
+    users = await read_all(User)
+    u: User
+    users = [UserOut.parse_raw(u.json()) for u in users if u.active and not u.approved]
+    if users:
+        return response(users, "Users retrieved successfully")
+    return response(users, "Empty list returned")
 
 
 @router.post("/{invitekey}")
