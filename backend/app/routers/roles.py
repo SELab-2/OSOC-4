@@ -16,4 +16,4 @@ async def get_roles():
     :rtype: dict
     """
     results = await read_all(Role)
-    list_modeltype_response(results, Role)
+    return list_modeltype_response(results, Role)

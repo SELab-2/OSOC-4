@@ -24,7 +24,7 @@ async def get_users():
     out_users = []
     for user in users:
         out_users.append(UserOut.parse_raw(user.json()))
-    list_modeltype_response(out_users, User)
+    return list_modeltype_response(out_users, User)
 
 
 @router.post("/create", response_description="User data added into the database")

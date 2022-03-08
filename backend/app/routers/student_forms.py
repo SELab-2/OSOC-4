@@ -16,4 +16,4 @@ async def get_student_forms():
     :rtype: dict
     """
     results = await read_all(StudentForm)
-    list_modeltype_response(results, StudentForm)
+    return list_modeltype_response(results, StudentForm)

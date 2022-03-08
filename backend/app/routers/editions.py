@@ -15,4 +15,4 @@ async def get_editions():
     :rtype: dict
     """
     results = await read_all(Edition)
-    list_modeltype_response(results, Edition)
+    return list_modeltype_response(results, Edition)

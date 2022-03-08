@@ -15,4 +15,4 @@ async def get_answers():
     :rtype: dict
     """
     results = await read_all(Answer)
-    list_modeltype_response(results, Answer)
+    return list_modeltype_response(results, Answer)

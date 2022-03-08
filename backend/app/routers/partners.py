@@ -15,7 +15,7 @@ async def get_partners():
     :rtype: dict
     """
     results = await read_all(Partner)
-    list_modeltype_response(results, Partner)
+    return list_modeltype_response(results, Partner)
 
 
 @router.post("/create", response_description="Partner data added into the database")

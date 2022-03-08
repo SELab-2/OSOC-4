@@ -16,4 +16,4 @@ async def get_coaches():
     :rtype: dict
     """
     results = await read_all(Coach)
-    list_modeltype_response(results, Coach)
+    return list_modeltype_response(results, Coach)

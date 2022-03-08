@@ -16,4 +16,4 @@ async def get_participations():
     :rtype: dict
     """
     results = await read_all(Participation)
-    list_modeltype_response(results, Participation)
+    return list_modeltype_response(results, Participation)
