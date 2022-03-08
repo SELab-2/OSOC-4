@@ -17,10 +17,10 @@ client = AsyncIOMotorClient(MONGO_DETAILS)
 
 engine = AIOEngine(motor_client=client, database="selab")
 
-
 REDIS_URL = os.getenv('REDIS_URL')
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 
 redis = Redis(host=REDIS_URL, port=REDIS_PORT, db=0,
               decode_responses=True, password=REDIS_PASSWORD)
+

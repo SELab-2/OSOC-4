@@ -1,5 +1,4 @@
 from typing import List, Optional
-
 from odmantic import ObjectId
 from app.utils.cryptography import get_password_hash
 from app.models.user import User
@@ -19,8 +18,8 @@ async def retrieve_users() -> List[User]:
 async def add_user(user: User) -> User:
     """add_user this adds a new user to the database
 
-    :param user_data: user data to create a new user
-    :type user_data: dict
+    :param user: the new user to be added
+    :type user: User
     :return: returns the new user
     :rtype: User
     """
