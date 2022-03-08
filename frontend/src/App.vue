@@ -5,7 +5,7 @@
   <header>
   </header>
   <main>
-    <div>test</div>
+    <div>OSOC!</div>
   </main>
 </template>
 
