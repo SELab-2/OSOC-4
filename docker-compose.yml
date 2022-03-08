@@ -14,7 +14,14 @@ services:
       REDIS_URL: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: justapassword
-  
+      # SMTP Mail
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_SSL_PORT: 465
+      SENDER_EMAIL: osoc.groep4@gmail.com
+      SENDER_PASSWORD: Justapassword123!
+      # Invite Settings
+      INVITE_EXPIRE: 4320 #in minutes
+
   mongodb_container:
     image: mongo:latest
     container_name: "osoc-mongodb"
@@ -33,5 +40,5 @@ services:
     ports:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
-    volumes: 
+    volumes:
       - ./data/redis:/data

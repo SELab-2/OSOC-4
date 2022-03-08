@@ -4,6 +4,7 @@ motor
 passlib
 autopep8
 fastapi_jwt_auth
+python-dotenv
 redis
 odmantic
 python-dotenv
