@@ -1,9 +1,10 @@
-from app.database import redis
-from app.models.user import User
-import string
-import random
-from datetime import timedelta
 import os
+import random
+import string
+from datetime import timedelta
+
+from app.database import db
+from app.models.user import User
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,7 +32,7 @@ def create_invite(user: User) -> str:
         invitekey = random_string(20) + "_" + str(user.id)
 
     try:
-        redis.setex(invitekey, invite_expires, "true")
+        db.redis.setex(invitekey, invite_expires, "true")
     except:
         return None
     return invitekey
@@ -45,7 +46,7 @@ def invite_exists(invitekey: str) -> str:
     :return: None if the key is invalid
     :rtype: str or None
     """
-    return redis.get(invitekey)
+    return db.redis.get(invitekey)
 
 
 def delete_invite(invitekey: str):
@@ -55,4 +56,4 @@ def delete_invite(invitekey: str):
     :type invitekey: str
     """
     if invite_exists(invitekey):
-        redis.delete(invitekey)
+        db.redis.delete(invitekey)
