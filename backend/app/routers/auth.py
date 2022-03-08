@@ -2,12 +2,10 @@ from pydantic import BaseModel
 from fastapi_jwt_auth import AuthJWT
 from fastapi import APIRouter, Depends, status
 from app.models.user import UserLogin
-from app.crud.users import get_user_by_username
+from app.crud.users import get_user_by_email
 from fastapi.exceptions import HTTPException
 from datetime import timedelta
-from redis import Redis
-import os
-from dotenv import load_dotenv
+from app.database import redis
 
 
 class Settings(BaseModel):
@@ -24,14 +22,6 @@ class Settings(BaseModel):
 
 settings = Settings()
 router = APIRouter(prefix="")
-load_dotenv()
-
-REDIS_URL = os.getenv('REDIS_URL')
-REDIS_PORT = os.getenv('REDIS_PORT')
-REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
-
-redis_conn = Redis(host=REDIS_URL, port=REDIS_PORT, db=0,
-                   decode_responses=True, password=REDIS_PASSWORD)
 
 
 @AuthJWT.load_config
@@ -54,7 +44,7 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
     :rtype: boolean
     """
     jti = decrypted_token['jti']
-    entry = redis_conn.get(jti)
+    entry = redis.get(jti)
     return entry and entry == 'true'
 
 
@@ -70,10 +60,10 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :return: access and refresh token
     :rtype: dict
     """
-    u = await get_user_by_username(user.username)
+    u = await get_user_by_email(user.email)
     if u:
-        access_token = Authorize.create_access_token(subject=user.username)
-        refresh_token = Authorize.create_refresh_token(subject=user.username)
+        access_token = Authorize.create_access_token(subject=user.email)
+        refresh_token = Authorize.create_refresh_token(subject=user.email)
 
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
@@ -81,7 +71,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
         return {"access_token": access_token, "refresh_token": refresh_token}
 
     raise HTTPException(status_code='401',
-                        detail="Invalid username or password")
+                        detail="Invalid email or password")
 
 
 @router.post('/refresh')
@@ -122,7 +112,7 @@ def access_revoke(Authorize: AuthJWT = Depends()):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
     jti = Authorize.get_raw_jwt()['jti']
-    redis_conn.setex(jti, settings.access_expires, 'true')
+    redis.setex(jti, settings.access_expires, 'true')
     return {"detail": "Access token has been revoked"}
 
 
@@ -142,7 +132,7 @@ def refresh_revoke(Authorize: AuthJWT = Depends()):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     jti = Authorize.get_raw_jwt()['jti']
-    redis_conn.setex(jti, settings.refresh_expires, 'true')
+    redis.setex(jti, settings.refresh_expires, 'true')
     return {"detail": "Refresh token has been revoked"}
 
 
