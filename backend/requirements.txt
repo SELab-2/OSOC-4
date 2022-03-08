@@ -8,3 +8,8 @@ python-dotenv
 redis
 odmantic
 python-dotenv
+pytest
+requests
+asgi_lifespan
+httpx
+pytest-asyncio
