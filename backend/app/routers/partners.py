@@ -1,9 +1,23 @@
 from fastapi import APIRouter, Body
+from odmantic import ObjectId
+
+from app.crud.base_crud import read_all, update, read_by_key_value
 from app.models.partner import Partner
-from fastapi.encoders import jsonable_encoder
-from app.utils.response import response
-from app.crud.partners import add_partner, retrieve_partners
+from app.utils.response import response, errorresponse
 router = APIRouter(prefix="/partners")
+
+
+@router.get("/", response_description="Partners retrieved")
+async def get_partners():
+    """get_partners get all the partners from the database
+
+    :return: list of partners
+    :rtype: dict
+    """
+    partners = await read_all(Partner)
+    if partners:
+        return response(partners, "Partners retrieved successfully")
+    return response(partners, "Empty list returned")
 
 
 @router.post("/create", response_description="Partner data added into the database")
@@ -15,22 +29,17 @@ async def add_partner_data(partner: Partner = Body(...)):
     :return: data of new created partner
     :rtype: dict
     """
+    # check if a partner with the same name is already present
+    if await read_by_key_value(Partner, Partner.name, partner.name):
+        return errorresponse("Name already in use", 409, "")
 
-    # check if partner already present
-
-    new_partner = await add_partner(Partner.parse_obj(partner))
+    new_partner = await update(Partner.parse_obj(partner))
     return response(new_partner, "Partner added successfully.")
 
 
-@router.get("/", response_description="Partners retrieved")
-async def get_partners():
-    """get_partners get all the partners from the database
-
-    :return: list of partners
-    :rtype: dict
-    """
-    partners = await retrieve_partners()
-    if partners:
-        return response(partners, "Partners retrieved successfully")
-    return response(partners, "Empty list returned")
-
+@router.get("/{id}")
+async def get_partner_by_id(id):
+    partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
+    if not partner:
+        return errorresponse(None, 400, "Partner not found")
+    return response(partner, "Returned the partner successfully")

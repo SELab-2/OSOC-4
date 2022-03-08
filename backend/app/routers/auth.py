@@ -1,12 +1,11 @@
-from datetime import timedelta
-
-from app.crud.users import get_user_by_email
 from app.database import db
-from app.models.user import UserLogin
-from fastapi import APIRouter, Depends, status
-from fastapi.exceptions import HTTPException
-from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
+from fastapi_jwt_auth import AuthJWT
+from fastapi import APIRouter, Depends, status
+from app.models.user import UserLogin, User
+from fastapi.exceptions import HTTPException
+from datetime import timedelta
+from app.crud.base_crud import read_by_key_value
 
 
 class Settings(BaseModel):
@@ -61,7 +60,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :return: access and refresh token
     :rtype: dict
     """
-    u = await get_user_by_email(user.email)
+    u = await read_by_key_value(User, User.email, user.email)
     if u:
         access_token = Authorize.create_access_token(subject=user.email)
         refresh_token = Authorize.create_refresh_token(subject=user.email)

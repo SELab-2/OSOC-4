@@ -1,4 +1,4 @@
-from app.routers import partners
+from app.routers import partners, editions
 import inspect
 import re
 
@@ -26,6 +26,7 @@ app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(user_invites.router)
 app.include_router(partners.router)
+app.include_router(editions.router)
 
 
 def custom_openapi():

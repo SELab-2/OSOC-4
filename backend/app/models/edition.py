@@ -1,10 +1,10 @@
-from odmantic import Model, Field
+from odmantic import Model
 from typing import List
 from bson import ObjectId
 
 
 class Edition(Model):
-    form_id: str = Field(primary_field=True)
+    form_id: str
     name: str
     year: int
     description: str

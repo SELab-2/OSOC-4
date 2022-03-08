@@ -1,10 +1,8 @@
-from app.crud.student_forms import add_studentform
+from app.crud.base_crud import update, read_by_key_value
 from app.models.question_answer import QuestionAnswer
 from app.models.student_form import StudentForm
-from ..models.question import Question
-from ..models.answer import Answer
-from ..crud.questions import question_exists, add_question
-from ..crud.answers import answer_exists, add_answer
+from app.models.question import Question
+from app.models.answer import Answer
 
 
 async def process_tally(data):
@@ -16,7 +14,7 @@ async def process_tally(data):
     # [to implement] get edition by form id
     # form_id = res["data"]["formId"]
 
-    studentform = StudentForm(
+    studentform: StudentForm = StudentForm(
         name="", email="", phonenumber="", nickname="", questions=[])
 
     for field in data["data"]["fields"]:
@@ -24,25 +22,25 @@ async def process_tally(data):
             studentform.email = field["value"]
         else:
             # check if question already in database
-            q = Question(question=field["label"],
-                         field_id=field["key"], type=field["type"])
-            question = await question_exists(q)
+            q: Question = Question(question=field["label"],
+                                   field_id=field["key"], type=field["type"])
+            question = await read_by_key_value(Question, Question.id, q.id)
 
             if not question:
-                question = await add_question(q)
+                question = await update(q)
 
             if question.type == "MULTIPLE_CHOICE":
                 options = field["options"]
                 for option in options:
-                    a = Answer(questionid=question.id,
-                               field_id=option["id"], text=option["text"])
+                    a: Answer = Answer(questionid=question.id,
+                                       field_id=option["id"], text=option["text"])
 
-                    answer = await answer_exists(a)
+                    answer = await read_by_key_value(Answer, Answer.id, a.id)
                     if not a:
-                        answer = await add_answer(a)
+                        answer = await update(a)
 
                     if option["id"] == field["value"]:
                         studentform.questions.append(QuestionAnswer(
                             question=question.id, answer=answer.id))
 
-            await add_studentform(studentform)
+            await update(studentform)

@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
+from app.crud.base_crud import read_by_key_value
 from app.crud.userinvites import delete_invite, invite_exists
-from app.crud.users import get_user_by_id, set_user_password, set_user_active
-from app.models.user import UserInvite
+from app.crud.users import set_user_password, set_user_active
+from app.models.user import UserInvite, User
 from app.utils.response import response, errorresponse
 
 router = APIRouter(prefix="/invite")
@@ -25,7 +26,7 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
 
     if invite_exists(invitekey):
 
-        user = await get_user_by_id(invitekey.split("_")[1])
+        user = await read_by_key_value(User, User.id, invitekey.split("_")[1])
 
         if user.active:
             return errorresponse(None, 400, "account already active")
