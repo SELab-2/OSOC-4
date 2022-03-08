@@ -8,4 +8,4 @@ jobs:
       - name: Build the stack
         run: docker-compose -f test-docker-compose.yml up -d
       - name: Run tests
-        run: docker-compose run test-osoc-backend pytest
+        run: docker-compose -f test-docker-compose.ym run test-osoc-backend pytest
