@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from odmantic import ObjectId
 
 from app.crud.base_crud import read_by_key_value
 from app.crud.userinvites import delete_invite, invite_exists
@@ -26,7 +27,7 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
 
     if invite_exists(invitekey):
 
-        user = await read_by_key_value(User, User.id, invitekey.split("_")[1])
+        user = await read_by_key_value(User, User.id, ObjectId(invitekey.split("_")[1]))
 
         if user.active:
             return errorresponse(None, 400, "account already active")
