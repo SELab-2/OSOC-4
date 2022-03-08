@@ -8,11 +8,11 @@ services:
       dockerfile: TestDockerfile
     environment:
       MONGO_URL: test-osoc-mongodb
-      MONGO_PORT: 27018
+      MONGO_PORT: 27017
       MONGO_USER: root
       MONGO_PASSWORD: justapassword
       REDIS_URL: test-osoc-redis
-      REDIS_PORT: 6380
+      REDIS_PORT: 6379
       REDIS_PASSWORD: justapassword
       # SMTP Mail
       SMTP_SERVER: smtp.gmail.com
@@ -28,8 +28,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: justapassword
-    ports:
-      - 27018:27017
     volumes:
       - ./data/mongo:/data/db
 
@@ -37,8 +35,6 @@ services:
     image: redis:latest
     container_name: test-osoc-redis
     restart: always
-    ports:
-      - '6380:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
     volumes:
       - ./data/redis:/data
