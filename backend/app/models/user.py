@@ -1,5 +1,5 @@
-from odmantic import Model, ObjectId
-from pydantic import BaseModel, Field
+from odmantic import Model
+from pydantic import BaseModel
 from enum import Enum
 
 
