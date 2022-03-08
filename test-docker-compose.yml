@@ -7,11 +7,11 @@ services:
       context: ./backend
       dockerfile: TestDockerfile
     environment:
-      MONGO_URL: mongodb_container
+      MONGO_URL: test-osoc-mongodb
       MONGO_PORT: 27018
       MONGO_USER: root
       MONGO_PASSWORD: justapassword
-      REDIS_URL: redis
+      REDIS_URL: test-osoc-redis
       REDIS_PORT: 6380
       REDIS_PASSWORD: justapassword
       # SMTP Mail
@@ -22,7 +22,7 @@ services:
       # Invite Settings
       INVITE_EXPIRE: 4320 #in minutes
 
-  test-mongodb_container:
+  test-osoc-mongodb:
     image: mongo:latest
     container_name: "test-osoc-mongodb"
     environment:
@@ -33,7 +33,7 @@ services:
     volumes:
       - ./data/mongo:/data/db
 
-  test-redis:
+  test-osoc-redis:
     image: redis:latest
     container_name: test-osoc-redis
     restart: always
