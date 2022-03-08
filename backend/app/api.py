@@ -34,7 +34,7 @@ app.include_router(questions.router)
 app.include_router(roles.router)
 app.include_router(student_forms.router)
 app.include_router(suggestions.router)
-app.include_router(tally.router)
+# app.include_router(tally.router)
 app.include_router(user_invites.router)
 app.include_router(users.router)
 
