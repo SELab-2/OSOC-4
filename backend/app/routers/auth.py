@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from fastapi_jwt_auth import AuthJWT
 from fastapi import APIRouter, Depends, status
 from app.models.user import UserLogin
-from app.crud.users import get_user_by_username
+from app.crud.users import get_user_by_email
 from fastapi.exceptions import HTTPException
 from datetime import timedelta
 from redis import Redis
@@ -70,10 +70,10 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :return: access and refresh token
     :rtype: dict
     """
-    u = await get_user_by_username(user.username)
+    u = await get_user_by_email(user.email)
     if u:
-        access_token = Authorize.create_access_token(subject=user.username)
-        refresh_token = Authorize.create_refresh_token(subject=user.username)
+        access_token = Authorize.create_access_token(subject=user.email)
+        refresh_token = Authorize.create_refresh_token(subject=user.email)
 
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
@@ -81,7 +81,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
         return {"access_token": access_token, "refresh_token": refresh_token}
 
     raise HTTPException(status_code='401',
-                        detail="Invalid username or password")
+                        detail="Invalid email or password")
 
 
 @router.post('/refresh')
