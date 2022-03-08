@@ -45,13 +45,25 @@ When changes are made to the api, the docker image needs to be rebuild and the a
 While developing you can use your own environment variables by using a .env file in the backend directory of the application.
 
 ```
+# Mongo
 MONGO_URL=192.168.0.102
 MONGO_PORT=27017
 MONGO_USER=root
 MONGO_PASSWORD=justapassword
+
+# Redis
 REDIS_URL=192.168.0.102
 REDIS_PORT=6379
 REDIS_PASSWORD=justapassword
+
+# SMTP Mail
+SMTP_SERVER=smtp.gmail.com
+SMTP_SSL_PORT=465
+SENDER_EMAIL=osoc.groep4@gmail.com
+SENDER_PASSWORD=Justapassword123!
+
+# Invite Settings
+INVITE_EXPIRE=4320 # in minutes
 ```
 
 # Accessing API docs
