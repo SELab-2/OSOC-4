@@ -1,15 +1,30 @@
-from fastapi import FastAPI
-from .routers import user_invites, users, auth
-from fastapi.openapi.utils import get_openapi
 import inspect
 import re
+
+from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 
+from .database import connect_db, disconnect_db
+from .routers import auth, user_invites, users
+
 app = FastAPI()
+
+
+@app.on_event("startup")
+async def startup():
+    connect_db()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    disconnect_db()
+
 
 app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(user_invites.router)
+
 
 def custom_openapi():
     if app.openapi_schema:

@@ -1,8 +1,9 @@
 from typing import List, Optional
-from odmantic import ObjectId
-from app.utils.cryptography import get_password_hash
+
+from app.database import db
 from app.models.user import User
-from app.database import engine
+from app.utils.cryptography import get_password_hash
+from odmantic import ObjectId
 
 
 async def retrieve_users() -> List[User]:
@@ -11,7 +12,7 @@ async def retrieve_users() -> List[User]:
     :return: list of all users in the database
     :rtype: List[User]
     """
-    res = await engine.find(User)
+    res = await db.engine.find(User)
     return res
 
 
@@ -26,8 +27,9 @@ async def add_user(user: User) -> User:
     # replace the plain password with the hashed one
     user.password = get_password_hash(user.password)
 
-    new_user = await engine.save(user)
+    new_user = await db.engine.save(user)
     return new_user
+
 
 async def get_user_by_id(id: str) -> Optional[User]:
     """get_user_by_id this function returns the user with id
@@ -37,7 +39,7 @@ async def get_user_by_id(id: str) -> Optional[User]:
     :return: The user with the given id or None if the user doesn't exist
     :rtype: User
     """
-    user = await engine.find_one(User, User.id == ObjectId(id))
+    user = await db.engine.find_one(User, User.id == ObjectId(id))
     return user
 
 
@@ -49,7 +51,7 @@ async def get_user_by_email(email: str) -> Optional[User]:
     :return: The user with the given email or None if the user doesn't exist
     :rtype: User
     """
-    user = await engine.find_one(User, User.email == email)
+    user = await db.engine.find_one(User, User.email == email)
     return user
 
 
@@ -64,7 +66,7 @@ async def set_user_password(user: User, password: str) -> User:
     :rtype: User
     """
     user.password = get_password_hash(password)
-    new_user = await engine.save(user)
+    new_user = await db.engine.save(user)
     return new_user
 
 
@@ -79,7 +81,7 @@ async def set_user_active(user: User, active: bool) -> User:
     :rtype: User
     """
     user.active = active
-    new_user = await engine.save(user)
+    new_user = await db.engine.save(user)
     return new_user
 
 
@@ -94,5 +96,5 @@ async def set_user_approved(user: User, approved: bool = True) -> User:
     :rtype: User
     """
     user.approved = approved
-    new_user = await engine.save(user)
+    new_user = await db.engine.save(user)
     return new_user

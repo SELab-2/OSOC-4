@@ -1,11 +1,12 @@
-from pydantic import BaseModel
-from fastapi_jwt_auth import AuthJWT
-from fastapi import APIRouter, Depends, status
-from app.models.user import UserLogin
-from app.crud.users import get_user_by_email
-from fastapi.exceptions import HTTPException
 from datetime import timedelta
-from app.database import redis
+
+from app.crud.users import get_user_by_email
+from app.database import db
+from app.models.user import UserLogin
+from fastapi import APIRouter, Depends, status
+from fastapi.exceptions import HTTPException
+from fastapi_jwt_auth import AuthJWT
+from pydantic import BaseModel
 
 
 class Settings(BaseModel):
@@ -44,7 +45,7 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
     :rtype: boolean
     """
     jti = decrypted_token['jti']
-    entry = redis.get(jti)
+    entry = db.redis.get(jti)
     return entry and entry == 'true'
 
 
@@ -112,7 +113,7 @@ def access_revoke(Authorize: AuthJWT = Depends()):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
     jti = Authorize.get_raw_jwt()['jti']
-    redis.setex(jti, settings.access_expires, 'true')
+    db.redis.setex(jti, settings.access_expires, 'true')
     return {"detail": "Access token has been revoked"}
 
 
@@ -132,7 +133,7 @@ def refresh_revoke(Authorize: AuthJWT = Depends()):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     jti = Authorize.get_raw_jwt()['jti']
-    redis.setex(jti, settings.refresh_expires, 'true')
+    db.redis.setex(jti, settings.refresh_expires, 'true')
     return {"detail": "Refresh token has been revoked"}
 
 
