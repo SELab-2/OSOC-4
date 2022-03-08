@@ -5,6 +5,7 @@ from app.crud.users import add_user, get_user_by_id, retrieve_users, get_user_by
 from app.crud.userinvites import create_invite
 from app.utils.mailsender import send_invite
 
+
 router = APIRouter(prefix="/users")
 
 

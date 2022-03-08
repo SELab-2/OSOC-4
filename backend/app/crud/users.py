@@ -29,7 +29,6 @@ async def add_user(user: User) -> User:
     new_user = await engine.save(user)
     return new_user
 
-
 async def get_user_by_id(id: str) -> Optional[User]:
     """get_user_by_id this function returns the user with id
 
