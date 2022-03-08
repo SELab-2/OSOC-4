@@ -1,3 +1,4 @@
+from app.routers import partners
 import inspect
 import re
 
@@ -24,6 +25,7 @@ async def shutdown():
 app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(user_invites.router)
+app.include_router(partners.router)
 
 
 def custom_openapi():
