@@ -6,3 +6,4 @@ class Coach(Model):
     username: str
     password: str
     is_admin: bool
+    is_approved: bool

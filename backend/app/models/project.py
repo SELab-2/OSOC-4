@@ -5,7 +5,7 @@ from app.models.edition import Edition
 
 
 class RequiredRole(EmbeddedModel):
-    role: ObjectId
+    role: ObjectId  # points to role from role.py
     number: int = Field(gt=0)
 
 

@@ -1,15 +1,29 @@
-from typing import List, Optional
-from ..database import engine
-from ..models.answer import Answer
+from typing import Optional
+from app.database import engine
+from app.models.answer import Answer
 
 
 async def add_answer(answer: Answer) -> Answer:
+    """add_answer this adds a new answer to the database
+
+    :param answer: the new answer to add
+    :type answer: Answer
+    :return: returns the new user
+    :rtype: User
+    """
     a = await engine.save(answer)
     return a
 
 
 async def answer_exists(answer: Answer) -> Optional[Answer]:
-    a = await engine.find_one(Answer, Answer.field_id == answer.field_id, Answer.questionid == answer.questionid, Answer.text == answer.text)
+    """answer_exists this checks whether an answer exists
+
+    :param answer: the answer to check
+    :type answer: Answer
+    :return: returns the answer if it exists, else None
+    :rtype: Optional[Answer]
+    """
+    a = await engine.find_one(Answer, Answer.field_id == answer.field_id, Answer.question_id == answer.question_id, Answer.text == answer.text)
     if a:
         return a
     return None

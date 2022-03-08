@@ -11,5 +11,5 @@ class StudentForm(Model):
     phonenumber: str
     nickname: str
     questions: List[QuestionAnswer]
-    roles: List[ObjectId]
+    roles: List[ObjectId]  # role from role.py
     edition: Edition = Reference()
