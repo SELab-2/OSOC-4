@@ -3,21 +3,19 @@ from odmantic import ObjectId
 
 from app.crud.base_crud import read_all, update, read_by_key_value
 from app.models.partner import Partner
-from app.utils.response import response, errorresponse
+from app.utils.response import response, errorresponse, list_modeltype_response
 router = APIRouter(prefix="/partners")
 
 
 @router.get("/", response_description="Partners retrieved")
 async def get_partners():
-    """get_partners get all the partners from the database
+    """get_partners get all the Partner instances from the database
 
     :return: list of partners
     :rtype: dict
     """
-    partners = await read_all(Partner)
-    if partners:
-        return response(partners, "Partners retrieved successfully")
-    return response(partners, "Empty list returned")
+    results = await read_all(Partner)
+    list_modeltype_response(results, Partner)
 
 
 @router.post("/create", response_description="Partner data added into the database")

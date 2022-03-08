@@ -4,13 +4,27 @@ from fastapi import APIRouter
 from app.crud.base_crud import read_by_key_value, update, read_all
 from app.models.user import User, UserCreate, UserOut
 from app.utils.cryptography import get_password_hash
-from app.utils.response import response, errorresponse
+from app.utils.response import response, errorresponse, list_modeltype_response
 from app.crud.users import set_user_approved
 from app.crud.userinvites import create_invite
 from app.utils.mailsender import send_invite
 
 
 router = APIRouter(prefix="/users")
+
+
+@router.get("/", response_description="Users retrieved")
+async def get_users():
+    """get_users get all the users from the database
+
+    :return: list of users
+    :rtype: dict
+    """
+    users = await read_all(User)
+    out_users = []
+    for user in users:
+        out_users.append(UserOut.parse_raw(user.json()))
+    list_modeltype_response(out_users, User)
 
 
 @router.post("/create", response_description="User data added into the database")
@@ -32,22 +46,6 @@ async def add_user_data(user: UserCreate):
 
     new_user = await update(User.parse_obj(user))
     return response(new_user, "User added successfully.")
-
-
-@router.get("/", response_description="Users retrieved")
-async def get_users():
-    """get_users get all the users from the database
-
-    :return: list of users
-    :rtype: dict
-    """
-    users = await read_all(User)
-    out_users = []
-    for user in users:
-        out_users.append(UserOut.parse_raw(user.json()))
-    if out_users:
-        return response(out_users, "Users retrieved successfully")
-    return response(out_users, "Empty list returned")
 
 
 @router.post("/{id}/invite")

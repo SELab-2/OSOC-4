@@ -2,19 +2,17 @@ from fastapi import APIRouter
 
 from app.crud.base_crud import read_all
 from app.models.edition import Edition
-from app.utils.response import response
+from app.utils.response import list_modeltype_response
+
 router = APIRouter(prefix="/editions")
 
 
 @router.get("/", response_description="Editions retrieved")
 async def get_editions():
-    """get_editions get all the editions from the database
+    """get_editions get all the Edition instances from the database
 
     :return: list of editions
     :rtype: dict
     """
-    editions = await read_all(Edition)
-    if editions:
-        return response(editions, "Partners retrieved successfully")
-    return response(editions, "Empty list returned")
-
+    results = await read_all(Edition)
+    list_modeltype_response(results, Edition)
