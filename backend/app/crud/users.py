@@ -17,8 +17,8 @@ async def retrieve_users() -> List[User]:
 async def add_user(user: User) -> User:
     """add_user this adds a new user to the database
 
-    :param user_data: user data to create a new user
-    :type user_data: dict
+    :param user: the new user to be added
+    :type user: User
     :return: returns the new user
     :rtype: User
     """
@@ -27,6 +27,7 @@ async def add_user(user: User) -> User:
 
     new_user = await engine.save(user)
     return new_user
+
 
 
 async def get_user_by_email(email: str) -> Optional[User]:
@@ -39,3 +40,4 @@ async def get_user_by_email(email: str) -> Optional[User]:
     """
     user = await engine.find_one(User, User.email == email)
     return user
+
