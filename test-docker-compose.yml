@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  test-osoc-backend:
+    container_name: "test-osoc-backend"
+    build:
+      context: ./backend
+      dockerfile: TestDockerfile
+    environment:
+      MONGO_URL: mongodb_container
+      MONGO_PORT: 27018
+      MONGO_USER: root
+      MONGO_PASSWORD: justapassword
+      REDIS_URL: redis
+      REDIS_PORT: 6380
+      REDIS_PASSWORD: justapassword
+      # SMTP Mail
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_SSL_PORT: 465
+      SENDER_EMAIL: osoc.groep4@gmail.com
+      SENDER_PASSWORD: Justapassword123!
+      # Invite Settings
+      INVITE_EXPIRE: 4320 #in minutes
+
+  test-mongodb_container:
+    image: mongo:latest
+    container_name: "test-osoc-mongodb"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: justapassword
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data/mongo:/data/db
+
+  test-redis:
+    image: redis:latest
+    container_name: test-osoc-redis
+    restart: always
+    ports:
+      - '6380:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
+    volumes:
+      - ./data/redis:/data
