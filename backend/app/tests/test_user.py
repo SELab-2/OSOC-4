@@ -13,4 +13,4 @@ async def client():
 @pytest.mark.asyncio
 async def test_read_main(client):
     response = await client.get("/users/")
-    assert response.status_code == 200
+    assert response.status_code == 403
