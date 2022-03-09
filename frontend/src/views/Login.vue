@@ -1,4 +1,4 @@
-<script setup lang="ts" xmlns:name="http://www.w3.org/1999/xhtml">
+<script setup lang="ts">
 import {ref} from "vue";
 
 let email = ref("");

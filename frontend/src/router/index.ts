@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/projects',
         name: 'Projects',
-        component: () => import('../views/Projects.vue')
+        component: () => import('../views/ManageProjects.vue')
     },
     {
         path: '/select-users',
