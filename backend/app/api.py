@@ -1,5 +1,5 @@
 
-from app.routers import answers, auth, coaches, editions, participation, partners, projects, question_answers, questions, roles, student_forms, suggestions, tally, user_invites, users
+from app.routers import answers, auth, editions, participation, partners, projects, question_answers, questions, roles, student_forms, suggestions, tally, user_invites, users
 import inspect
 import re
 
@@ -24,7 +24,6 @@ async def shutdown():
 
 app.include_router(answers.router)
 app.include_router(auth.router)
-app.include_router(coaches.router)
 app.include_router(editions.router)
 app.include_router(participation.router)
 app.include_router(partners.router)

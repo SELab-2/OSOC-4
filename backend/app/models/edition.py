@@ -8,4 +8,4 @@ class Edition(Model):
     name: str
     year: int
     description: str
-    coach_ids: List[ObjectId]
+    user_ids: List[ObjectId]
