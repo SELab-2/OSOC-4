@@ -18,7 +18,10 @@ async def read_all(model: Type[ModelType], key=None, value=None) -> List[ModelTy
     :return: list with all data-entries of type model
     :rtype: List[ModelType]
     """
-    res = await db.engine.find(model)
+    if key is not None and value is not None:
+        res = await db.engine.find(model, key, value)
+    else:
+        res = await db.engine.find(model)
     return res
 
 
