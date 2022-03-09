@@ -1,3 +1,5 @@
+
+from app.routers import answers, auth, editions, participation, partners, projects, question_answers, questions, roles, student_forms, suggestions, tally, user_invites, users
 import inspect
 import re
 
@@ -5,8 +7,7 @@ from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 
-from .database import connect_db, disconnect_db
-from .routers import auth, user_invites, users
+from app.database import connect_db, disconnect_db
 
 app = FastAPI()
 
@@ -21,9 +22,20 @@ async def shutdown():
     disconnect_db()
 
 
-app.include_router(users.router)
+app.include_router(answers.router)
 app.include_router(auth.router)
+app.include_router(editions.router)
+app.include_router(participation.router)
+app.include_router(partners.router)
+app.include_router(projects.router)
+app.include_router(question_answers.router)
+app.include_router(questions.router)
+app.include_router(roles.router)
+app.include_router(student_forms.router)
+app.include_router(suggestions.router)
+# app.include_router(tally.router)
 app.include_router(user_invites.router)
+app.include_router(users.router)
 
 
 def custom_openapi():

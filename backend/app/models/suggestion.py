@@ -1,8 +1,6 @@
 from enum import Enum
-from app.models.student_form import StudentForm
-from app.models.coach import Coach
 from typing import Optional
-from odmantic import Model, Reference
+from odmantic import Model
 from bson import ObjectId
 from pydantic import validator
 
@@ -16,8 +14,8 @@ class SuggestionOption(int, Enum):
 class Suggestion(Model):
     suggestion: SuggestionOption
     reason: str
-    student_form: StudentForm = Reference()
-    suggested_by: Coach = Reference()
+    student_form: ObjectId
+    suggested_by: ObjectId
     project: Optional[ObjectId]
     role: Optional[ObjectId]
     confirmed: bool

@@ -1,12 +1,30 @@
+from bson import ObjectId
 from fastapi import APIRouter
+
+from app.crud.base_crud import read_by_key_value, update, read_all
 from app.models.user import User, UserCreate, UserOut
-from app.utils.response import response, errorresponse
-from app.crud.users import add_user, get_user_by_id, retrieve_users, get_user_by_email, set_user_approved
+from app.utils.cryptography import get_password_hash
+from app.utils.response import response, errorresponse, list_modeltype_response
+from app.crud.users import set_user_approved
 from app.crud.userinvites import create_invite
 from app.utils.mailsender import send_invite
 
 
 router = APIRouter(prefix="/users")
+
+
+@router.get("/", response_description="Users retrieved")
+async def get_users():
+    """get_users get all the users from the database
+
+    :return: list of users
+    :rtype: dict
+    """
+    users = await read_all(User)
+    out_users = []
+    for user in users:
+        out_users.append(UserOut.parse_raw(user.json()))
+    return list_modeltype_response(out_users, User)
 
 
 @router.post("/create", response_description="User data added into the database")
@@ -20,27 +38,14 @@ async def add_user_data(user: UserCreate):
     """
 
     # check if email already used
-    if await get_user_by_email(user.email):
+    if await read_by_key_value(User, User.email, user.email):
         return errorresponse("Email already used", 409, "")
 
-    new_user = await add_user(User.parse_obj(user))
+    # replace the plain password with the hashed one
+    user.password = get_password_hash(user.password)
+
+    new_user = await update(User.parse_obj(user))
     return response(new_user, "User added successfully.")
-
-
-@router.get("/", response_description="Users retrieved")
-async def get_users():
-    """get_users get all the users from the database
-
-    :return: list of users
-    :rtype: dict
-    """
-    users = await retrieve_users()
-    out_users = []
-    for user in users:
-        out_users.append(UserOut.parse_raw(user.json()))
-    if out_users:
-        return response(out_users, "Users retrieved successfully")
-    return response(out_users, "Empty list returned")
 
 
 @router.post("/{id}/invite")
@@ -52,7 +57,7 @@ async def invite_user(id: str):
     :return: response
     :rtype: success or error
     """
-    user = await get_user_by_id(id)
+    user = await read_by_key_value(User, User.id, ObjectId(id))
 
     if user.active:
         return errorresponse(None, 400, "The user is already active")
@@ -72,7 +77,7 @@ async def approve_user(user_id: str):
     :return: response
     :rtype: _type_
     """
-    user = await get_user_by_id(user_id)
+    user = await read_by_key_value(User, User.id, ObjectId(user_id))
 
     if not user.active:
         return errorresponse(None, 400, "The user is not activated")
