@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Filters from "@/views/Users/Filters.vue";
+import ListUsers from "@/views/Users/ListUsers.vue";
 </script>
 
 <template>
@@ -8,6 +9,8 @@ import Filters from "@/views/Users/Filters.vue";
     <Filters/>
   </div>
   <div class="division">
+
+    <ListUsers/>
   </div>
 
 </template>
