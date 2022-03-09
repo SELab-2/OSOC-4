@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/select-users',
         name: 'SelectUsers',
-        component: () => import('../views/SelectUsers.vue')
+        component: () => import('../views/Users/SelectUsers.vue')
     },
     {
         path: '/manage-users',

@@ -1,0 +1,21 @@
+<script setup lang="ts">
+import Filters from "@/views/Users/Filters.vue";
+</script>
+
+<template>
+  <h1>Select Users</h1>
+  <div class="division">
+    <Filters/>
+  </div>
+  <div class="division">
+  </div>
+
+</template>
+
+<style scoped>
+.division{
+  width:50%;
+  height:100px;
+  float:left;
+}
+</style>
