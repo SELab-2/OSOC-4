@@ -41,7 +41,7 @@ async def read_by_key_value(model: Type[ModelType], key, value) -> Optional[Mode
     return res if res else None
 
 
-async def update(model: Type[ModelType]) -> Optional[ModelType]:
+async def update(model: ModelType) -> Optional[ModelType]:
     """update this function updates one entry from a model (the one with the same id, or else it adds the id)
 
     example new_user is the updated version of the old user but the id remained:  update(new_user)

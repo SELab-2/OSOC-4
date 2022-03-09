@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.crud.base_crud import read_all
+from app.crud import read_all
 from app.models.question_answer import QuestionAnswer
 from app.utils.response import list_modeltype_response
 
