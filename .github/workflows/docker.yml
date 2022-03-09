@@ -8,7 +8,6 @@ services:
       RUNNER_NAME: github-runner-docker
       RUNNER_TOKEN: AOWQLSS4XOY7J5OW4YK6SZLCFAAHI
       RUNNER_WORKDIR: /tmp/runner/work
-      RUNNER_GROUP: my-group
       RUNNER_SCOPE: 'repo'
       LABELS: linux,x64,cpu
     security_opt:
