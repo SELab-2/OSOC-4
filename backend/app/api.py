@@ -1,5 +1,3 @@
-
-from app.routers import answers, auth, editions, participation, partners, projects, question_answers, questions, roles, student_forms, suggestions, tally, user_invites, users
 import inspect
 import re
 
@@ -8,6 +6,10 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 
 from app.database import connect_db, disconnect_db
+from app.routers import (answers, auth, editions, participation, partners,
+                         projects, question_answers, questions, roles,
+                         student_forms, suggestions, tally, user_invites,
+                         users)
 
 app = FastAPI()
 
