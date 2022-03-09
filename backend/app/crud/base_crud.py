@@ -4,13 +4,17 @@ from odmantic.engine import ModelType
 from app.database import db
 
 
-async def read_all(model: Type[ModelType]) -> List[ModelType]:
-    """read_all this function reads all the entries from a specific model
+async def read_all(model: Type[ModelType], key=None, value=None) -> List[ModelType]:
+    """read_all this function reads all the entries from a specific model,
+    if a key and a value are passed this will be checked on each instance of model
 
     example read all Users:  read_all(User)
+    example read all Users with Role admin: read_all(User, User.role, UserRole.ADMIN)
 
     :param model: the model to read all entries from
     :type model: ModelType
+    :param key: the key to check the value on, pass this argument as ModelType.key (see the example)
+    :param value: the value that the key should have
     :return: list with all data-entries of type model
     :rtype: List[ModelType]
     """
