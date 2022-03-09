@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, status
 from app.models.user import UserLogin, User
 from fastapi.exceptions import HTTPException
 from datetime import timedelta
-from app.crud.base_crud import read_by_key_value
+from app.crud import read_by_key_value
 
 
 class Settings(BaseModel):

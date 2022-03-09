@@ -1,4 +1,4 @@
-from app.crud.base_crud import update, read_by_key_value
+from app.crud import update, read_by_key_value
 from app.models.question_answer import QuestionAnswer
 from app.models.student_form import StudentForm
 from app.models.question import Question

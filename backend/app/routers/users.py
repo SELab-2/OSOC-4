@@ -1,12 +1,11 @@
 from bson import ObjectId
 from fastapi import APIRouter
 
-from app.crud.base_crud import read_by_key_value, update, read_all
+from app.crud import read_by_key_value, update, read_all
+from app.database import db
 from app.models.user import User, UserCreate, UserOut
-from app.utils.cryptography import get_password_hash
+from app.utils.invite import generate_new_invite_key
 from app.utils.response import response, errorresponse, list_modeltype_response
-from app.crud.users import set_user_approved
-from app.crud.userinvites import create_invite
 from app.utils.mailsender import send_invite
 
 
@@ -41,9 +40,6 @@ async def add_user_data(user: UserCreate):
     if await read_by_key_value(User, User.email, user.email):
         return errorresponse("Email already used", 409, "")
 
-    # replace the plain password with the hashed one
-    user.password = get_password_hash(user.password)
-
     new_user = await update(User.parse_obj(user))
     return response(new_user, "User added successfully.")
 
@@ -62,9 +58,12 @@ async def invite_user(id: str):
     if user.active:
         return errorresponse(None, 400, "The user is already active")
 
-    invitekey = create_invite(user)
-
-    send_invite(user.email, invitekey)
+    # create an invite key
+    invite_key, invite_expires = generate_new_invite_key(str(user.id))
+    # save it
+    db.redis.setex(invite_key, invite_expires, "true")
+    # send email to user with the invite key
+    send_invite(user.email, invite_key)
     return response(None, "Invite sent succesfull")
 
 
@@ -84,5 +83,6 @@ async def approve_user(user_id: str):
     if user.approved:
         return errorresponse(None, 400, "The user is already approved")
 
-    newuser = await set_user_approved(user, True)
+    user.approved = True
+    await update(user)
     return response(None, "Approved the user successfully")

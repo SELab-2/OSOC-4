@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from odmantic import ObjectId
 
-from app.crud.base_crud import read_by_key_value, read_all
-from app.crud.userinvites import delete_invite, invite_exists
-from app.crud.users import set_user_password, set_user_active
+from app.crud import read_by_key_value, read_all, update
+from app.database import db
 from app.models.user import UserInvite, User, UserOut
+from app.utils.cryptography import get_password_hash
 from app.utils.response import response, errorresponse
 
 router = APIRouter(prefix="/invite")
@@ -35,17 +35,19 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
     if userinvite.password != userinvite.validate_password:
         return errorresponse(None, 400, "entered passwords are not the same")
 
-    if invite_exists(invitekey):
+    if db.redis.get(invitekey):  # check that the inv key exists
 
-        user = await read_by_key_value(User, User.id, ObjectId(invitekey.split("_")[1]))
+        user: User = await read_by_key_value(User, User.id, ObjectId(invitekey.split("_")[1]))
 
         if user.active:
             return errorresponse(None, 400, "account already active")
 
-        user = await set_user_password(user, userinvite.password)
-        user = await set_user_active(user, True)
-        delete_invite(invitekey)
+        user.name = userinvite.name
+        user.password = get_password_hash(userinvite.password)
+        user.active = True
+        await update(user)
+        db.redis.delete(invitekey)
 
-        return response(None, "User created successfully")
+        return response(None, "User activated successfully")
     else:
         return errorresponse(None, 400, "invite is not valid")

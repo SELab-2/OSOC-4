@@ -9,8 +9,9 @@ class UserRole(int, Enum):
 
 
 class User(Model):
+    name: str = ""
     email: str
-    password: str
+    password: str = ""
     role: UserRole = 1
     active: bool = False
     approved: bool = False
@@ -18,13 +19,16 @@ class User(Model):
 
 class UserCreate(BaseModel):
     email: str
-    password: str
+    # password: str
 
 
 class UserOut(BaseModel):
-    id: str
     email: str
+    name: str
     role: UserRole
+    id: str
+    active: bool
+    approved: bool
 
 
 class UserLogin(BaseModel):
@@ -33,5 +37,6 @@ class UserLogin(BaseModel):
 
 
 class UserInvite(BaseModel):
+    name: str
     password: str
     validate_password: str
