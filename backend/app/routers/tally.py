@@ -1,6 +1,6 @@
-from fastapi import APIRouter
-from app.utils.response import response, errorresponse
+from app.utils.response import response
 from app.utils.tallyhandler import process_tally
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/tally")
 

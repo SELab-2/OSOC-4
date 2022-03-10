@@ -15,7 +15,7 @@ class RoleChecker:
 
         try:
             Authorize.jwt_required()
-        except Exception as e:
+        except Exception:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 

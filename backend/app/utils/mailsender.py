@@ -1,10 +1,9 @@
-from email import encoders
-from email.mime.base import MIMEBase
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import os
 import smtplib
 import ssl
-import os
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from dotenv import load_dotenv
 
 load_dotenv()

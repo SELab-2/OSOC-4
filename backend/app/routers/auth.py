@@ -87,7 +87,7 @@ def refresh(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_refresh_token_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     current_user_id = Authorize.get_jwt_subject()
@@ -108,7 +108,7 @@ def access_revoke(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
@@ -129,7 +129,7 @@ def refresh_revoke(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_refresh_token_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     jti = Authorize.get_raw_jwt()['jti']
@@ -148,7 +148,7 @@ def logout(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 

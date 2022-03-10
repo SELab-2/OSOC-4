@@ -1,12 +1,11 @@
 import os
-import string
 import random
+import string
 from datetime import timedelta
 from typing import Tuple
 
-from dotenv import load_dotenv
-
 from app.database import db
+from dotenv import load_dotenv
 
 
 def generate_new_invite_key(suffix: str) -> Tuple[str, int]:
