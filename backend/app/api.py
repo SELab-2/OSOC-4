@@ -8,8 +8,7 @@ from fastapi.routing import APIRoute
 from app.database import connect_db, disconnect_db
 from app.routers import (answers, auth, editions, participation, partners,
                          projects, question_answers, questions, roles,
-                         student_forms, suggestions, tally, user_invites,
-                         users)
+                         student_forms, suggestions, user_invites, users)
 
 app = FastAPI()
 
@@ -101,9 +100,9 @@ def custom_openapi():
         for method in methods:
             # access_token
             if (
-                re.search("jwt_required", inspect.getsource(endpoint)) or
-                re.search("fresh_jwt_required", inspect.getsource(endpoint)) or
-                re.search("jwt_optional", inspect.getsource(endpoint))
+                re.search("jwt_required", inspect.getsource(endpoint))
+                    or re.search("fresh_jwt_required", inspect.getsource(endpoint))
+                    or re.search("jwt_optional", inspect.getsource(endpoint))
             ):
                 try:
                     openapi_schema["paths"][path][method]['parameters'].append(
