@@ -1,13 +1,16 @@
 from app.crud import read_all, read_by_key_value, update
 from app.models.partner import Partner
+from app.models.user import UserRole
 from app.utils.response import errorresponse, list_modeltype_response, response
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Depends
 from odmantic import ObjectId
+
+from app.utils.rolechecker import RoleChecker
 
 router = APIRouter(prefix="/partners")
 
 
-@router.get("/", response_description="Partners retrieved")
+@router.get("/", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="Partners retrieved")
 async def get_partners():
     """get_partners get all the Partner instances from the database
 
@@ -18,13 +21,13 @@ async def get_partners():
     return list_modeltype_response(results, Partner)
 
 
-@router.post("/create", response_description="Partner data added into the database")
+@router.post("/create", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="Partner data added into the database")
 async def add_partner_data(partner: Partner = Body(...)):
     """add_partner_data add a new partner
 
     :param partner: defaults to Body(...)
     :type partner: Partner, optional
-    :return: data of new created partner
+    :return: data of newly created partner
     :rtype: dict
     """
     # check if a partner with the same name is already present
@@ -35,7 +38,23 @@ async def add_partner_data(partner: Partner = Body(...)):
     return response(new_partner, "Partner added successfully.")
 
 
-@router.get("/{id}")
+@router.post("/{id}", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="Partner data updated in the database")
+async def update_partner_data(partner: Partner = Body(...)):
+    """update_partner_data update the data of a partner
+
+    :param partner: defaults to Body(...)
+    :type partner: Partner, optional
+    :return: data of updated partner
+    :rtype: dict
+    """
+    # check if a partner with the same name is already present
+    if await read_by_key_value(Partner, Partner.id, partner.id):
+        new_partner = await update(Partner.parse_obj(partner))
+        return response(new_partner, "Partner updated successfully.")
+    return errorresponse("Partner doesn't exist", 409, "")
+
+
+@router.get("/{id}", dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="User retrieved")
 async def get_partner(id):
     """get_partner get the Partner instance with the given id from the database
 

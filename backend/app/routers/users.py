@@ -26,7 +26,7 @@ async def get_users():
     return list_modeltype_response(out_users, User)
 
 
-@router.post("/create", response_description="User data added into the database")
+@router.post("/create", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="User data added into the database")
 async def add_user_data(user: UserCreate):
     """add_user_data add a new user
 
@@ -44,7 +44,7 @@ async def add_user_data(user: UserCreate):
     return response(new_user, "User added successfully.")
 
 
-@router.post("/{id}/invite")
+@router.post("/{id}/invite", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))])
 async def invite_user(id: str):
     """invite_user this functions invites a user
 
@@ -67,7 +67,44 @@ async def invite_user(id: str):
     return response(None, "Invite sent succesfull")
 
 
-@router.post("/{user_id}/approve")
+@router.get("/{id}", dependencies=[Depends(RoleChecker([UserRole.COACH]))])
+async def get_user(id: str):
+    """get_user this functions returns the user with given id (or None)
+
+    :param id: the user id
+    :type id: str
+    :return: response
+    :rtype: success or error
+    """
+    user = await read_by_key_value(User, User.id, ObjectId(id))
+
+    if not user:
+        return errorresponse(None, 400, "User not found")
+
+    if not user.approved:
+        return errorresponse(None, 400, "The user doesn't exist (yet)")
+
+    return response(UserOut.parse_obj(user), "User retrieved successfully")
+
+
+@router.post("/{id}", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))])
+async def update_user(id: str):
+    """update_user this updates a user
+
+    :param id: the user id
+    :type id: str
+    :return: response
+    :rtype: success or error
+    """
+    user = await read_by_key_value(User, User.id, ObjectId(id))
+
+    if not user.approved:
+        return errorresponse(None, 400, "The user doesn't exist (yet)")
+
+    return response(UserOut.parse_obj(user), "User retrieved successfully")
+
+
+@router.post("/{user_id}/approve", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))])
 async def approve_user(user_id: str):
     """approve_user this approves the user if the user account is activated
 

@@ -1,4 +1,4 @@
-from app.crud import read_all, read_by_key_value, update
+from app.crud import read_by_key_value, update
 from app.database import db
 from app.models.user import User, UserInvite, UserOut
 from app.utils.cryptography import get_password_hash
@@ -9,14 +9,18 @@ from odmantic import ObjectId
 router = APIRouter(prefix="/invite")
 
 
-@router.get("/")
-async def get_invites():
-    users = await read_all(User)
-    u: User
-    users = [UserOut.parse_raw(u.json()) for u in users if u.active and not u.approved]
-    if users:
-        return response(users, "Users retrieved successfully")
-    return response(users, "Empty list returned")
+@router.get("/{invitekey}")
+async def check_invite(invitekey: str):
+    """get_invite: returns whether an invite exists or not
+
+    :param invitekey: key for the invite to identify the user
+    :return: response
+    :rtype: succes or error
+    """
+    if db.redis.get(invitekey):
+        return response(None, "User activated successfully")
+    else:
+        return errorresponse(None, 400, "invite is not valid")
 
 
 @router.post("/{invitekey}")
