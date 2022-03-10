@@ -88,7 +88,6 @@ def refresh(Authorize: AuthJWT = Depends()):
 
     Authorize.jwt_refresh_token_required()
 
-
     current_user_id = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user_id)
     Authorize.set_access_cookies(new_access_token)
@@ -144,7 +143,5 @@ def logout(Authorize: AuthJWT = Depends()):
     """
 
     Authorize.jwt_required()
-
-
     Authorize.unset_jwt_cookies()
     return {"msg": "Successfully logout"}
