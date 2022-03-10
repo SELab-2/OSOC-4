@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import axios from "axios";
 
-let email = ref("");
-let password = ref("");
+let emailRef = ref("");
+let passwordRef = ref("");
 
 function loginButton(){
-  if(email.value !== "" && password.value !== ""){
-    //TODO use axios to use backedn?
-    console.log(email.value);
-    console.log(password.value)
+  if(emailRef.value !== "" && passwordRef.value !== ""){
+    axios.post("/login", {email : emailRef.value, password : passwordRef.value })
   }
 }
 
@@ -17,9 +16,9 @@ function loginButton(){
 <template>
     <h1>Login</h1>
     <p class="text-muted"> Please enter your login and password!</p>
-    <input v-model="email" type="email" name="" placeholder="Email">
+    <input v-model="emailRef" type="email" name="" placeholder="Email">
     <br/>
-    <input v-model="password" type="password" name="" placeholder="Password">
+    <input v-model="passwordRef" type="password" name="" placeholder="Password">
     <br/>
     <input v-on:click=loginButton() type="submit" name="" value="Login">
     <br/>
