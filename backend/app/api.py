@@ -1,11 +1,14 @@
 import inspect
 import re
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
+from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app.database import connect_db, disconnect_db
+from app.exceptions.base_exception import BaseException
 from app.routers import (answers, auth, editions, participation, partners,
                          projects, question_answers, questions, roles,
                          student_forms, suggestions, user_invites, users)
@@ -37,6 +40,16 @@ app.include_router(suggestions.router)
 # app.include_router(tally.router)
 app.include_router(user_invites.router)
 app.include_router(users.router)
+
+
+@app.exception_handler(BaseException)
+async def my_exception_handler(request: Request, exception: BaseException):
+    return exception._raise()
+
+
+@app.exception_handler(AuthJWTException)
+async def auth_exception_handler(request: Request, exception: AuthJWTException):
+    return JSONResponse(status_code=exception.status_code, content={"message": exception.message})
 
 
 def custom_openapi():
