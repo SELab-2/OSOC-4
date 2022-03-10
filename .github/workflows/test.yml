@@ -16,4 +16,4 @@ jobs:
       - name: Build the stack
         run: docker-compose -f test-docker-compose.yml up -d
       - name: Run tests
-        run: docker-compose -f test-docker-compose.yml run test-osoc-backend pytest
+        run: docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover
