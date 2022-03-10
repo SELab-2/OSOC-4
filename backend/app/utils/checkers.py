@@ -10,8 +10,8 @@ from odmantic import ObjectId
 
 
 class RoleChecker:
-    def __init__(self, allowed_roles: List[UserRole]):
-        self.allowed_roles = allowed_roles
+    def __init__(self, role: UserRole):
+        self.role = role
 
     async def __call__(self, Authorize: AuthJWT = Depends()):
 
@@ -20,7 +20,7 @@ class RoleChecker:
         current_user_id = Authorize.get_jwt_subject()
         user = await read_by_key_value(User, User.id, ObjectId(current_user_id))
 
-        if user.role not in self.allowed_roles:
+        if user.role < self.role:
             raise NotPermittedException()
 
 

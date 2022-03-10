@@ -10,7 +10,7 @@ from fastapi import APIRouter, Body, Depends
 router = APIRouter(prefix="/editions")
 
 
-@router.get("/", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="Editions retrieved")
+@router.get("/", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Editions retrieved")
 async def get_editions():
     """get_editions get all the Edition instances from the database
 
@@ -21,7 +21,7 @@ async def get_editions():
     return list_modeltype_response(results, Edition)
 
 
-@router.post("/create", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="Created a new edition")
+@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
 async def create_edition(edition: Edition = Body(...)):
     """create_edition creates a new edition in the database
 
@@ -41,7 +41,7 @@ async def create_edition(edition: Edition = Body(...)):
 
 
 # todo: only coaches from same edition may view the edition
-@router.get("/{year}", dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="Editions retrieved")
+@router.get("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Editions retrieved")
 async def get_edition(year):
     """get_edition get the Edition instance with given year
 
@@ -54,7 +54,7 @@ async def get_edition(year):
     return response(edition, "Edition successfully retrieved")
 
 
-@router.post("/{year}", dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="Editions retrieved")
+@router.post("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Editions retrieved")
 async def update_edition(year, edition: Edition = Body(...)):
     """update_edition update the Edition instance with given year
 

@@ -44,7 +44,7 @@ app.include_router(users.router)
 
 @app.exception_handler(BaseException)
 async def my_exception_handler(request: Request, exception: BaseException):
-    return exception._raise()
+    return exception.json()
 
 
 @app.exception_handler(AuthJWTException)

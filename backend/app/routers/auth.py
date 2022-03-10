@@ -71,7 +71,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-    raise HTTPException(status_code='401',
+    raise HTTPException(status_code=401,
                         detail="Invalid email or password")
 
 

@@ -9,7 +9,7 @@ from odmantic import ObjectId
 router = APIRouter(prefix="/answers")
 
 
-@router.get("/", dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="Answers retrieved")
+@router.get("/", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Answers retrieved")
 async def get_answers():
     """get_answer get all the Answer instances from the database
 
@@ -20,7 +20,7 @@ async def get_answers():
     return list_modeltype_response(results, Answer)
 
 
-@router.get("/{id}", dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="Answer retrieved")
+@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Answer retrieved")
 async def get_answer(id):
     """get_partner get the Partner instance with the given id from the database
 
