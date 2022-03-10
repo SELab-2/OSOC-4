@@ -5,8 +5,11 @@ let email = ref("");
 let password = ref("");
 
 function loginButton(){
-  console.log(email.value);
-  console.log(password.value)
+  if(email.value !== "" && password.value !== ""){
+    //TODO use axios to use backedn?
+    console.log(email.value);
+    console.log(password.value)
+  }
 }
 
 </script>
