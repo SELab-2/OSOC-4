@@ -1,9 +1,9 @@
+from app.crud import read_all, read_by_key_value, update
+from app.models.partner import Partner
+from app.utils.response import errorresponse, list_modeltype_response, response
 from fastapi import APIRouter, Body
 from odmantic import ObjectId
 
-from app.crud import read_all, update, read_by_key_value
-from app.models.partner import Partner
-from app.utils.response import response, errorresponse, list_modeltype_response
 router = APIRouter(prefix="/partners")
 
 

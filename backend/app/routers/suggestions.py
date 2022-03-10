@@ -1,9 +1,7 @@
-from fastapi import APIRouter
-
 from app.crud import read_all
 from app.models.suggestion import Suggestion
 from app.utils.response import list_modeltype_response
-
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/suggestions")
 

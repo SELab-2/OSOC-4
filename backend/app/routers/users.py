@@ -1,24 +1,24 @@
-from bson import ObjectId
-from fastapi import APIRouter
-
-from app.crud import read_by_key_value, update, read_all
+from app.crud import read_all, read_by_key_value, update
 from app.database import db
-from app.models.user import User, UserCreate, UserOut
+from app.models.user import User, UserCreate, UserOut, UserRole
 from app.utils.invite import generate_new_invite_key
-from app.utils.response import response, errorresponse, list_modeltype_response
 from app.utils.mailsender import send_invite
-
+from app.utils.response import errorresponse, list_modeltype_response, response
+from app.utils.rolechecker import RoleChecker
+from bson import ObjectId
+from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/users")
 
 
-@router.get("/", response_description="Users retrieved")
+@router.get("/", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="Users retrieved")
 async def get_users():
     """get_users get all the users from the database
 
     :return: list of users
     :rtype: dict
     """
+
     users = await read_all(User)
     out_users = []
     for user in users:

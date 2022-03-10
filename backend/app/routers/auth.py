@@ -1,11 +1,12 @@
-from app.database import db
-from pydantic import BaseModel
-from fastapi_jwt_auth import AuthJWT
-from fastapi import APIRouter, Depends, status
-from app.models.user import UserLogin, User
-from fastapi.exceptions import HTTPException
 from datetime import timedelta
+
 from app.crud import read_by_key_value
+from app.database import db
+from app.models.user import User, UserLogin
+from fastapi import APIRouter, Depends, status
+from fastapi.exceptions import HTTPException
+from fastapi_jwt_auth import AuthJWT
+from pydantic import BaseModel
 
 
 class Settings(BaseModel):
@@ -62,8 +63,8 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     """
     u = await read_by_key_value(User, User.email, user.email)
     if u:
-        access_token = Authorize.create_access_token(subject=user.email)
-        refresh_token = Authorize.create_refresh_token(subject=user.email)
+        access_token = Authorize.create_access_token(subject=str(u.id))
+        refresh_token = Authorize.create_refresh_token(subject=str(u.id))
 
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
@@ -86,16 +87,16 @@ def refresh(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_refresh_token_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    current_user = Authorize.get_jwt_subject()
-    new_access_token = Authorize.create_access_token(subject=current_user)
+    current_user_id = Authorize.get_jwt_subject()
+    new_access_token = Authorize.create_access_token(subject=current_user_id)
     Authorize.set_access_cookies(new_access_token)
     return {"access_token": new_access_token}
 
 
-@router.delete('/access-revoke',  operation_id="authorize")
+@router.delete('/access-revoke')
 def access_revoke(Authorize: AuthJWT = Depends()):
     """access_revoke revoke the access token
 
@@ -107,7 +108,7 @@ def access_revoke(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
@@ -128,7 +129,7 @@ def refresh_revoke(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_refresh_token_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     jti = Authorize.get_raw_jwt()['jti']
@@ -147,7 +148,7 @@ def logout(Authorize: AuthJWT = Depends()):
     """
     try:
         Authorize.jwt_required()
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
