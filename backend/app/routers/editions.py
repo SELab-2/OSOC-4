@@ -54,7 +54,7 @@ async def get_edition(year):
     return response(edition, "Edition successfully retrieved")
 
 
-@router.post("/{year}",  dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="Editions retrieved")
+@router.post("/{year}", dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="Editions retrieved")
 async def update_edition(year, edition: Edition = Body(...)):
     """update_edition update the Edition instance with given year
 

@@ -107,7 +107,6 @@ def access_revoke(Authorize: AuthJWT = Depends()):
 
     Authorize.jwt_required()
 
-
     jti = Authorize.get_raw_jwt()['jti']
     db.redis.setex(jti, settings.access_expires, 'true')
     return {"detail": "Access token has been revoked"}
@@ -125,7 +124,6 @@ def refresh_revoke(Authorize: AuthJWT = Depends()):
     """
 
     Authorize.jwt_refresh_token_required()
-
 
     jti = Authorize.get_raw_jwt()['jti']
     db.redis.setex(jti, settings.refresh_expires, 'true')
