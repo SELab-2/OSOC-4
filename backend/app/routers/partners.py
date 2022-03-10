@@ -36,7 +36,12 @@ async def add_partner_data(partner: Partner = Body(...)):
 
 
 @router.get("/{id}")
-async def get_partner_by_id(id):
+async def get_partner(id):
+    """get_partner get the Partner instance with the given id from the database
+
+    :return: the partner if found, else None
+    :rtype: dict
+    """
     partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
     if not partner:
         return errorresponse(None, 400, "Partner not found")
