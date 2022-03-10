@@ -7,7 +7,6 @@ fastapi_jwt_auth
 python-dotenv
 redis
 odmantic
-python-dotenv
 pytest
 requests
 asgi_lifespan
