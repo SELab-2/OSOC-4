@@ -1,18 +1,20 @@
+from enum import Enum
+
 from odmantic import Model
 from pydantic import BaseModel
-from enum import Enum
 
 
 class UserRole(int, Enum):
-    ADMIN = 0
+    NO_ROLE = 0
     COACH = 1
+    ADMIN = 2
 
 
 class User(Model):
     name: str = ""
     email: str
     password: str = ""
-    role: UserRole = 1
+    role: UserRole = 0
     active: bool = False
     approved: bool = False
 

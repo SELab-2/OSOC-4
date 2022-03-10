@@ -1,12 +1,10 @@
-from odmantic import ObjectId
-
 from app.crud import read_all, read_by_key_value
 from app.models.answer import Answer
 from app.models.user import UserRole
-from app.utils.response import list_modeltype_response, errorresponse, response
+from app.utils.checkers import RoleChecker
+from app.utils.response import errorresponse, list_modeltype_response, response
 from fastapi import APIRouter, Depends
-
-from app.utils.rolechecker import RoleChecker
+from odmantic import ObjectId
 
 router = APIRouter(prefix="/answers")
 
@@ -23,7 +21,7 @@ async def get_answers():
 
 
 @router.get("/{id}", dependencies=[Depends(RoleChecker([UserRole.COACH]))], response_description="Answer retrieved")
-def get_answer(id):
+async def get_answer(id):
     """get_partner get the Partner instance with the given id from the database
 
     :return: the partner if found, else None

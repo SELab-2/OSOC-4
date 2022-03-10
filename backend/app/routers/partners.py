@@ -1,11 +1,10 @@
 from app.crud import read_all, read_by_key_value, update
 from app.models.partner import Partner
 from app.models.user import UserRole
+from app.utils.checkers import RoleChecker
 from app.utils.response import errorresponse, list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
 from odmantic import ObjectId
-
-from app.utils.rolechecker import RoleChecker
 
 router = APIRouter(prefix="/partners")
 

@@ -151,6 +151,5 @@ def logout(Authorize: AuthJWT = Depends()):
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-
     Authorize.unset_jwt_cookies()
     return {"msg": "Successfully logout"}

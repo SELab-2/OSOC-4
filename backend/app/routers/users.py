@@ -1,10 +1,10 @@
 from app.crud import read_all, read_by_key_value, update
 from app.database import db
 from app.models.user import User, UserCreate, UserOut, UserRole
+from app.utils.checkers import RoleChecker
 from app.utils.invite import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
-from app.utils.rolechecker import RoleChecker
 from bson import ObjectId
 from fastapi import APIRouter, Depends
 

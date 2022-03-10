@@ -13,11 +13,25 @@ class RoleChecker:
 
     async def __call__(self, Authorize: AuthJWT = Depends()):
 
-        try:
-            Authorize.jwt_required()
-        except Exception:
+        Authorize.jwt_required()
+
+        current_user_id = Authorize.get_jwt_subject()
+        user = await read_by_key_value(User, User.id, ObjectId(current_user_id))
+
+        if user.role not in self.allowed_roles:
+            print(
+                f"User with role {user.role} not in {self.allowed_roles}")
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+                status_code=403, detail="Operation not permitted")
+
+
+class EditionChecker:
+    def __init__(self, always_allowed: List[UserRole] = [UserRole.ADMIN]):
+        self.always_allowed = always_allowed
+
+    async def __call__(self, Authorize: AuthJWT = Depends()):
+
+        Authorize.jwt_required()
 
         current_user_id = Authorize.get_jwt_subject()
         user = await read_by_key_value(User, User.id, ObjectId(current_user_id))
