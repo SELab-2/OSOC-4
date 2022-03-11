@@ -43,6 +43,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
             try:
                 await func(client=client)
+                await delete()
             except Wrong as wrong:
                 await delete()
                 self.assertTrue(False, wrong.msg)

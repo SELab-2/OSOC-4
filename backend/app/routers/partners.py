@@ -31,6 +31,7 @@ async def add_partner_data(partner: Partner = Body(...)):
     :return: data of newly created partner
     :rtype: dict
     """
+
     # check if a partner with the same name is already present
     if await read_by_key_value(Partner, Partner.name, partner.name):
         raise NameAlreadyUsedException()
