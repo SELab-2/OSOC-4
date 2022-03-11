@@ -1,4 +1,5 @@
 import json
+import unittest
 
 from app.api import app
 from app.tests.test_base import Wrong
@@ -8,6 +9,9 @@ from httpx import AsyncClient
 
 
 class TestPartnersGet(TestPartnerBase):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     async def get_access_token(self, client, user, password):
         login = await client.post("/login", json={"email": user.email, "password": password}, headers={"Content-Type": "application/json"})
@@ -19,6 +23,6 @@ class TestPartnersGet(TestPartnerBase):
 
             response = await client.get("/partners/", headers={"Authorization": f"Bearer {access_token}"})
 
-            if response.status_code == 200:
+            if response.status_code != 200:
                 raise Wrong("wrong status code")
         await self.with_all(do)

@@ -1,10 +1,12 @@
+import unittest
+
 from app.models.partner import Partner
 from app.models.user import User, UserRole
 from app.tests.test_base import TestBase
 
 
 class TestPartnerBase(TestBase):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
 
         objects = {
             "user_unactivated": User(
@@ -36,5 +38,4 @@ class TestPartnerBase(TestBase):
                 name="Dummy partner",
                 about="Dummy partner about")
         }
-
-        super().__init__(objects)
+        super().__init__(objects, *args, **kwargs)

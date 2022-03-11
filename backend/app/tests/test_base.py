@@ -19,9 +19,8 @@ class Wrong(Exception):
 
 
 class TestBase(unittest.IsolatedAsyncioTestCase):
-    def __init__(self, objects):
-        super().__init__()
-
+    def __init__(self, objects, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.objects = objects
         self.saved_objects = {}
 
@@ -39,30 +38,15 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
             async def delete():
                 for object in self.saved_objects.values():
-                    await db.engine.delete(object)
+                    if not isinstance(object, dict):
+                        await db.engine.delete(object)
 
             try:
                 await func(client=client)
             except Wrong as wrong:
                 await delete()
-                self.assertTrue(True, wrong.msg)
+                self.assertTrue(False, wrong.msg)
+
             except Exception as e:
                 await delete()
                 raise e
-
-
-"""
-an example of how to use this class once you inhereted it
-    async def test_get_partners_as_admin(self):
-        async def do(client: AsyncClient):
-            admin = self.user_admin
-            login = await client.post("/login", json={"email": admin.email, "password": "Test123!user_admin"},
-                                      headers={"Content-Type": "application/json"})
-            print(login)
-            # die accestoken die key vindt ie nie
-            access_token = json.loads(login.content)["access_token"]
-            response = await client.get("/partners/", headers={"Authorization": f"Bearer {access_token}"})
-            if response.status_code == 200:
-                raise Wrong("wrong status code")
-        await self.with_all(do)
-"""
