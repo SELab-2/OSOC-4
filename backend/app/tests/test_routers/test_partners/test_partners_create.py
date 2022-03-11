@@ -1,6 +1,5 @@
 import json
 
-from app.api import app
 from app.crud import read_by_key_value
 from app.exceptions.partner_exceptions import NameAlreadyUsedException
 from app.exceptions.permissions import NotPermittedException

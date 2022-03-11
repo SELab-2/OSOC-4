@@ -1,6 +1,5 @@
 import json
 
-from app.api import app
 from app.exceptions.permissions import NotPermittedException
 from app.tests.test_base import Wrong
 from app.tests.test_routers.test_partners.test_partner_base import \

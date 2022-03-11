@@ -1,15 +1,10 @@
 import json
 
-from app.api import app
-from app.crud import read_by_key_value
-from app.exceptions.partner_exceptions import NameAlreadyUsedException
 from app.exceptions.permissions import NotPermittedException
-from app.models.partner import Partner
 from app.tests.test_base import Wrong
 from app.tests.test_routers.test_partners.test_partner_base import \
     TestPartnerBase
 from httpx import AsyncClient
-from odmantic import ObjectId
 
 
 class TestPartnersUpdate(TestPartnerBase):
