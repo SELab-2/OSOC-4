@@ -5,7 +5,6 @@ from app.database import db
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.user import User, UserLogin
 from fastapi import APIRouter, Depends
-from fastapi.exceptions import HTTPException
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 

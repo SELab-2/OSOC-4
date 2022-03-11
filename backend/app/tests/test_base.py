@@ -1,13 +1,11 @@
-import json
 import unittest
-
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient
 
 from app.api import app
 from app.database import db
 from app.models.partner import Partner
-from app.models.user import UserRole, User
+from app.models.user import User, UserRole
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient
 
 
 class Wrong(Exception):
@@ -18,6 +16,7 @@ class Wrong(Exception):
 
     def __str__(self):
         return self.msg
+
 
 class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self):
@@ -80,6 +79,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             except Exception as e:
                 await delete()
                 raise e
+
 
 """
 an example of how to use this class once you inhereted it
