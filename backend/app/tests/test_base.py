@@ -21,13 +21,13 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         super().__init__()
 
         self.objects = objects
-        self.save_objects = {}
+        self.saved_objects = {}
 
     async def with_all(self, func):
         async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
 
             for k, v in self.objects.items():
-                self.save_objects[k] = await db.engine.save(v)
+                self.saved_objects[k] = await db.engine.save(v)
 
             async def delete():
                 for object in self.saved_objects.values():
