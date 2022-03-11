@@ -2,9 +2,9 @@ from datetime import timedelta
 
 from app.crud import read_by_key_value
 from app.database import db
+from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.user import User, UserLogin
-from fastapi import APIRouter, Depends, status
-from fastapi.exceptions import HTTPException
+from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
@@ -71,8 +71,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-    raise HTTPException(status_code='401',
-                        detail="Invalid email or password")
+    raise InvalidEmailOrPasswordException()
 
 
 @router.post('/refresh')
@@ -85,11 +84,9 @@ def refresh(Authorize: AuthJWT = Depends()):
     :return: new access token
     :rtype: dict
     """
-    try:
-        Authorize.jwt_refresh_token_required()
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    Authorize.jwt_refresh_token_required()
+
     current_user_id = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user_id)
     Authorize.set_access_cookies(new_access_token)
@@ -106,11 +103,8 @@ def access_revoke(Authorize: AuthJWT = Depends()):
     :return: success if access token revoked
     :rtype: dict
     """
-    try:
-        Authorize.jwt_required()
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    Authorize.jwt_required()
 
     jti = Authorize.get_raw_jwt()['jti']
     db.redis.setex(jti, settings.access_expires, 'true')
@@ -127,11 +121,9 @@ def refresh_revoke(Authorize: AuthJWT = Depends()):
     :return: success if refresh token revoked
     :rtype: dict
     """
-    try:
-        Authorize.jwt_refresh_token_required()
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    Authorize.jwt_refresh_token_required()
+
     jti = Authorize.get_raw_jwt()['jti']
     db.redis.setex(jti, settings.refresh_expires, 'true')
     return {"detail": "Refresh token has been revoked"}
@@ -146,11 +138,7 @@ def logout(Authorize: AuthJWT = Depends()):
     :return: success if user logged out
     :rtype: dict
     """
-    try:
-        Authorize.jwt_required()
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
+    Authorize.jwt_required()
     Authorize.unset_jwt_cookies()
     return {"msg": "Successfully logout"}

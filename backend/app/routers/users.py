@@ -1,17 +1,22 @@
 from app.crud import read_all, read_by_key_value, update
 from app.database import db
+from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
+                                            InvalidEmailException,
+                                            UserAlreadyActiveException,
+                                            UserNotFoundException)
 from app.models.user import User, UserCreate, UserOut, UserRole
+from app.utils.checkers import RoleChecker
 from app.utils.invite import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
-from app.utils.rolechecker import RoleChecker
+from app.utils.validators import valid_email
 from bson import ObjectId
 from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/users")
 
 
-@router.get("/", dependencies=[Depends(RoleChecker([UserRole.ADMIN]))], response_description="Users retrieved")
+@router.get("/", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved")
 async def get_users():
     """get_users get all the users from the database
 
@@ -26,7 +31,7 @@ async def get_users():
     return list_modeltype_response(out_users, User)
 
 
-@router.post("/create", response_description="User data added into the database")
+@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="User data added into the database")
 async def add_user_data(user: UserCreate):
     """add_user_data add a new user
 
@@ -36,15 +41,19 @@ async def add_user_data(user: UserCreate):
     :rtype: dict
     """
 
+    # check if valid email
+    if not valid_email(user.email):
+        raise InvalidEmailException()
+
     # check if email already used
     if await read_by_key_value(User, User.email, user.email):
-        return errorresponse("Email already used", 409, "")
+        raise EmailAlreadyUsedException()
 
     new_user = await update(User.parse_obj(user))
     return response(new_user, "User added successfully.")
 
 
-@router.post("/{id}/invite")
+@router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def invite_user(id: str):
     """invite_user this functions invites a user
 
@@ -56,7 +65,7 @@ async def invite_user(id: str):
     user = await read_by_key_value(User, User.id, ObjectId(id))
 
     if user.active:
-        return errorresponse(None, 400, "The user is already active")
+        raise UserAlreadyActiveException()
 
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key(str(user.id))
@@ -67,7 +76,44 @@ async def invite_user(id: str):
     return response(None, "Invite sent succesfull")
 
 
-@router.post("/{user_id}/approve")
+@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def get_user(id: str):
+    """get_user this functions returns the user with given id (or None)
+
+    :param id: the user id
+    :type id: str
+    :return: response
+    :rtype: success or error
+    """
+    user = await read_by_key_value(User, User.id, ObjectId(id))
+
+    if not user:
+        raise UserNotFoundException()
+
+    if not user.approved:
+        return errorresponse(None, 400, "The user doesn't exist (yet)")
+
+    return response(UserOut.parse_obj(user), "User retrieved successfully")
+
+
+@router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def update_user(id: str):
+    """update_user this updates a user
+
+    :param id: the user id
+    :type id: str
+    :return: response
+    :rtype: success or error
+    """
+    user = await read_by_key_value(User, User.id, ObjectId(id))
+
+    if not user.approved:
+        return errorresponse(None, 400, "The user doesn't exist (yet)")
+
+    return response(UserOut.parse_obj(user), "User retrieved successfully")
+
+
+@router.post("/{user_id}/approve", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def approve_user(user_id: str):
     """approve_user this approves the user if the user account is activated
 
