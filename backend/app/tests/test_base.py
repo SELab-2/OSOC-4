@@ -2,8 +2,6 @@ import unittest
 
 from app.api import app
 from app.database import db
-from app.models.partner import Partner
-from app.models.user import User, UserRole
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
 
@@ -19,57 +17,21 @@ class Wrong(Exception):
 
 
 class TestBase(unittest.IsolatedAsyncioTestCase):
-    def __init__(self):
+    def __init__(self, objects):
         super().__init__()
 
-        self.user_unactivated = User(
-            email="user_unactivated@test.be",
-            name="user_unactivated",
-            password="Test123!user_unactivated",
-            role=UserRole.COACH,
-            active=False,
-            approved=False)
-
-        self.user_activated = User(
-            email="user_activated@test.be",
-            name="user_activated",
-            password="Test123!user_activated",
-            role=UserRole.COACH,
-            active=True, approved=False)
-
-        self.user_approved = User(
-            email="user_approved@test.be",
-            name="user_approved",
-            password="Test123!user_approved",
-            role=UserRole.COACH,
-            active=True, approved=True)
-
-        self.user_admin = User(
-            email="user_admin@test.be",
-            name="user_admin",
-            password="Test123!user_admin",
-            role=UserRole.ADMIN,
-            active=True, approved=True)
-
-        self.partner = Partner(
-            name="Dummy partner",
-            about="Dummy partner about")
+        self.objects = objects
+        self.save_objects = {}
 
     async def with_all(self, func):
         async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
 
-            self.user_unactivated = await db.engine.save(self.user_unactivated)
-            self.user_activated = await db.engine.save(self.user_activated)
-            self.user_approved = await db.engine.save(self.user_approved)
-            self.user_admin = await db.engine.save(self.user_admin)
-
-            self.partner = await db.engine.save(self.partner)
+            for k, v in self.objects.items():
+                self.save_objects[k] = await db.engine.save(v)
 
             async def delete():
-                await db.engine.delete(self.user_unactivated)
-                await db.engine.delete(self.user_activated)
-                await db.engine.delete(self.user_approved)
-                await db.engine.delete(self.user_admin)
+                for object in self.saved_objects.values():
+                    await db.engine.delete(object)
 
             try:
                 await func(client=client)
