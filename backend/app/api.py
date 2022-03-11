@@ -11,7 +11,7 @@ from app.database import connect_db, disconnect_db
 from app.exceptions.base_exception import BaseException
 from app.routers import (answers, auth, editions, participation, partners,
                          projects, question_answers, questions, roles,
-                         student_forms, suggestions, user_invites, users)
+                         student_forms, suggestions, user_invites, users, ddd)
 
 app = FastAPI()
 
@@ -26,6 +26,7 @@ async def shutdown():
     disconnect_db()
 
 
+app.include_router(ddd.router)
 app.include_router(answers.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
