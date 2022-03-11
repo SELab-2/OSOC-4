@@ -1,6 +1,6 @@
 <template>
 <h1>
-  Add users!
+  Add an user!
 </h1>
 </template>
 
