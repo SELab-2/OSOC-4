@@ -1,9 +1,8 @@
-from app.crud import read_all
 from app.database import db
 
 from app.models.partner import Partner
-from app.models.user import User, UserOut, UserRole
-from app.utils.response import list_modeltype_response, response
+from app.models.user import User, UserRole
+from app.utils.response import response
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/ddd")
