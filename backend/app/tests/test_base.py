@@ -2,6 +2,8 @@ import unittest
 
 from app.api import app
 from app.database import db
+from app.models.user import User
+from app.utils.cryptography import get_password_hash
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient
 
@@ -27,6 +29,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
 
             for k, v in self.objects.items():
+                if isinstance(v, User):
+                    plain_password = v.password
+                    v.password = get_password_hash(v.password)
+                    if "passwords" not in self.saved_objects:
+                        self.saved_objects["passwords"] = {}
+                    self.saved_objects["passwords"][k] = plain_password
                 self.saved_objects[k] = await db.engine.save(v)
 
             async def delete():
