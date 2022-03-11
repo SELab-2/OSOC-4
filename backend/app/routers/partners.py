@@ -1,11 +1,15 @@
 from app.crud import read_all, read_by_key_value, update
+from app.database import db
 from app.exceptions.partner_exceptions import (NameAlreadyUsedException,
                                                PartnerNotFoundException)
+from app.exceptions.permissions import NotPermittedException
 from app.models.partner import Partner
+from app.models.project import Project
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.response import list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
+from fastapi_jwt_auth import AuthJWT
 from odmantic import ObjectId
 
 router = APIRouter(prefix="/partners")
@@ -64,12 +68,21 @@ async def update_partner_data(id: str, partner: Partner = Body(...)):
 
 
 @router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="User retrieved")
-async def get_partner(id):
+async def get_partner(id, Authorize: AuthJWT = Depends()):
     """get_partner get the Partner instance with the given id from the database
 
     :return: the partner if found, else None
     :rtype: dict
     """
+
+    current_user_id = Authorize.get_jwt_subject()
+
+    # if coach -> check if the coach is involved with partner
+    projects = [project for project in await db.engine.find(Project) if ObjectId(current_user_id) in project.user_ids and ObjectId(id) in project.partner_ids]
+
+    if not len(projects):
+        raise NotPermittedException()
+
     partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
     if not partner:
         raise PartnerNotFoundException()
