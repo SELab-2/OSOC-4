@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from app.crud import read_by_key_value
 from app.database import db
+from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.user import User, UserLogin
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
@@ -71,8 +72,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
 
         return {"access_token": access_token, "refresh_token": refresh_token}
 
-    raise HTTPException(status_code=401,
-                        detail="Invalid email or password")
+    raise InvalidEmailOrPasswordException()
 
 
 @router.post('/refresh')

@@ -1,6 +1,8 @@
 import datetime
 
 from app.crud import read_all, read_by_key_value, update
+from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
+                                               YearAlreadyOverException)
 from app.models.edition import Edition
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
@@ -31,10 +33,10 @@ async def create_edition(edition: Edition = Body(...)):
     :rtype: dict
     """
     if edition.year is None or edition.year == "" or int(edition.year) < datetime.date.today().year:
-        return errorresponse(f"You can't make an edition for a year that is already over {edition.year}", 409, "")
+        raise YearAlreadyOverException()
     # check if an edition with the same year is already present
     if await read_by_key_value(Edition, Edition.year, edition.year):
-        return errorresponse(f"There already is an edition with the year {edition.year}", 409, "")
+        raise AlreadyEditionWithYearException(edition.year)
 
     new_edition = await update(Edition.parse_obj(edition))
     return response(new_edition, "Edition added successfully.")
