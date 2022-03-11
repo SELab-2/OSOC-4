@@ -8,9 +8,9 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/Login.vue')
     },
     {
-        path: '/add-users',
-        name: 'AddUsers',
-        component: () => import('../views/AddUsers.vue')
+        path: '/invite-users',
+        name: 'InviteUsers',
+        component: () => import('../views/InviteUsers.vue')
     },
     {
         path: '/projects',
@@ -26,6 +26,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/manage-users',
         name: 'ManageUsers',
         component: () => import('../views/ManageUsers.vue')
+    },
+    {
+        path: '/invite/:key',
+        name: 'JoinUser',
+        component: () => import('../views/JoinUser.vue')
     }
     ];
 
