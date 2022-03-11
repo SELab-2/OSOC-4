@@ -1,10 +1,15 @@
 from app.crud import read_all, read_by_key_value, update
 from app.database import db
+from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
+                                            InvalidEmailException,
+                                            UserAlreadyActiveException,
+                                            UserNotFoundException)
 from app.models.user import User, UserCreate, UserOut, UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.invite import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
+from app.utils.validators import valid_email
 from bson import ObjectId
 from fastapi import APIRouter, Depends
 
@@ -36,9 +41,13 @@ async def add_user_data(user: UserCreate):
     :rtype: dict
     """
 
+    # check if valid email
+    if not valid_email(user.email):
+        raise InvalidEmailException()
+
     # check if email already used
     if await read_by_key_value(User, User.email, user.email):
-        return errorresponse("Email already used", 409, "")
+        raise EmailAlreadyUsedException()
 
     new_user = await update(User.parse_obj(user))
     return response(new_user, "User added successfully.")
@@ -56,7 +65,7 @@ async def invite_user(id: str):
     user = await read_by_key_value(User, User.id, ObjectId(id))
 
     if user.active:
-        return errorresponse(None, 400, "The user is already active")
+        raise UserAlreadyActiveException()
 
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key(str(user.id))
@@ -79,7 +88,7 @@ async def get_user(id: str):
     user = await read_by_key_value(User, User.id, ObjectId(id))
 
     if not user:
-        return errorresponse(None, 400, "User not found")
+        raise UserNotFoundException()
 
     if not user.approved:
         return errorresponse(None, 400, "The user doesn't exist (yet)")

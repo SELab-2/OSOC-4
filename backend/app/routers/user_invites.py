@@ -1,8 +1,12 @@
 from app.crud import read_by_key_value, update
 from app.database import db
+from app.exceptions.invite_exceptions import InvalidInviteException
+from app.exceptions.user_exceptions import (InvalidPasswordException,
+                                            PasswordsDoNotMatchException)
 from app.models.user import User, UserInvite
 from app.utils.cryptography import get_password_hash
-from app.utils.response import errorresponse, response
+from app.utils.response import response
+from app.utils.validators import valid_password
 from fastapi import APIRouter
 from odmantic import ObjectId
 
@@ -20,7 +24,7 @@ async def check_invite(invitekey: str):
     if db.redis.get(invitekey):
         return response(None, "User activated successfully")
     else:
-        return errorresponse(None, 400, "invite is not valid")
+        raise InvalidInviteException()
 
 
 @router.post("/{invitekey}")
@@ -35,15 +39,18 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
     :rtype: success or error
     """
 
+    if not valid_password(userinvite.password):
+        raise InvalidPasswordException()
+
     if userinvite.password != userinvite.validate_password:
-        return errorresponse(None, 400, "entered passwords are not the same")
+        raise PasswordsDoNotMatchException()
 
     if db.redis.get(invitekey):  # check that the inv key exists
 
         user: User = await read_by_key_value(User, User.id, ObjectId(invitekey.split("_")[1]))
 
         if user.active:
-            return errorresponse(None, 400, "account already active")
+            raise InvalidInviteException()
 
         user.name = userinvite.name
         user.password = get_password_hash(userinvite.password)
@@ -53,4 +60,4 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
 
         return response(None, "User activated successfully")
     else:
-        return errorresponse(None, 400, "invite is not valid")
+        raise InvalidInviteException()
