@@ -19,10 +19,9 @@ class Wrong(Exception):
     def __str__(self):
         return self.msg
 
-
 class TestBase(unittest.IsolatedAsyncioTestCase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__()
 
         self.user_unactivated = User(
             email="user_unactivated@test.be",
@@ -82,8 +81,8 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 await delete()
                 raise e
 
-
-
+"""
+an example of how to use this class once you inhereted it
     async def test_get_partners_as_admin(self):
         async def do(client: AsyncClient):
             admin = self.user_admin
@@ -96,3 +95,4 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             if response.status_code == 200:
                 raise Wrong("wrong status code")
         await self.with_all(do)
+"""
