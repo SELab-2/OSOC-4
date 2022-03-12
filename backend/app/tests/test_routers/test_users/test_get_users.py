@@ -1,11 +1,11 @@
 from httpx import AsyncClient
 
-from app.tests.test_base import TestBase, DefaultTestUsers
+from app.tests.test_base import TestBase
 
 
 class TestGetUsers(TestBase):
     def __init__(self, *args, **kwargs):
-        super().__init__(DefaultTestUsers, *args, **kwargs)
+        super().__init__({}, *args, **kwargs)
 
     async def test_get_users_as_admin(self):
         async def do(client: AsyncClient):
@@ -17,12 +17,12 @@ class TestGetUsers(TestBase):
     async def test_get_users_as_forbidden(self):
         """Test whether other users have the correct failing status code.
 
-        307: Redirect
         403: Forbidden
+        422: Unprocessable
         """
 
         async def do(client: AsyncClient):
-            for user_title in DefaultTestUsers:
+            for user_title in self.objects:
                 if user_title != "user_admin":
                     await self.get_response("/users/", client, user_title, 403)
 

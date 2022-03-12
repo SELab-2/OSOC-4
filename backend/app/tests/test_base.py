@@ -1,47 +1,13 @@
 import json
 import unittest
 
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient, Response
+
 from app.api import app
 from app.database import db
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient, Response
-
-DefaultTestUsers = {
-    "user_admin": User(
-        email="user_admin@test.be",
-        name="user_admin",
-        password="Test123!user_admin",
-        role=UserRole.ADMIN,
-        active=True, approved=True),
-    "user_approved_coach": User(
-        email="user_approved_coach@test.be",
-        name="user_approved_coach",
-        password="Test123!user_approved_coach",
-        role=UserRole.COACH,
-        active=True, approved=True),
-    "user_activated_coach": User(
-        email="user_activated_coach@test.be",
-        name="user_activated_coach",
-        password="Test123!user_activated_coach",
-        role=UserRole.COACH,
-        active=True, approved=False),
-    "user_unactivated_coach": User(
-        email="user_unactivated_coach@test.be",
-        name="user_unactivated_coach",
-        password="Test123!user_unactivated_coach",
-        role=UserRole.COACH,
-        active=False,
-        approved=False),
-    "user_no_role": User(
-        email="user_no_role@test.be",
-        name="user_no_role",
-        password="Test123!user_no_role",
-        role=UserRole.NO_ROLE,
-        active=False,
-        approved=False)
-}
 
 
 class Wrong(Exception):
@@ -57,8 +23,42 @@ class Wrong(Exception):
 class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self, objects, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.objects = objects
-        self.saved_objects = {}
+        self.objects = {
+            "user_admin": User(
+                email="user_admin@test.be",
+                name="user_admin",
+                password="Test123!user_admin",
+                role=UserRole.ADMIN,
+                active=True, approved=True),
+            "user_approved_coach": User(
+                email="user_approved_coach@test.be",
+                name="user_approved_coach",
+                password="Test123!user_approved_coach",
+                role=UserRole.COACH,
+                active=True, approved=True),
+            "user_activated_coach": User(
+                email="user_activated_coach@test.be",
+                name="user_activated_coach",
+                password="Test123!user_activated_coach",
+                role=UserRole.COACH,
+                active=True, approved=False),
+            "user_unactivated_coach": User(
+                email="user_unactivated_coach@test.be",
+                name="user_unactivated_coach",
+                password="Test123!user_unactivated_coach",
+                role=UserRole.COACH,
+                active=False,
+                approved=False),
+            "user_no_role": User(
+                email="user_no_role@test.be",
+                name="user_no_role",
+                password="Test123!user_no_role",
+                role=UserRole.NO_ROLE,
+                active=False,
+                approved=False)
+        }
+        self.objects.update(objects)
+        self.saved_objects = {"passwords": {}}
 
     async def get_access_token(self, client, user: str):
         email: str = self.saved_objects[user].email
@@ -138,7 +138,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
         if use_access_token:
             response = await client.post(path, json=json_body, headers={"Authorization": f"Bearer {access_token}",
-                                                                   "Content-Type": "application/json"})
+                                                                        "Content-Type": "application/json"})
         else:
             response = await client.post(path, json=json_body, headers={"Content-Type": "application/json"})
 
@@ -158,12 +158,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if isinstance(obj, User):
             plain_password = obj.password
             obj.password = get_password_hash(obj.password)
-            if "passwords" not in self.saved_objects:
-                self.saved_objects["passwords"] = {}
             self.saved_objects["passwords"][key] = plain_password
 
         if save_obj:
             self.saved_objects[key] = await db.engine.save(obj)
+        else:
+            self.saved_objects[key] = obj
 
     async def with_all(self, func):
         async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
