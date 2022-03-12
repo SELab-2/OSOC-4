@@ -2,8 +2,8 @@
 
 import {ref} from "vue";
 
-let filters: string[] = ["Marketer", "Video editor", "Copywriter"];
-let nameFilter = "Roles"
+let filters = ["Marketer", "Video editor", "Copywriter"];
+let nameFilter = "Roles";
 let checkedFilter = ref([]);
 </script>
 
