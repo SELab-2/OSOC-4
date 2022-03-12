@@ -1,11 +1,47 @@
+import json
 import unittest
 
 from app.api import app
 from app.database import db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 from asgi_lifespan import LifespanManager
-from httpx import AsyncClient
+from httpx import AsyncClient, Response
+
+DefaultTestUsers = {
+    "user_admin": User(
+        email="user_admin@test.be",
+        name="user_admin",
+        password="Test123!user_admin",
+        role=UserRole.ADMIN,
+        active=True, approved=True),
+    "user_approved_coach": User(
+        email="user_approved_coach@test.be",
+        name="user_approved_coach",
+        password="Test123!user_approved_coach",
+        role=UserRole.COACH,
+        active=True, approved=True),
+    "user_activated_coach": User(
+        email="user_activated_coach@test.be",
+        name="user_activated_coach",
+        password="Test123!user_activated_coach",
+        role=UserRole.COACH,
+        active=True, approved=False),
+    "user_unactivated_coach": User(
+        email="user_unactivated_coach@test.be",
+        name="user_unactivated_coach",
+        password="Test123!user_unactivated_coach",
+        role=UserRole.COACH,
+        active=False,
+        approved=False),
+    "user_no_role": User(
+        email="user_no_role@test.be",
+        name="user_no_role",
+        password="Test123!user_no_role",
+        role=UserRole.NO_ROLE,
+        active=False,
+        approved=False)
+}
 
 
 class Wrong(Exception):
@@ -24,17 +60,116 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.objects = objects
         self.saved_objects = {}
 
+    async def get_access_token(self, client, user: str):
+        email: str = self.saved_objects[user].email
+        password: str = self.saved_objects["passwords"][user]
+        login = await client.post("/login", json={"email": email, "password": password},
+                                  headers={"Content-Type": "application/json"})
+        return json.loads(login.content)["access_token"]
+
+    async def get_response(self, path: str, client: AsyncClient, user: str, expected_status: int = 200,
+                           access_token: str = None, use_access_token: bool = True) -> Response:
+        """GET request test template
+
+        Tests whether a request with the given data matches the expected status and returns the response.
+
+        Args:
+        :param path: The path of the GET request
+        :type path: str
+        :param client: The AsyncClient
+        :type client: AsyncClient
+        :param user: The requesting user
+        :type user: str
+        :param expected_status: The expected status of the request, defaults to 200
+        :type expected_status: int
+        :param access_token: The access token of the request, defaults to token of user
+        :type access_token: str
+        :param use_access_token: Toggle whether an access token is used in the request
+        :type use_access_token: bool
+
+        :return: The response of the GET request
+        :rtype: Response
+        """
+        if access_token is None:
+            access_token = await self.get_access_token(client, user)
+
+        if use_access_token:
+            response = await client.get(path, headers={"Authorization": f"Bearer {access_token}"})
+        else:
+            response = await client.get(path)
+
+        if response.status_code != expected_status:
+            raise Wrong(
+                f"While doing GET to '{path}': "
+                f"Unexpected status for {user}, "
+                f"status code was {response.status_code}, "
+                f"expected {expected_status}"
+            )
+
+        return response
+
+    async def post_response(self, path: str, json_body: dict, client: AsyncClient, user: str,
+                            expected_status: int = 200, access_token: str = None,
+                            use_access_token: bool = True) -> Response:
+        """POST request test template
+
+        Tests whether a request with the given data matches the expected status and returns the response.
+
+        :param path: The path of the POST request
+        :type path: str
+        :param json_body: The POST body
+        :type json_body: dict
+        :param client: The AsyncClient
+        :type client: AsyncClient
+        :param user: The requesting user
+        :type user: str
+        :param expected_status: The expected status of the POST request, defaults to 200
+        :type expected_status: int
+        :param access_token: The access token of the request, defaults to token of user
+        :type access_token: str
+        :param use_access_token: Toggle whether an access token is used in the request
+        :type use_access_token: bool
+
+        :return: The response of the POST request
+        :rtype: Response
+        """
+        if access_token is None:
+            access_token = await self.get_access_token(client, user)
+
+        if use_access_token:
+            response = await client.post(path, json=json_body, headers={"Authorization": f"Bearer {access_token}",
+                                                                   "Content-Type": "application/json"})
+        else:
+            response = await client.post(path, json=json_body, headers={"Content-Type": "application/json"})
+
+        if response.status_code != expected_status:
+            raise Wrong(
+                f"While doing POST of\n"
+                f"{json_body}\n"
+                f"to '{path}': "
+                f"Unexpected status for {user}, "
+                f"status code was {response.status_code}, "
+                f"expected {expected_status}"
+            )
+
+        return response
+
+    async def add_external_object(self, key, obj, save_obj=False):
+        if isinstance(obj, User):
+            plain_password = obj.password
+            obj.password = get_password_hash(obj.password)
+            if "passwords" not in self.saved_objects:
+                self.saved_objects["passwords"] = {}
+            self.saved_objects["passwords"][key] = plain_password
+
+        if save_obj:
+            self.saved_objects[key] = await db.engine.save(obj)
+
     async def with_all(self, func):
         async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
 
-            for k, v in self.objects.items():
-                if isinstance(v, User):
-                    plain_password = v.password
-                    v.password = get_password_hash(v.password)
-                    if "passwords" not in self.saved_objects:
-                        self.saved_objects["passwords"] = {}
-                    self.saved_objects["passwords"][k] = plain_password
-                self.saved_objects[k] = await db.engine.save(v)
+            for k, obj in self.objects.items():
+                await self.add_external_object(k, obj, True)
 
             async def delete():
                 for object in self.saved_objects.values():
@@ -46,7 +181,8 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             except Wrong as wrong:
                 await delete()
                 self.assertTrue(False, wrong.msg)
-
             except Exception as e:
                 await delete()
                 raise e
+
+            await delete()
