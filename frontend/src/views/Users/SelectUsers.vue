@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup >
 import Filters from "@/views/Users/Filters.vue";
 import ListUsers from "@/views/Users/ListUsers.vue";
 </script>

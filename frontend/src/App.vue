@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
   import {ref} from "vue";
   import LoggedInHeader from "@/views/headers/LoggedInHeader.vue";
   import NotLoggedInHeader from "@/views/headers/NotLoggedInHeader.vue";
