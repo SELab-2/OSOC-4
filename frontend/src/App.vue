@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {ref} from "vue";
-  import LoggedInHeader from "@/views/headers/LoggedInHeader.vue";
-  import NotLoggedInHeader from "@/views/headers/NotLoggedInHeader.vue";
+  import LoggedInHeader from "./views/headers/LoggedInHeader.vue";
+  import NotLoggedInHeader from "./views/headers/NotLoggedInHeader.vue";
 
   const loggedIn = ref(false)
   function switchLoginStatus() {
