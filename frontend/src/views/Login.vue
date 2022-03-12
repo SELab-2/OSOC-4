@@ -1,13 +1,13 @@
 <script setup >
 import {ref} from "vue";
-import axios from "axios";
 
 let emailRef = ref("");
 let passwordRef = ref("");
 
 function loginButton(){
   if(emailRef.value !== "" && passwordRef.value !== ""){
-    axios.post("/login", {email : emailRef.value, password : passwordRef.value })
+    console.log(passwordRef.value)
+    console.log(emailRef.value)
   }
 }
 
