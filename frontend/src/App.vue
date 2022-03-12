@@ -1,12 +1,6 @@
 <script setup>
-  import {ref} from "vue";
   import LoggedInHeader from "@/views/headers/LoggedInHeader.vue";
   import NotLoggedInHeader from "@/views/headers/NotLoggedInHeader.vue";
-
-  const loggedIn = ref(false)
-  function switchLoginStatus() {
-    loggedIn.value = ! loggedIn.value
-  }
 </script>
 
 <template>
@@ -15,10 +9,21 @@
   <main>
     <LoggedInHeader v-if="loggedIn"/>
     <NotLoggedInHeader v-else/>
-    <br>
-    <button @click=switchLoginStatus()>Log off / on view</button>
   </main>
 </template>
+
+<script>
+export default {
+  name: 'App',
+  computed: {
+    loggedIn: function (){
+      return this.$store.getters.isAuthenticated;
+    }
+  }
+}
+
+
+</script>
 
 <style>
 </style>

@@ -1,28 +1,41 @@
-<script setup >
-import {ref} from "vue";
-
-let emailRef = ref("");
-let passwordRef = ref("");
-
-function loginButton(){
-  if(emailRef.value !== "" && passwordRef.value !== ""){
-    console.log(passwordRef.value)
-    console.log(emailRef.value)
+<script >
+import {mapActions } from 'vuex';
+export default {
+  name: 'Login',
+  data() {
+    return {
+      user: {
+        email: '',
+        password: ''
+      }
+    }
+  },
+  methods:{
+    ...mapActions(['logIn']),
+    ...mapActions(['test']),
+    async loginButton() {
+      if (this.user.email !== "" && this.user.password !== "") {
+        this.test(this.user);
+        // console.log(this.user.password)
+        // console.log(this.user.email)
+        // await this.logIn(this.user)
+        // console.log('finished login in?');
+      }
+    }
   }
 }
+
 
 </script>
 
 <template>
     <h1>Login</h1>
     <p class="text-muted"> Please enter your login and password!</p>
-    <input v-model="emailRef" type="email" name="" placeholder="Email">
+    <input v-model="user.email" type="email" name="" placeholder="Email">
     <br/>
-    <input v-model="passwordRef" type="password" name="" placeholder="Password">
+    <input v-model="user.password" type="password" name="" placeholder="Password">
     <br/>
-    <input v-on:click=loginButton() type="submit" name="" value="Login">
-    <br/>
-    <p @click="$router.push('/sign-up')">Don't have an account yet?</p>
+    <input v-on:click=loginButton type="submit" name="" value="Login">
 </template>
 
 <style scoped>

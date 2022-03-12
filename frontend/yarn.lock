@@ -4652,6 +4652,7 @@ __metadata:
     vue: ^3.2.31
     vue-router: ^4.0.14
     vuex: ^4.0.2
+    vuex-persistedstate: ^4.1.0
   languageName: unknown
   linkType: soft
 
@@ -7924,6 +7925,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"shvl@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "shvl@npm:2.0.3"
+  checksum: 07d93a9dd92f966b1e506d479d841243d7296902673f8641927c8624fec700742298063d06d2f1b6cf52b546f015a3c4bb5900a910fc0181c02b73bf4791223d
+  languageName: node
+  linkType: hard
+
 "side-channel@npm:^1.0.4":
   version: 1.0.4
   resolution: "side-channel@npm:1.0.4"
@@ -8948,6 +8956,18 @@ __metadata:
     "@vue/server-renderer": 3.2.31
     "@vue/shared": 3.2.31
   checksum: 2d66b563e60ce01ff4872f425b1acaf9a9f9d36f48eb986c89962d9b324c6bf566868503811462317052273b53056bbc58be3ceb06ea39dff174bb0fa62db3a2
+  languageName: node
+  linkType: hard
+
+"vuex-persistedstate@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "vuex-persistedstate@npm:4.1.0"
+  dependencies:
+    deepmerge: ^4.2.2
+    shvl: ^2.0.3
+  peerDependencies:
+    vuex: ^3.0 || ^4.0.0-rc
+  checksum: f9dd42ea0e0118e0c579f9d9012ceeac17fdea66904780416cb2abed6e1a40c1fb1cec23d455de0d2480747e6226a58dbd36c23a35751904ffbc4f0499fed2c0
   languageName: node
   linkType: hard
 
