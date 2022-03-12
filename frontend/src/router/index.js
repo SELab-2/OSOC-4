@@ -29,7 +29,14 @@ const routes = [
   {
     path: '/invite/:key',
     name: 'JoinUser',
-    component: () => import('../views/JoinUser.vue')
+    component: () => import('../views/InviteUsers.vue')
+  },
+  // ERRORS
+  {
+    path: '/error',
+    name: 'ErrorPage',
+    component: () => import('../views/ErrorPage.vue'),
+    props: true
   }
 ];
 
