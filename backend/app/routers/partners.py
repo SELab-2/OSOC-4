@@ -78,7 +78,7 @@ async def get_partner(id, Authorize: AuthJWT = Depends()):
     current_user_id = Authorize.get_jwt_subject()
 
     # if coach -> check if the coach is involved with partner
-    projects = [project for project in await db.engine.find(Project) if ObjectId(current_user_id) in project.user_ids and ObjectId(id) in project.partner_ids]
+    projects = await db.engine.find(Project, {"user_ids": ObjectId(current_user_id), "partner_ids": ObjectId(id)})
 
     if not len(projects):
         raise NotPermittedException()
