@@ -1,12 +1,7 @@
-/**
- * Respond to an error by constructing an error page
- * & redirecting
- * @param e
- * @returns {Promise<undefined>}
- */
 import axios from "axios";
 import router from "../router";
 
+const config = {headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "<origin>"}};
 
 /**
  * redirects to another url
@@ -48,8 +43,6 @@ async function catch_error(e) {
  * @returns {Promise<undefined|*>}
  */
 export async function get_json(url) {
-    const config = {headers: {Accept: "application/json"}};
-
     try {
         const req = await axios.get(url, config);
         return req.data;
@@ -66,8 +59,6 @@ export async function get_json(url) {
  * @returns {Promise<undefined|any>}
  */
 export async function send_delete(url) {
-    const config = {headers: {Accept: "application/json"}};
-
     try {
         const req = await axios.delete(url, config);
         return req.data;
@@ -85,8 +76,6 @@ export async function send_delete(url) {
  * @returns {Promise<string|{data, success: boolean}>}
  */
 export async function postCreate(url, json) {
-    const config = {headers: {"Content-Type": "application/json"}};
-
     try {
         return {
             success: true,
@@ -111,8 +100,6 @@ export async function postCreate(url, json) {
  * @returns {Promise<string|{data, success: boolean}>}
  */
 export async function patchEdit(url, json) {
-    const config = {headers: {"Content-Type": "application/json"}};
-
     try {
         return {
             success: true,
