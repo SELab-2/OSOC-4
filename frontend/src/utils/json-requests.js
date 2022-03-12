@@ -76,6 +76,7 @@ export async function send_delete(url) {
  * @returns {Promise<string|{data, success: boolean}>}
  */
 export async function postCreate(url, json) {
+    console.log(json)
     try {
         return {
             success: true,
