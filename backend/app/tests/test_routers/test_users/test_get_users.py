@@ -13,7 +13,6 @@ class TestGetUsers(TestBase):
 
     async def test_get_users_as_admin(self):
         async def do(client: AsyncClient):
-            # TODO check response.content
             response = await self.get_response("/users/", client, "user_admin", 200)
             gotten_users = json.loads(response.content)["data"]
             users = await db.engine.find(User)
