@@ -17,3 +17,5 @@ jobs:
         run: docker-compose -f test-docker-compose.yml up -d
       - name: Run tests
         run: docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover
+      - name: Clean up
+        run: docker-compose -f test-docker-compose.yml rm
