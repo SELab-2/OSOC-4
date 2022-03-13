@@ -54,7 +54,7 @@ export class Engine {
      */
     async get_json(url) {
         try {
-            const req = await axiosEngine.get(url, this.headers());
+            const req = await axios.get(url, this.headers());
             return req.data;
         } catch (e) {
             return await catch_error(e);
@@ -113,7 +113,7 @@ export class Engine {
         try {
             return {
                 success: true,
-                data: (await axiosEngine.patch(url, json, this.headers())).data.url};
+                data: (await axios.patch(url, json, this.headers())).data.url};
         } catch (e) {
             if (e.response.status === 400 && e.response.data.message) {
                 return { success: false,
@@ -129,13 +129,12 @@ export class Engine {
     async login(url, json) {
         try {
             console.log("sending login req");
-            let resp = await axios.post(url, json, this.headers());
-            console.log(resp);
+            await axios.post(url, json, this.headers());
             this._headers['X-CSRF-TOKEN'] = Cookies.get('csrf_access_token');
             console.log("headers updated");
             return {
                 success: true,
-                data: resp.data};
+                };
         } catch (e) {
             if (e.response.status === 400 && e.response.data.message) {
                 return { success: false,
@@ -150,8 +149,8 @@ export class Engine {
     async logout(url) {
         try {
             console.log("sending logout req")
-            console.log(this.headers)
             const req = await axios.delete(url, this.headers());
+            delete this._headers['X-CSRF-TOKEN']
             return req.data;
         } catch (e) {
             return await catch_error(e);

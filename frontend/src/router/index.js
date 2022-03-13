@@ -7,11 +7,6 @@ const routes = [
     component: () => import('../views/Login.vue')
   },
   {
-    path: '/logout',
-    name: 'Logout',
-    component: () => import('../views/Logout.vue')
-  },
-  {
     path: '/invite-users',
     name: 'InviteUsers',
     component: () => import('../views/InviteUsers.vue')
