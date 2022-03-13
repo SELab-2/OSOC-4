@@ -1,6 +1,10 @@
+import json
+
 from httpx import AsyncClient
 
-from app.tests.test_base import TestBase
+from app.database import db
+from app.models.user import User
+from app.tests.test_base import TestBase, Wrong
 
 
 class TestGetUsers(TestBase):
@@ -10,7 +14,17 @@ class TestGetUsers(TestBase):
     async def test_get_users_as_admin(self):
         async def do(client: AsyncClient):
             # TODO check response.content
-            await self.get_response("/users/", client, "user_admin", 200)
+            response = await self.get_response("/users/", client, "user_admin", 200)
+            gotten_users = json.loads(response.content)["data"]
+            users = await db.engine.find(User)
+
+            user_emails: list[str] = sorted([user.email for user in users])
+            gotten_user_emails: list[str] = sorted([user["email"] for user in gotten_users])
+
+            if user_emails != gotten_user_emails:
+                raise Wrong("Users in the database were not the same as the returned users.\n"
+                            f"Expected: {user_emails}\n"
+                            f"Was: {gotten_user_emails}")
 
         await self.with_all(do)
 
