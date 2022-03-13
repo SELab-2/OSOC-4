@@ -185,5 +185,3 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             except Exception as e:
                 await delete()
                 raise e
-
-            await delete()
