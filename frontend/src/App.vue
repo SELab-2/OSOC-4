@@ -7,19 +7,14 @@
   <header>
   </header>
   <main>
-    <LoggedInHeader v-if="loggedIn"/>
+    <LoggedInHeader v-if="this.$store.getters.getIsAuthenticated"/>
     <NotLoggedInHeader v-else/>
   </main>
 </template>
 
 <script>
 export default {
-  name: 'App',
-  computed: {
-    loggedIn: function (){
-      return this.$store.getters.isAuthenticated;
-    }
-  }
+  name: 'App'
 }
 
 

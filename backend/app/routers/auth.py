@@ -8,6 +8,8 @@ from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
+from app.utils.response import response
+
 
 class Settings(BaseModel):
     authjwt_secret_key: str = 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0'
@@ -69,7 +71,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
 
-        return {"access_token": access_token, "refresh_token": refresh_token}
+        return response(None, "Login successful")
 
     raise InvalidEmailOrPasswordException()
 

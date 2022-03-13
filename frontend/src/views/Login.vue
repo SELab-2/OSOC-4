@@ -15,10 +15,6 @@ export default {
     async loginButton() {
       if (this.user.email !== "" && this.user.password !== "") {
         await this.logIn(this.user);
-        // console.log(this.user.password)
-        // console.log(this.user.email)
-        // await this.logIn(this.user)
-        // console.log('finished login in?');
       }
     }
   }

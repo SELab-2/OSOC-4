@@ -1,28 +1,31 @@
-import {postCreate} from "../../utils/json-requests";
+import {Engine} from "../../utils/json-requests";
 
 const state = {
-    user: null
+    isAuthenticated: false
 };
 
 const getters = {
-    isAuthenticated: state => !!state.user,
-    stateUser: state => state.user,
+    getIsAuthenticated: state => state.isAuthenticated,
 }
 
 const actions = {
     async logIn({dispatch}, user){
         console.log("trying to log in")
-        const data = await postCreate('http://localhost:8000/login', user)
-        this.commit('setUser', data);
+        this.engine = new Engine()
+        await this.engine.login('http://localhost:8000/login', user)
+        this.commit('setIsAuthenticated', true);
     },
-    async logout({commit}){
-        this.commit('setUser', null);
+    async logOut({commit}){
+        console.log("logout")
+        console.log(this.tokens)
+        await this.engine.logout('http://localhost:8000/logout')
+        this.commit('setIsAuthenticated', false);
     }
 };
 
 const mutations = {
-    setUser(state, user){
-        state.user = user
+    setIsAuthenticated(state, value){
+        state.isAuthenticated = value
     }
 };
 

@@ -1,7 +1,6 @@
 import axios from "axios";
 import router from "../router";
-
-const config = {headers: {"Content-Type": "application/json", "Access-Control-Allow-Origin": "<origin>"}};
+import Cookies from 'js-cookie';
 
 /**
  * redirects to another url
@@ -35,84 +34,133 @@ async function catch_error(e) {
     return undefined;
 }
 
-
-/**
- * Send a GET-request to an endpoint & return the JSON data.
- * In case of an invalid request, redirects to the error page & returns undefined.
- * @param url the URL to send the request to
- * @returns {Promise<undefined|*>}
- */
-export async function get_json(url) {
-    try {
-        const req = await axios.get(url, config);
-        return req.data;
-    } catch (e) {
-        return await catch_error(e);
+export class Engine {
+    constructor() {
+        axios.defaults.withCredentials = true
+        this._headers = {"Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "<origin>"}
     }
-}
 
-
-/**
- * Send a DELETE-request to an endpoint & return the returned JSON.
- * In case of an invalid request, redirects to the error page & returns undefined.
- * @param url the URL to send the request to
- * @returns {Promise<undefined|any>}
- */
-export async function send_delete(url) {
-    try {
-        const req = await axios.delete(url, config);
-        return req.data;
-    } catch (e) {
-        return await catch_error(e);
+    headers() {
+        return {"headers": this._headers}
     }
-}
 
 
-/**
- * Send a POST-request to an endpoint & return the returned JSON data.
- * In case of an invalid request, redirects to the error page & returns undefined.
- * @param url the URL to send the request to
- * @param json the data
- * @returns {Promise<string|{data, success: boolean}>}
- */
-export async function postCreate(url, json) {
-    console.log(json)
-    try {
-        return {
-            success: true,
-            data: (await axios.post(url, json, config)).data.url};
-    } catch (e) {
-        if (e.response.status === 400 && e.response.data.message) {
-            return { success: false,
-                data: e.response.data.message};
-        } else {
-            await catch_error(e);
-            return "";
+    /**
+     * Send a GET-request to an endpoint & return the JSON data.
+     * In case of an invalid request, redirects to the error page & returns undefined.
+     * @param url the URL to send the request to
+     * @returns {Promise<undefined|*>}
+     */
+    async get_json(url) {
+        try {
+            const req = await axiosEngine.get(url, this.headers());
+            return req.data;
+        } catch (e) {
+            return await catch_error(e);
         }
     }
-}
 
+    /**
+     * Send a DELETE-request to an endpoint & return the returned JSON.
+     * In case of an invalid request, redirects to the error page & returns undefined.
+     * @param url the URL to send the request to
+     * @returns {Promise<undefined|any>}
+     */
+    async send_delete(url) {
 
-/**
- * Send a PATCH-request to an endpoint & return the returned JSON data.
- * In case of an invalid request, redirects to the error page & returns undefined.
- * @param url the URL to send the request to
- * @param json the data
- * @returns {Promise<string|{data, success: boolean}>}
- */
-export async function patchEdit(url, json) {
-    try {
-        return {
-            success: true,
-            data: (await axios.patch(url, json, config)).data.url};
-    } catch (e) {
-        if (e.response.status === 400 && e.response.data.message) {
-            return { success: false,
-                data: e.response.data.message};
-        } else {
-            await catch_error(e);
-            return "";
+        try {
+            const req = await axios.delete(url, this.headers());
+            return req.data;
+        } catch (e) {
+            return await catch_error(e);
         }
     }
+
+    /**
+     * Send a POST-request to an endpoint & return the returned JSON data.
+     * In case of an invalid request, redirects to the error page & returns undefined.
+     * @param url the URL to send the request to
+     * @param json the data
+     * @returns {Promise<string|{data, success: boolean}>}
+     */
+    async postCreate(url, json) {
+        console.log(json)
+        try {
+            let resp = await axios.post(url, json, this.headers())
+            return {
+                success: true,
+                data: resp.data};
+        } catch (e) {
+            if (e.response.status === 400 && e.response.data.message) {
+                return { success: false,
+                    data: e.response.data.message};
+            } else {
+                await catch_error(e);
+                return "";
+            }
+        }
+    }
+
+    /**
+     * Send a PATCH-request to an endpoint & return the returned JSON data.
+     * In case of an invalid request, redirects to the error page & returns undefined.
+     * @param url the URL to send the request to
+     * @param json the data
+     * @returns {Promise<string|{data, success: boolean}>}
+     */
+    async patchEdit(url, json) {
+        try {
+            return {
+                success: true,
+                data: (await axiosEngine.patch(url, json, this.headers())).data.url};
+        } catch (e) {
+            if (e.response.status === 400 && e.response.data.message) {
+                return { success: false,
+                    data: e.response.data.message};
+            } else {
+                await catch_error(e);
+                return "";
+            }
+        }
+    }
+
+
+    async login(url, json) {
+        try {
+            console.log("sending login req");
+            let resp = await axios.post(url, json, this.headers());
+            console.log(resp);
+            this._headers['X-CSRF-TOKEN'] = Cookies.get('csrf_access_token');
+            console.log("headers updated");
+            return {
+                success: true,
+                data: resp.data};
+        } catch (e) {
+            if (e.response.status === 400 && e.response.data.message) {
+                return { success: false,
+                    data: e.response.data.message};
+            } else {
+                await catch_error(e);
+                return "";
+            }
+        }
+    }
+
+    async logout(url) {
+        try {
+            console.log("sending logout req")
+            console.log(this.headers)
+            const req = await axios.delete(url, this.headers());
+            return req.data;
+        } catch (e) {
+            return await catch_error(e);
+        }
+    }
+
 }
+
+
+
+
 
