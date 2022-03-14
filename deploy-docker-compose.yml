@@ -7,7 +7,7 @@ services:
     ports:
       - 3000
     environment:
-      - API_URL: ${PATHPREFIX}/api
+      - VITE_API_URL: https://sel2-4.ugent.be/${PATHPREFIX}/api
     networks:
         - proxynet
     labels:
