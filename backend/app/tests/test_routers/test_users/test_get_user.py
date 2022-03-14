@@ -6,7 +6,7 @@ from httpx import AsyncClient, Response
 from app.tests.test_base import TestBase, Wrong
 
 
-class TestGetUsers(TestBase):
+class TestGetUser(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__({}, *args, **kwargs)
 
