@@ -39,8 +39,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: justapassword
-    ports:
-      - 27017:27017
     volumes:
       - ./data/mongo:/data/db
     networks:
@@ -50,8 +48,6 @@ services:
   redis:
     image: redis:latest
     restart: always
-    ports:
-      - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
     volumes:
       - ./data/redis:/data
