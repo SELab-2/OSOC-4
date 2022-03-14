@@ -7,7 +7,7 @@
   <header>
   </header>
   <main>
-    <LoggedInHeader v-if="this.$store.getters.getIsAuthenticated"/>
+    <LoggedInHeader v-if="$store.getters.getIsAuthenticated"/>
     <NotLoggedInHeader v-else/>
   </main>
 </template>
