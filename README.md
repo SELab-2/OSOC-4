@@ -71,5 +71,5 @@ INVITE_EXPIRE=4320 # in minutes
 Use the following URL to access the Swagger API docs. Change the port if needed.
 
 `http://localhost:8000/docs`
-
+ 
 # Testing
