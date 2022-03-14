@@ -1,8 +1,13 @@
-version: "3.8"
+version: "3.7"
 
 services:
+  osoc-frontend: 
+    build: ./frontend
+    ports:
+      - "3000:3000"
+
   osoc-backend:
-    container_name: "osoc-backend"
+    # container_name: "osoc-backend"
     build: ./backend
     ports:
       - "8000:8000"
@@ -24,21 +29,17 @@ services:
 
   mongodb_container:
     image: mongo:latest
-    container_name: "osoc-mongodb"
+    # container_name: "osoc-mongodb"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: justapassword
-    ports:
-      - 27017:27017
     volumes:
       - ./data/mongo:/data/db
 
   redis:
     image: redis:latest
-    container_name: osoc-redis
+    # container_name: osoc-redis
     restart: always
-    ports:
-      - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
     volumes:
       - ./data/redis:/data

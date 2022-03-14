@@ -1,0 +1,83 @@
+version: "3.7"
+
+services:
+
+  osoc-frontend:
+    build: ./frontend
+    ports:
+      - 3000
+    environment:
+      VITE_API_URL: https://sel2-4.ugent.be/${PATHPREFIX}/api
+    networks:
+        - proxynet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.osoc-frontend.rule=Host(`sel2-4.ugent.be`) && PathPrefix(`${PATHPREFIX}/frontend`)
+      - traefik.http.routers.osoc-frontend.tls=true
+      - traefik.http.routers.osoc-frontend.tls.certresolver=le
+      - traefik.http.routers.osoc-frontend.entrypoints=websecure
+      - traefik.http.routers.osoc-frontend.middlewares=osocfrontendpathstrip
+      - traefik.http.middlewares.osocfrontendpathstrip.stripprefix.prefixes=${PATHPREFIX}/frontend
+      - traefik.port=3000
+    user: "1000:1000"
+
+
+  osoc-backend:
+    build: ./backend
+    ports:
+      - 8000
+    environment:
+      MONGO_URL: mongodb
+      MONGO_PORT: 27017
+      MONGO_USER: root
+      MONGO_PASSWORD: justapassword
+      REDIS_URL: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: justapassword
+      # SMTP Mail
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_SSL_PORT: 465
+      SENDER_EMAIL: osoc.groep4@gmail.com
+      SENDER_PASSWORD: Justapassword123!
+      # Invite Settings
+      INVITE_EXPIRE: 4320 #in minutes
+      PATHPREFIX: ${PATHPREFIX}
+    networks:
+      - proxynet
+      - default
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.osoc-backend.rule=Host(`sel2-4.ugent.be`) && PathPrefix(`${PATHPREFIX}/api`)
+      - traefik.http.routers.osoc-backend.tls=true
+      - traefik.http.routers.osoc-backend.tls.certresolver=le
+      - traefik.http.routers.osoc-backend.entrypoints=websecure
+      - traefik.http.routers.osoc-backend.middlewares=osocbackendpathstrip
+      - traefik.http.middlewares.osocbackendpathstrip.stripprefix.prefixes=${PATHPREFIX}/api
+      - traefik.port=8000
+    user: "1000:1000"
+    
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: justapassword
+    ports:
+      - 27017
+    volumes:
+      - ./data/mongo:/data/db
+    user: "1000:1000"
+ 
+  redis:
+    image: redis:latest
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
+    ports:
+      - 6379
+    volumes:
+      - ./data/redis:/data
+    user: "1000:1000"
+
+networks:
+  proxynet:
+    external:
+      name: proxy_network
