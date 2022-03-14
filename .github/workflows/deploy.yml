@@ -16,7 +16,7 @@ jobs:
         id: extract_branch
 
       
-      - name: executing remote ssh commands using password
+      - name: Move data to temp folder
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -24,10 +24,10 @@ jobs:
           key: ${{ secrets.SSH_SERVER_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && cp -r OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || echo "data doesn't exist"
-            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && docker-compose down) || echo "containers don't exist"
-      
-      - name: copy file via ssh password
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && cd OSOC-deployments/${{ steps.extract_branch.outputs.branch }} && docker-compose down) || echo "Containers don't exist"
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && mv OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || echo "Data doesn't exist"
+            
+      - name: Copy repo to the server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -37,4 +37,15 @@ jobs:
           source: "."
           target: "OSOC-deployments/${{ steps.extract_branch.outputs.branch }}"
           overwrite: true
+          
+      - name: Copy database data back
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_SERVER_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            ([[ -d /tmp/${{ steps.extract_branch.outputs.branch }}/data ]] && mv /tmp/${{ steps.extract_branch.outputs.branch }}/data OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data) || echo "Data doesn't exist"
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && cd OSOC-deployments/${{ steps.extract_branch.outputs.branch }} && docker-compose up --build -d) || echo "Repo not copied"
      
