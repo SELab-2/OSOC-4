@@ -18,8 +18,7 @@ jobs:
           key: ${{ secrets.SSH_SERVER_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            (test -f OSOC-deployments/${GITHUB_REF##*/}/data && cp OSOC-deployments/${GITHUB_REF##*/}/data /tmp/${GITHUB_REF##*/}/data)
-            (test -f OSOC-deployments/${GITHUB_REF##*/} && docker-compose down)
+            ls
       
       - name: copy file via ssh password
         uses: appleboy/scp-action@master
