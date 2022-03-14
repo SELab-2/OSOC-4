@@ -33,7 +33,8 @@ services:
       - traefik.http.routers.osoc-backend.middlewares=osocbackendpathstrip
       - traefik.http.middlewares.osocbackendpathstrip.stripprefix.prefixes=${PATHPREFIX}/api
       - traefik.port=8000
-
+    user: "1000:1000"
+    
   mongodb_container:
     image: mongo:latest
     container_name: "osoc-mongodb"
@@ -46,6 +47,7 @@ services:
       - ./data/mongo:/data/db
     networks:
       - backend
+    user: "1000:1000"
 
   redis:
     image: redis:latest
@@ -58,6 +60,7 @@ services:
       - ./data/redis:/data
     networks:
       - backend
+    user: "1000:1000"
 
 networks:
   proxynet:
