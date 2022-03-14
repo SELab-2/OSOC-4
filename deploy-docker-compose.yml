@@ -33,6 +33,7 @@ services:
       - traefik.http.routers.osoc-backend.middlewares=osocbackendpathstrip
       - traefik.http.middlewares.osocbackendpathstrip.stripprefix.prefixes=${PATHPREFIX}/api
       - traefik.port=8000
+      - treafik.docker.network=default
     user: "1000:1000"
     
   mongodb:
