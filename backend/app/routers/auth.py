@@ -4,6 +4,8 @@ from app.crud import read_by_key_value
 from app.database import db
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.user import User, UserLogin
+from app.utils.cryptography import verify_password
+from app.utils.response import response
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
@@ -63,13 +65,17 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     """
     u = await read_by_key_value(User, User.email, user.email)
     if u:
+
+        if not verify_password(user.password, u.password):
+            raise InvalidEmailOrPasswordException()
+
         access_token = Authorize.create_access_token(subject=str(u.id))
         refresh_token = Authorize.create_refresh_token(subject=str(u.id))
 
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
 
-        return {"access_token": access_token, "refresh_token": refresh_token}
+        return response(None, "Login successful")
 
     raise InvalidEmailOrPasswordException()
 

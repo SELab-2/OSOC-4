@@ -6,6 +6,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import connect_db, disconnect_db
 from app.exceptions.base_exception import BaseException
@@ -13,7 +14,22 @@ from app.routers import (answers, auth, editions, participation, partners,
                          projects, question_answers, questions, roles,
                          student_forms, suggestions, user_invites, users, ddd)
 
+
 app = FastAPI()
+
+
+origins = [
+    "http://localhost:3000",
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
