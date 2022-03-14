@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.SSH_SERVER_KEY }}
           source: "."
           target: "OSOC-deployments/${{ steps.extract_branch.outputs.branch }}"
-          overwrite: true
+          rm: true
           
       - name: Copy database data back
         uses: appleboy/ssh-action@master
