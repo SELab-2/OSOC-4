@@ -43,7 +43,7 @@ class TestGetUsers(TestBase):
             await self.get_response("/users/", client, "user_no_role", 403, access_token="",
                                     use_access_token=False)
             # Wrong authorization
-            await self.get_response("/users/", client, "user_no_role", 422,
+            await self.get_response("/users/", client, "user_no_role", 403,
                                     access_token="wrong token")
 
         await self.with_all(do)

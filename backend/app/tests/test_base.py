@@ -61,11 +61,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.saved_objects = {"passwords": {}}
 
     async def get_access_token(self, client, user: str):
+        print("get_acces_token")
         email: str = self.saved_objects[user].email
         password: str = self.saved_objects["passwords"][user]
         login = await client.post("/login", json={"email": email, "password": password},
                                   headers={"Content-Type": "application/json"})
-        return json.loads(login.content)["access_token"]
+        return login.cookies["csrf_access_token"]
 
     async def get_response(self, path: str, client: AsyncClient, user: str, expected_status: int = 200,
                            access_token: str = None, use_access_token: bool = True) -> Response:
@@ -94,7 +95,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             access_token = await self.get_access_token(client, user)
 
         if use_access_token:
-            response = await client.get(path, headers={"Authorization": f"Bearer {access_token}"})
+            response = await client.get(path, headers={"X-CSRF-TOKEN": access_token})
         else:
             response = await client.get(path)
 
@@ -137,7 +138,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             access_token = await self.get_access_token(client, user)
 
         if use_access_token:
-            response = await client.post(path, json=json_body, headers={"Authorization": f"Bearer {access_token}",
+            response = await client.post(path, json=json_body, headers={"X-CSRF-TOKEN": access_token,
                                                                         "Content-Type": "application/json"})
         else:
             response = await client.post(path, json=json_body, headers={"Content-Type": "application/json"})

@@ -1,4 +1,5 @@
 import json
+import unittest
 
 from app.exceptions.permissions import NotPermittedException
 from app.tests.test_base import Wrong
@@ -7,6 +8,7 @@ from app.tests.test_routers.test_partners.test_partner_base import \
 from httpx import AsyncClient
 
 
+@unittest.skip("deprecated")
 class TestPartnersGet(TestPartnerBase):
 
     def __init__(self, *args, **kwargs):
@@ -16,6 +18,7 @@ class TestPartnersGet(TestPartnerBase):
         login = await client.post("/login", json={"email": user.email, "password": password}, headers={"Content-Type": "application/json"})
         return json.loads(login.content)["access_token"]
 
+    @unittest.skip("deprecated")
     async def test_get_partners_as_admin(self):
         async def do(client: AsyncClient):
             access_token = await self.get_access_token(client, self.saved_objects["user_admin"], self.saved_objects["passwords"]["user_admin"])
@@ -24,6 +27,7 @@ class TestPartnersGet(TestPartnerBase):
                 raise Wrong("wrong status code")
         await self.with_all(do)
 
+    @unittest.skip("deprecated")
     async def test_get_partners_as_coach(self):
         async def do(client: AsyncClient):
             access_token = await self.get_access_token(client, self.saved_objects["user_coach"], self.saved_objects["passwords"]["user_coach"])
@@ -32,6 +36,7 @@ class TestPartnersGet(TestPartnerBase):
                 raise Wrong("wrong status code")
         await self.with_all(do)
 
+    @unittest.skip("deprecated")
     async def test_get_partners_as_no_role(self):
         async def do(client: AsyncClient):
             access_token = await self.get_access_token(client, self.saved_objects["user_no_role"], self.saved_objects["passwords"]["user_no_role"])
@@ -40,6 +45,7 @@ class TestPartnersGet(TestPartnerBase):
                 raise Wrong("wrong status code")
         await self.with_all(do)
 
+    @unittest.skip("deprecated")
     async def test_get_partners_no_authorization(self):
         async def do(client: AsyncClient):
             response = await client.get("/partners/")
@@ -47,6 +53,7 @@ class TestPartnersGet(TestPartnerBase):
                 raise Wrong("wrong status code")
         await self.with_all(do)
 
+    @unittest.skip("deprecated")
     async def test_get_partners_wrong_authorization(self):
         async def do(client: AsyncClient):
             response = await client.get("/partners/", headers={"Authorization": "Bearer abc"})
@@ -54,6 +61,7 @@ class TestPartnersGet(TestPartnerBase):
                 raise Wrong("wrong status code")
         await self.with_all(do)
 
+    @unittest.skip("deprecated")
     async def test_get_partner_as_admin(self):
         async def do(client: AsyncClient):
             access_token = await self.get_access_token(client, self.saved_objects["user_admin"], self.saved_objects["passwords"]["user_admin"])

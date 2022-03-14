@@ -47,7 +47,7 @@ class TestCreateUsers(TestBase):
 
             body["email"] = "added_as_wrong_access_token@test.com"
             # Wrong authorization
-            await self.post_response("/users/create", body, client, "user_no_role", 422,
+            await self.post_response("/users/create", body, client, "user_no_role", 401,
                                      access_token="wrong token")
 
             # check that no users were added to the database
