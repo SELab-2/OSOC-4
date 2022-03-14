@@ -1,6 +1,11 @@
 version: "3.7"
 
 services:
+  osoc-frontend: 
+    build: ./frontend
+    ports:
+      - "3000:3000"
+
   osoc-backend:
     # container_name: "osoc-backend"
     build: ./backend

@@ -1,6 +1,27 @@
 version: "3.7"
 
 services:
+
+  osoc-frontend:
+    build: ./frontend
+    ports:
+      - 3000
+    environment:
+      - API_URL: ${PATHPREFIX}/api
+    networks:
+        - proxynet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.osoc-frontend.rule=Host(`sel2-4.ugent.be`) && PathPrefix(`${PATHPREFIX}/frontend`)
+      - traefik.http.routers.osoc-frontend.tls=true
+      - traefik.http.routers.osoc-frontend.tls.certresolver=le
+      - traefik.http.routers.osoc-frontend.entrypoints=websecure
+      - traefik.http.routers.osoc-frontend.middlewares=osocfrontendpathstrip
+      - traefik.http.middlewares.osocfrontendpathstrip.stripprefix.prefixes=${PATHPREFIX}/frontend
+      - traefik.port=3000
+    user: "1000:1000"
+
+
   osoc-backend:
     build: ./backend
     ports:
@@ -33,7 +54,6 @@ services:
       - traefik.http.routers.osoc-backend.middlewares=osocbackendpathstrip
       - traefik.http.middlewares.osocbackendpathstrip.stripprefix.prefixes=${PATHPREFIX}/api
       - traefik.port=8000
-      - treafik.docker.network=default
     user: "1000:1000"
     
   mongodb:
