@@ -24,8 +24,8 @@ jobs:
           key: ${{ secrets.SSH_SERVER_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            [[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && cp OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data
-            [[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && docker-compose down
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && cp -r OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || echo "data doesn't exist"
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && docker-compose down) || echo "containers don't exist"
       
       - name: copy file via ssh password
         uses: appleboy/scp-action@master
