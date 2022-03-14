@@ -9,12 +9,14 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: copy file via ssh password
-        uses: appleboy/scp-action@master
+      
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          port: ${{ secrets.PORT }}
           key: ${{ secrets.SSH_SERVER_KEY }}
-          source: "."
-          target: "/home/${{ secrets.USERNAME }}/test"
+          port: ${{ secrets.PORT }}
+          script: cd test && git pull
+      
+     
