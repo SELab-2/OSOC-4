@@ -10,6 +10,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
@@ -18,8 +24,8 @@ jobs:
           key: ${{ secrets.SSH_SERVER_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            ls
-      
+            (test -f OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data && cp OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data)
+            (test -f OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data && docker-compose down)
       - name: copy file via ssh password
         uses: appleboy/scp-action@master
         with:
@@ -28,6 +34,6 @@ jobs:
           port: ${{ secrets.PORT }}
           key: ${{ secrets.SSH_SERVER_KEY }}
           source: "."
-          target: "OSOC-deployments/${GITHUB_REF##*/}"
+          target: "OSOC-deployments/${{ steps.extract_branch.outputs.branch }}"
           overwrite: true
      
