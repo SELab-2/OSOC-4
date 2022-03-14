@@ -6,26 +6,25 @@ axios.defaults.withCredentials = true
 let _config = {"headers": {"Content-Type": "application/json",
         "Access-Control-Allow-Origin": "<origin>"}}
 
-function headers(getters, commit) {
+export function headers(getters, commit) {
     let cookie = Cookies.get('csrf_access_token');
     if (cookie) {
         _config["headers"]["X-CSRF-TOKEN"] = cookie;
         if (! getters.getIsAuthenticated) {
             commit('setIsAuthenticated', true);}
-        console.log("HEADERS: cookie")
+        console.log("HEADERS: with cookie")
     }
     else {
         delete _config["headers"]["X-CSRF-TOKEN"];
         if (getters.getIsAuthenticated) {
             commit('setIsAuthenticated', false);}
-        console.log("HEADERS: no cookie")
+        console.log("HEADERS: without cookie")
     }
     return _config;
 }
 
-export function isAuthenticated() {
-    console.log("auth checked")
-    return "X-CSRF-TOKEN" in headers()["headers"]
+export function isStillAuthenticated() {
+    return Cookies.get('csrf_access_token')
 }
 /**
  * redirects to another url
@@ -67,9 +66,9 @@ export async function catch_error(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function get_json(url) {
+export async function get_json(url, getters, commit) {
     try {
-        const req = await axios.get(url, headers());
+        const req = await axios.get(url, headers(getters, commit));
         return req.data;
     } catch (e) {
         return await catch_error(e);
@@ -82,10 +81,10 @@ export async function get_json(url) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|any>}
  */
-export async function send_delete(url) {
+export async function send_delete(url, getters, commit) {
 
     try {
-        const req = await axios.delete(url, headers());
+        const req = await axios.delete(url, headers(getters, commit));
         return req.data;
     } catch (e) {
         return await catch_error(e);
@@ -99,10 +98,9 @@ export async function send_delete(url) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function postCreate(url, json) {
-    console.log(json)
+export async function postCreate(url, json, getters, commit) {
     try {
-        let resp = await axios.post(url, json, headers())
+        let resp = await axios.post(url, json, headers(getters, commit))
         return {
             success: true,
             data: resp.data};
@@ -124,11 +122,11 @@ export async function postCreate(url, json) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function patchEdit(url, json) {
+export async function patchEdit(url, json, getters, commit) {
     try {
         return {
             success: true,
-            data: (await axios.patch(url, json, headers())).data.url};
+            data: (await axios.patch(url, json, headers(getters, commit))).data.url};
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
             return { success: false,
@@ -158,7 +156,7 @@ export async function login(url, json, getters, commit) {
 export async function logout(url, getters, commit) {
     try {
         console.log("sending logout req")
-        const req = await axios.delete(url, headers(getters, commit));
+        await axios.delete(url, headers(getters, commit));
         commit('setIsAuthenticated', false);
         return {success: true};
     } catch (e) {
