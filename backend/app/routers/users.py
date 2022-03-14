@@ -93,7 +93,7 @@ async def get_user(id: str):
     if not user.approved:
         return errorresponse(None, 400, "The user doesn't exist (yet)")
 
-    return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
+    return response(UserOut.parse_obj(user), "User retrieved successfully")
 
 
 @router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])

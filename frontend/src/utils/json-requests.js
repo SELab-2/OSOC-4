@@ -1,31 +1,13 @@
+/**
+ * Respond to an error by constructing an error page
+ * & redirecting
+ * @param e
+ * @returns {Promise<undefined>}
+ */
 import axios from "axios";
 import router from "../router";
-import Cookies from 'js-cookie';
 
-axios.defaults.withCredentials = true
-let _config = {"headers": {"Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "<origin>"}}
 
-export function headers(getters, commit) {
-    let cookie = Cookies.get('csrf_access_token');
-    if (cookie) {
-        _config["headers"]["X-CSRF-TOKEN"] = cookie;
-        if (! getters.getIsAuthenticated) {
-            commit('setIsAuthenticated', true);}
-        console.log("HEADERS: with cookie")
-    }
-    else {
-        delete _config["headers"]["X-CSRF-TOKEN"];
-        if (getters.getIsAuthenticated) {
-            commit('setIsAuthenticated', false);}
-        console.log("HEADERS: without cookie")
-    }
-    return _config;
-}
-
-export function isStillAuthenticated() {
-    return Cookies.get('csrf_access_token')
-}
 /**
  * redirects to another url
  * @param name the name where to redirect to, as defined in router/index.js
@@ -42,13 +24,12 @@ export async function redirect(name, params = {}) {
  * @param e
  * @returns {Promise<undefined>}
  */
-export async function catch_error(e) {
-    console.log(e.toString())
-    let params = {}
-    // Add status in case it exists
-    if (e.status !== undefined) {
-        params.status = e.status
-    }
+async function catch_error(e) {
+    const params = {
+        status: e.response.status,
+        message: e.response.data.message || e.response.data // If there is no message, the error is in .data for some reason (ex. 404's)
+    };
+
     // Add status text in case it exists
     if (e.response.statusText !== undefined) {
         params.status = `${params.status} | ${e.response.statusText}`
@@ -66,14 +47,17 @@ export async function catch_error(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function get_json(url, getters, commit) {
+export async function get_json(url) {
+    const config = {headers: {Accept: "application/json"}};
+
     try {
-        const req = await axios.get(url, headers(getters, commit));
+        const req = await axios.get(url, config);
         return req.data;
     } catch (e) {
         return await catch_error(e);
     }
 }
+
 
 /**
  * Send a DELETE-request to an endpoint & return the returned JSON.
@@ -81,15 +65,17 @@ export async function get_json(url, getters, commit) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|any>}
  */
-export async function send_delete(url, getters, commit) {
+export async function send_delete(url) {
+    const config = {headers: {Accept: "application/json"}};
 
     try {
-        const req = await axios.delete(url, headers(getters, commit));
+        const req = await axios.delete(url, config);
         return req.data;
     } catch (e) {
         return await catch_error(e);
     }
 }
+
 
 /**
  * Send a POST-request to an endpoint & return the returned JSON data.
@@ -98,12 +84,13 @@ export async function send_delete(url, getters, commit) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function postCreate(url, json, getters, commit) {
+export async function postCreate(url, json) {
+    const config = {headers: {"Content-Type": "application/json"}};
+
     try {
-        let resp = await axios.post(url, json, headers(getters, commit))
         return {
             success: true,
-            data: resp.data};
+            data: (await axios.post(url, json, config)).data.url};
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
             return { success: false,
@@ -114,6 +101,7 @@ export async function postCreate(url, json, getters, commit) {
         }
     }
 }
+
 
 /**
  * Send a PATCH-request to an endpoint & return the returned JSON data.
@@ -122,11 +110,13 @@ export async function postCreate(url, json, getters, commit) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function patchEdit(url, json, getters, commit) {
+export async function patchEdit(url, json) {
+    const config = {headers: {"Content-Type": "application/json"}};
+
     try {
         return {
             success: true,
-            data: (await axios.patch(url, json, headers(getters, commit))).data.url};
+            data: (await axios.patch(url, json, config)).data.url};
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
             return { success: false,
@@ -137,36 +127,4 @@ export async function patchEdit(url, json, getters, commit) {
         }
     }
 }
-
-
-export async function login(url, json, getters, commit) {
-    try {
-        console.log("sending login req");
-        let resp = await axios.post(url, json, headers(getters, commit));
-        console.log(resp)
-        commit('setIsAuthenticated', true);
-        return {success: true};
-    } catch (e) {
-        console.log(e)
-        await catch_error(e);
-        return "";
-    }
-}
-
-export async function logout(url, getters, commit) {
-    try {
-        console.log("sending logout req")
-        await axios.delete(url, headers(getters, commit));
-        commit('setIsAuthenticated', false);
-        return {success: true};
-    } catch (e) {
-        return await catch_error(e);
-    }
-}
-
-
-
-
-
-
 
