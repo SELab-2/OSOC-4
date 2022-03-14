@@ -6,7 +6,7 @@ services:
     ports:
       - 8000
     environment:
-      MONGO_URL: mongodb_container
+      MONGO_URL: mongodb
       MONGO_PORT: 27017
       MONGO_USER: root
       MONGO_PASSWORD: justapassword
@@ -20,9 +20,10 @@ services:
       SENDER_PASSWORD: Justapassword123!
       # Invite Settings
       INVITE_EXPIRE: 4320 #in minutes
+      PATHPREFIX: ${PATHPREFIX}
     networks:
       - proxynet
-      - backend
+      - default
     labels:
       - traefik.enable=true
       - traefik.http.routers.osoc-backend.rule=Host(`sel2-4.ugent.be`) && PathPrefix(`${PATHPREFIX}/api`)
@@ -39,25 +40,23 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: justapassword
+    ports:
+      - 27017
     volumes:
       - ./data/mongo:/data/db
-    networks:
-      - backend
     user: "1000:1000"
-
+ 
   redis:
     image: redis:latest
     restart: always
     command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
+    ports:
+      - 6379
     volumes:
       - ./data/redis:/data
-    networks:
-      - backend
     user: "1000:1000"
 
 networks:
   proxynet:
     external:
       name: proxy_network
-  backend:
-    name: backend
