@@ -1,9 +1,12 @@
 import {createRouter, createWebHistory} from "vue-router";
-import store from '../store/index'
+
+//todo router env var gebruiken
+//todo package.json env var gebruiken
+//todo VITE_API_URL die dubbele slash wegdoen
 
 const routes = [
   {
-    path: '/login',
+    path: '/development/frontend/login',
     name: 'Login',
     component: () => import('../views/Login.vue')
   },
@@ -46,10 +49,13 @@ const router = createRouter({
   routes
 });
 
+//todo get path from router
+/*
 router.beforeEach((to, from) => {
   if(to.name !== 'Login' &&! store.getters.getIsAuthenticated){
     return '/login'
   }
 })
+ */
 
 export default router
