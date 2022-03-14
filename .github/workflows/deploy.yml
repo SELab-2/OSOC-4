@@ -24,8 +24,9 @@ jobs:
           key: ${{ secrets.SSH_SERVER_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            (test -f OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data && cp OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || :
-            (test -f OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data && docker-compose down) || :
+            [[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && cp OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data
+            [[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && docker-compose down
+      
       - name: copy file via ssh password
         uses: appleboy/scp-action@master
         with:
