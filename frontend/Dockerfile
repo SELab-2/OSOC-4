@@ -4,5 +4,6 @@ COPY package.json .
 COPY package-lock.json* .
 RUN yarn install
 COPY . .
+RUN yarn global add serve
 RUN yarn build
-CMD [ "serve", "dist"]
+CMD [ "serve", "-s", "dist"]

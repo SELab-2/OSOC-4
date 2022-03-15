@@ -1,8 +1,7 @@
 import {createRouter, createWebHistory} from "vue-router";
 import store from "../store"
 
-const BASEURL = import.meta.env.FRONTEND_BASE_URL || "/test"; //TODO: CHANGE THIS TO THE RIGHT ENV VAR
-
+const BASEURL = import.meta.env.VITE_FRONTEND_BASE_URL || "/test"; //TODO: CHANGE THIS TO THE RIGHT ENV VAR
 
 const routes = [
   {
