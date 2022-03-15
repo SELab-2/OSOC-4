@@ -14,4 +14,5 @@ export default defineConfig({
     }
   },
   base: BASE + '/',
+  prod: "master" in BASE,
 })
