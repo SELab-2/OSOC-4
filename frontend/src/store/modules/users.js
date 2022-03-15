@@ -1,4 +1,5 @@
 import { login, logout, redirect } from "../../utils/json-requests";
+import {log} from "../../utils/logger";
 
 const state = {
     isAuthenticated: false

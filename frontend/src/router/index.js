@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from "vue-router";
 import store from "../store"
-
+import {log} from "../utils/logger";
 const BASEURL = import.meta.env.VITE_FRONTEND_BASE_URL || "/test"; //TODO: CHANGE THIS TO THE RIGHT ENV VAR
 
 const routes = [
@@ -56,7 +56,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   log("Router: before each")
-  if((to.name !== 'Login') &&! store.getters.getIsAuthenticated){
+  if((to.name !== 'Login' || to.name !== "ErrorPage") &&! store.getters.getIsAuthenticated){
     // redirect the user to the login page
     log("Router: before each: not logged in -> redirected to Login")
     return { name: 'Login' }
