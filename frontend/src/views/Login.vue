@@ -24,14 +24,35 @@ export default {
 </script>
 
 <template>
-    <h1>Login</h1>
-    <p class="text-muted"> Please enter your login and password!</p>
-    <input v-model="user.email" type="email" name="" placeholder="Email">
-    <br/>
-    <input v-model="user.password" type="password" name="" placeholder="Password">
-    <br/>
-    <input v-on:click=loginButton type="submit" name="" value="Login">
+  <div id="reset-this-root">
+
+  <div class="header">
+    <p class="title">Welcome!</p>
+  </div>
+
+  <div class="body">
+
+    <section class="side">
+      <img src="../assets/images/logo-osoc-color.svg" alt="osoc-emblem">
+    </section>
+
+    <section class="main">
+
+      <div class="login-container">
+        <p class="welcome-message">Please provide login credentials to proceed</p>
+        <form class="login-form">
+          <input v-model="user.email" type="email" name="" placeholder="Email address">
+          <input v-model="user.password" type="password" name="" placeholder="Password">
+          <input class="submit" v-on:click=loginButton type="submit" name="" value="Login">
+        </form>
+      </div>
+    </section>
+  </div>
+
+  </div>
 </template>
 
 <style scoped>
+@import "../assets/styles/base.css";
+@import "../assets/styles/login.css";
 </style>

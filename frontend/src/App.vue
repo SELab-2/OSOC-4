@@ -30,4 +30,5 @@ window.addEventListener('storage', function(event) {
 </script>
 
 <style>
+@import './assets/styles/base.css';
 </style>

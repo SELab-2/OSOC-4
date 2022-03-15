@@ -1,0 +1,26 @@
+:root {
+    /* THE OSOC COLOR-SCHEME */
+    --yellow: #FCB70F;
+    --dark_blue: #0A0839;
+    --red: #F14A3B;
+    --green: #67BA98;
+    --green_lighter: #44DBA4;
+
+    /* other colors */
+    --btn_blue: dodgerblue;
+    --white: #fff;
+    --gray2: #222;
+    --gray3: #333;
+    --gray4: #444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: FreeSans, sans-serif;
+    color: #303433;
+}
+
+
+
