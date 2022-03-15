@@ -3,7 +3,10 @@ version: "3.7"
 services:
 
   osoc-frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_FRONTEND_BASE_URL: ${PATHPREFIX}/frontend
     ports:
       - 3000
     environment:
