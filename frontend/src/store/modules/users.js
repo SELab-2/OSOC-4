@@ -10,17 +10,20 @@ const getters = {
 
 const actions = {
     async logIn({ getters, commit }, user) {
-        console.log("login")
+        log("Users: login")
         await login('/login', user, getters, commit)
     },
     async logOut({ getters, commit }) {
+        log("Users: logout")
         await logout('/logout', getters, commit)
+        log("Users: logout: redirect to Login")
         await redirect("Login")
     }
 };
 
 const mutations = {
     setIsAuthenticated(state, value) {
+        log("Users: setIsAuthenticated: " + value)
         state.isAuthenticated = value
     }
 };

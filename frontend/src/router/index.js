@@ -47,6 +47,7 @@ for (let route of routes) {
   route.path = BASEURL + route.path;
 }
 
+log("Creating router")
 const router = createRouter({
   history: createWebHistory(),
   routes
@@ -54,9 +55,10 @@ const router = createRouter({
 
 
 router.beforeEach((to, from) => {
+  log("Router: before each")
   if((to.name !== 'Login') &&! store.getters.getIsAuthenticated){
     // redirect the user to the login page
-    console.log("Not logged in")
+    log("Router: before each: not logged in -> redirected to Login")
     return { name: 'Login' }
   }
 })

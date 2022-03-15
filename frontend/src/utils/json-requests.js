@@ -9,24 +9,27 @@ let _config = {"headers": {"Content-Type": "application/json",
         "Access-Control-Allow-Origin": "<origin>"}}
 
 export function headers(getters, commit) {
+    log("json-requests: updating headers")
     let cookie = Cookies.get('csrf_access_token');
     if (cookie) {
         _config["headers"]["X-CSRF-TOKEN"] = cookie;
         if (! getters.getIsAuthenticated) {
             commit('setIsAuthenticated', true);}
-        console.log("HEADERS: with cookie")
+        log("json-requests: updating headers: now with cookie")
     }
     else {
         delete _config["headers"]["X-CSRF-TOKEN"];
         if (getters.getIsAuthenticated) {
             commit('setIsAuthenticated', false);}
-        console.log("HEADERS: without cookie")
+        log("json-requests: updating headers: now without cookie")
     }
     return _config;
 }
 
 export function isStillAuthenticated() {
-    return Cookies.get('csrf_access_token')
+    const cookie = Cookies.get('csrf_access_token');
+    log("json-requests: isStillAuthenticated: " + Boolean(cookie));
+    return cookie
 }
 /**
  * redirects to another url
@@ -35,6 +38,7 @@ export function isStillAuthenticated() {
  * @returns {Promise<void>}
  */
 export async function redirect(name, params = {}) {
+    log("json-requests: redirect: to " + name)
     await router.push({name: name, params: params});
 }
 
@@ -44,8 +48,8 @@ export async function redirect(name, params = {}) {
  * @param e
  * @returns {Promise<undefined>}
  */
-export async function catch_error(e) {
-    console.log(e.toString())
+export async function catchError(e) {
+    log("json-requests: catchError: " + e)
     let params = {}
     // Add status in case it exists
     if (e.status !== undefined) {
@@ -68,12 +72,13 @@ export async function catch_error(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function get_json(url, getters, commit) {
+export async function getJson(url, getters, commit) {
+    log("json-requests: getJson: " + url)
     try {
         const req = await axios.get(url, headers(getters, commit));
         return req.data;
     } catch (e) {
-        return await catch_error(e);
+        return await catchError(e);
     }
 }
 
@@ -83,13 +88,13 @@ export async function get_json(url, getters, commit) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|any>}
  */
-export async function send_delete(url, getters, commit) {
-
+export async function sendDelete(url, getters, commit) {
+    log("json-requests: sendDelete: " + url)
     try {
         const req = await axios.delete(url, headers(getters, commit));
         return req.data;
     } catch (e) {
-        return await catch_error(e);
+        return await catchError(e);
     }
 }
 
@@ -101,6 +106,7 @@ export async function send_delete(url, getters, commit) {
  * @returns {Promise<string|{data, success: boolean}>}
  */
 export async function postCreate(url, json, getters, commit) {
+    log("json-requests: postCreate: " + url)
     try {
         let resp = await axios.post(url, json, headers(getters, commit))
         return {
@@ -111,7 +117,7 @@ export async function postCreate(url, json, getters, commit) {
             return { success: false,
                 data: e.response.data.message};
         } else {
-            await catch_error(e);
+            await catchError(e);
             return "";
         }
     }
@@ -125,6 +131,7 @@ export async function postCreate(url, json, getters, commit) {
  * @returns {Promise<string|{data, success: boolean}>}
  */
 export async function patchEdit(url, json, getters, commit) {
+    log("json-requests: patchEdit: " + url)
     try {
         return {
             success: true,
@@ -134,7 +141,7 @@ export async function patchEdit(url, json, getters, commit) {
             return { success: false,
                 data: e.response.data.message};
         } else {
-            await catch_error(e);
+            await catchError(e);
             return "";
         }
     }
@@ -142,27 +149,29 @@ export async function patchEdit(url, json, getters, commit) {
 
 
 export async function login(url, json, getters, commit) {
+    log("json-requests: login")
     try {
-        console.log("sending login req");
         let resp = await axios.post(url, json, headers(getters, commit));
-        console.log(resp)
+        log(resp)
         commit('setIsAuthenticated', true);
         return {success: true};
     } catch (e) {
-        console.log(e)
-        await catch_error(e);
+        log(e)
+        await catchError(e);
         return "";
     }
 }
 
 export async function logout(url, getters, commit) {
+    log("json-requests: logout")
     try {
-        console.log("sending logout req")
-        await axios.delete(url, headers(getters, commit));
+        let resp = await axios.delete(url, headers(getters, commit));
+        log(resp)
         commit('setIsAuthenticated', false);
         return {success: true};
     } catch (e) {
-        return await catch_error(e);
+        log(e)
+        return await catchError(e);
     }
 }
 
