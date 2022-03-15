@@ -56,9 +56,9 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   log("Router: before each")
-  if((to.name !== 'Login' || to.name !== "ErrorPage") &&! store.getters.getIsAuthenticated){
+  if(!(to.name === 'Login' || to.name === "ErrorPage") &&! store.getters.getIsAuthenticated){
     // redirect the user to the login page
-    log("Router: before each: not logged in -> redirected to Login")
+    log("before each: not logged in -> redirected to Login")
     return { name: 'Login' }
   }
 })
