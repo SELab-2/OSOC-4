@@ -5,7 +5,7 @@ on:
     branches: [ development ]
 
 jobs:
-  test:
+  deploy:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +38,7 @@ jobs:
           target: "OSOC-deployments/${{ steps.extract_branch.outputs.branch }}"
           rm: true
           
-      - name: Copy database data back
+      - name: Copy database data back + deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
