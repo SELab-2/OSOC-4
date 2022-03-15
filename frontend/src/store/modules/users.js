@@ -8,18 +8,13 @@ const getters = {
     getIsAuthenticated: state => state.isAuthenticated,
 }
 
-const BASEURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
 const actions = {
-
-
-
     async logIn({ getters, commit }, user) {
         console.log("login")
-        await login(BASEURL + '/login', user, getters, commit)
+        await login('/login', user, getters, commit)
     },
     async logOut({ getters, commit }) {
-        await logout(BASEURL + '/logout', getters, commit)
+        await logout('/logout', getters, commit)
         await redirect("Login")
     }
 };
