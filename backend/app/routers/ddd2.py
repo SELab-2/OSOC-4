@@ -1,8 +1,7 @@
 from app.database import db
 
-from app.models.partner import Partner
 from app.models.edition import Edition
-from app.models.project import Project, RequiredRole
+from app.models.project import Project, RequiredRole, Partner
 from app.models.role import Role
 from app.models.student_form import StudentForm
 from app.models.user import User, UserRole
@@ -10,7 +9,7 @@ from app.utils.response import response
 from fastapi import APIRouter
 from random import choice, sample, randrange
 
-router = APIRouter(prefix="/ddd")
+router = APIRouter(prefix="/ddd2")
 
 roles = [Role(name="backend developer"), Role(name="frontend developer"), Role(name="UX designer")]
 
@@ -54,35 +53,6 @@ def generate_student(edition_id):
 
 @router.get("/", response_description="Data retrieved")
 async def ddd():
-    user_unactivated = User(
-        email="user_unactivated@test.be",
-        name="user_unactivated",
-        password="Test123!user_unactivated",
-        role=UserRole.COACH,
-        active=False,
-        approved=False)
-
-    user_activated = User(
-        email="user_activated@test.be",
-        name="user_activated",
-        password="Test123!user_activated",
-        role=UserRole.COACH,
-        active=True, approved=False)
-
-    user_approved = User(
-        email="user_approved@test.be",
-        name="user_approved",
-        password="Test123!user_approved",
-        role=UserRole.COACH,
-        active=True, approved=True)
-
-    user_admin = User(
-        email="user_admin@test.be",
-        name="user_admin",
-        password="Test123!user_admin",
-        role=UserRole.ADMIN,
-        active=True, approved=True)
-
     coaches = [generate_user() for i in range(5)]
 
     partner = Partner(
@@ -99,7 +69,7 @@ async def ddd():
         goals=["Goal 1", "Goal 2"],
         description="Free real estate",
         student_amount=7,
-        partner_ids=[partner.id],
+        partner=partner,
         user_ids=[coaches[i].id for i in range(2)],
         required_roles=[RequiredRole(role=roles[0].id, number=2),
                         RequiredRole(role=roles[1].id, number=3),
@@ -108,15 +78,10 @@ async def ddd():
 
     students = [generate_student(edition.id) for _ in range(10)]
 
-    await db.engine.save(user_unactivated)
-    await db.engine.save(user_activated)
-    await db.engine.save(user_approved)
-    await db.engine.save(user_admin)
     for role in roles:
         await db.engine.save(role)
     for coach in coaches:
         await db.engine.save(coach)
-    await db.engine.save(partner)
     await db.engine.save(edition)
     await db.engine.save(project)
     for student in students:
