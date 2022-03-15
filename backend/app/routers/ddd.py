@@ -1,6 +1,5 @@
 from app.database import db
 
-from app.models.partner import Partner
 from app.models.user import User, UserRole
 from app.utils.response import response
 from app.utils.cryptography import get_password_hash
@@ -40,14 +39,9 @@ async def ddd():
         role=UserRole.ADMIN,
         active=True, approved=True)
 
-    partner = Partner(
-        name="Dummy partner",
-        about="Dummy partner about")
-
     await db.engine.save(user_unactivated)
     await db.engine.save(user_activated)
     await db.engine.save(user_approved)
     await db.engine.save(user_admin)
-    await db.engine.save(partner)
 
     return response(None, "Dummy data inserted")

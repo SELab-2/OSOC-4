@@ -11,9 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import connect_db, disconnect_db
 from app.exceptions.base_exception import BaseException
-from app.routers import (answers, auth, editions, participation, partners,
-                         projects, question_answers, questions, roles,
-                         student_forms, suggestions, user_invites, users, ddd)
+from app.routers import (answers, auth, editions, participation, projects,
+                         question_answers, questions, roles, student_forms,
+                         suggestions, user_invites, users, ddd)
 
 
 app = FastAPI(root_path=os.getenv("PATHPREFIX", "") + "/api")
@@ -48,7 +48,6 @@ app.include_router(answers.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
 app.include_router(participation.router)
-app.include_router(partners.router)
 app.include_router(projects.router)
 app.include_router(question_answers.router)
 app.include_router(questions.router)
