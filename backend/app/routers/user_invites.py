@@ -1,8 +1,7 @@
-from app.crud import read_by_key_value, update
+from app.crud import read_where, update
 from app.database import db
-from app.exceptions.invite_exceptions import InvalidInviteException
-from app.exceptions.user_exceptions import (InvalidPasswordException,
-                                            PasswordsDoNotMatchException)
+from app.exceptions.key_exceptions import InvalidInviteException
+from app.exceptions.user_exceptions import PasswordsDoNotMatchException
 from app.models.user import User, UserInvite
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
@@ -39,15 +38,12 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
     :rtype: success or error
     """
 
-    if not valid_password(userinvite.password):
-        raise InvalidPasswordException()
-
     if userinvite.password != userinvite.validate_password:
         raise PasswordsDoNotMatchException()
 
     if db.redis.get(invitekey):  # check that the inv key exists
 
-        user: User = await read_by_key_value(User, User.id, ObjectId(invitekey.split("_")[1]))
+        user: User = await read_where(User, User.id == ObjectId(invitekey.split("_")[1]))
 
         if user.active:
             raise InvalidInviteException()

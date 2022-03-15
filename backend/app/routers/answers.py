@@ -1,4 +1,4 @@
-from app.crud import read_all, read_by_key_value
+from app.crud import read_all, read_where
 from app.models.answer import Answer
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
@@ -27,7 +27,7 @@ async def get_answer(id):
     :return: the partner if found, else None
     :rtype: dict
     """
-    partner = await read_by_key_value(Answer, Answer.id, ObjectId(id))
+    partner = await read_where(Answer, Answer.id == ObjectId(id))
     if not partner:
         return errorresponse(None, 400, "Partner not found")
     return response(partner, "Returned the partner successfully")

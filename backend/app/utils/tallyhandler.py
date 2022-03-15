@@ -1,8 +1,8 @@
-from app.crud import update, read_by_key_value
+from app.crud import read_where, update
+from app.models.answer import Answer
+from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.student_form import StudentForm
-from app.models.question import Question
-from app.models.answer import Answer
 
 
 async def process_tally(data):
@@ -24,7 +24,7 @@ async def process_tally(data):
             # check if question already in database
             q: Question = Question(question=field["label"],
                                    field_id=field["key"], type=field["type"])
-            question = await read_by_key_value(Question, Question.id, q.id)
+            question = await read_where(Question, Question.id == q.id)
 
             if not question:
                 question = await update(q)
@@ -35,7 +35,7 @@ async def process_tally(data):
                     a: Answer = Answer(questionid=question.id,
                                        field_id=option["id"], text=option["text"])
 
-                    answer = await read_by_key_value(Answer, Answer.id, a.id)
+                    answer = await read_where(Answer, Answer.id == a.id)
                     if not a:
                         answer = await update(a)
 

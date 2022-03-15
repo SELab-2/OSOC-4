@@ -1,4 +1,4 @@
-from app.crud import read_all, read_by_key_value, update
+from app.crud import read_all, read_where, update
 from app.database import db
 from app.exceptions.partner_exceptions import (NameAlreadyUsedException,
                                                PartnerNotFoundException)
@@ -37,7 +37,7 @@ async def add_partner_data(partner: Partner = Body(...)):
     """
 
     # check if a partner with the same name is already present
-    if await read_by_key_value(Partner, Partner.name, partner.name):
+    if await read_where(Partner, Partner.name == partner.name):
         raise NameAlreadyUsedException()
 
     new_partner = await update(Partner.parse_obj(partner))
@@ -54,10 +54,10 @@ async def update_partner_data(id: str, partner: Partner = Body(...)):
     :rtype: dict
     """
     # check if a partner with the same name is already present
-    old_partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
+    old_partner = await read_where(Partner, Partner.id == ObjectId(id))
     if old_partner:
 
-        if old_partner.name != partner.name and await read_by_key_value(Partner, Partner.name, partner.name):
+        if old_partner.name != partner.name and await read_where(Partner, Partner.name == partner.name):
             raise NameAlreadyUsedException()
 
         old_partner.name = partner.name
@@ -84,7 +84,7 @@ async def get_partner(id, Authorize: AuthJWT = Depends()):
     if not len(projects):
         raise NotPermittedException()
 
-    partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
+    partner = await read_where(Partner, Partner.id == ObjectId(id))
     if not partner:
         raise PartnerNotFoundException()
     return response(partner, "Returned the partner successfully")

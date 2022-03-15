@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from app.crud import read_by_key_value
+from app.crud import read_where
 from app.exceptions.partner_exceptions import NameAlreadyUsedException
 from app.exceptions.permissions import NotPermittedException
 from app.models.partner import Partner
@@ -29,7 +29,7 @@ class TestPartnersCreate(TestPartnerBase):
             response = await client.post("/partners/create", headers={"Authorization": f"Bearer {access_token}"}, json={"name": "test", "about": "test"})
             if response.status_code == 200:
                 id = json.loads(response.content)["data"]["id"]
-                partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
+                partner = await read_where(Partner, Partner.id == ObjectId(id))
                 self.saved_objects["new_partner"] = partner
 
             if response.status_code != 200:
@@ -43,7 +43,7 @@ class TestPartnersCreate(TestPartnerBase):
             response = await client.post("/partners/create", headers={"Authorization": f"Bearer {access_token}"}, json={"name": "test", "about": "test"})
             if response.status_code == 200:
                 id = json.loads(response.content)["data"]["id"]
-                partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
+                partner = await read_where(Partner, Partner.id == ObjectId(id))
                 self.saved_objects["new_partner"] = partner
 
             if not NotPermittedException().checkResponse(response):
@@ -57,7 +57,7 @@ class TestPartnersCreate(TestPartnerBase):
             response = await client.post("/partners/create", headers={"Authorization": f"Bearer {access_token}"}, json={"name": "test", "about": "test"})
             if response.status_code == 200:
                 id = json.loads(response.content)["data"]["id"]
-                partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
+                partner = await read_where(Partner, Partner.id == ObjectId(id))
                 self.saved_objects["new_partner"] = partner
 
             if not NotPermittedException().checkResponse(response):
@@ -88,7 +88,7 @@ class TestPartnersCreate(TestPartnerBase):
 
             if response.status_code == 200:
                 id = json.loads(response.content)["data"]["id"]
-                partner = await read_by_key_value(Partner, Partner.id, ObjectId(id))
+                partner = await read_where(Partner, Partner.id == ObjectId(id))
                 self.saved_objects["new_partner"] = partner
 
             print(response.content)

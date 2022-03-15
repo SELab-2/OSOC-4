@@ -14,6 +14,26 @@ SENDER_EMAIL = os.getenv('SENDER_EMAIL')
 SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
 
 
+def send_password_reset(email: str, resetkey: str):
+    receiver_email = email  # Enter receiver address
+
+    subject = "Forgot Password"
+    body = f"Use this link to reset the password of your account http://localhost:8000/resetpassword/{resetkey}"
+
+    message = MIMEMultipart()
+    message["From"] = SENDER_EMAIL
+    message["To"] = receiver_email
+    message["Subject"] = subject
+
+    message.attach(MIMEText(body, "plain"))
+    text = message.as_string()
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_SSL_PORT, context=context) as server:
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.sendmail(SENDER_EMAIL, receiver_email, text)
+
+
 def send_invite(email: str, invitekey: str):
     """send_invite this functions sents an invite email
 
