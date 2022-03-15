@@ -1,12 +1,12 @@
 import {createRouter, createWebHistory} from "vue-router";
+import store from "../store"
 
-//todo router env var gebruiken
-//todo package.json env var gebruiken
-//todo VITE_API_URL die dubbele slash wegdoen
+const BASEURL = import.meta.env.FRONTEND_BASE_URL || "/test"; //TODO: CHANGE THIS TO THE RIGHT ENV VAR
+
 
 const routes = [
   {
-    path: '/development/frontend/login',
+    path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue')
   },
@@ -44,18 +44,23 @@ const routes = [
   }
 ];
 
+for (let route of routes) {
+  route.path = BASEURL + route.path;
+}
+
 const router = createRouter({
   history: createWebHistory(),
   routes
 });
 
-//todo get path from router
-/*
+
 router.beforeEach((to, from) => {
-  if(to.name !== 'Login' &&! store.getters.getIsAuthenticated){
-    return '/login'
+  if((to.name !== 'Login') &&! store.getters.getIsAuthenticated){
+    // redirect the user to the login page
+    console.log("Not logged in")
+    return { name: 'Login' }
   }
 })
- */
+
 
 export default router

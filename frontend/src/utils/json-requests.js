@@ -3,6 +3,8 @@ import router from "../router";
 import Cookies from 'js-cookie';
 
 axios.defaults.withCredentials = true
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 let _config = {"headers": {"Content-Type": "application/json",
         "Access-Control-Allow-Origin": "<origin>"}}
 
