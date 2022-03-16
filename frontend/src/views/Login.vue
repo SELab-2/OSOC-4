@@ -40,11 +40,11 @@ export default {
 
       <div class="login-container">
         <p class="welcome-message">Please provide login credentials to proceed</p>
-        <form class="login-form">
+        <div class="login-form">
           <input v-model="user.email" type="email" name="" placeholder="Email address">
           <input v-model="user.password" type="password" name="" placeholder="Password">
           <input class="submit" v-on:click=loginButton type="submit" name="" value="Login">
-        </form>
+        </div>
       </div>
     </section>
   </div>
