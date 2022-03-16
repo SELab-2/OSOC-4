@@ -1,6 +1,6 @@
 from typing import List
 
-from app.crud import read_by_key_value
+from app.crud import read_where
 from app.exceptions.permissions import NotPermittedException
 from app.models.edition import Edition
 from app.models.user import User, UserRole
@@ -18,7 +18,7 @@ class RoleChecker:
         Authorize.jwt_required()
 
         current_user_id = Authorize.get_jwt_subject()
-        user = await read_by_key_value(User, User.id, ObjectId(current_user_id))
+        user = await read_where(User, User.id == ObjectId(current_user_id))
 
         if not user.approved:
             raise NotPermittedException()
@@ -36,9 +36,9 @@ class EditionChecker:
         Authorize.jwt_required()
 
         current_user_id = Authorize.get_jwt_subject()
-        user = await read_by_key_value(User, User.id, ObjectId(current_user_id))
+        user = await read_where(User, User.id == ObjectId(current_user_id))
 
         if user.role not in self.always_allowed:
-            edition = await read_by_key_value(Edition, Edition.year, int(year))
+            edition = await read_where(Edition, Edition.year == int(year))
             if current_user_id not in edition.user_ids:
                 raise NotPermittedException()

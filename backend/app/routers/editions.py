@@ -1,6 +1,6 @@
 import datetime
 
-from app.crud import read_all, read_by_key_value, update
+from app.crud import read_all, read_where, update
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition
@@ -35,7 +35,7 @@ async def create_edition(edition: Edition = Body(...)):
     if edition.year is None or edition.year == "" or int(edition.year) < datetime.date.today().year:
         raise YearAlreadyOverException()
     # check if an edition with the same year is already present
-    if await read_by_key_value(Edition, Edition.year, edition.year):
+    if await read_where(Edition, Edition.year == edition.year):
         raise AlreadyEditionWithYearException(edition.year)
 
     new_edition = await update(Edition.parse_obj(edition))
@@ -50,7 +50,7 @@ async def get_edition(year):
     :return: list of editions
     :rtype: dict
     """
-    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    edition = await read_where(Edition, Edition.year == int(year))
     if not edition:
         return errorresponse(None, 400, "Edition not found")
     return response(edition, "Edition successfully retrieved")
@@ -66,7 +66,7 @@ async def update_edition(year, edition: Edition = Body(...)):
     if not year == edition.year:
         return errorresponse(None, 400, "Edition can't change it's year")
 
-    results = await read_by_key_value(Edition, Edition.id, edition.id)
+    results = await read_where(Edition, Edition.id == edition.id)
     if not results:
         return errorresponse(None, 400, "Edition not found")
     return response(results, "Edition successfully retrieved")
