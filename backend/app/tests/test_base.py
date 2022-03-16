@@ -116,7 +116,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(response.status_code == expected_status,
                         f"""While doing GET to '{path}':
                         Unexpected status for {user},
-                        status code was {response.status_code}, 
+                        status code was {response.status_code},
                         expected {expected_status}
                         """)
         return response
