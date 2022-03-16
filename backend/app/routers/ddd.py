@@ -1,8 +1,7 @@
 from app.database import db
-
 from app.models.user import User, UserRole
-from app.utils.response import response
 from app.utils.cryptography import get_password_hash
+from app.utils.response import response
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/ddd")
@@ -37,7 +36,7 @@ async def ddd():
         name="user_admin",
         password=get_password_hash("Test123!user_admin"),
         role=UserRole.ADMIN,
-        active=True, approved=True)
+        active=True, approved=True),
 
     await db.engine.save(user_unactivated)
     await db.engine.save(user_activated)

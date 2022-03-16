@@ -1,7 +1,11 @@
 from enum import Enum
 
+from app.exceptions.validator_exeptions import (EmptyNameException,
+                                                InvalidEmailException,
+                                                InvalidPasswordException)
+from app.utils.validators import valid_email, valid_password
 from odmantic import Model
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class UserRole(int, Enum):
@@ -17,11 +21,18 @@ class User(Model):
     role: UserRole = 0
     active: bool = False
     approved: bool = False
+    disabled: bool = True
 
 
 class UserCreate(BaseModel):
     email: str
     # password: str
+
+    @validator('email')
+    def password_format_check(cls, v):
+        if not valid_email(v):
+            raise InvalidEmailException()
+        return v
 
 
 class UserOut(BaseModel):
@@ -42,3 +53,15 @@ class UserInvite(BaseModel):
     name: str
     password: str
     validate_password: str
+
+    @validator('name')
+    def name_not_empty(cls, v):
+        if v == "":
+            raise EmptyNameException()
+        return v
+
+    @validator('password')
+    def password_format_check(cls, v):
+        if not valid_password(v):
+            raise InvalidPasswordException()
+        return v

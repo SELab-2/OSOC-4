@@ -64,6 +64,7 @@ SENDER_PASSWORD=Justapassword123!
 
 # Invite Settings
 INVITE_EXPIRE=4320 # in minutes
+PASSWORDRESET_EXPIRE=30 # in minutes
 ```
 
 # Accessing API docs
@@ -71,5 +72,5 @@ INVITE_EXPIRE=4320 # in minutes
 Use the following URL to access the Swagger API docs. Change the port if needed.
 
 `http://localhost:8000/docs`
- 
+
 # Testing

@@ -1,4 +1,5 @@
-from typing import Type, List, Optional
+from typing import List, Optional, Type
+
 from odmantic.engine import ModelType
 
 from app.database import db
@@ -25,19 +26,19 @@ async def read_all(model: Type[ModelType], key=None, value=None) -> List[ModelTy
     return res
 
 
-async def read_by_key_value(model: Type[ModelType], key, value) -> Optional[ModelType]:
-    """read_by_key_value this function reads one entry from a specific model that matches the given key and value
+async def read_where(model: Type[ModelType], *args) -> Optional[ModelType]:
+    """read_where this function reads one entry from a specific model that matches the given key and value
 
-    example read user with id user_id:  read_by_key_value(User, User.id, user_id)
+    example read user with id user_id:  read_where(User, User.id == user_id)
 
     :param model: the model to read all entries from
     :type model: ModelType
     :param key: the key to check the value on, pass this argument as ModelType.key (see the example)
     :param value: the value that the key should have
-    :return: a data-entry of type model that has value as value for the key key, or None is no such data-entry could be found
+    :return: a data-entry of type model that has values as values for the keys, or None is no such data-entry could be found
     :rtype: Optional[ModelType]
     """
-    res = await db.engine.find_one(model, key == value)
+    res = await db.engine.find_one(model, *args)
     return res if res else None
 
 
