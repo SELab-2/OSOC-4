@@ -7,7 +7,6 @@ from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
 from app.models.user import User, UserInvite
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
-from app.utils.validators import valid_password
 from fastapi import APIRouter
 from odmantic import ObjectId
 

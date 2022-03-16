@@ -1,5 +1,4 @@
 import datetime
-from asyncore import read
 
 from app.crud import read_all, read_where, update
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
