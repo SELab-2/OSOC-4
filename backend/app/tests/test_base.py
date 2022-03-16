@@ -114,8 +114,8 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             response = await self.client.get(path)
 
         self.assertTrue(response.status_code == expected_status,
-                        f"""While doing GET to '{path}': 
-                        Unexpected status for {user}, 
+                        f"""While doing GET to '{path}':
+                        Unexpected status for {user},
                         status code was {response.status_code}, 
                         expected {expected_status}
                         """)
@@ -147,7 +147,8 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.post(path, json=json_body, headers={"X-CSRF-TOKEN": access_token,                                                                  "Content-Type": "application/json"})
+            response = await self.client.post(path, json=json_body, headers={"X-CSRF-TOKEN": access_token,
+                                                                             "Content-Type": "application/json"})
         else:
             response = await self.client.post(path, json=json_body, headers={"Content-Type": "application/json"})
 

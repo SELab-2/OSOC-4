@@ -14,9 +14,6 @@ from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
-from app.utils.validators import valid_email
-from fastapi import APIRouter, Depends
-from bson import ObjectId
 from fastapi import APIRouter, Body, Depends
 
 router = APIRouter(prefix="/users")
