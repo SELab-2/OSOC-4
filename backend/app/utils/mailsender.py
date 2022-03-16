@@ -15,6 +15,13 @@ SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
 
 
 def send_password_reset(email: str, resetkey: str):
+    """send_password_reset this function sents an email to reset the user password
+
+    :param email: the email of the user
+    :type email: str
+    :param resetkey: the reset key
+    :type resetkey: str
+    """
     receiver_email = email  # Enter receiver address
 
     subject = "Forgot Password"

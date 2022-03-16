@@ -35,7 +35,7 @@ async def read_where(model: Type[ModelType], *args) -> Optional[ModelType]:
     :type model: ModelType
     :param key: the key to check the value on, pass this argument as ModelType.key (see the example)
     :param value: the value that the key should have
-    :return: a data-entry of type model that has value as value for the key key, or None is no such data-entry could be found
+    :return: a data-entry of type model that has values as values for the keys, or None is no such data-entry could be found
     :rtype: Optional[ModelType]
     """
     res = await db.engine.find_one(model, *args)

@@ -154,15 +154,19 @@ def logout(Authorize: AuthJWT = Depends()):
 
 @router.post('/forgot')
 async def forgot(emailinput: EmailInput = Body(...)):
+    """forgot send an email with a reset password link if the user exists
 
+    :param emailinput: email adress input, defaults to Body(...)
+    :type emailinput: EmailInput, required
+    :return: a messagae
+    :rtype: dict
+    """
     # check if user exists and not disabled
     user = await read_where(User, User.email == emailinput.email, User.disabled == False)
     if user:
         reset_key, reset_expires = generate_new_reset_password_key()
-        print(reset_key)
         db.redis.setex(reset_key, reset_expires, str(user.id))
         # send email to user with the reset key
         send_password_reset(user.email, reset_key)
 
     return {"msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}
-

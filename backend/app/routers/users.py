@@ -134,9 +134,20 @@ async def approve_user(user_id: str):
 
 
 @router.post("/forgot/{reset_key}")
-async def change_password(reset_key, passwords: PasswordResetInput = Body(...)):
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...)):
+    """change_password function that changes the user password
 
-    # check key in redis server
+    :param reset_key: the reset key
+    :type reset_key: str
+    :param passwords: password and validate_password are needed, defaults to Body(...)
+    :type passwords: PasswordResetInput, optional
+    :raises InvalidResetKeyException: invalid reset key
+    :raises PasswordsDoNotMatchException: passwords don't match
+    :raises NotPermittedException: Unauthorized
+    :return: message to check the emails
+    :rtype: dict
+    """
+
     if reset_key[0] != "R":
         raise InvalidResetKeyException()
 
