@@ -24,19 +24,14 @@ export default {
 </script>
 
 <template>
-  <div id="reset-this-root">
-
-  <div class="header">
-    <p class="title">Welcome!</p>
-  </div>
 
   <div class="body">
 
-    <section class="side">
-      <img src="../assets/images/logo-osoc-color.svg" alt="osoc-emblem">
+    <section class="body-left">
+      <img src="../assets/images/logo-osoc-color.svg" alt="osoc-logo">
     </section>
 
-    <section class="main">
+    <section class="body-right">
 
       <div class="login-container">
         <p class="welcome-message">Please provide login credentials to proceed</p>
@@ -53,7 +48,6 @@ export default {
     </section>
   </div>
 
-  </div>
 </template>
 
 <style scoped>

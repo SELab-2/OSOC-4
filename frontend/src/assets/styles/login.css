@@ -3,25 +3,21 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
-
-.header {
-    width: 100%;
-    align-items: center;
-    align-content: center;
-    align-self: center;
-    margin-top: 5%;
-    margin-bottom: 5%;
+.body-right {
+    margin-left: 5%;
+    justify-content: left;
 }
 
 section {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 0;
 }
 
-.side img {
-    width: 75%;
-    max-width: 75%;
+.body-left img {
+    width: 65%;
+    max-width: 65%;
 }
 
 .login-container {
@@ -33,7 +29,6 @@ section {
 }
 
 .title {
-    text-transform: uppercase;
     font-size: 3em;
     font-weight: bold;
     text-align: center;
@@ -107,7 +102,7 @@ input:focus{
         align-items: center;
     }
 
-    .side {
+    .body-left {
         display: none;
     }
 }

@@ -19,7 +19,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: FreeSans, sans-serif;
-    color: #303433;
+    color: var(--gray3);
 }
 
 

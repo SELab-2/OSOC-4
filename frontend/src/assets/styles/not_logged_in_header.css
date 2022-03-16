@@ -1,0 +1,48 @@
+.header {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: center;
+    align-content: center;
+    align-self: center;
+    justify-content: center;
+}
+
+section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.header-right {
+    justify-content: left;
+}
+
+.header-right img {
+    width: 55%;
+    max-width: 55%;
+}
+
+.title {
+    font-size: 3em;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+
+
+/* ----  Responsiveness   ----  */
+@media (max-width: 780px) {
+
+    .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .header-left {
+        display: none;
+    }
+}
