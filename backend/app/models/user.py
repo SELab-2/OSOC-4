@@ -1,6 +1,7 @@
 from enum import Enum
 
-from app.exceptions.validator_exeptions import (InvalidEmailException,
+from app.exceptions.validator_exeptions import (EmptyNameException,
+                                                InvalidEmailException,
                                                 InvalidPasswordException)
 from app.utils.validators import valid_email, valid_password
 from odmantic import Model
@@ -52,6 +53,12 @@ class UserInvite(BaseModel):
     name: str
     password: str
     validate_password: str
+
+    @validator('name')
+    def name_not_empty(cls, v):
+        if v == "":
+            raise EmptyNameException()
+        return v
 
     @validator('password')
     def password_format_check(cls, v):

@@ -9,3 +9,8 @@ class InvalidEmailException(BaseException):
 class InvalidPasswordException(BaseException):
     def __init__(self):
         super().__init__(400, "The entered password doesn't meet the requirements")
+
+
+class EmptyNameException(BaseException):
+    def __init__(self):
+        super().__init__(400, "The entered name cannot be empty")

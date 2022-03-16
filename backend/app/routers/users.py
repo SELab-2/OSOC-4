@@ -67,9 +67,9 @@ async def invite_user(id: str):
         raise UserAlreadyActiveException()
 
     # create an invite key
-    invite_key, invite_expires = generate_new_invite_key(str(user.id))
+    invite_key, invite_expires = generate_new_invite_key()
     # save it
-    db.redis.setex(invite_key, invite_expires, "true")
+    db.redis.setex(invite_key, invite_expires, str(user.id))
     # send email to user with the invite key
     send_invite(user.email, invite_key)
     return response(None, "Invite sent succesfull")
