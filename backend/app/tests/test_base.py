@@ -1,7 +1,9 @@
+import asyncio
 import unittest
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
+from odmantic.engine import ModelType
 
 from app.api import app
 from app.database import db
@@ -19,9 +21,11 @@ class Wrong(Exception):
         return self.msg
 
 
-class TestBase(unittest.IsolatedAsyncioTestCase):
-    def __init__(self, objects, *args, **kwargs):
+class TestBase:
+    def __init__(self, objects=dict(), *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if objects is None:
+            objects = {}
         self.objects = {
             "user_admin": User(
                 email="user_admin@test.be",
@@ -59,6 +63,15 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.objects.update(objects)
         self.saved_objects = {"passwords": {}}
 
+        async def save_all():
+            async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
+                for k, obj in self.objects.items():
+                    await self.add_external_object(k, obj)
+
+        future = save_all()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(future)
+
     async def get_access_token(self, client, user: str):
         print("get_acces_token")
         email: str = self.saved_objects[user].email
@@ -66,6 +79,36 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         login = await client.post("/login", json={"email": email, "password": password},
                                   headers={"Content-Type": "application/json"})
         return login.cookies["csrf_access_token"]
+
+    async def add_external_object(self, key, obj):
+        if isinstance(obj, User):
+            plain_password = obj.password
+            obj.password = get_password_hash(obj.password)
+            self.saved_objects["passwords"][key] = plain_password
+        self.saved_objects[key] = await db.engine.save(obj)
+
+    async def delete(self):
+        for object in self.saved_objects.values():
+            if not isinstance(object, dict):
+                await db.engine.delete(object)
+
+    def __call__(self, that, f, *args, **kwargs):
+        print("in __call__")
+        future = self.with_all(that, f)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(future)
+        super.__call__(*args, **kwargs)
+
+    async def with_all(self, that, func):
+        async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
+            try:
+                await func(that, client=client)
+                await self.delete()
+            except Wrong as wrong:
+                await self.delete()
+            except Exception as e:
+                await self.delete()
+                raise e
 
     async def get_response(self, path: str, client: AsyncClient, user: str, expected_status: int = 200,
                            access_token: str = None, use_access_token: bool = True) -> Response:
@@ -153,35 +196,3 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             )
 
         return response
-
-    async def add_external_object(self, key, obj, save_obj=False):
-        if isinstance(obj, User):
-            plain_password = obj.password
-            obj.password = get_password_hash(obj.password)
-            self.saved_objects["passwords"][key] = plain_password
-
-        if save_obj:
-            self.saved_objects[key] = await db.engine.save(obj)
-        else:
-            self.saved_objects[key] = obj
-
-    async def with_all(self, func):
-        async with AsyncClient(app=app, base_url="http://test") as client, LifespanManager(app):
-
-            for k, obj in self.objects.items():
-                await self.add_external_object(k, obj, True)
-
-            async def delete():
-                for object in self.saved_objects.values():
-                    if not isinstance(object, dict):
-                        await db.engine.delete(object)
-
-            try:
-                await func(client=client)
-                await delete()
-            except Wrong as wrong:
-                await delete()
-                self.assertTrue(False, wrong.msg)
-            except Exception as e:
-                await delete()
-                raise e
