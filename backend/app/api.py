@@ -15,8 +15,8 @@ from app.routers import (answers, auth, ddd, editions, participation, partners,
                          projects, question_answers, questions, roles,
                          student_forms, suggestions, user_invites, users)
 
-# app = FastAPI(root_path=os.getenv("PATHPREFIX", "") + "/api")
-app = FastAPI()
+PATHPREFIX = os.getenv("PATHPREFIX", "")
+app = FastAPI(root_path=(PATHPREFIX + "/api" if PATHPREFIX else "/"))
 
 origins = [
     "http://localhost:3000",
@@ -77,10 +77,7 @@ def custom_openapi():
         version="2.5.0",
         description="This is a very custom OpenAPI schema",
         routes=app.routes,
-        servers=[
-            {"url": os.getenv("PATHPREFIX", "") + "/api"},
-            {"url": "/"}
-            ]
+        servers=[{"url": os.getenv("PATHPREFIX", "") + "/api"}] if PATHPREFIX else [{"url": "/"}]
     )
     openapi_schema["info"]["x-logo"] = {
         "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
