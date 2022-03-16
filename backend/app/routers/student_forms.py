@@ -3,12 +3,12 @@ from app.models.student_form import StudentForm
 from app.utils.response import list_modeltype_response
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/student_forms")
+router = APIRouter(prefix="/students")
 
 
-@router.get("/", response_description="Questions retrieved")
-async def get_student_forms():
-    """get_student_forms get all the StudentForm instances from the database
+@router.get("/", response_description="Students retrieved")
+async def get_student():
+    """get_students get all the StudentForm instances from the database
 
     :return: list of student forms
     :rtype: dict
