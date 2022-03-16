@@ -19,6 +19,9 @@ const actions = {
         await logout('/logout', getters, commit)
         log("Users: logout: redirect to Login")
         await redirect("Login")
+    },
+    async forgot({getters, commit}, user) {
+        log("Users: forgot: " + user.email)
     }
 };
 

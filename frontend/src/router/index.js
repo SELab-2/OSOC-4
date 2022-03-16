@@ -10,6 +10,11 @@ const routes = [
     component: () => import('../views/Login.vue')
   },
   {
+    path: '/forgot',
+    name: 'Forgot',
+    component: () => import('../views/Forgot.vue')
+  },
+  {
     path: '/invite-users',
     name: 'InviteUsers',
     component: () => import('../views/InviteUsers.vue')
@@ -56,7 +61,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   log("Router: before each")
-  if(!(to.name === 'Login' || to.name === "ErrorPage") &&! store.getters.getIsAuthenticated){
+  if(!(to.name === 'Login' || to.name === "ErrorPage" || to.name === "Forgot") &&! store.getters.getIsAuthenticated){
     // redirect the user to the login page
     log("before each: not logged in -> redirected to Login")
     return { name: 'Login' }

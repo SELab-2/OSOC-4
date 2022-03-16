@@ -45,6 +45,10 @@ export default {
           <input v-model="user.password" type="password" name="" placeholder="Password">
           <input class="submit" v-on:click=loginButton type="submit" name="" value="Login">
         </div>
+          <router-link :to="{name: 'Forgot'}"><p class="forgot-text">Forgot your password?</p></router-link>
+        <div class="forgot">
+
+        </div>
       </div>
     </section>
   </div>
