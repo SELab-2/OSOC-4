@@ -6,7 +6,7 @@ from app.models.user import User
 from app.tests.test_base import TestBase, Status
 
 
-class TestCreateUsers(TestBase):
+class TestUsers(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
