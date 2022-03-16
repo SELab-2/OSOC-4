@@ -1,3 +1,5 @@
+from odmantic import ObjectId
+
 from app.crud import read_all, read_by_key_value, update
 from app.database import db
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
@@ -10,7 +12,6 @@ from app.utils.invite import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
 from app.utils.validators import valid_email
-from bson import ObjectId
 from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/users")
@@ -73,7 +74,7 @@ async def invite_user(id: str):
     db.redis.setex(invite_key, invite_expires, "true")
     # send email to user with the invite key
     send_invite(user.email, invite_key)
-    return response(None, "Invite sent succesfull")
+    return response(None, "Invite sent successfully")
 
 
 @router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
