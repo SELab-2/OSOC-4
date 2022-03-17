@@ -56,7 +56,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 active=False,
                 approved=False)
         }
-        self.saved_objects = {"passwords": {}}
+        self.saved_objects = {"passwords": {}}  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         self.created = []
 
     async def asyncSetUp(self) -> None:
