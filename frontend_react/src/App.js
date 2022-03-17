@@ -11,7 +11,7 @@ function App() {
 
   return (
     <div className="App">
-      { (isStillAuthenticated())?
+      { (! isStillAuthenticated())?
         // sign in page
         <Login />
         : (
