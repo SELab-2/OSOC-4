@@ -1,4 +1,5 @@
 from typing import List
+from odmantic import ObjectId
 from app.crud import read_all, read_where, update
 from app.database import db
 from app.exceptions.key_exceptions import InvalidResetKeyException
@@ -14,7 +15,6 @@ from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
-from bson import ObjectId
 from fastapi import APIRouter, Body, Depends
 
 router = APIRouter(prefix="/users")
@@ -73,7 +73,7 @@ async def invite_user(id: str):
     db.redis.setex(invite_key, invite_expires, str(user.id))
     # send email to user with the invite key
     send_invite(user.email, invite_key)
-    return response(None, "Invite sent succesfull")
+    return response(None, "Invite sent successfully")
 
 
 @router.post("/invites", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])

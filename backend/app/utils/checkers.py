@@ -20,6 +20,9 @@ class RoleChecker:
         current_user_id = Authorize.get_jwt_subject()
         user = await read_where(User, User.id == ObjectId(current_user_id))
 
+        if not user.approved:
+            raise NotPermittedException()
+
         if user.role < self.role:
             raise NotPermittedException()
 
