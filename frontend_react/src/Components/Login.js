@@ -1,11 +1,11 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Navigate} from "react-router-dom";
 
 
 import {login} from "../utils/json-requests";
 import {log} from "../utils/logger";
 
-export default class Login extends React.Component {
+class Loginn extends React.Component {
     constructor(props) {
         super(props);
 
@@ -41,22 +41,45 @@ export default class Login extends React.Component {
             // todo reroute to "/"
         }
     }
+}
 
-    render() {
-        if (this.state.failed) {
-            return (
-                <Navigate to={{pathname: "/login"}}/>
-            );
+
+export default function Login(props) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleChangeEmail = (event) => {
+        setEmail(event.target.value);
+    }
+    const handleChangePassword = (event) => {
+        setPassword(event.target.value);
+    }
+
+    async function handleSubmit(event) {
+        log("handle login submit")
+        event.preventDefault();
+        let credentials = JSON.stringify({
+            "email": email,
+            "password": password
+        });
+        log(credentials)
+        // post, if any errors, show them
+        let output = await login("/login", credentials);
+        console.log(output)
+        if (output.success) {
+            // todo reroute to "/"
+            props.history.push("/")
         }
+    }
 
-        return (
+    return (
             <div className="body">
                 <div className="login-container">
                     <p className="welcome-message">Please provide login credentials to proceed</p>
                     <div className="login-form">
-                        <form onSubmit={this.handleSubmit}>
-                            <input type="email" name="email" value={this.state.email} onChange={this.handleChangeText} placeholder="Email address"/>
-                            <input type="password" name="password" value={this.state.password} onChange={this.handleChangeText} placeholder="Password"/>
+                        <form onSubmit={handleSubmit}>
+                            <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address"/>
+                            <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password"/>
                             <input className="submit" type="submit" name="submit" value="Login"/>
                         </form>
                     </div>
@@ -66,4 +89,4 @@ export default class Login extends React.Component {
     }
 
 
-}
+

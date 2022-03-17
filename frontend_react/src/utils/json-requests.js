@@ -7,7 +7,7 @@ axios.defaults.withCredentials = true
 axios.defaults.baseURL = "http://localhost:8000";
 
 let _config = {"headers": {"Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "<origin>"}}
+        "Access-Control-Allow-Origin": "http://localhost:3001"}}
 
 export function headers() {
     log("json-requests: updating headers")
@@ -150,6 +150,7 @@ export async function patchEdit(url, json, getters, commit) {
 export async function login(url, json) {
     log("json-requests: login")
     try {
+        console.log(headers())
         let resp = await axios.post(url, json, headers());
         log(resp)
         return {success: true};
