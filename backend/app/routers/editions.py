@@ -114,7 +114,7 @@ async def get_edition_students_with_filter(
 
     query = {"edition": edition.id}
     if search is not None:
-        query["name"] = search
+        query["name"] = {"$regex": search, "$options": "i"}
     if role_filter is not None and len(role_filter) > 0:
         if len(role_filter) == 1:
             query["roles"] = role_filter[0]
