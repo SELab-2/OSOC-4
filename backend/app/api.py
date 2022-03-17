@@ -1,7 +1,9 @@
 import inspect
+import os
 import re
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
@@ -9,11 +11,25 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app.database import connect_db, disconnect_db
 from app.exceptions.base_exception import BaseException
-from app.routers import (answers, auth, editions, participation, partners,
+from app.routers import (answers, auth, ddd, ddd2, editions, participation,
                          projects, question_answers, questions, roles,
-                         student_forms, suggestions, user_invites, users, ddd)
+                         student_forms, suggestions, user_invites, users)
 
-app = FastAPI()
+PATHPREFIX = os.getenv("PATHPREFIX", "")
+app = FastAPI(root_path=(PATHPREFIX + "/api" if PATHPREFIX else "/"))
+
+origins = [
+    "http://localhost:3000",
+]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
@@ -27,11 +43,11 @@ async def shutdown():
 
 
 app.include_router(ddd.router)
+app.include_router(ddd2.router)
 app.include_router(answers.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
 app.include_router(participation.router)
-app.include_router(partners.router)
 app.include_router(projects.router)
 app.include_router(question_answers.router)
 app.include_router(questions.router)
@@ -61,6 +77,7 @@ def custom_openapi():
         version="2.5.0",
         description="This is a very custom OpenAPI schema",
         routes=app.routes,
+        servers=[{"url": os.getenv("PATHPREFIX", "") + "/api"}] if PATHPREFIX else [{"url": "/"}]
     )
     openapi_schema["info"]["x-logo"] = {
         "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"

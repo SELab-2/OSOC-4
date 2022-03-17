@@ -13,5 +13,6 @@ async def get_projects():
     :return: list of projects
     :rtype: dict
     """
+
     results = await read_all(Project)
     return list_modeltype_response(results, Project)

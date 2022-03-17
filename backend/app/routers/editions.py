@@ -3,7 +3,7 @@ from typing import Optional, List
 from bson import ObjectId
 
 from app.database import db
-from app.crud import read_all, read_by_key_value, update
+from app.crud import read_all, read_where, update
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition
@@ -41,7 +41,7 @@ async def create_edition(edition: Edition = Body(...)):
     if edition.year is None or edition.year == "" or int(edition.year) < datetime.date.today().year:
         raise YearAlreadyOverException()
     # check if an edition with the same year is already present
-    if await read_by_key_value(Edition, Edition.year, edition.year):
+    if await read_where(Edition, Edition.year == edition.year):
         raise AlreadyEditionWithYearException(edition.year)
 
     new_edition = await update(Edition.parse_obj(edition))
@@ -49,20 +49,20 @@ async def create_edition(edition: Edition = Body(...)):
 
 
 @router.get("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Editions retrieved")
-async def get_edition(year):
+async def get_edition(year: int):
     """get_edition get the Edition instance with given year
 
     :return: list of editions
     :rtype: dict
     """
-    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    edition = await read_where(Edition, Edition.year == year)
     if not edition:
         return errorresponse(None, 400, "Edition not found")
     return response(edition, "Edition successfully retrieved")
 
 
 @router.post("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Editions retrieved")
-async def update_edition(year, edition: Edition = Body(...)):
+async def update_edition(year: int, edition: Edition = Body(...)):
     """update_edition update the Edition instance with given year
 
     :return: the updated edition
@@ -71,20 +71,20 @@ async def update_edition(year, edition: Edition = Body(...)):
     if not year == edition.year:
         return errorresponse(None, 400, "Edition can't change it's year")
 
-    results = await read_by_key_value(Edition, Edition.id, edition.id)
+    results = await read_where(Edition, Edition.id == edition.id)
     if not results:
         return errorresponse(None, 400, "Edition not found")
     return response(results, "Edition successfully retrieved")
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Students retrieved")
-async def get_edition_students(year):
+async def get_edition_students(year: int):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    edition = await read_where(Edition, Edition.year == year)
     if not edition:
         return errorresponse(None, 400, "Edition not found")
 
@@ -108,7 +108,7 @@ async def get_edition_students_with_filter(
     :return: list of all the students matching the criteria
     :rtype: dict
     """
-    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    edition = await read_where(Edition, Edition.year == year)
     if not edition:
         return errorresponse(None, 400, "Edition not found")
 
@@ -126,7 +126,7 @@ async def get_edition_students_with_filter(
 
 
 @router.get("/{year}/projects", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Projects retrieved")
-async def get_edition_projects(year):
+async def get_edition_projects(year: int):
     """get_edition_projects get all the projects in the edition with the given year
 
     :param year: year of the edition
@@ -134,7 +134,7 @@ async def get_edition_projects(year):
     :return: list of projects
     :rtype: dict
     """
-    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    edition = await read_where(Edition, Edition.year == year)
     if not edition:
         return errorresponse(None, 400, "Edition not found")
 
@@ -143,7 +143,7 @@ async def get_edition_projects(year):
 
 
 @router.get("/{year}/student/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Student retrieved")
-async def get_student(year, student_id):
+async def get_student(year: int, student_id: ObjectId):
     """get_student get the StudentForm with the corresponding id
 
     :param year: year of the edition
@@ -151,7 +151,7 @@ async def get_student(year, student_id):
     :return: StudentForm
     :rtype: dict
     """
-    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    edition = await read_where(Edition, Edition.year == year)
     if not edition:
         return errorresponse(None, 400, "Edition not found")
     student = await db.engine.find(StudentForm, {"edition": edition.id, "_id": student_id})
@@ -176,7 +176,7 @@ async def edit_student(student: StudentForm = Body(...)):
 
 
 @router.get("/{year}/student/students/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Projects retrieved")
-async def get_conflicting_students(year):
+async def get_conflicting_students(year: int):
     """get_conflicting_projects gets all students with conflicts in their confirmed suggestions
     within an edition
 
@@ -187,7 +187,7 @@ async def get_conflicting_students(year):
     :rtype: dict
     """
 
-    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    edition = await read_where(Edition, Edition.year == year)
     if not edition:
         return errorresponse(None, 400, "Edition not found")
 

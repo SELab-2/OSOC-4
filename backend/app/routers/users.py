@@ -1,18 +1,21 @@
 from typing import List
-from app.crud import read_all, read_by_key_value, update
+from app.crud import read_all, read_where, update
 from app.database import db
+from app.exceptions.key_exceptions import InvalidResetKeyException
+from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
-                                            InvalidEmailException,
+                                            PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserNotFoundException)
+from app.models.passwordreset import PasswordResetInput
 from app.models.user import User, UserCreate, UserOut, UserRole
 from app.utils.checkers import RoleChecker
-from app.utils.invite import generate_new_invite_key
+from app.utils.cryptography import get_password_hash
+from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
-from app.utils.validators import valid_email
 from bson import ObjectId
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 
 router = APIRouter(prefix="/users")
 
@@ -42,12 +45,8 @@ async def add_user_data(user: UserCreate):
     :rtype: dict
     """
 
-    # check if valid email
-    if not valid_email(user.email):
-        raise InvalidEmailException()
-
     # check if email already used
-    if await read_by_key_value(User, User.email, user.email):
+    if await read_where(User, User.email == user.email):
         raise EmailAlreadyUsedException()
 
     new_user = await update(User.parse_obj(user))
@@ -63,15 +62,15 @@ async def invite_user(id: str):
     :return: response
     :rtype: success or error
     """
-    user = await read_by_key_value(User, User.id, ObjectId(id))
+    user = await read_where(User, User.id == ObjectId(id))
 
     if user.active:
         raise UserAlreadyActiveException()
 
     # create an invite key
-    invite_key, invite_expires = generate_new_invite_key(str(user.id))
+    invite_key, invite_expires = generate_new_invite_key()
     # save it
-    db.redis.setex(invite_key, invite_expires, "true")
+    db.redis.setex(invite_key, invite_expires, str(user.id))
     # send email to user with the invite key
     send_invite(user.email, invite_key)
     return response(None, "Invite sent succesfull")
@@ -88,7 +87,7 @@ async def invite_users(ids: List[str]):
     """
     users = []
     for id in ids:
-        users.append(await read_by_key_value(User, User.id, ObjectId(id)))
+        users.append(await read_where(User, User.id == ObjectId(id)))
 
     # throw exception if any user is already active
     if any([user.active for user in users]):
@@ -114,7 +113,7 @@ async def get_user(id: str):
     :return: response
     :rtype: success or error
     """
-    user = await read_by_key_value(User, User.id, ObjectId(id))
+    user = await read_where(User, User.id == ObjectId(id))
 
     if not user:
         raise UserNotFoundException()
@@ -122,7 +121,7 @@ async def get_user(id: str):
     if not user.approved:
         return errorresponse(None, 400, "The user doesn't exist (yet)")
 
-    return response(UserOut.parse_obj(user), "User retrieved successfully")
+    return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 
 
 @router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
@@ -134,7 +133,7 @@ async def update_user(id: str):
     :return: response
     :rtype: success or error
     """
-    user = await read_by_key_value(User, User.id, ObjectId(id))
+    user = await read_where(User, User.id == ObjectId(id))
 
     if not user.approved:
         return errorresponse(None, 400, "The user doesn't exist (yet)")
@@ -151,7 +150,7 @@ async def approve_user(user_id: str):
     :return: response
     :rtype: _type_
     """
-    user = await read_by_key_value(User, User.id, ObjectId(user_id))
+    user = await read_where(User, User.id == ObjectId(user_id))
 
     if not user.active:
         return errorresponse(None, 400, "The user is not activated")
@@ -161,3 +160,39 @@ async def approve_user(user_id: str):
     user.approved = True
     await update(user)
     return response(None, "Approved the user successfully")
+
+
+@router.post("/forgot/{reset_key}")
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...)):
+    """change_password function that changes the user password
+
+    :param reset_key: the reset key
+    :type reset_key: str
+    :param passwords: password and validate_password are needed, defaults to Body(...)
+    :type passwords: PasswordResetInput, optional
+    :raises InvalidResetKeyException: invalid reset key
+    :raises PasswordsDoNotMatchException: passwords don't match
+    :raises NotPermittedException: Unauthorized
+    :return: message to check the emails
+    :rtype: dict
+    """
+
+    if reset_key[0] != "R":
+        raise InvalidResetKeyException()
+
+    userid = db.redis.get(reset_key)
+    if not userid:
+        raise InvalidResetKeyException()
+
+    if passwords.password != passwords.validate_password:
+        raise PasswordsDoNotMatchException()
+
+    user = await read_where(User, User.id == ObjectId(userid))
+    if not user or user.disabled:
+        raise NotPermittedException()
+
+    user.password = get_password_hash(passwords.password)
+    db.redis.delete(reset_key)
+    await update(user)
+
+    return response(None, "Password updated successfully")

@@ -1,10 +1,15 @@
 from datetime import timedelta
 
-from app.crud import read_by_key_value
+from app.crud import read_where
 from app.database import db
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
+from app.models.passwordreset import EmailInput
 from app.models.user import User, UserLogin
-from fastapi import APIRouter, Depends
+from app.utils.cryptography import verify_password
+from app.utils.keygenerators import generate_new_reset_password_key
+from app.utils.mailsender import send_password_reset
+from app.utils.response import response
+from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
@@ -61,15 +66,18 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :return: access and refresh token
     :rtype: dict
     """
-    u = await read_by_key_value(User, User.email, user.email)
+    u = await read_where(User, User.email == user.email)
     if u:
+        if not verify_password(user.password, u.password):
+            raise InvalidEmailOrPasswordException()
+
         access_token = Authorize.create_access_token(subject=str(u.id))
         refresh_token = Authorize.create_refresh_token(subject=str(u.id))
 
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
 
-        return {"access_token": access_token, "refresh_token": refresh_token}
+        return response(None, "Login successful")
 
     raise InvalidEmailOrPasswordException()
 
@@ -142,3 +150,23 @@ def logout(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     Authorize.unset_jwt_cookies()
     return {"msg": "Successfully logout"}
+
+
+@router.post('/forgot')
+async def forgot(emailinput: EmailInput = Body(...)):
+    """forgot send an email with a reset password link if the user exists
+
+    :param emailinput: email adress input, defaults to Body(...)
+    :type emailinput: EmailInput, required
+    :return: a messagae
+    :rtype: dict
+    """
+    # check if user exists and not disabled
+    user = await read_where(User, User.email == emailinput.email, User.disabled == False)
+    if user:
+        reset_key, reset_expires = generate_new_reset_password_key()
+        db.redis.setex(reset_key, reset_expires, str(user.id))
+        # send email to user with the reset key
+        send_password_reset(user.email, reset_key)
+
+    return {"msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}

@@ -1,16 +1,6 @@
 from app.exceptions.base_exception import BaseException
 
 
-class InvalidEmailException(BaseException):
-    def __init__(self):
-        super().__init__(400, "Email is not valid")
-
-
-class InvalidPasswordException(BaseException):
-    def __init__(self):
-        super().__init__(400, "Password is not valid")
-
-
 class PasswordsDoNotMatchException(BaseException):
     def __init__(self):
         super().__init__(400, "Passwords do not match")

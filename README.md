@@ -64,6 +64,7 @@ SENDER_PASSWORD=Justapassword123!
 
 # Invite Settings
 INVITE_EXPIRE=4320 # in minutes
+PASSWORDRESET_EXPIRE=30 # in minutes
 ```
 
 # Accessing API docs
