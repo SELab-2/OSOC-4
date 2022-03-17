@@ -9,6 +9,7 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
 from app.models.edition import Edition
 from app.models.student_form import StudentForm
 from app.models.project import Project
+from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker, EditionChecker
 from app.utils.response import errorresponse, list_modeltype_response, response
@@ -174,12 +175,56 @@ async def edit_student(student: StudentForm = Body(...)):
     return response(new_student, "Student added successfully.")
 
 
-@router.get("/{year}/student/projects/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Projects retrieved")
-async def get_conflicting_projects(year):
-    """get_conflicting_projects gets all projects with conflicts within an edition
+@router.get("/{year}/student/students/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Projects retrieved")
+async def get_conflicting_students(year):
+    """get_conflicting_projects gets all students with conflicts in their confirmed suggestions
+    within an edition
 
     :param year: year of the edition
     :type year: int
-    :return: list of projects with conflicts
+    :return: list of students with conflicting suggestions
+             each entry is a dictionary with keys "student_id" and "suggestion_ids"
     :rtype: dict
     """
+
+    edition = await read_by_key_value(Edition, Edition.year, int(year))
+    if not edition:
+        return errorresponse(None, 400, "Edition not found")
+
+    collection = db.engine.get_collection(Suggestion)
+    if not collection:
+        return errorresponse(None, 400, "Unable to retrieve suggestions")
+
+    students = await db.engine.find(StudentForm, {"edition": edition.id})
+    students = [student.id for student in students]
+
+    pipeline = [
+        # get confirmed suggestions for students in the current edition that say yes
+        {"$match": {
+                "confirmed": True,
+                "student_form": {"$in": students},
+                "suggestion": SuggestionOption.YES}},
+        # group by student_form, create set of suggestions and get count of suggestions
+        {"$group": {
+                "_id": "$student_form",
+                "suggestion_ids": {"$addToSet": "$_id"},
+                "count": {"$sum": 1}}},
+        # only match if count of suggestions > 0, since this means there is a conflict
+        {"$match": {
+                "_id": {"$ne": None},
+                "count": {"$gt": 1}}},
+        # change field names
+        {"$project": {
+                "student_id": "$_id",
+                "suggestion_ids": 1,
+                "_id": 0}}
+    ]
+
+    documents = await collection.aggregate(pipeline).to_list(length=None)
+    students = []
+    for doc in documents:
+        students.append(doc)
+        students[-1]["student_id"] = str(students[-1]["student_id"])
+        students[-1]["suggestion_ids"] = [str(s_id) for s_id in students[-1]["suggestion_ids"]]
+
+    return response(students, "Students with conflicting suggestions retrieved succesfully")
