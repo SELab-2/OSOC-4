@@ -1,3 +1,4 @@
+from typing import List
 from odmantic import ObjectId
 from app.crud import read_all, read_where, update
 from app.database import db
@@ -73,6 +74,34 @@ async def invite_user(id: str):
     # send email to user with the invite key
     send_invite(user.email, invite_key)
     return response(None, "Invite sent successfully")
+
+
+@router.post("/invites", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def invite_users(ids: List[str]):
+    """invite_users this functions invites multiple users
+
+    :param id: list of user ids
+    :type id: List[str]
+    :return: response
+    :rtype: success or error
+    """
+    users = []
+    for id in ids:
+        users.append(await read_where(User, User.id == ObjectId(id)))
+
+    # throw exception if any user is already active
+    if any([user.active for user in users]):
+        raise UserAlreadyActiveException()
+
+    for user in users:
+        # create an invite key
+        invite_key, invite_expires = generate_new_invite_key(str(user.id))
+        # save it
+        db.redis.setex(invite_key, invite_expires, "true")
+        # send email to user with the invite key
+        send_invite(user.email, invite_key)
+
+    return response(None, "Invites sent succesfull")
 
 
 @router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
