@@ -201,23 +201,23 @@ async def get_conflicting_students(year: int):
     pipeline = [
         # get confirmed suggestions for students in the current edition that say yes
         {"$match": {
-                "confirmed": True,
-                "student_form": {"$in": students},
-                "suggestion": SuggestionOption.YES}},
+            "confirmed": True,
+            "student_form": {"$in": students},
+            "suggestion": SuggestionOption.YES}},
         # group by student_form, create set of suggestions and get count of suggestions
         {"$group": {
-                "_id": "$student_form",
-                "suggestion_ids": {"$addToSet": "$_id"},
-                "count": {"$sum": 1}}},
+            "_id": "$student_form",
+            "suggestion_ids": {"$addToSet": "$_id"},
+            "count": {"$sum": 1}}},
         # only match if count of suggestions > 0, since this means there is a conflict
         {"$match": {
-                "_id": {"$ne": None},
-                "count": {"$gt": 1}}},
+            "_id": {"$ne": None},
+            "count": {"$gt": 1}}},
         # change field names
         {"$project": {
-                "student_id": "$_id",
-                "suggestion_ids": 1,
-                "_id": 0}}
+            "student_id": "$_id",
+            "suggestion_ids": 1,
+            "_id": 0}}
     ]
 
     documents = await collection.aggregate(pipeline).to_list(length=None)
