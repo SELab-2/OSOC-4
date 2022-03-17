@@ -37,4 +37,3 @@ class TestAuth(TestBase):
         # incorrect password or non existing password
         await self.post_login_fail(user_admin.email, user_admin.name, user_approved_pass)
         await self.post_login_fail(user_admin.email, user_admin.name, "I am a non-existing password")
-
