@@ -2,9 +2,10 @@ import logo from './logo.svg';
 import './App.css';
 import Login from './Components/Login'
 import { BrowserRouter, Route, Routes, useLocation, Switch } from 'react-router-dom'
-import HomeHeader from './Components/HomeHeader'
 import {isStillAuthenticated} from "./utils/json-requests";
 import {useState} from "react";
+import NavHeader fr './Components/NavHeader.js'
+import { isStillAuthenticated } from "./utils/json-requests";
 
 function App() {
 
@@ -16,11 +17,12 @@ function App() {
         // sign in page
         <Login setIsLoggedIn={setIsLoggedIn} />
         : (
-          <Routes>
-            <Route path="/" element={<HomeHeader />} >
-              <Route index element={<HomeHeader />} />
-            </Route>
-          </Routes>
+          <NavHeader />
+          // <Routes>
+          //   <Route path="/" element={<HomeHeader />} >
+          //     <Route index element={<HomeHeader />} />
+          //   </Route>
+          // </Routes>
 
         )}
     </div>

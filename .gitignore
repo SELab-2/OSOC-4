@@ -1,5 +1,7 @@
 data
 
+node_modules/
+
 .vscode/
 .devcontainer/
 data/
