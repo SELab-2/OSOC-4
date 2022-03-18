@@ -9,7 +9,7 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             UserAlreadyActiveException,
                                             UserNotFoundException)
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import User, UserCreate, UserOut, UserRole
+from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
@@ -21,18 +21,18 @@ from odmantic import ObjectId
 router = APIRouter(prefix="/users")
 
 
-@router.get("/", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved")
+@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved")
 async def get_users():
     """get_users get all the users from the database
 
-    :return: list of users
+    :return: list of users url
     :rtype: dict
     """
 
     users = await read_all_where(User)
     out_users = []
     for user in users:
-        out_users.append(UserOut.parse_raw(user.json()))
+        out_users.append(UserOutSimple.parse_raw(user.json()))
     return list_modeltype_response(out_users, User)
 
 
