@@ -1,50 +1,11 @@
-import React, {useEffect, useState} from "react";
-import {Navigate} from "react-router-dom";
+import React, {useState} from "react";
 
 
 import {login} from "../utils/json-requests";
 import {log} from "../utils/logger";
 
-class Loginn extends React.Component {
-    constructor(props) {
-        super(props);
 
-        this.state = {
-            email: "",
-            password: "",
-        };
-
-        // bind this to the functions
-        this.handleChangeText = this.handleChangeText.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
-
-    handleChangeText(event) {
-        console.log("handle change text: (" + Object.keys(event) + ")")
-        const target = event.target;
-        this.setState({[target.name]: target.value});
-    }
-
-    async handleSubmit(event) {
-        log("handle login submit")
-        event.preventDefault();
-
-        let credentials = JSON.stringify({
-            "email": this.state.email,
-            "password": this.state.password
-        });
-        log(credentials)
-        // post, if any errors, show them
-        let output = await login("/login", credentials);
-        console.log(output)
-        if (output.success) {
-            // todo reroute to "/"
-        }
-    }
-}
-
-
-export default function Login(props) {
+const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -68,7 +29,7 @@ export default function Login(props) {
         console.log(output)
         if (output.success) {
             // todo reroute to "/"
-            props.history.push("/")
+            props.history.push("/test")
         }
     }
 
@@ -90,3 +51,4 @@ export default function Login(props) {
 
 
 
+export default Login
