@@ -5,12 +5,12 @@ from odmantic.engine import ModelType
 from app.database import db
 
 
-async def read_all(model: Type[ModelType], key=None, value=None) -> List[ModelType]:
-    """read_all this function reads all the entries from a specific model,
+async def read_all_where(model: Type[ModelType], *args) -> List[ModelType]:
+    """read_all_where this function reads all the entries from a specific model,
     if a key and a value are passed this will be checked on each instance of model
 
-    example read all Users:  read_all(User)
-    example read all Users with Role admin: read_all(User, User.role, UserRole.ADMIN)
+    example read all Users:  read_all_where(User)
+    example read all Users with Role admin: read_all_where(User, User.role, UserRole.ADMIN)
 
     :param model: the model to read all entries from
     :type model: ModelType
@@ -19,10 +19,7 @@ async def read_all(model: Type[ModelType], key=None, value=None) -> List[ModelTy
     :return: list with all data-entries of type model
     :rtype: List[ModelType]
     """
-    if key is not None and value is not None:
-        res = await db.engine.find(model, key, value)
-    else:
-        res = await db.engine.find(model)
+    res = await db.engine.find(model, *args)
     return res
 
 

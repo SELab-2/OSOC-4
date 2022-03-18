@@ -1,6 +1,6 @@
 from typing import List
-from odmantic import ObjectId
-from app.crud import read_all, read_where, update
+
+from app.crud import read_all_where, read_where, update
 from app.database import db
 from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
@@ -16,6 +16,7 @@ from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
+from odmantic import ObjectId
 
 router = APIRouter(prefix="/users")
 
@@ -28,7 +29,7 @@ async def get_users():
     :rtype: dict
     """
 
-    users = await read_all(User)
+    users = await read_all_where(User)
     out_users = []
     for user in users:
         out_users.append(UserOut.parse_raw(user.json()))

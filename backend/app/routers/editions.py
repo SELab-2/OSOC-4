@@ -1,18 +1,22 @@
 import datetime
-from typing import Optional, List
-from bson import ObjectId
+from typing import List, Optional
 
+from app.crud import read_all_where, read_where, update
 from app.database import db
-from app.crud import read_all, read_where, update
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
+                                               EditionNotFound,
+                                               EditionYearModifyException,
+                                               StudentNotFoundException,
+                                               SuggestionRetrieveException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition
-from app.models.student_form import StudentForm
 from app.models.project import Project
+from app.models.student_form import StudentForm
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
-from app.utils.checkers import RoleChecker, EditionChecker
-from app.utils.response import errorresponse, list_modeltype_response, response
+from app.utils.checkers import EditionChecker, RoleChecker
+from app.utils.response import list_modeltype_response, response
+from bson import ObjectId
 from fastapi import APIRouter, Body, Depends
 
 router = APIRouter(prefix="/editions")
@@ -25,7 +29,7 @@ async def get_editions():
     :return: list of editions
     :rtype: dict
     """
-    results = await read_all(Edition)
+    results = await read_all_where(Edition)
     return list_modeltype_response(results, Edition)
 
 
@@ -57,7 +61,7 @@ async def get_edition(year: int):
     """
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
-        return errorresponse(None, 400, "Edition not found")
+        raise EditionNotFound()
     return response(edition, "Edition successfully retrieved")
 
 
@@ -69,11 +73,11 @@ async def update_edition(year: int, edition: Edition = Body(...)):
     :rtype: dict
     """
     if not year == edition.year:
-        return errorresponse(None, 400, "Edition can't change it's year")
+        raise EditionYearModifyException()
 
     results = await read_where(Edition, Edition.id == edition.id)
     if not results:
-        return errorresponse(None, 400, "Edition not found")
+        raise EditionNotFound()
     return response(results, "Edition successfully retrieved")
 
 
@@ -86,7 +90,7 @@ async def get_edition_students(year: int):
     """
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
-        return errorresponse(None, 400, "Edition not found")
+        raise EditionNotFound()
 
     students = await db.engine.find(StudentForm, {"edition": edition.id})
     return list_modeltype_response(students, StudentForm)
@@ -110,7 +114,7 @@ async def get_edition_students_with_filter(
     """
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
-        return errorresponse(None, 400, "Edition not found")
+        raise EditionNotFound()
 
     query = {"edition": edition.id}
     if search is not None:
@@ -136,14 +140,14 @@ async def get_edition_projects(year: int):
     """
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
-        return errorresponse(None, 400, "Edition not found")
+        raise EditionNotFound()
 
     projects = await db.engine.find(Project, {"edition": edition.id})
     return list_modeltype_response(projects, Project)
 
 
 @router.get("/{year}/student/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Student retrieved")
-async def get_student(year: int, student_id: ObjectId):
+async def get_student(year: int, student_id: str):
     """get_student get the StudentForm with the corresponding id
 
     :param year: year of the edition
@@ -153,10 +157,10 @@ async def get_student(year: int, student_id: ObjectId):
     """
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
-        return errorresponse(None, 400, "Edition not found")
+        raise EditionNotFound()
     student = await db.engine.find(StudentForm, {"edition": edition.id, "_id": student_id})
     if not student:
-        return errorresponse(None, 400, "Student not found")
+        raise StudentNotFoundException()
     return response(student, "Student successfully retrieved")
 
 
@@ -189,11 +193,11 @@ async def get_conflicting_students(year: int):
 
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
-        return errorresponse(None, 400, "Edition not found")
+        raise EditionNotFound()
 
     collection = db.engine.get_collection(Suggestion)
     if not collection:
-        return errorresponse(None, 400, "Unable to retrieve suggestions")
+        raise SuggestionRetrieveException()
 
     students = await db.engine.find(StudentForm, {"edition": edition.id})
     students = [student.id for student in students]
