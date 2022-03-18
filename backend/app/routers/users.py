@@ -1,5 +1,6 @@
-from odmantic import ObjectId
-from app.crud import read_all, read_where, update
+from typing import List
+
+from app.crud import read_all_where, read_where, update
 from app.database import db
 from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
@@ -15,6 +16,7 @@ from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
+from odmantic import ObjectId
 
 router = APIRouter(prefix="/users")
 
@@ -27,7 +29,7 @@ async def get_users():
     :rtype: dict
     """
 
-    users = await read_all(User)
+    users = await read_all_where(User)
     out_users = []
     for user in users:
         out_users.append(UserOut.parse_raw(user.json()))
@@ -73,6 +75,34 @@ async def invite_user(id: str):
     # send email to user with the invite key
     send_invite(user.email, invite_key)
     return response(None, "Invite sent successfully")
+
+
+@router.post("/invites", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def invite_users(ids: List[str]):
+    """invite_users this functions invites multiple users
+
+    :param id: list of user ids
+    :type id: List[str]
+    :return: response
+    :rtype: success or error
+    """
+    users = []
+    for id in ids:
+        users.append(await read_where(User, User.id == ObjectId(id)))
+
+    # throw exception if any user is already active
+    if any([user.active for user in users]):
+        raise UserAlreadyActiveException()
+
+    for user in users:
+        # create an invite key
+        invite_key, invite_expires = generate_new_invite_key(str(user.id))
+        # save it
+        db.redis.setex(invite_key, invite_expires, "true")
+        # send email to user with the invite key
+        send_invite(user.email, invite_key)
+
+    return response(None, "Invites sent succesfull")
 
 
 @router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))])

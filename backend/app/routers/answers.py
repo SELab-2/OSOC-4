@@ -1,4 +1,4 @@
-from app.crud import read_all, read_where
+from app.crud import read_all_where, read_where
 from app.models.answer import Answer
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
@@ -16,7 +16,7 @@ async def get_answers():
     :return: list of answers
     :rtype: dict
     """
-    results = await read_all(Answer)
+    results = await read_all_where(Answer)
     return list_modeltype_response(results, Answer)
 
 

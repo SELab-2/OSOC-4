@@ -1,4 +1,4 @@
-from app.crud import read_all
+from app.crud import read_all_where
 from app.models.participation import Participation
 from app.utils.response import list_modeltype_response
 from fastapi import APIRouter
@@ -13,5 +13,5 @@ async def get_participations():
     :return: list of participations
     :rtype: dict
     """
-    results = await read_all(Participation)
+    results = await read_all_where(Participation)
     return list_modeltype_response(results, Participation)

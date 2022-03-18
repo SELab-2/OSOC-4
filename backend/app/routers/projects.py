@@ -1,4 +1,4 @@
-from app.crud import read_all
+from app.crud import read_all_where
 from app.models.project import Project
 from app.utils.response import list_modeltype_response
 from fastapi import APIRouter
@@ -14,5 +14,5 @@ async def get_projects():
     :rtype: dict
     """
 
-    results = await read_all(Project)
+    results = await read_all_where(Project)
     return list_modeltype_response(results, Project)
