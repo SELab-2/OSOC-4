@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {useNavigate} from 'react-router-dom'
+import {useLocation, useNavigate} from 'react-router-dom'
 import {login} from "../utils/json-requests";
 import {log} from "../utils/logger";
 
@@ -8,7 +8,7 @@ import {log} from "../utils/logger";
 const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    let from =  useLocation().state?.from?.pathname || "/";
     const navigate = useNavigate()
 
     const handleChangeEmail = (event) => {
@@ -32,6 +32,8 @@ const Login = props => {
         console.log(output)
         if (output.success) {
             props.setIsLoggedIn(true)
+            // navigate to original path or '/'
+            navigate(from, { replace: true });
         }
     }
 
