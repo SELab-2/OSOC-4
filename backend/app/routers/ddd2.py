@@ -6,6 +6,7 @@ from app.models.project import Partner, Project, RequiredRole
 from app.models.role import Role
 from app.models.student_form import StudentForm
 from app.models.user import User, UserRole
+from app.utils.cryptography import get_password_hash
 from app.utils.response import response
 from fastapi import APIRouter
 
@@ -86,5 +87,13 @@ async def ddd():
     await db.engine.save(project)
     for student in students:
         await db.engine.save(student)
+
+    user_admin = User(
+        email="user_admin@test.be",
+        name="user_admin",
+        password=get_password_hash("Test123!user_admin"),
+        role=UserRole.ADMIN,
+        active=True, approved=True)
+    await db.engine.save(user_admin)
 
     return response(None, "Dummy data inserted")
