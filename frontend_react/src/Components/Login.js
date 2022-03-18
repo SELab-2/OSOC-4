@@ -1,15 +1,16 @@
 import React, {useState} from "react";
-import {useNavigate} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {login} from "../utils/json-requests";
 import {log} from "../utils/logger";
+import "../styles/colors.css"
+import "../styles/login.css"
 
 
 
 const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    const navigate = useNavigate()
+    const [showForgot, setShowForgot] = useState(false)
 
     const handleChangeEmail = (event) => {
         setEmail(event.target.value);
@@ -19,7 +20,8 @@ const Login = props => {
         setPassword(event.target.value);
     }
 
-    async function handleSubmit(event) {
+
+    async function handleSubmitLogin(event) {
         log("handle login submit")
         event.preventDefault();
         let credentials = JSON.stringify({
@@ -35,18 +37,55 @@ const Login = props => {
         }
     }
 
+    async function handleSubmitForgot(event) {
+        log("handle forgot submit")
+        event.preventDefault();
+        let credentials = JSON.stringify({
+            "email": email,
+        });
+        log(credentials)
+        // post, if any errors, show them
+        let output = await login("/forgot", credentials);
+        console.log(output)
+        if (output.success) {
+        }
+        setShowForgot(false)
+    }
+
     return (
             <div className="body">
-                <div className="login-container">
-                    <p className="welcome-message">Please provide login credentials to proceed</p>
-                    <div className="login-form">
-                        <form onSubmit={handleSubmit}>
-                            <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address"/>
-                            <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password"/>
-                            <input className="submit" type="submit" name="submit" value="Login"/>
-                        </form>
-                    </div>
-                </div>
+                <section className="body-left">
+                    <img src={process.env.PUBLIC_URL + "/assets/0-1-osoc-full-2.png"} alt="osoc-logo"/>
+                </section>
+
+                <section className="body-right">
+
+                    {(!showForgot)? (
+                        <div className="login-container">
+                            <p className="welcome-message">Please provide login credentials to proceed</p>
+                            <div className="login-form">
+                                <form onSubmit={handleSubmitLogin}>
+                                    <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address"/>
+                                    <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password"/>
+                                    <input className="submit" type="submit" name="submit" value="Login"/>
+                                </form>
+                            </div>
+                            <button onClick={() => setShowForgot(true)} >Forgot your password?</button>
+                        </div>
+                    ):
+                        (
+                            <div className="login-container">
+                                <p className="welcome-message">Please provide your email address to proceed</p>
+                                <div className="login-form">
+                                    <form onSubmit={handleSubmitForgot}>
+                                        <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address"/>
+                                        <input className="submit" type="submit" name="submit" value="Reset my password"/>
+                                    </form>
+                                </div>
+                            </div>
+                        )
+                    }
+                </section>
             </div>
         )
     }
