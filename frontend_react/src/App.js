@@ -2,18 +2,20 @@ import logo from './logo.svg';
 import './App.css';
 import Login from './Components/Login'
 import { BrowserRouter, Route, Routes, useLocation, Switch } from 'react-router-dom'
-import NavHeader from './Components/NavHeader.js'
+import {isStillAuthenticated} from "./utils/json-requests";
+import {useState} from "react";
+import NavHeader fr './Components/NavHeader.js'
 import { isStillAuthenticated } from "./utils/json-requests";
 
 function App() {
 
-
+  let [isLoggedIn, setIsLoggedIn] = useState()
 
   return (
     <div className="App">
-      {(!true) ?
+      { (! isLoggedIn)?
         // sign in page
-        <Login />
+        <Login setIsLoggedIn={setIsLoggedIn} />
         : (
           <NavHeader />
           // <Routes>

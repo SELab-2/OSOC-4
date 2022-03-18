@@ -7,21 +7,17 @@ axios.defaults.withCredentials = true
 axios.defaults.baseURL = "http://localhost:8000";
 
 let _config = {"headers": {"Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "<origin>"}}
+        "Access-Control-Allow-Origin": "http://localhost:3001"}}
 
-export function headers(getters, commit) {
+export function headers() {
     log("json-requests: updating headers")
     let cookie = Cookies.get('csrf_access_token');
     if (cookie) {
         _config["headers"]["X-CSRF-TOKEN"] = cookie;
-        if (! getters.getIsAuthenticated) {
-            commit('setIsAuthenticated', true);}
         log("json-requests: updating headers: now with cookie")
     }
     else {
         delete _config["headers"]["X-CSRF-TOKEN"];
-        if (getters.getIsAuthenticated) {
-            commit('setIsAuthenticated', false);}
         log("json-requests: updating headers: now without cookie")
     }
     return _config;
@@ -151,17 +147,16 @@ export async function patchEdit(url, json, getters, commit) {
 }
 
 
-export async function login(url, json, getters, commit) {
+export async function login(url, json) {
     log("json-requests: login")
     try {
-        let resp = await axios.post(url, json, headers(getters, commit));
+        console.log(headers())
+        let resp = await axios.post(url, json, headers());
         log(resp)
-        commit('setIsAuthenticated', true);
         return {success: true};
     } catch (e) {
         log(e)
-        await catchError(e);
-        return "";
+        return {success: false};
     }
 }
 
@@ -170,7 +165,6 @@ export async function logout(url, getters, commit) {
     try {
         let resp = await axios.delete(url, headers(getters, commit));
         log(resp)
-        commit('setIsAuthenticated', false);
         return {success: true};
     } catch (e) {
         log(e)
