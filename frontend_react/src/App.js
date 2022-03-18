@@ -4,16 +4,17 @@ import Login from './Components/Login'
 import { BrowserRouter, Route, Routes, useLocation, Switch } from 'react-router-dom'
 import HomeHeader from './Components/HomeHeader'
 import {isStillAuthenticated} from "./utils/json-requests";
+import {useState} from "react";
 
 function App() {
 
-
+  let [isLoggedIn, setIsLoggedIn] = useState()
 
   return (
     <div className="App">
-      { (! isStillAuthenticated())?
+      { (! isLoggedIn)?
         // sign in page
-        <Login />
+        <Login setIsLoggedIn={setIsLoggedIn} />
         : (
           <Routes>
             <Route path="/" element={<HomeHeader />} >

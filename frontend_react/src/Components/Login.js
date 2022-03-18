@@ -1,17 +1,20 @@
 import React, {useState} from "react";
-
-
+import {useNavigate} from 'react-router-dom'
 import {login} from "../utils/json-requests";
 import {log} from "../utils/logger";
+
 
 
 const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const navigate = useNavigate()
+
     const handleChangeEmail = (event) => {
         setEmail(event.target.value);
     }
+
     const handleChangePassword = (event) => {
         setPassword(event.target.value);
     }
@@ -28,8 +31,7 @@ const Login = props => {
         let output = await login("/login", credentials);
         console.log(output)
         if (output.success) {
-            // todo reroute to "/"
-            props.history.push("/test")
+            props.setIsLoggedIn(true)
         }
     }
 
