@@ -1,5 +1,5 @@
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
-
+import { logout } from "../utils/json-requests";
 
 
 const user = {
@@ -23,11 +23,14 @@ function classNames(...classes) {
 }
 
 
-export default function NavHeader() {
+export default function NavHeader(props) {
 
     async function logoutHandler(event) {
         event.preventDefault();
-        console.log("Logging out");
+        let r = await logout("/logout")
+        if (r.success) {
+            props.setIsLoggedIn(false)
+        }
     }
 
     return (
