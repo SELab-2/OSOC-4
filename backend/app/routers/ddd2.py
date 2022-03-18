@@ -1,13 +1,13 @@
-from app.database import db
+from random import choice, randrange, sample
 
+from app.database import db
 from app.models.edition import Edition
-from app.models.project import Project, RequiredRole, Partner
+from app.models.project import Partner, Project, RequiredRole
 from app.models.role import Role
 from app.models.student_form import StudentForm
 from app.models.user import User, UserRole
 from app.utils.response import response
 from fastapi import APIRouter
-from random import choice, sample, randrange
 
 router = APIRouter(prefix="/ddd2")
 

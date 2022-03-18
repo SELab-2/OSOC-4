@@ -15,7 +15,8 @@ async def ddd():
         password=get_password_hash("Test123!user_unactivated"),
         role=UserRole.COACH,
         active=False,
-        approved=False)
+        approved=False,
+        disabled=False)
 
     user_activated = User(
         email="user_activated@test.be",
@@ -36,7 +37,7 @@ async def ddd():
         name="user_admin",
         password=get_password_hash("Test123!user_admin"),
         role=UserRole.ADMIN,
-        active=True, approved=True),
+        active=True, approved=True)
 
     await db.engine.save(user_unactivated)
     await db.engine.save(user_activated)
