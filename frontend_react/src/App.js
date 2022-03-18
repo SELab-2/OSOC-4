@@ -1,6 +1,6 @@
 import './App.css';
 import Login from './Components/Login'
-import {  Route, Routes } from 'react-router-dom'
+import { Route, Routes} from 'react-router-dom'
 import { useState } from "react";
 import NavHeader from './Components/NavHeader.js'
 import SelectUsers from "./Components/SelectUsers";
@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div className="App">
-        {(isLoggedIn) ? <NavHeader setIsLoggedIn={setIsLoggedIn} /> : <p>wtf</p>}
+        {(isLoggedIn) ? <NavHeader setIsLoggedIn={setIsLoggedIn} /> : null}
       <Routes>
         <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path='/select-users' element={
