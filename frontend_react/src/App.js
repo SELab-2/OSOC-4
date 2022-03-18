@@ -1,10 +1,13 @@
-import logo from './logo.svg';
 import './App.css';
 import Login from './Components/Login'
-import { BrowserRouter, Route, Routes, useLocation, Switch } from 'react-router-dom'
+import { Route, Routes} from 'react-router-dom'
 import { useState } from "react";
 import NavHeader from './Components/NavHeader.js'
-import { isStillAuthenticated } from "./utils/json-requests";
+import SelectUsers from "./Components/SelectUsers";
+import Projects from "./Components/Projects";
+import RequireAuthentication from "./Components/authentication/RequireAuthentication";
+import EmailUsers from "./Components/EmailUsers";
+import Settings from "./Components/Settings"
 
 function App() {
 
@@ -12,18 +15,30 @@ function App() {
 
   return (
     <div className="App">
-      {(!isLoggedIn) ?
-        // sign in page
-        <Login setIsLoggedIn={setIsLoggedIn} />
-        : (
-          <NavHeader setIsLoggedIn={setIsLoggedIn} />
-          // <Routes>
-          //   <Route path="/" element={<HomeHeader />} >
-          //     <Route index element={<HomeHeader />} />
-          //   </Route>
-          // </Routes>
-
-        )}
+        {(isLoggedIn) ? <NavHeader setIsLoggedIn={setIsLoggedIn} /> : null}
+      <Routes>
+        <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path='/select-users' element={
+            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+                <SelectUsers/>
+            </RequireAuthentication>
+        }/>
+        <Route path='/email-users' element={
+            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+                <EmailUsers/>
+            </RequireAuthentication>
+        }/>
+        <Route path='/projects' element={
+            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+                <Projects/>
+            </RequireAuthentication>
+        }/>
+        <Route path='/settings' element={
+            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+                <Settings/>
+            </RequireAuthentication>
+        }/>
+        </Routes>
     </div>
   );
 }

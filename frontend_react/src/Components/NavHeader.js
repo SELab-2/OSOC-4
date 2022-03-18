@@ -1,27 +1,6 @@
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
 import { logout } from "../utils/json-requests";
-
-
-const user = {
-    name: 'Tom Cook',
-    email: 'tom@example.com',
-    imageUrl:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-}
-const navigation = [
-    { name: 'Devices', href: '#', current: true },
-    { name: 'Add Device', href: '#', current: false },
-]
-const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#' },
-]
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-}
-
+import {Link} from "react-router-dom";
 
 export default function NavHeader(props) {
 
@@ -48,7 +27,16 @@ export default function NavHeader(props) {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link href="#features">UserManagement</Nav.Link>
+                        <Link to="/select-users">Select Users</Link>
+                    </Nav>
+                    <Nav className="me-auto">
+                        <Link to="/email-users">Email Users</Link>
+                    </Nav>
+                    <Nav className="me-auto">
+                        <Link to="/projects">Projects</Link>
+                    </Nav>
+                    <Nav className="me-auto">
+                        <Link to="/settings">Settings</Link>
                     </Nav>
                     <Nav>
                         <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
