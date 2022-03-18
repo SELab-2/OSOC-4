@@ -1,13 +1,17 @@
 import axios from "axios";
-import {log} from "./logger";
+import { log } from "./logger";
 import Cookies from 'js-cookie';
 
 axios.defaults.withCredentials = true
 // todo fix base url with env var
-axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.baseURL = process.env.PUBLIC_URL || "http://localhost:8000";
 
-let _config = {"headers": {"Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost:3001"}}
+let _config = {
+    "headers": {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "http://localhost:3000"
+    }
+}
 
 export function headers() {
     log("json-requests: updating headers")
@@ -110,11 +114,14 @@ export async function postCreate(url, json, getters, commit) {
         let resp = await axios.post(url, json, headers(getters, commit))
         return {
             success: true,
-            data: resp.data};
+            data: resp.data
+        };
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
-            return { success: false,
-                data: e.response.data.message};
+            return {
+                success: false,
+                data: e.response.data.message
+            };
         } else {
             await catchError(e);
             return "";
@@ -134,11 +141,14 @@ export async function patchEdit(url, json, getters, commit) {
     try {
         return {
             success: true,
-            data: (await axios.patch(url, json, headers(getters, commit))).data.url};
+            data: (await axios.patch(url, json, headers(getters, commit))).data.url
+        };
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
-            return { success: false,
-                data: e.response.data.message};
+            return {
+                success: false,
+                data: e.response.data.message
+            };
         } else {
             await catchError(e);
             return "";
@@ -153,10 +163,10 @@ export async function login(url, json) {
         console.log(headers())
         let resp = await axios.post(url, json, headers());
         log(resp)
-        return {success: true};
+        return { success: true };
     } catch (e) {
         log(e)
-        return {success: false};
+        return { success: false };
     }
 }
 
@@ -165,12 +175,13 @@ export async function logout(url, getters, commit) {
     try {
         let resp = await axios.delete(url, headers(getters, commit));
         log(resp)
-        return {success: true};
+        return { success: true };
     } catch (e) {
         log(e)
         return await catchError(e);
     }
 }
+
 
 
 

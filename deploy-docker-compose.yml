@@ -4,15 +4,12 @@ services:
 
   osoc-frontend:
     build:
-      context: ./frontend
+      context: ./frontend-react
       args:
-        VITE_FRONTEND_BASE_URL: ${PATHPREFIX}/frontend
-        VITE_API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
+        PUBLIC_URL: ${PATHPREFIX}/frontend
+        API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
     ports:
       - 3000
-    # environment:
-    #   VITE_API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
-    #   VITE_FRONTEND_BASE_URL: ${PATHPREFIX}/frontend
     networks:
         - proxynet
     labels:
