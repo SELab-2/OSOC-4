@@ -2,8 +2,8 @@ import logo from './logo.svg';
 import './App.css';
 import Login from './Components/Login'
 import { BrowserRouter, Route, Routes, useLocation, Switch } from 'react-router-dom'
-import HomeHeader from './Components/HomeHeader'
-import {isStillAuthenticated} from "./utils/json-requests";
+import NavHeader from './Components/NavHeader.js'
+import { isStillAuthenticated } from "./utils/json-requests";
 
 function App() {
 
@@ -11,15 +11,16 @@ function App() {
 
   return (
     <div className="App">
-      { (! isStillAuthenticated())?
+      {(!true) ?
         // sign in page
         <Login />
         : (
-          <Routes>
-            <Route path="/" element={<HomeHeader />} >
-              <Route index element={<HomeHeader />} />
-            </Route>
-          </Routes>
+          <NavHeader />
+          // <Routes>
+          //   <Route path="/" element={<HomeHeader />} >
+          //     <Route index element={<HomeHeader />} />
+          //   </Route>
+          // </Routes>
 
         )}
     </div>
