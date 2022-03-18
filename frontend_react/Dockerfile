@@ -9,4 +9,4 @@ ENV PUBLIC_URL=${PUBLIC_URL}
 ARG API_URL
 ENV API_URL=${API_URL}
 RUN yarn build
-CMD ["serve", "-s", "dist"]
+CMD ["serve", "-s", "build"]

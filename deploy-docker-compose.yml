@@ -4,7 +4,7 @@ services:
 
   osoc-frontend:
     build:
-      context: ./frontend-react
+      context: ./frontend_react
       args:
         PUBLIC_URL: ${PATHPREFIX}/frontend
         API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
