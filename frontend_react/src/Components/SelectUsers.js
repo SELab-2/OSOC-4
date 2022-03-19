@@ -1,5 +1,9 @@
+import StudentListelement from "./StudentListelement";
+
 export default function SelectUsers(props) {
     return(
-            <p>Select Users!</p>
+        <div className="students-list">
+            <StudentListelement/>
+        </div>
     )
 }

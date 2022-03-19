@@ -75,10 +75,10 @@ export async function catchError(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function getJson(url, getters, commit) {
+export async function getJson(url) {
     log("json-requests: getJson: " + url)
     try {
-        const req = await axios.get(url, headers(getters, commit));
+        const req = await axios.get(url, headers());
         return req.data;
     } catch (e) {
         return await catchError(e);
