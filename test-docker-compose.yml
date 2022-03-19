@@ -29,13 +29,9 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: justapassword
-    volumes:
-      - ./data/mongo:/data/db
 
   test-osoc-redis:
     image: redis:latest
     container_name: test-osoc-redis
     restart: always
     command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
-    volumes:
-      - ./data/redis:/data

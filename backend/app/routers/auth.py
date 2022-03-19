@@ -4,7 +4,7 @@ from app.crud import read_where
 from app.database import db
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.passwordreset import EmailInput
-from app.models.user import User, UserLogin
+from app.models.user import User, UserLogin, UserOutSimple
 from app.utils.cryptography import verify_password
 from app.utils.keygenerators import generate_new_reset_password_key
 from app.utils.mailsender import send_password_reset
@@ -77,7 +77,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
 
-        return response(None, "Login successful")
+        return response(UserOutSimple.parse_raw(u.json()), "Login successful")
 
     raise InvalidEmailOrPasswordException()
 

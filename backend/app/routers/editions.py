@@ -9,7 +9,7 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                StudentNotFoundException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
-from app.models.edition import Edition
+from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
 from app.models.project import Project
 from app.models.student_form import StudentForm
 from app.models.suggestion import Suggestion, SuggestionOption
@@ -22,7 +22,7 @@ from fastapi import APIRouter, Body, Depends
 router = APIRouter(prefix="/editions")
 
 
-@router.get("/", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Editions retrieved")
+@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Editions retrieved")
 async def get_editions():
     """get_editions get all the Edition instances from the database
 
@@ -30,7 +30,7 @@ async def get_editions():
     :rtype: dict
     """
     results = await read_all_where(Edition)
-    return list_modeltype_response(results, Edition)
+    return list_modeltype_response([EditionOutSimple.parse_raw(r.json()) for r in results], Edition)
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
@@ -62,7 +62,7 @@ async def get_edition(year: int):
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
         raise EditionNotFound()
-    return response(edition, "Edition successfully retrieved")
+    return response(EditionOutExtended.parse_raw(edition.json()), "Edition successfully retrieved")
 
 
 @router.post("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Editions retrieved")
@@ -75,10 +75,10 @@ async def update_edition(year: int, edition: Edition = Body(...)):
     if not year == edition.year:
         raise EditionYearModifyException()
 
-    results = await read_where(Edition, Edition.id == edition.id)
-    if not results:
+    result = await read_where(Edition, Edition.id == edition.id)
+    if not result:
         raise EditionNotFound()
-    return response(results, "Edition successfully retrieved")
+    return response(EditionOutExtended.parse_raw(result.json()), "Edition successfully retrieved")
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Students retrieved")
@@ -142,7 +142,7 @@ async def get_edition_projects(year: int):
     if not edition:
         raise EditionNotFound()
 
-    projects = await db.engine.find(Project, {"edition": edition.id})
+    projects = await read_where(Project, Project.editions == edition.id)
     return list_modeltype_response(projects, Project)
 
 

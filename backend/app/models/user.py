@@ -1,5 +1,6 @@
 from enum import Enum
 
+from app.config import config
 from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
                                                 InvalidPasswordException)
@@ -33,6 +34,14 @@ class UserCreate(BaseModel):
         if not valid_email(v):
             raise InvalidEmailException()
         return v
+
+
+class UserOutSimple(BaseModel):
+    id: str
+
+    def __init__(self, **data):
+        data["id"] = config.api_url + "users/" + data["id"]
+        super().__init__(**data)
 
 
 class UserOut(BaseModel):

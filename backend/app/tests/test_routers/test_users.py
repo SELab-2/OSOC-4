@@ -3,7 +3,7 @@ from typing import Dict
 
 from app.database import db
 from app.models.user import User
-from app.tests.test_base import TestBase, Status
+from app.tests.test_base import Status, TestBase
 
 
 class TestUsers(TestBase):
@@ -63,13 +63,13 @@ class TestUsers(TestBase):
     """
     async def test_get_users_roles(self):
         # Test correct role (admin)
-        response = await self.get_response("/users/", "user_admin", Status.SUCCES)
+        response = await self.get_response("/users", "user_admin", Status.SUCCES)
 
         ep_users = json.loads(response.content)["data"]  # collected from EndPoint
-        ep_users = sorted([user["email"] for user in ep_users])  # collected from db itself
+        ep_users = sorted([user["id"].split("/")[-1] for user in ep_users])  # collected from db itself
 
         db_users = await db.engine.find(User)
-        db_users = sorted([user.email for user in db_users])
+        db_users = sorted([str(user.id) for user in db_users])
 
         self.assertTrue(db_users == ep_users,
                         f"""Users in the database were not the same as the returned users.
@@ -79,4 +79,4 @@ class TestUsers(TestBase):
         # Test wrong roles
         for user_title in self.objects:
             if user_title != "user_admin":
-                await self.get_response("/users/", user_title, Status.FORBIDDEN)
+                await self.get_response("/users", user_title, Status.FORBIDDEN)

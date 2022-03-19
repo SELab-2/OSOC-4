@@ -52,7 +52,7 @@ def generate_student(edition_id):
                        edition=edition_id)
 
 
-@router.get("/", response_description="Data retrieved")
+@router.get("", response_description="Data retrieved")
 async def ddd():
     coaches = [generate_user() for i in range(5)]
 

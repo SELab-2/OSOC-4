@@ -7,7 +7,7 @@ from fastapi import APIRouter
 router = APIRouter(prefix="/ddd")
 
 
-@router.get("/", response_description="Users retrieved")
+@router.get("", response_description="Users retrieved")
 async def ddd():
     user_unactivated = User(
         email="user_unactivated@test.be",

@@ -1,4 +1,4 @@
-from app.tests.test_base import TestBase, Status
+from app.tests.test_base import Status, TestBase
 
 
 class TestEndpointAuthorization(TestBase):
@@ -7,7 +7,7 @@ class TestEndpointAuthorization(TestBase):
 
     async def test_get_endpoints(self):
         eps = [
-            "/users/",
+            "/users",
             f"/users/{self.objects['user_admin'].id}"
         ]
 

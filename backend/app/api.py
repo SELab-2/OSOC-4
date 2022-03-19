@@ -1,5 +1,4 @@
 import inspect
-import os
 import re
 
 from fastapi import FastAPI, Request
@@ -9,14 +8,14 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
+from app.config import config
 from app.database import connect_db, disconnect_db
 from app.exceptions.base_exception import BaseException
 from app.routers import (answers, auth, ddd, ddd2, editions, participation,
                          projects, question_answers, questions, roles,
                          student_forms, suggestions, user_invites, users)
 
-PATHPREFIX = os.getenv("PATHPREFIX", "")
-app = FastAPI(root_path=(PATHPREFIX + "/api" if PATHPREFIX else "/"))
+app = FastAPI(root_path=config.api_path)
 
 origins = [
     "http://localhost:3000",
@@ -77,7 +76,7 @@ def custom_openapi():
         version="2.5.0",
         description="This is a very custom OpenAPI schema",
         routes=app.routes,
-        servers=[{"url": os.getenv("PATHPREFIX", "") + "/api"}] if PATHPREFIX else [{"url": "/"}]
+        servers=[{"url": config.api_path}]
     )
     openapi_schema["info"]["x-logo"] = {
         "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
