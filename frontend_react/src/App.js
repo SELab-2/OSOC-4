@@ -11,31 +11,31 @@ import Settings from "./Components/Settings"
 
 function App() {
 
-  let [isLoggedIn, setIsLoggedIn] = useState()
+  let [loggedInAs, setLoggedInAs] = useState(null)
 
   return (
     <div className="App">
-        {(isLoggedIn) ? <NavHeader setIsLoggedIn={setIsLoggedIn} /> : null}
+        {(loggedInAs) ? <NavHeader setLoggedInAs={setLoggedInAs} /> : null}
       <Routes>
-        <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path='/login' element={<Login setLoggedInAs={setLoggedInAs} />} />
         <Route path='/select-users' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+            <RequireAuthentication loggedInAs={loggedInAs} setLoggedInAs={setLoggedInAs}>
                 <SelectUsers/>
             </RequireAuthentication>
         }/>
         <Route path='/email-users' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+            <RequireAuthentication loggedInAs={loggedInAs} setLoggedInAs={setLoggedInAs}>
                 <EmailUsers/>
             </RequireAuthentication>
         }/>
         <Route path='/projects' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
+            <RequireAuthentication loggedInAs={loggedInAs} setLoggedInAs={setLoggedInAs}>
                 <Projects/>
             </RequireAuthentication>
         }/>
         <Route path='/settings' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <Settings/>
+            <RequireAuthentication loggedInAs={loggedInAs} setLoggedInAs={setLoggedInAs}>
+                <Settings loggedInAs={loggedInAs}/>
             </RequireAuthentication>
         }/>
         </Routes>

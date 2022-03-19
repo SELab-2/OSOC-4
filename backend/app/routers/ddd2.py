@@ -96,4 +96,12 @@ async def ddd():
         active=True, approved=True)
     await db.engine.save(user_admin)
 
+    user_approved = User(
+        email="user_approved@test.be",
+        name="user_approved",
+        password=get_password_hash("Test123!user_approved"),
+        role=UserRole.COACH,
+        active=True, approved=True)
+    await db.engine.save(user_approved)
+
     return response(None, "Dummy data inserted")
