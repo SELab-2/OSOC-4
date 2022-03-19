@@ -85,7 +85,7 @@ Use the following URL to access the Swagger API docs. Change the port if needed.
 
 ## Testing
 
-Tests are run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing dont't map there ports to the host machine so they can't be accessed by the internet for security.
+Tests are run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 ```
 docker-compose -f test-docker-compose.yml up --build -d # this starts the test database and test redis server
 docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover # This executes the python -m ... command in the backend container
