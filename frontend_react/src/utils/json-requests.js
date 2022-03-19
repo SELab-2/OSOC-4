@@ -75,11 +75,12 @@ export async function catchError(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function getJson(url, getters, commit) {
+export async function getJson(url) {
     log("json-requests: getJson: " + url)
     try {
-        const req = await axios.get(url, headers(getters, commit));
-        return req.data;
+        const response = await axios.get(url, headers());
+        console.log(response)
+        return response.data;
     } catch (e) {
         return await catchError(e);
     }
@@ -108,10 +109,11 @@ export async function sendDelete(url, getters, commit) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function postCreate(url, json, getters, commit) {
+export async function postCreate(url, json) {
     log("json-requests: postCreate: " + url)
+    console.log(json)
     try {
-        let resp = await axios.post(url, json, headers(getters, commit))
+        let resp = await axios.post(url, json, headers())
         return {
             success: true,
             data: resp.data
@@ -163,7 +165,7 @@ export async function login(url, json) {
         console.log(headers())
         let resp = await axios.post(url, json, headers());
         log(resp)
-        return { success: true };
+        return { success: true, id: resp.data.data.id };
     } catch (e) {
         log(e)
         return { success: false };
