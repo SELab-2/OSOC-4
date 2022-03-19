@@ -16,6 +16,7 @@ from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
+from fastapi_jwt_auth import AuthJWT
 from odmantic import ObjectId
 
 router = APIRouter(prefix="/users")
@@ -197,3 +198,14 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
     await update(user)
 
     return response(None, "Password updated successfully")
+
+
+@router.get("/me")
+async def get_user_me(Authorize: AuthJWT = Depends()):
+    current_user_id = Authorize.get_jwt_subject()
+
+    user = await read_where(User, User.id == ObjectId(current_user_id))
+    if not user:
+        raise UserNotFoundException()
+
+    return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")
