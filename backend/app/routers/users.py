@@ -141,17 +141,17 @@ async def update_user(id: str, new_data: UserData):
 
     user = await read_where(User, User.id == ObjectId(id))
 
-    # user_w_email = await read_where(User, User.email == new_data.email)
-    # if user_w_email.id != user.id:
-    #    raise EmailAlreadyUsedException()
-    # else:
-    user.email = new_data.email
+    user_w_email = await read_where(User, User.email == new_data.email)
+    if user_w_email.id != user.id:
+        raise EmailAlreadyUsedException()
+    else:
+        user.email = new_data.email
 
     user.name = new_data.name
 
     user = await update(user)
 
-    return response(UserOut.parse_obj(user), "User updated successfully")
+    return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
 @router.post("/{user_id}/approve", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])

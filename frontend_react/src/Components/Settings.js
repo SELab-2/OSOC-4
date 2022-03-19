@@ -36,9 +36,9 @@ export default function Settings(props) {
             "email": user.email,
             "name": name
         })
-        setSavedSuccess(true)
-        //let response = await postCreate(props.loggedInAs, body)
-        //if (response.success) {setSavedSuccess(true);}
+        //setSavedSuccess(true)
+        let response = await postCreate(props.loggedInAs, body)
+        if (response.success) {setSavedSuccess(true);}
     }
 
     return(
