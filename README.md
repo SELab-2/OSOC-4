@@ -1,5 +1,5 @@
 # OSOC-4
-# Development
+# Deployment
 
 ## Requirements
 
