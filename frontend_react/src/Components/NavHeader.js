@@ -15,7 +15,7 @@ export default function NavHeader(props) {
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Container>
-                <Navbar.Brand href="#home">
+                <Navbar.Brand>
                     <img
                         src={process.env.PUBLIC_URL + "/assets/osoc-emblem.svg"}
                         width="50"
