@@ -68,29 +68,29 @@ const Login = props => {
             </section>
 
             <section className="body-right">
-                <div className="login-container">
-                    <p className="welcome-message">Please provide login credentials to proceed</p>
-                    <div className="login-form">
-                        <form onSubmit={handleSubmitLogin}>
-                            <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address"/>
-                            <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password"/>
-                            <input className="submit" type="submit" name="submit" value="Login"/>
-                        </form>
-                    </div>
-                    {(!showForgot)? (
-                        <button className="submit" onClick={() => {setEmailForgot(email); setShowForgot(true);}} >Forgot your password?</button>
-                        ):
-                        (
-                        <div>
-                            <p className="welcome-message">Please provide your email address to proceed</p>
-                            <form onSubmit={handleSubmitForgot}>
-                                <input type="email" name="email" value={emailForgot} onChange={handleChangeEmailForgot} placeholder="Email address"/>
-                                <input className="submit" type="submit" name="submit" value="Reset my password"/>
+                {(!showForgot)? (
+                    <div className="login-container">
+                        <p className="welcome-message">Please provide login credentials to proceed</p>
+                        <div className="login-form">
+                            <form onSubmit={handleSubmitLogin}>
+                                <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address"/>
+                                <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password"/>
+                                <input className="submit" type="submit" name="submit" value="Login"/>
                             </form>
                         </div>
-                        )}
-                </div>
-            </section>
+                        <a href="#" onClick={() => {setEmailForgot(email); setShowForgot(true);}} >Forgot your password?</a>
+                    </div>
+                            ) : (
+                                <div className="login-container">
+                                    <p className="welcome-message">Please provide your email address to proceed</p>
+                                    <form onSubmit={handleSubmitForgot}>
+                                        <input type="email" name="email" value={emailForgot} onChange={handleChangeEmailForgot} placeholder="Email address"/>
+                                        <input className="submit" type="submit" name="submit" value="Reset my password"/>
+                                    </form>
+                                    <a href="#" onClick={() => {setShowForgot(false);}} >Just want to log in?</a>
+                                </div>
+                            )}
+                </section>
         </div>
     )
 }
