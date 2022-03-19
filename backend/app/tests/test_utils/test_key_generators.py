@@ -14,11 +14,11 @@ class TestKeyGenerators(unittest.TestCase):
             self.assertTrue(key.isalnum(), "Key is incorrectly formatted")
 
     def test_generate_new_invite_key(self):
-        expire: int = timedelta(minutes=int(os.getenv('INVITE_EXPIRE')))
+        expire: int = os.getenv('INVITE_EXPIRE')
         self.key_check(generate_new_invite_key, "I", expire)
 
     def test_generate_new_reset_password_key(self):
-        expire: int = timedelta(minutes=int(os.getenv('PASSWORDRESET_EXPIRE')))
+        expire: int = os.getenv('PASSWORDRESET_EXPIRE')
         self.key_check(generate_new_reset_password_key, "R", expire)
 
     def key_check(self, key_gen, key_identifier: str, expire: int):
