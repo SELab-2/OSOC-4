@@ -1,10 +1,8 @@
 import os
 import unittest
 from datetime import timedelta
-from typing import Set
 
-from app.utils.keygenerators import generate_random_key, generate_new_invite_key, INVITE_EXPIRE, \
-    generate_new_reset_password_key
+from app.utils.keygenerators import generate_random_key, generate_new_invite_key, generate_new_reset_password_key
 
 
 class TestKeyGenerators(unittest.TestCase):
@@ -15,28 +13,31 @@ class TestKeyGenerators(unittest.TestCase):
             self.assertTrue(len(key) == i, "Key had unexpected length")
             self.assertTrue(key.isalnum(), "Key is incorrectly formatted")
 
-    @unittest.skip("Test fails")
     def test_generate_new_invite_key(self):
-        expire = os.getenv('INVITE_EXPIRE')
-        sample_size: int = 1000
+        expire: int = timedelta(minutes=int(os.getenv('INVITE_EXPIRE')))
+        self.key_check(generate_new_invite_key, "I", expire)
 
-        keys: Set = {
-            key and self.assertEqual(expiry, timedelta(minutes=int(expire)), "Key expiry, was incorrect.")
-            for key, expiry in generate_new_invite_key()
-            for _ in range(sample_size)
-        }
-
-        self.assertEqual(sample_size, len(keys), "Keys were not unique.")
-
-    @unittest.skip("Test fails")
     def test_generate_new_reset_password_key(self):
-        expire = os.getenv('PASSWORDRESET_EXPIRE')
-        sample_size: int = 1000
+        expire: int = timedelta(minutes=int(os.getenv('PASSWORDRESET_EXPIRE')))
+        self.key_check(generate_new_reset_password_key, "R", expire)
 
-        keys: Set = {
-            key and self.assertEqual(expiry, timedelta(minutes=int(expire)), "Key expiry, was incorrect.")
-            for key, expiry in generate_new_reset_password_key()
-            for _ in range(sample_size)
-        }
+    def key_check(self, key_gen, key_identifier: str, expire: int):
+        """
+        Checks correctness of the given key generator
 
-        self.assertEqual(sample_size, len(keys), "Keys were not unique.")
+        Args:
+            key_gen: The key generator
+            key_identifier: The start of the key
+            expire: The expire variable of the key
+
+        Returns:
+
+        """
+        key, gotten_expire = key_gen()
+        # self.assertEqual does not accept datetime.timedelta
+        # TypeError: int() argument must be a string, a bytes-like object or a number, not 'datetime.timedelta'
+        self.assertEqual(gotten_expire, timedelta(minutes=int(expire)),
+                         f"Expire was '{gotten_expire}' but expected '{expire}'")
+        self.assertEqual(key_identifier, key[:len(key_identifier)],
+                         f"Key identifier was '{key[:len(key_identifier)]}' but expected '{key_identifier}'.")
+        self.assertEqual(21, len(key), f"Key '{key}' had length {len(key)} but expected length of 21.")
