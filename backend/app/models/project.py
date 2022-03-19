@@ -20,7 +20,6 @@ class Project(Model):
     name: str
     goals: List[str]
     description: str
-    student_amount: int = Field(ge=0)
     partner: Partner
     user_ids: List[ObjectId]
     required_roles: List[RequiredRole]
@@ -40,7 +39,6 @@ class ProjectOutExtended(BaseModel):
     name: str
     goals: List[str]
     description: str
-    student_amount: int = Field(ge=0)
     partner: Partner
     user_ids: List[str]
     required_roles: List[RequiredRole]
