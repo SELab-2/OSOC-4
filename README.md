@@ -1,6 +1,5 @@
 # OSOC-4
-
-# Deployment
+# Development
 
 ## Requirements
 
@@ -13,7 +12,7 @@
 
 `docker-compose up -d`
 
-This command starts a mongodb server, redis server and the api. Ports can be changed in the docker-compose.yml file.
+This command starts a mongodb server, redis server, the backend api and the frontend. Ports can be changed in the docker-compose.yml file.
 
 This will also create a new data folder in the root directory. This contains the data for the mongodb and redis server. The folder can be deleted but keep in mind that all data in the database will be lost.
 
@@ -42,6 +41,7 @@ When changes are made to the api, the docker image needs to be rebuild and the a
 
 # Development
 
+## Config
 While developing you can use your own environment variables by using a .env file in the backend directory of the application.
 
 ```
@@ -67,10 +67,18 @@ INVITE_EXPIRE=4320 # in minutes
 PASSWORDRESET_EXPIRE=30 # in minutes
 ```
 
-# Accessing API docs
+## Accessing API docs
 
 Use the following URL to access the Swagger API docs. Change the port if needed.
 
 `http://localhost:8000/docs`
 
-# Testing
+## Testing
+
+Tests are run automatically with github actions but can be run locally too.
+```
+docker-compose -f test-docker-compose.yml up --build -d # this starts the test database and test redis server
+docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover # This executes the python -m ... command in the backend container
+docker-compose down
+
+
