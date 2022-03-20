@@ -5,11 +5,9 @@ import { useEffect, useState } from "react";
 import NavHeader from './Components/NavHeader.js'
 import SelectUsers from "./Components/SelectUsers";
 import Projects from "./Components/Projects";
-import RequireAuthentication from "./Components/authentication/RequireAuthentication";
 import EmailUsers from "./Components/EmailUsers";
 import Settings from "./Components/Settings";
 import ErrorPage from "./Components/ErrorPage";
-import { getJson, isStillAuthenticated } from "./utils/json-requests";
 
 function App() {
     let [loggedInAs, setLoggedInAs] = useState(null);
