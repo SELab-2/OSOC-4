@@ -15,6 +15,7 @@ class Status(IntEnum):
     SUCCES = 200
     UNAUTHORIZED = 401
     FORBIDDEN = 403
+    NOT_FOUND = 404
     UNPROCESSABLE = 422
 
 
@@ -121,7 +122,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         """)
         return response
 
-    async def post_response(self, path: str, json_body: dict, user: str,
+    async def post_response(self, path: str, json_body, user: str,
                             expected_status: int = 200, access_token: str = None,
                             use_access_token: bool = True) -> Response:
         """POST request test template
@@ -131,7 +132,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         :param path: The path of the POST request
         :type path: str
         :param json_body: The POST body
-        :type json_body: dict
+        :type json_body: Depends on POST request, most of the time a dict
         :param user: The requesting user
         :type user: str
         :param expected_status: The expected status of the POST request, defaults to 200

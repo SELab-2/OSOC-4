@@ -65,7 +65,9 @@ async def invite_user(id: str):
     """
     user = await read_where(User, User.id == ObjectId(id))
 
-    if user.active:
+    if user is None:
+        raise UserNotFoundException()
+    elif user.active:
         raise UserAlreadyActiveException()
 
     # create an invite key
@@ -91,12 +93,14 @@ async def invite_users(ids: List[str]):
         users.append(await read_where(User, User.id == ObjectId(id)))
 
     # throw exception if any user is already active
-    if any([user.active for user in users]):
+    if None in users:
+        raise UserNotFoundException()
+    elif any([user.active for user in users]):
         raise UserAlreadyActiveException()
 
     for user in users:
         # create an invite key
-        invite_key, invite_expires = generate_new_invite_key(str(user.id))
+        invite_key, invite_expires = generate_new_invite_key()
         # save it
         db.redis.setex(invite_key, invite_expires, "true")
         # send email to user with the invite key
