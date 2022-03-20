@@ -1,22 +1,20 @@
 import {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
 
 export default function StudentListelement(props) {
 
+  // These constants are initialized empty, the data will be inserted in useEffect
   const [student, setStudent] = useState(undefined);
   const [name, setName] = useState("");
-  const [url, setUrl] = useState("")
 
+  // This function inserts the data in the variables
   useEffect(() => {
     if (!student) {
-      getJson(props.student).then(res => {
-        setStudent(res.data)
-        setName(res.data.name)
-        setUrl(res.data.url)
-      });
+      setStudent(props.student)
+      setName(props.student.name)
     }
   });
 
+  // The html representation of a list-element
   return(
     <div id="list-element" className="list-element" style={{textAlign: "left", width: "800px", position: "relative"}}>
 
@@ -36,6 +34,7 @@ export default function StudentListelement(props) {
         Decision:
         </p>
       </div>
+
       <br/><br/><br/><br/><br/>
 
       <div id="roles" style={{float: "right"}}>
@@ -45,6 +44,7 @@ export default function StudentListelement(props) {
         </ul>
       </div>
 
+      <br/><br/>
 
     </div>
   )
