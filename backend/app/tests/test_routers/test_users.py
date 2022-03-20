@@ -11,7 +11,7 @@ class TestUsers(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    """ 
+    """
     GET /users
     """
 
@@ -99,8 +99,8 @@ class TestUsers(TestBase):
 
         for name, user in self.objects.items():
             if user.approved and user.role == UserRole.ADMIN:
-                await self.post_response(f"/users/invites", to_invite, name, Status.SUCCES)
-                await self.post_response(f"/users/invites", [bad_user_id], name, Status.NOT_FOUND)
+                await self.post_response("/users/invites", to_invite, name, Status.SUCCES)
+                await self.post_response("/users/invites", [bad_user_id], name, Status.NOT_FOUND)
 
     async def test_invite_users_as_forbidden(self):
         to_invite = [self.objects["user_unactivated_coach"]]
@@ -115,8 +115,9 @@ class TestUsers(TestBase):
 
         for name, user in self.objects.items():
             if user.active and user.role != UserRole.ADMIN:
-                await self.post_response(f"/users/invites", to_invite, name, Status.FORBIDDEN)
-                await self.post_response(f"/users/invites", [bad_user_id], name, Status.FORBIDDEN)
+                await self.post_response("/users/invites", to_invite, name, Status.FORBIDDEN)
+                await self.post_response("/users/invites", [bad_user_id], name, Status.FORBIDDEN)
+
     """
     GET /users/{id}
     """
