@@ -11,7 +11,7 @@ from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
-                                            UserNotFoundException, UserNotApprovedException)
+                                            UserNotFoundException, UserNotApprovedException, UserBadStateException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole, UserData
 from app.utils.checkers import RoleChecker
@@ -148,9 +148,14 @@ async def update_user(id: str, new_data: UserData):
     user = await read_where(User, User.id == ObjectId(id))
 
     user_w_email = await read_where(User, User.email == new_data.email)
-    if user_w_email.id != user.id:
+
+    if user is None:
+        raise UserNotFoundException()
+    if user_w_email is not None and user_w_email.id != user.id:
+        # The email is already in use
         raise EmailAlreadyUsedException()
     else:
+        # No other user with the new email address was found
         user.email = new_data.email
 
     user.name = new_data.name
@@ -171,10 +176,12 @@ async def approve_user(user_id: str):
     """
     user = await read_where(User, User.id == ObjectId(user_id))
 
-    if not user.active:
-        return errorresponse(None, 400, "The user is not activated")
-    if user.approved:
-        return errorresponse(None, 400, "The user is already approved")
+    if user is None:
+        raise UserNotFoundException()
+    elif not user.active:
+        raise UserBadStateException()  # The user isn't activated
+    elif user.approved:
+        raise UserBadStateException()  # The user is already approved
 
     user.approved = True
     await update(user)
@@ -200,10 +207,10 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
         raise InvalidResetKeyException()
 
     userid = db.redis.get(reset_key)
+
     if not userid:
         raise InvalidResetKeyException()
-
-    if passwords.password != passwords.validate_password:
+    elif passwords.password != passwords.validate_password:
         raise PasswordsDoNotMatchException()
 
     user = await read_where(User, User.id == ObjectId(userid))

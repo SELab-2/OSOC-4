@@ -16,6 +16,11 @@ class UserNotApprovedException(BaseException):
         super().__init__(400, "The user doesn't exist (yet)")
 
 
+class UserBadStateException(BaseException):
+    def __init__(self):
+        super().__init__(400, "The user doesn't have the expected state")
+
+
 class UserNotFoundException(BaseException):
     def __init__(self):
         super().__init__(404, "User not found")
