@@ -1,5 +1,8 @@
 from typing import List
 
+from fastapi import APIRouter, Body, Depends
+from odmantic import ObjectId
+
 from app.crud import read_all_where, read_where, update
 from app.database import db
 from app.exceptions.key_exceptions import InvalidResetKeyException
@@ -7,7 +10,7 @@ from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
-                                            UserNotFoundException)
+                                            UserNotFoundException, UserNotApprovedException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole
 from app.utils.checkers import RoleChecker
@@ -15,8 +18,6 @@ from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import errorresponse, list_modeltype_response, response
-from fastapi import APIRouter, Body, Depends
-from odmantic import ObjectId
 
 router = APIRouter(prefix="/users")
 
@@ -36,7 +37,8 @@ async def get_users():
     return list_modeltype_response(out_users, User)
 
 
-@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="User data added into the database")
+@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
+             response_description="User data added into the database")
 async def add_user_data(user: UserCreate):
     """add_user_data add a new user
 
@@ -122,9 +124,8 @@ async def get_user(id: str):
 
     if not user:
         raise UserNotFoundException()
-
-    if not user.approved:
-        return errorresponse(None, 400, "The user doesn't exist (yet)")
+    elif not user.approved:
+        raise UserNotApprovedException()
 
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 

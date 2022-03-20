@@ -56,6 +56,10 @@ class TestUsers(TestBase):
         user = await db.engine.find(User, User.email == body["email"])
         self.assertIsNotNone(user, f"{user} was incorrectly added to the database")
 
+    async def test_create_existing_user_as_admin(self):
+        body: Dict[str, str] = {"email": self.objects["user_approved_coach"].email}
+        await self.post_response("/users/create", body, "user_admin", Status.BAD_REQUEST)
+
     """
     POST /users/{id}/invite
     """
@@ -63,22 +67,26 @@ class TestUsers(TestBase):
     @unittest.skip("Prevent email spam")
     async def test_invite_user_as_approved_user(self):
         to_invite = self.objects["user_unactivated_coach"]
+        active_user = self.objects["user_activated_coach"]
         to_invite.email = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
         bad_user_id = "00000a00a00aa00aa000aaaa"
 
         for name, user in self.objects.items():
             if user.approved and user.role == UserRole.ADMIN:
                 await self.post_response(f"/users/{to_invite.id}/invite", {}, name, Status.SUCCES)
+                await self.post_response(f"/users/{active_user.id}/invite", {}, name, Status.BAD_REQUEST)
                 await self.post_response(f"/users/{bad_user_id}/invite", {}, name, Status.NOT_FOUND)
 
     async def test_invite_user_as_forbidden(self):
         to_invite = self.objects["user_unactivated_coach"]
+        active_user = self.objects["user_activated_coach"]
         to_invite.email = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
         bad_user_id = "00000a00a00aa00aa000aaaa"
 
         for name, user in self.objects.items():
             if user.active and user.role != UserRole.ADMIN:
                 await self.post_response(f"/users/{to_invite.id}/invite", {}, name, Status.FORBIDDEN)
+                await self.post_response(f"/users/{active_user.id}/invite", {}, name, Status.FORBIDDEN)
                 await self.post_response(f"/users/{bad_user_id}/invite", {}, name, Status.FORBIDDEN)
 
     """
@@ -88,6 +96,7 @@ class TestUsers(TestBase):
     @unittest.skip("Prevent email spam")
     async def test_invite_users_as_approved_user(self):
         to_invite = [self.objects["user_unactivated_coach"]]
+        active_users = [self.objects["user_activated_coach"]]
         test_mail = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
         bad_user_id = "00000a00a00aa00aa000aaaa"
 
@@ -96,10 +105,12 @@ class TestUsers(TestBase):
             return str(user.id)
 
         to_invite = list(map(lambda user: set_email(user, test_mail), to_invite))
+        active_users = list(map(lambda user: set_email(user, test_mail), active_users))
 
         for name, user in self.objects.items():
             if user.approved and user.role == UserRole.ADMIN:
                 await self.post_response("/users/invites", to_invite, name, Status.SUCCES)
+                await self.post_response("/users/invites", active_users, name, Status.BAD_REQUEST)
                 await self.post_response("/users/invites", [bad_user_id], name, Status.NOT_FOUND)
 
     async def test_invite_users_as_forbidden(self):
@@ -122,7 +133,7 @@ class TestUsers(TestBase):
     GET /users/{id}
     """
 
-    async def test_get_user_as_approved_user(self):  # todo: get non-existing users
+    async def test_get_user_as_approved_user(self):
         expected = self.objects["user_admin"]
         bad_user_id = "00000a00a00aa00aa000aaaa"
         for name, user in self.objects.items():
@@ -134,6 +145,7 @@ class TestUsers(TestBase):
                                 Expected: {expected}
                                 Was: {gotten_user}
                                 """)
+                await self.get_response(f"/users/{self.objects['user_activated_coach'].id}", name, Status.BAD_REQUEST)
                 await self.get_response(f"/users/{bad_user_id}", name, Status.NOT_FOUND)
 
     async def test_get_user_as_forbidden(self):

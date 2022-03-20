@@ -13,6 +13,7 @@ from app.utils.cryptography import get_password_hash
 
 class Status(IntEnum):
     SUCCES = 200
+    BAD_REQUEST = 400
     UNAUTHORIZED = 401
     FORBIDDEN = 403
     NOT_FOUND = 404
