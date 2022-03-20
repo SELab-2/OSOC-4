@@ -1,11 +1,11 @@
 from datetime import timedelta
 
-from app.crud import read_where
+from app.crud import count_where, read_where, update
 from app.database import db
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.passwordreset import EmailInput
-from app.models.user import User, UserLogin, UserOutSimple
-from app.utils.cryptography import verify_password
+from app.models.user import User, UserLogin, UserOutSimple, UserRole
+from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_reset_password_key
 from app.utils.mailsender import send_password_reset
 from app.utils.response import response
@@ -66,7 +66,22 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :return: access and refresh token
     :rtype: dict
     """
-    u = await read_where(User, User.email == user.email)
+
+    # check if any user exist else make one
+    user_count = await count_where(User)
+    if not user_count:
+        new_user = User(
+            email=user.email,
+            name="Undefined",
+            password=get_password_hash(user.password),
+            role=UserRole.ADMIN,
+            active=True,
+            approved=True,
+            disabled=False)
+        u = await update(new_user)
+    else:
+        u = await read_where(User, User.email == user.email)
+
     if u:
         if not verify_password(user.password, u.password):
             raise InvalidEmailOrPasswordException()

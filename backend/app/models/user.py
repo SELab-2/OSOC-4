@@ -53,6 +53,11 @@ class UserOut(BaseModel):
     approved: bool
 
 
+class UserData(BaseModel):
+    email: str
+    name: str
+
+
 class UserLogin(BaseModel):
     email: str
     password: str

@@ -1,53 +1,42 @@
 import './App.css';
 import Login from './Components/Login'
-import { Route, Routes} from 'react-router-dom'
-import { useState } from "react";
+import { Route, Routes } from 'react-router-dom'
+import { useEffect, useState } from "react";
 import NavHeader from './Components/NavHeader.js'
 import SelectUsers from "./Components/SelectUsers";
 import Projects from "./Components/Projects";
-import RequireAuthentication from "./Components/authentication/RequireAuthentication";
 import EmailUsers from "./Components/EmailUsers";
 import Settings from "./Components/Settings";
 import ErrorPage from "./Components/ErrorPage";
 
 function App() {
-  //TODO check if access token in present in cookies to find initial state
-  let [isLoggedIn, setIsLoggedIn] = useState()
+    let [loggedInAs, setLoggedInAs] = useState(null);
 
-  return (
-    <div className="App">
-      <Routes>
-        <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path='/select-users' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <NavHeader setIsLoggedIn={setIsLoggedIn} />
-                <SelectUsers/>
-            </RequireAuthentication>
-        }/>
-        <Route path='/email-users' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <NavHeader setIsLoggedIn={setIsLoggedIn} />
-                <EmailUsers/>
-            </RequireAuthentication>
-        }/>
-        <Route path='/projects' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <NavHeader setIsLoggedIn={setIsLoggedIn} />
-                <Projects/>
-            </RequireAuthentication>
-        }/>
-        <Route path='/settings' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <NavHeader setIsLoggedIn={setIsLoggedIn} />
-                <Settings/>
-            </RequireAuthentication>
-        }/>
-        <Route path="*" element={
-            <ErrorPage status={404} message={"Page not found"}/>
-        }/>
-      </Routes>
-    </div>
-  );
+    // todo uncomment this when get "/" returns your user id if you have the access_token cookie
+    /*
+    useEffect(() => { if (isStillAuthenticated()) {
+        getJson("/").then(resp => setLoggedInAs(resp.data.id))
+    }});
+     */
+
+    if (!loggedInAs) {
+        return <Login setLoggedInAs={setLoggedInAs} />
+    }
+
+    return (
+        <div className="App">
+            <NavHeader setLoggedInAs={setLoggedInAs} />
+            <Routes>
+                <Route path='/select-users' element={<SelectUsers />} />
+                <Route path='/email-users' element={<EmailUsers />} />
+                <Route path='/projects' element={<Projects />} />
+                <Route path='/settings' element={<Settings loggedInAs={loggedInAs} />} />
+                <Route path="*" element={
+                    <ErrorPage status={404} message={"Page not found"} />
+                } />
+            </Routes>
+        </div>
+    );
 }
 
 export default App;

@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Body, Depends
+from fastapi_jwt_auth import AuthJWT
 from odmantic import ObjectId
 
 from app.crud import read_all_where, read_where, update
@@ -12,7 +13,7 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             UserAlreadyActiveException,
                                             UserNotFoundException, UserNotApprovedException)
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole
+from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole, UserData
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
@@ -131,20 +132,32 @@ async def get_user(id: str):
 
 
 @router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_user(id: str):
+async def update_user(id: str, new_data: UserData):
     """update_user this updates a user
 
     :param id: the user id
     :type id: str
+    :param new_data: email and name, defaults to Body(...)
+    :type new_data: UserData, optional
+    :raises EmailAlreadyUsedException: email already in use
+    :raises NotPermittedException: Unauthorized
     :return: response
     :rtype: success or error
     """
+
     user = await read_where(User, User.id == ObjectId(id))
 
-    if not user.approved:
-        return errorresponse(None, 400, "The user doesn't exist (yet)")
+    user_w_email = await read_where(User, User.email == new_data.email)
+    if user_w_email.id != user.id:
+        raise EmailAlreadyUsedException()
+    else:
+        user.email = new_data.email
 
-    return response(UserOut.parse_obj(user), "User retrieved successfully")
+    user.name = new_data.name
+
+    user = await update(user)
+
+    return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
 @router.post("/{user_id}/approve", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
@@ -202,3 +215,14 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
     await update(user)
 
     return response(None, "Password updated successfully")
+
+
+@router.get("/me")
+async def get_user_me(Authorize: AuthJWT = Depends()):
+    current_user_id = Authorize.get_jwt_subject()
+
+    user = await read_where(User, User.id == ObjectId(current_user_id))
+    if not user:
+        raise UserNotFoundException()
+
+    return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")

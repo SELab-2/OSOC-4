@@ -40,7 +40,7 @@ const Login = props => {
         let output = await login("/login", credentials);
         console.log(output)
         if (output.success) {
-            props.setIsLoggedIn(true)
+            props.setLoggedInAs(output.id)
             // navigate to original path or '/'
             navigate(from, { replace: true });
         }
@@ -62,7 +62,7 @@ const Login = props => {
     }
 
     return (
-        <div className="body">
+        <div className="body-login">
             <section className="body-left">
                 <img src={process.env.PUBLIC_URL + "/assets/0-1-osoc-full-2.png"} alt="osoc-logo"/>
             </section>

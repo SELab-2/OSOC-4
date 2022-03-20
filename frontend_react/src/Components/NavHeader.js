@@ -8,7 +8,7 @@ export default function NavHeader(props) {
         event.preventDefault();
         let r = await logout("/logout")
         if (r.success) {
-            props.setIsLoggedIn(false)
+            props.setLoggedInAs(null)
         }
     }
 
