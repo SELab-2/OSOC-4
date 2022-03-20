@@ -1,5 +1,10 @@
+import StudentsFilters from "./StudentsFilters";
+
 export default function SelectUsers(props) {
+
     return(
-            <p>Select Users!</p>
+      <div>
+          <StudentsFilters />
+      </div>
     )
 }
