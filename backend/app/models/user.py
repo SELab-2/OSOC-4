@@ -24,6 +24,10 @@ class User(Model):
     approved: bool = False
     disabled: bool = True
 
+    @validator('email')
+    def email_lowercase(cls, v):
+        return v.lower()
+
 
 class UserCreate(BaseModel):
     email: str
@@ -61,6 +65,12 @@ class UserData(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+    @validator('email')
+    def email_lowercase_with_format(cls, v):
+        if not valid_email(v):
+            raise InvalidEmailException()
+        return v.lower()
 
 
 class UserInvite(BaseModel):
