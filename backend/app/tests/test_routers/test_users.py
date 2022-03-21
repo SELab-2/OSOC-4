@@ -290,7 +290,10 @@ class TestUsers(TestBase):
         }
 
         for user_title, user in self.objects.items():
+            # Todo find a way to get a valid key in redis
             key = generate_new_reset_password_key()
             db.redis.setex(key[0], key[1], str(user.id))
 
-            response = await self.post_response(f"/users/forgot/{key}", body, user_title, Status.SUCCES)
+            await self.post_response(f"/users/forgot/{key}", body, user_title, Status.SUCCES)
+            await self.post_response(f"/users/forgot/{key}", bad_body, user_title, Status.BAD_REQUEST)
+            # Todo check response
