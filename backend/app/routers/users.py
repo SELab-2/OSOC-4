@@ -1,9 +1,5 @@
 from typing import List
 
-from fastapi import APIRouter, Body, Depends
-from fastapi_jwt_auth import AuthJWT
-from odmantic import ObjectId
-
 from app.crud import read_all_where, read_where, update
 from app.database import db
 from app.exceptions.key_exceptions import InvalidResetKeyException
@@ -11,14 +7,20 @@ from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
-                                            UserNotFoundException, UserNotApprovedException, UserBadStateException)
+                                            UserBadStateException,
+                                            UserNotApprovedException,
+                                            UserNotFoundException)
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole, UserData
+from app.models.user import (User, UserCreate, UserData, UserOut,
+                             UserOutSimple, UserRole)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import list_modeltype_response, response
+from fastapi import APIRouter, Body, Depends
+from fastapi_jwt_auth import AuthJWT
+from odmantic import ObjectId
 
 router = APIRouter(prefix="/users")
 
@@ -71,7 +73,7 @@ async def add_user_data(user: UserCreate):
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def invite_user(id: str, body: Body(...)):
+async def invite_user(id: str, body = Body(default=None)):
     """invite_user this functions invites a user
 
     :param id: the user id
