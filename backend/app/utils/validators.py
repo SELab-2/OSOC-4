@@ -9,8 +9,7 @@ def valid_password(password: str) -> bool:
     :return: if password is valid
     :rtype: bool
     """
-    reg = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$"
-    return re.fullmatch(reg, password)
+    return len(password) > 11
 
 
 def valid_email(email: str) -> bool:
