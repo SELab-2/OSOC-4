@@ -195,7 +195,8 @@ class TestUsers(TestBase):
     async def test_update_user_as_forbidden(self):
         user_to_edit = self.objects["user_no_role"]
         bad_user_id = "00000a00a00aa00aa000aaaa"
-        body: Dict[str, str] = {"email": "new+email@new.me", "name": "Rocky"}
+        new_name = "Rocky"
+        body: Dict[str, str] = {"email": "new+email@new.me", "name": new_name}
         bad_body: Dict[str, str] = {"email": self.objects["user_admin"].email, "name": "Rocky"}
 
         for user_title in self.objects:
@@ -205,8 +206,8 @@ class TestUsers(TestBase):
                 await self.post_response(f"/users/{bad_user_id}", body, user_title, Status.FORBIDDEN)
 
         # check that the user was not changed in the database
-        user = await db.engine.find(User, User.email == body["email"])
-        self.assertIsNone(user, f"{user_to_edit.name} was modified in the database")
+        user = await read_where(User, User.id == ObjectId(user_to_edit.id))
+        self.assertNotEqual(user.name, new_name, f"{user_to_edit.name} was modified in the database")
 
     """
     POST /users/{id}/approve

@@ -18,7 +18,7 @@ from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
-from app.utils.response import errorresponse, list_modeltype_response, response
+from app.utils.response import list_modeltype_response, response
 
 router = APIRouter(prefix="/users")
 
