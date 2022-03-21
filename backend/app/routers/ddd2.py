@@ -11,6 +11,7 @@ from app.models.question_answer import QuestionAnswer
 from app.models.question import Question
 from app.models.answer import Answer
 from app.utils.response import response
+from app.utils.cryptography import get_password_hash
 from fastapi import APIRouter
 from random import choice, sample, randrange
 
@@ -102,7 +103,7 @@ for qa in qa_multiple_choice2:
                 for answer_text in qa[1:]])
 
 
-def generate_user(role=UserRole.COACH, active=True, approved=True):
+def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=False):
     first_name = choice(first_names)
     last_name = choice(last_names)
     email = choice(emails)
@@ -111,7 +112,8 @@ def generate_user(role=UserRole.COACH, active=True, approved=True):
                 password="a",
                 role=role,
                 active=active,
-                approved=approved)
+                approved=approved,
+                disabled=disabled)
 
 
 def generate_student(edition_id):
@@ -166,6 +168,13 @@ def generate_question_answers():
 
 @router.get("/", response_description="Data retrieved")
 async def add_dummy_data():
+    user_admin = User(
+        email="admin",
+        name="admin",
+        password=get_password_hash("admin"),
+        role=UserRole.ADMIN,
+        active=True, approved=True, disabled=False)
+
     admins = [generate_user(role=UserRole.ADMIN) for i in range(2)]
     coaches = [generate_user() for i in range(5)]
 
@@ -223,6 +232,13 @@ async def add_dummy_data():
         student.questions = generate_question_answers()
 
     # save models to database
+    await db.engine.save(user_admin)
+
+    for admin in admins:
+        await db.engine.save(admin)
+    for coach in coaches:
+        await db.engine.save(coach)
+
     for question in questions_yes_no:
         await db.engine.save(question)
     for answers in answers_yes_no:
@@ -247,11 +263,9 @@ async def add_dummy_data():
     for role in roles:
         await db.engine.save(role)
 
-    for coach in coaches:
-        await db.engine.save(coach)
-
     await db.engine.save(edition)
     await db.engine.save(project)
+    await db.engine.save(project2)
 
     for student in students:
         for question_answer in student.questions:
