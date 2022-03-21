@@ -44,6 +44,7 @@ class TestUsers(TestBase):
     """
 
     async def test_get_user_me(self):
+        # Correct GET
         for user_title, user in self.objects.items():
             response = await self.get_response("/users/me", user_title, Status.SUCCES)
             response = json.loads(response.content)["data"]["id"].split("/")[-1]
@@ -275,9 +276,8 @@ class TestUsers(TestBase):
 
     """
     POST /users/forgot/{reset_key}
-    """
+    """  # These tests need to be seperated to avoid issues with encrypted passwords
 
-    @unittest.skip("I didn't find a way to get the key")
     async def test_change_password(self):
         new_pass = "ValidPass?!123"
         body = {
@@ -290,10 +290,29 @@ class TestUsers(TestBase):
         }
 
         for user_title, user in self.objects.items():
-            # Todo find a way to get a valid key in redis
             key = generate_new_reset_password_key()
             db.redis.setex(key[0], key[1], str(user.id))
 
-            await self.post_response(f"/users/forgot/{key}", body, user_title, Status.SUCCES)
-            await self.post_response(f"/users/forgot/{key}", bad_body, user_title, Status.BAD_REQUEST)
-            # Todo check response
+            # Request using different validate_password
+            await self.post_response(f"/users/forgot/{key[0]}", bad_body, user_title, Status.BAD_REQUEST)
+            self.assertEqual(user.password, self.saved_objects[user_title].password,
+                             f"The password of {user_title} was {user.password}. "
+                             f"Expected: {self.saved_objects[user_title].password}")
+
+            # Now the password is encrypted in self.objects
+            key = generate_new_reset_password_key()
+            db.redis.setex(key[0], key[1], str(user.id))
+
+            await self.post_response(f"/users/forgot/{key[0]}", body, user_title, Status.SUCCES)
+            # Since password is encrypted, we assert using a simple get with the new password
+            self.saved_objects["passwords"][user_title] = new_pass
+            await self.get_response(f"/users/me", user_title, Status.SUCCES)
+
+        # Request using invalid reset keys
+        await self.post_response(f"/users/forgot/Rohnonotsogood", body, "user_admin", Status.BAD_REQUEST)
+        await self.post_response(f"/users/forgot/Iohnoevenworse", body, "user_admin", Status.BAD_REQUEST)
+
+        key = generate_new_reset_password_key()
+        db.redis.setex(key[0], key[1], str(self.objects["user_approved_coach"].id))
+
+        await self.post_response(f"/users/forgot/{key[0]}", body, "user_admin", Status.FORBIDDEN)

@@ -44,8 +44,8 @@ async def get_user_me(Authorize: AuthJWT = Depends()):
     current_user_id = Authorize.get_jwt_subject()
 
     user = await read_where(User, User.id == ObjectId(current_user_id))
-    if not user:
-        raise UserNotFoundException()
+    # User will always be found since otherwise they can't be authorized
+    # No need to check whether user exists
 
     return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")
 
@@ -202,7 +202,7 @@ async def approve_user(user_id: str):
 
 
 @router.post("/forgot/{reset_key}")
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...)):
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
     """change_password function that changes the user password
 
     :param reset_key: the reset key
@@ -227,7 +227,11 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
         raise PasswordsDoNotMatchException()
 
     user = await read_where(User, User.id == ObjectId(userid))
-    if not user or user.disabled:
+
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+
+    if not user or user.disabled or current_user_id != userid:
         raise NotPermittedException()
 
     user.password = get_password_hash(passwords.password)
