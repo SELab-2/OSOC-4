@@ -8,16 +8,15 @@ import Projects from "./Components/Projects";
 import EmailUsers from "./Components/EmailUsers";
 import Settings from "./Components/Settings";
 import ErrorPage from "./Components/ErrorPage";
+import {getJson, isStillAuthenticated} from "./utils/json-requests";
 
 function App() {
     let [loggedInAs, setLoggedInAs] = useState(null);
 
-    // todo uncomment this when get "/" returns your user id if you have the access_token cookie
-    /*
     useEffect(() => { if (isStillAuthenticated()) {
-        getJson("/").then(resp => setLoggedInAs(resp.data.id))
+        getJson("/users/me").then(resp => setLoggedInAs(resp.data.id))
     }});
-     */
+
 
     if (!loggedInAs) {
         return <Login setLoggedInAs={setLoggedInAs} />
