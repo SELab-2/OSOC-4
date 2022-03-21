@@ -38,6 +38,18 @@ async def get_users():
     return list_modeltype_response(out_users, User)
 
 
+@router.get("/me")
+async def get_user_me(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+
+    user = await read_where(User, User.id == ObjectId(current_user_id))
+    if not user:
+        raise UserNotFoundException()
+
+    return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")
+
+
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
              response_description="User data added into the database")
 async def add_user_data(user: UserCreate):
@@ -50,14 +62,15 @@ async def add_user_data(user: UserCreate):
     """
 
     # check if email already used
-    if await read_where(User, User.email == user.email):
-        raise EmailAlreadyUsedException()
+    u = await read_where(User, User.email == user.email)
+    if u:
+        return response(UserOutSimple.parse_raw(u.json()), "User with email already exists")
 
     new_user = await update(User.parse_obj(user))
-    return response(new_user, "User added successfully.")
+    return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
-@router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.get("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def invite_user(id: str):
     """invite_user this functions invites a user
 
@@ -66,7 +79,9 @@ async def invite_user(id: str):
     :return: response
     :rtype: success or error
     """
+    print("inviting user")
     user = await read_where(User, User.id == ObjectId(id))
+    print("1")
 
     if user is None:
         raise UserNotFoundException()
@@ -222,14 +237,3 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
     await update(user)
 
     return response(None, "Password updated successfully")
-
-
-@router.get("/me")
-async def get_user_me(Authorize: AuthJWT = Depends()):
-    current_user_id = Authorize.get_jwt_subject()
-
-    user = await read_where(User, User.id == ObjectId(current_user_id))
-    if not user:
-        raise UserNotFoundException()
-
-    return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")

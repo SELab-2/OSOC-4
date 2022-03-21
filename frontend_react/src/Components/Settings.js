@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {log} from "../utils/logger";
-import {getJson, postCreate} from "../utils/json-requests";
+import {getJson, isStillAuthenticated, postCreate} from "../utils/json-requests";
 import "../styles/settings.css"
+import ManageUsers from "./ManageUsers";
+
+
 
 export default function Settings(props) {
     const [user, setUser] = useState(undefined);
@@ -10,13 +13,16 @@ export default function Settings(props) {
     const [role, setRole] = useState(0);
     const [savedSuccess, setSavedSuccess] = useState(false);
 
+
     useEffect(() => {
         if (!user) {getJson(props.loggedInAs).then(res => {
-            setUser(res.data);
-            setName(res.data.name);
-            setEmail(res.data.email);
-            setRole(res.data.role);
-        })}
+            if (isStillAuthenticated()) {
+                setUser(res.data);
+                setName(res.data.name);
+                setEmail(res.data.email);
+                setRole(res.data.role);
+            }}
+        )}
     });
 
     const handleChangeName = (event) => {
@@ -43,9 +49,9 @@ export default function Settings(props) {
 
     return(
         <div className="body-settings">
-        <h2>Settings</h2>
+        <h1>Settings</h1>
             <div className="personal-settings">
-            <h5>Personal information</h5>
+            <h3>Personal information</h3>
                 <form onSubmit={handleSubmitChange}>
                     <input type="text" name="name" value={name} onChange={handleChangeName} />
                     <input type="email" name="email" value={email} onChange={handleChangeEmail} />
@@ -55,7 +61,7 @@ export default function Settings(props) {
             </div>
             {(role === 2)? (
                 <div className="admin-settings">
-                    admin-settings
+                    <ManageUsers/>
                 </div>
 
             ) : null}
