@@ -1,0 +1,110 @@
+.body-login {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.body-login .body-right {
+    margin-left: 5%;
+    justify-content: left;
+}
+
+.body-login section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.body-login .body-left img {
+    width: 65%;
+    max-width: 65%;
+}
+
+.body-login .login-container {
+    max-width: 450px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-container .title {
+    font-size: 3em;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.login-container .welcome-message {
+    text-align: center;
+    font-size: 1.1em;
+    line-height: 28px;
+    margin-bottom: 30px;
+}
+
+.login-container .login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container .form-control {
+    width: 100%;
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.login-container input,
+.login-container .submit {
+    outline: none;
+    border-radius: 3em;
+    font-size: 1.1em;
+}
+
+.login-container input {
+    width: 100%;
+    background: var(--white) !important;
+    color: var(--gray3);
+    padding: 0.75em 2.5em;
+    margin: 0.2em 0.2em 0.2em 0.2em;
+    border-color: var(--dark_blue);
+    border-width: 4px;
+}
+
+
+.login-container input:focus{
+    color: var(--gray2);
+}
+
+.login-container .submit {
+    color: var(--white);
+    padding: 14px 64px;
+    margin: 32px auto;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    background-color: var(--dark_blue) !important;
+    cursor: pointer;
+    transition: opacity 0.4s;
+}
+
+
+
+.login-container .submit:hover {
+    opacity: 0.9;
+}
+
+/* ----  Responsiveness   ----  */
+@media (max-width: 780px) {
+
+    .login-container .body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-container .body-left {
+        display: none;
+    }
+}
