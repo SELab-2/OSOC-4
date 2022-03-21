@@ -70,7 +70,7 @@ async def add_user_data(user: UserCreate):
     return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
-@router.get("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def invite_user(id: str):
     """invite_user this functions invites a user
 
@@ -79,9 +79,7 @@ async def invite_user(id: str):
     :return: response
     :rtype: success or error
     """
-    print("inviting user")
     user = await read_where(User, User.id == ObjectId(id))
-    print("1")
 
     if user is None:
         raise UserNotFoundException()

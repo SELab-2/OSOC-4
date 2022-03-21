@@ -8,6 +8,7 @@ from app.crud import read_where
 from app.database import db
 from app.models.user import User, UserRole
 from app.tests.test_base import Status, TestBase
+from app.utils.keygenerators import generate_new_reset_password_key
 
 
 class TestUsers(TestBase):
@@ -22,11 +23,11 @@ class TestUsers(TestBase):
         # Test correct role (admin)
         response = await self.get_response("/users", "user_admin", Status.SUCCES)
 
-        ep_users = json.loads(response.content)["data"]  # collected from EndPoint
-        ep_users = sorted([user["id"].split("/")[-1] for user in ep_users])  # collected from db itself
+        ep_users = json.loads(response.content)["data"]
+        ep_users = sorted([user["id"].split("/")[-1] for user in ep_users])  # collected from EndPoint
 
         db_users = await db.engine.find(User)
-        db_users = sorted([str(user.id) for user in db_users])
+        db_users = sorted([str(user.id) for user in db_users])  # collected from db itself
 
         self.assertTrue(db_users == ep_users,
                         f"""Users in the database were not the same as the returned users.
@@ -37,6 +38,17 @@ class TestUsers(TestBase):
         for user_title in self.objects:
             if user_title != "user_admin":
                 await self.get_response("/users", user_title, Status.FORBIDDEN)
+
+    """
+    GET /users/me
+    """
+
+    async def test_get_user_me(self):
+        for user_title, user in self.objects.items():
+            response = await self.get_response("/users/me", user_title, Status.SUCCES)
+            response = json.loads(response.content)["data"]["id"].split("/")[-1]
+
+            self.assertEqual(str(user.id), response)
 
     """
     POST /create
@@ -60,8 +72,11 @@ class TestUsers(TestBase):
         self.assertIsNotNone(user, f"{user} was incorrectly added to the database")
 
     async def test_create_existing_user_as_admin(self):
-        body: Dict[str, str] = {"email": self.objects["user_approved_coach"].email}
-        await self.post_response("/users/create", body, "user_admin", Status.BAD_REQUEST)
+        existing_user = self.objects["user_approved_coach"]
+        body: Dict[str, str] = {"email": existing_user.email}
+        response = await self.post_response("/users/create", body, "user_admin", Status.SUCCES)
+        gotten_user_id = json.loads(response.content)["data"]["id"].split('/')[-1]
+        self.assertEqual(str(existing_user.id), gotten_user_id)
 
     """
     POST /users/{id}/invite
@@ -257,3 +272,25 @@ class TestUsers(TestBase):
         user = await read_where(User, User.id == ObjectId(unactivated_user.id))
         self.assertFalse(user.approved)
         self.assertFalse(user.active)
+
+    """
+    POST /users/forgot/{reset_key}
+    """
+
+    @unittest.skip("I didn't find a way to get the key")
+    async def test_change_password(self):
+        new_pass = "ValidPass?!123"
+        body = {
+            "password": new_pass,
+            "validate_password": new_pass
+        }
+        bad_body = {
+            "password": new_pass,
+            "validate_password": new_pass + "oeps"
+        }
+
+        for user_title, user in self.objects.items():
+            key = generate_new_reset_password_key()
+            db.redis.setex(key[0], key[1], str(user.id))
+
+            response = await self.post_response(f"/users/forgot/{key}", body, user_title, Status.SUCCES)

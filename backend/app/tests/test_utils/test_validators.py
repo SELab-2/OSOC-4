@@ -10,17 +10,17 @@ class TestValidators(unittest.TestCase):
         invalid_emails = ["test.test@test"]
 
         valid_map = [valid_email(email) for email in valid_emails]
-        invalid_map = [valid_email(email) for email in invalid_emails]
+        invalid_map = [not valid_email(email) for email in invalid_emails]
 
-        self.assertNotIn(False, valid_map, "A valid email was tagged invalid")
-        self.assertNotIn(True, invalid_map, "An invalid email was tagged valid")
+        self.assertTrue(all(valid_map), "A valid email was tagged invalid")
+        self.assertTrue(all(invalid_map), "An invalid email was tagged valid")
 
     def test_valid_password(self):
-        valid_passwords = ["JustAPasswordThatIsValid?!"]
+        valid_passwords = ["ValidPass?!123"]
         invalid_passwords = ["", "abce"]
 
         valid_map = [valid_password(passw) for passw in valid_passwords]
-        invalid_map = [valid_password(passw) for passw in invalid_passwords]
+        invalid_map = [not valid_password(passw) for passw in invalid_passwords]
 
-        self.assertNotIn(False, valid_map, "A valid password was tagged invalid")
-        self.assertNotIn(True, invalid_map, "An invalid password was tagged valid")
+        self.assertTrue(all(valid_map), "A valid password was tagged invalid")
+        self.assertTrue(all(invalid_map), "An invalid password was tagged valid")
