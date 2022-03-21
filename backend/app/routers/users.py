@@ -71,7 +71,7 @@ async def add_user_data(user: UserCreate):
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def invite_user(id: str):
+async def invite_user(id: str, body: Body(...)):
     """invite_user this functions invites a user
 
     :param id: the user id
