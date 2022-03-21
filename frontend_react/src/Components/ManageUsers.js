@@ -40,7 +40,7 @@ export default function ManageUsers() {
             postCreate("users/create", {"email": e}).then(resp => {
                 console.log(resp.data.data)
                 if (resp.data.data.id) {
-                    postCreate(resp.data.data.id + "/invite", undefined, false);
+                    postCreate(resp.data.data.id + "/invite", {}, false);
                 }
             })
             // post to invite
