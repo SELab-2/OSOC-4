@@ -34,23 +34,23 @@ last_names = ["Andrews", "Hayes", "Martinez", "Evans", "Pratt", "Vaughan",
 emails = ["gmail.com", "outlook.com", "yahoo.com", "hotmail.com"]
 
 questions_yes_no = [Question(question=q, field_id="", type="MULTIPLE_CHOICE") for q in
-    ["Will you live in Belgium in July 2022?",
-     "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
-     "Would you like to be called by a different name than your birth name?",
-     "Would you like to add your pronouns?",
-     "Have you participated in osoc before?",
-     "Would you like to be a student coach this year?"]]
+                    ["Will you live in Belgium in July 2022?",
+                     "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
+                     "Would you like to be called by a different name than your birth name?",
+                     "Would you like to add your pronouns?",
+                     "Have you participated in osoc before?",
+                     "Would you like to be a student coach this year?"]]
 
 answers_yes_no = [[Answer(question_id=question.id, field_id="", text=yn)
                    for yn in ["yes", "no"]] for question in questions_yes_no]
 
 questions_text = [Question(question=q, field_id="", type="TEXTAREA") for q in
-    ["Are there any responsibilities you might have which could hinder you during the day?",
-     "Tell us a fun fact about yourself.",
-     "How many years does your degree take?",
-     "Which year of your degree are you in?",
-     "What is the name of your college or university?",
-     "Which skill would you list as your best one?"]]
+                  ["Are there any responsibilities you might have which could hinder you during the day?",
+                   "Tell us a fun fact about yourself.",
+                   "How many years does your degree take?",
+                   "Which year of your degree are you in?",
+                   "What is the name of your college or university?",
+                   "Which skill would you list as your best one?"]]
 
 answers_text = [[Answer(question_id=question.id, field_id="", text=f"text{t}")
                  for t in range(1, 4)] for question in questions_text]
@@ -79,8 +79,8 @@ answers_multiple_choice = []
 for qa in qa_multiple_choice:
     questions_multiple_choice.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
     answers_multiple_choice.append(
-            [Answer(question_id=questions_multiple_choice[-1].id, field_id="", text=answer_text)
-                for answer_text in qa[1:]])
+        [Answer(question_id=questions_multiple_choice[-1].id, field_id="", text=answer_text)
+            for answer_text in qa[1:]])
 
 # multiple choice questions with max 2 answers
 qa_multiple_choice2 = [
@@ -99,8 +99,8 @@ answers_multiple_choice2 = []
 for qa in qa_multiple_choice2:
     questions_multiple_choice2.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
     answers_multiple_choice2.append(
-            [Answer(question_id=questions_multiple_choice2[-1].id, field_id="", text=answer_text)
-                for answer_text in qa[1:]])
+        [Answer(question_id=questions_multiple_choice2[-1].id, field_id="", text=answer_text)
+            for answer_text in qa[1:]])
 
 
 def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=False):
@@ -132,23 +132,23 @@ def generate_student(edition_id):
 
 def generate_suggestions(student, project, unconfirmed=3, confirmed_suggestion=None, admin=None):
     suggestions = [Suggestion(
-                    suggestion=choice(list(SuggestionOption)),
-                    reason="reason x",
-                    student_form=student.id,
-                    suggested_by=choice(project.user_ids),
-                    project=project.id,
-                    role=choice(student.roles),
-                    confirmed=False) for _ in range(unconfirmed)]
+                   suggestion=choice(list(SuggestionOption)),
+                   reason="reason x",
+                   student_form=student.id,
+                   suggested_by=choice(project.user_ids),
+                   project=project.id,
+                   role=choice(student.roles),
+                   confirmed=False) for _ in range(unconfirmed)]
 
     if confirmed_suggestion is not None and admin is not None:
         suggestions.append(Suggestion(
-                    suggestion=confirmed_suggestion,
-                    reason="reason x",
-                    student_form=student.id,
-                    suggested_by=admin.id,
-                    project=project.id,
-                    role=choice(student.roles),
-                    confirmed=True))
+            suggestion=confirmed_suggestion,
+            reason="reason x",
+            student_form=student.id,
+            suggested_by=admin.id,
+            project=project.id,
+            role=choice(student.roles),
+            confirmed=True))
 
     return suggestions
 
@@ -174,6 +174,11 @@ async def add_dummy_data():
         password=get_password_hash("admin"),
         role=UserRole.ADMIN,
         active=True, approved=True, disabled=False)
+
+    users = [generate_user(active=False, approved=False, disabled=False),
+             generate_user(active=True, approved=False, disabled=False),
+             generate_user(active=True, approved=True, disabled=False),
+             generate_user(active=True, approved=True, disabled=True)]
 
     admins = [generate_user(role=UserRole.ADMIN) for i in range(2)]
     coaches = [generate_user() for i in range(5)]
@@ -233,7 +238,8 @@ async def add_dummy_data():
 
     # save models to database
     await db.engine.save(user_admin)
-
+    for user in users:
+        await db.engine.save(user)
     for admin in admins:
         await db.engine.save(admin)
     for coach in coaches:
