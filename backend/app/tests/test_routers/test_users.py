@@ -15,8 +15,8 @@ class TestUsers(TestBase):
     """
     async def test_create_user_as_admin(self):
         body: Dict[str, str] = {"email": "added_user_as_admin@test.com"}
-        response = await self.post_response("/users/create", body, "user_admin", Status.SUCCES)
-        user = await db.engine.find_one(User, {"email": json.loads(response.content)["data"]["email"]})
+        await self.post_response("/users/create", body, "user_admin", Status.SUCCES)
+        user = await db.engine.find_one(User, {"email": body['email']})
         self.assertIsNotNone(user, f"{body['email']} was not found in the database")
         await db.engine.delete(user)
 
