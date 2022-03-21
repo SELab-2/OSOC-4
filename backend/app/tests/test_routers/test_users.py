@@ -306,11 +306,11 @@ class TestUsers(TestBase):
             await self.post_response(f"/users/forgot/{key[0]}", body, user_title, Status.SUCCES)
             # Since password is encrypted, we assert using a simple get with the new password
             self.saved_objects["passwords"][user_title] = new_pass
-            await self.get_response(f"/users/me", user_title, Status.SUCCES)
+            await self.get_response("/users/me", user_title, Status.SUCCES)
 
         # Request using invalid reset keys
-        await self.post_response(f"/users/forgot/Rohnonotsogood", body, "user_admin", Status.BAD_REQUEST)
-        await self.post_response(f"/users/forgot/Iohnoevenworse", body, "user_admin", Status.BAD_REQUEST)
+        await self.post_response("/users/forgot/Rohnonotsogood", body, "user_admin", Status.BAD_REQUEST)
+        await self.post_response("/users/forgot/Iohnoevenworse", body, "user_admin", Status.BAD_REQUEST)
 
         key = generate_new_reset_password_key()
         db.redis.setex(key[0], key[1], str(self.objects["user_approved_coach"].id))
