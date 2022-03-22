@@ -1,8 +1,8 @@
 # User manual for OSOC Selection tool 
-#### [1. Introduction](#1-introduction)
-#### [2. Product information](#2-product-information)
-#### [3. Intended use](#3-intended-use)
-#### [4. Description of the main product elements](#4-description-of-the-main-product-elements)
+#### [1. Introduction](#1-introduction-1)
+#### [2. Product information](#2-product-information-1)
+#### [3. Intended use](#3-intended-use-1)
+#### [4. Description of the main product elements](#4-description-of-the-main-product-elements-1)
 [4.1. Domain Model](#41-domain-model) \
 [4.1.1. User](#411-user) \
 [4.1.2. Project](#412-project) \
@@ -18,14 +18,14 @@
 
 [4.2. Architecture and Design](#42-architecture-and-design)
 
-#### [5. Common use cases](#5-common-use-cases)
-#### [6. Description of the user interface](#6-description-of-the-user-interface)
-#### [7. Safety warnings](#7-safety-warnings)
-#### [8. Configuration](#8-configuration)
-#### [9. Installation instructions](#9-installation-instructions)
-#### [10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems)
-#### [11. Maintenance information](#11-maintenance-information)
-#### [12. Testing](#12-setting-up-a-development-environment-and-running-tests)
+#### [5. Common use cases](#5-common-use-cases-1)
+#### [6. Description of the user interface](#6-description-of-the-user-interface-1)
+#### [7. Safety warnings](#7-safety-warnings-1)
+#### [8. Configuration](#8-configuration-1)
+#### [9. Installation instructions](#9-installation-instructions-1)
+#### [10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems-1)
+#### [11. Maintenance information](#11-maintenance-information-1)
+#### [12. Testing](#12-setting-up-a-development-environment-and-running-tests-1)
 
 
 ## 1. Introduction
