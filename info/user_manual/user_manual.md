@@ -56,8 +56,6 @@ Now follows an in depth description of the attributes of a user.
 **email**: the email address of the user, this is unique for each user \
 **name**: the name of the user, two or more users with the same name may exist \
 **password**: the password of the user, this will be saved in the database, hashed and salted for security reasons \
-**alumn**: whether the student has already participated in an edition of OSOC. \
-**cv**: a link to the students' cv
 **role**: there are 2 types of roles: coaches and admins, admins can do anything any coach can do and more \
 **role: coach**: ... \
 **role: admin**: can do anything any coach can do \
@@ -147,6 +145,8 @@ Now follows an in depth description of the attributes of a student.
 **name**: the name of the student \
 **nickname**: the nickname of the student \
 **phone_number**: the phone number of the student \
+**alumn**: whether the student has already participated in an edition of OSOC. \
+**cv**: a link to the students' cv
 **question_answers**: a list of questions-answers ids, the questions and answers which the student filled in \
 **skills**: a list of skills (represented by their id's) which the student has \
 **edition**: the edition in which the student filled in the form
