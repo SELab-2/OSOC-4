@@ -3,6 +3,7 @@
 #### [2. Product information](#2-product-information-1)
 #### [3. Intended use](#3-intended-use-1)
 #### [4. Description of the main product elements](#4-description-of-the-main-product-elements-1)
+
 [4.1. Domain Model](#41-domain-model) \
 [4.1.1. User](#411-user) \
 [4.1.2. Project](#412-project) \
@@ -22,6 +23,12 @@
 #### [6. Description of the user interface](#6-description-of-the-user-interface-1)
 #### [7. Configuration](#7-configuration-1)
 #### [8. Installation instructions](#8-installation-instructions-1)
+
+[8.1. Local installation](#81-local-installation) \
+[8.1.1. Requirements](#811-requirements) \
+[8.1.2. Local installation](#812-local-installation) \
+[8.2. Automatic deployment](#82-automatic-deployment)
+
 #### [9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems-1)
 #### [10. Maintenance information](#10-maintenance-information-1)
 #### [11. Testing](#11-testing-1)
@@ -240,7 +247,7 @@ PASSWORDRESET_EXPIRE=30 # in minutes
 
 If you want to run docker without sudo, we recommend you check here: https://docs.docker.com/engine/install/linux-postinstall/
 
-#### 8.1.2. Installation
+#### 8.1.2. Local installation
 
 You first need to clone the repository that contains the code for the selection tool:
 ```
@@ -265,12 +272,14 @@ docker-compose restart
 ```
 
 If you only want to restart one service, use one of the following commands:
-```
-docker restart osoc-backend
-docker restart osoc-mongodb
-docker restart osoc-redis
-docker restart osoc-frontend
-```
+
+`docker restart osoc-backend`
+
+`docker restart osoc-mongodb`
+
+`docker restart osoc-redis`
+
+`docker restart osoc-frontend`
 
 If you want to stop all services you can use
 ```
