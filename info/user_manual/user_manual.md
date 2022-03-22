@@ -299,5 +299,5 @@ Tests will run automatically with github actions but can be run locally too. The
 ```
 docker-compose -f test-docker-compose.yml up --build -d # this starts the test database and test redis server
 docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover # This executes the python -m ... command in the backend container
-docker-compose down
+docker-compose down  # this stops the container again
 ```
