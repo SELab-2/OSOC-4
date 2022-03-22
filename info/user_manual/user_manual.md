@@ -24,3 +24,20 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 
 ## 4. Features/accessories
 
+## 5. Description of the user interface
+
+## 6. Safety warnings
+
+## 7. Installation-instructions
+
+## 8. Description of how to use/operate the product
+
+## 9. Troubleshooting section and instructions on how to solve problems
+
+## 10. Maintenance information
+
+## 11. Information on disposal of the product and packaging
+
+## 12. Technical specifications
+
+## 13. Index
