@@ -7,21 +7,23 @@
 
 [4. Description of the main product elements](#4-description-of-the-main-product-elements)
 
-[5. Description of the user interface](#5-description-of-the-user-interface)
+[5. Common use cases](#5-common-use-cases)
 
-[6. Safety warnings](#6-safety-warnings)
+[6. Description of the user interface](#6-description-of-the-user-interface)
 
-[7. Configuration](#7-configuration)
+[7. Safety warnings](#7-safety-warnings)
 
-[8. Installation instructions](#8-installation-instructions)
+[8. Configuration](#8-configuration)
 
-[9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems)
+[9. Installation instructions](#9-installation-instructions)
 
-[10. Maintenance information](#10-maintenance-information)
+[10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems)
 
-[11. Technical specifications/requirements](#11-technical-specificationsrequirements)
+[11. Maintenance information](#11-maintenance-information)
 
-[12. Setting up a development environment and running tests](#12-setting-up-a-development-environment-and-running-tests)
+[12. Technical specifications/requirements](#12-technical-specificationsrequirements)
+
+[13. Setting up a development environment and running tests](#13-setting-up-a-development-environment-and-running-tests)
 
 
 ## 1. Introduction
@@ -143,6 +145,8 @@ Now follows an in depth description of the attributes of a student.
 **name**: the name of the student \
 **nickname**: the nickname of the student \
 **phone_number**: the phone number of the student \
+**alumn**: whether the student has already participated in an edition of OSOC. \
+**cv**: a link to the students' cv
 **question_answers**: a list of questions-answers ids, the questions and answers which the student filled in \
 **skills**: a list of skills (represented by their id's) which the student has \
 **edition**: the edition in which the student filled in the form \
@@ -162,9 +166,13 @@ Now follows an in depth description of the attributes of a suggestion.
 
 
 #### 4.1.10 Participation
-Defines which role a student will perform in a project.
+Defines a ternair relationship which is converted to an entity itself. It describes what student will take on what role in what project. 
 
-A participation has no attributes.
+Now follows an in depth description of the attributes of a participation.
+
+**student**: the id of the student who will participate
+**project**: the id of the project in which the student will participate
+**skill**: the role (thus the skill the student has and will use) the student will take on in the project
 
 #### 4.1.11 Default_email
 Default emails are stored in the database.
@@ -178,20 +186,20 @@ Now follows an in depth description of the attributes of a default email.
 
 First of all we have a login system. If you already have an account on the tool (see the next section 'invite system' if you want to know how to obtain an account), you need to provide your email-adress and password in order to login. There is no support yet for github, but that will be added in a later version. There also is no 2FA, but it may be added in later versions.
 
+## 5. Common use cases
 
+## 6. Description of the user interface
 
-## 5. Description of the user interface
+## 7. Safety warnings
 
-## 6. Safety warnings
+## 8. Configuration
 
-## 7. Configuration
+## 9. Installation-instructions
 
-## 8. Installation-instructions
+## 10. Troubleshooting section and instructions on how to solve problems
 
-## 9. Troubleshooting section and instructions on how to solve problems
+## 11. Maintenance information
 
-## 10. Maintenance information
+## 12. Technical specifications/requirements
 
-## 11. Technical specifications/requirements
-
-## 12. Setting up a development environment and running tests
+## 13. Setting up a development environment and running tests
