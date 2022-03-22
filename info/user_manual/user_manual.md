@@ -7,7 +7,7 @@
 
 [4. Description of the main product elements](#4-description-of-the-main-product-elements)
 
-[5. Common use cases](#5-commom-use-cases)
+[5. Common use cases](#5-common-use-cases)
 
 [6. Description of the user interface](#6-description-of-the-user-interface)
 
