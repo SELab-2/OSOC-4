@@ -169,9 +169,9 @@ def generate_question_answers():
 @router.get("/", response_description="Data retrieved")
 async def add_dummy_data():
     user_admin = User(
-        email="admin",
+        email="user_admin@test.be",
         name="admin",
-        password=get_password_hash("admin"),
+        password=get_password_hash("Test123!user_admin"),
         role=UserRole.ADMIN,
         active=True, approved=True, disabled=False)
 
