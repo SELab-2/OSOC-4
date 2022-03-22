@@ -7,6 +7,8 @@ from httpx import AsyncClient, Response
 
 from app.api import app
 from app.database import db
+from app.models.edition import Edition
+from app.models.project import Project, Partner
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 
@@ -64,10 +66,22 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 role=UserRole.NO_ROLE,
                 active=False,
                 approved=False,
-                disabled=False)
+                disabled=False),
+            "project_test": Project(
+                name="project_test",
+                goals=["Testing this application", "Being dummy data"],
+                description="A project aimed at being dummy data",
+                partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
+                user_ids=[],
+                required_roles=[],
+                edition=Edition(year=2022, user_ids=[]).id
+            )
         }
         self.saved_objects = {
-            "passwords": {}}  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
+            "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
+            "projects": [],
+            "users": []
+        }
         self.created = []
 
     async def asyncSetUp(self) -> None:
@@ -80,11 +94,15 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 plain_password = obj.password
                 obj.password = get_password_hash(obj.password)
                 self.saved_objects["passwords"][key] = plain_password
+                self.saved_objects["users"].append(key)
+            elif isinstance(obj, Project):
+                self.saved_objects["projects"].append(key)
+
             self.saved_objects[key] = await db.engine.save(obj)
 
     async def asyncTearDown(self) -> None:
         for o in self.saved_objects.values():
-            if not isinstance(o, dict):
+            if not isinstance(o, dict) and not isinstance(o, list):
                 await db.engine.delete(o)
         await self.lf.__aexit__()
         await self.client.aclose()
