@@ -34,6 +34,33 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 
 ## 4. Description of the main product elements
 
+## 4.1 Domain model
+![Domain model](../domain_model/domain_model.svg)
+
+### 4.1 Users
+
+### 4.1.1 active approved disabled
+A user can either be active, approved, disabled or nothing. 
+
+If a user is:
+- nothing, then the user has been created and an invite has been send to that user.
+- active, then the user has set a name and password by using the invite link.
+- approved, then the user was active, and an admin has approved the user (the user now has acces to the tool). 
+- disabled, then the user does not take part in the current edition
+
+### 4.1.1 roles
+There are 2 types of roles: coaches and admins. Admins can do anything any coach can do.
+
+**Coaches**
+Coaches are 
+
+First of all we have a login system. If you already have an account on the tool (see the next section 'invite system' if you want to know how to obtain an account), you need to provide your email-adress and password in order to login. There is no support yet for github, but that will be added in a later version. There also is no 2FA, but it may be added in later versions.
+
+
+
+### 4.2 Invite system
+
+
 ## 5. Description of the user interface
 
 ## 6. Safety warnings
