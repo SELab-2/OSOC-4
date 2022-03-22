@@ -25,8 +25,7 @@
 #### [9. Installation instructions](#9-installation-instructions)
 #### [10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems)
 #### [11. Maintenance information](#11-maintenance-information)
-#### [12. Technical specifications/requirements](#12-technical-specificationsrequirements)
-#### [13. Setting up a development environment and running tests](#13-setting-up-a-development-environment-and-running-tests)
+#### [12. Testing](#12-setting-up-a-development-environment-and-running-tests)
 
 
 ## 1. Introduction
@@ -210,16 +209,41 @@ Now we will describe how all these containers work toghetter in order to archiev
 ## 7. Safety warnings
 
 ## 8. Configuration
+While developing or before installing you can use your own environment variables by using a .env file in the backend directory of the application. It should look like this:
+```
+# Mongo
+MONGO_URL=192.168.0.102
+MONGO_PORT=27017
+MONGO_USER=root
+MONGO_PASSWORD=justapassword
+
+# Redis
+REDIS_URL=192.168.0.102
+REDIS_PORT=6379
+REDIS_PASSWORD=justapassword
+
+# SMTP Mail
+SMTP_SERVER=smtp.gmail.com
+SMTP_SSL_PORT=465
+SENDER_EMAIL=osoc.groep4@gmail.com
+SENDER_PASSWORD=Justapassword123!
+
+# Invite Settings
+INVITE_EXPIRE=4320 # in minutes
+PASSWORDRESET_EXPIRE=30 # in minutes
+```
 
 ## 9. Installation-instructions
 
-### 9.1. Requirements
+### 9.1. Local installation
+
+#### 9.1.1. Requirements
 - Docker (installation guide: https://docs.docker.com/get-docker/)
 - Docker Compose (installation guide: https://docs.docker.com/compose/install/)
 
 If you want to run docker without sudo, we recommend you check here: https://docs.docker.com/engine/install/linux-postinstall/
 
-### 9.2 Installation
+#### 9.1.2. Installation
 
 You first need to clone the repository that contains the code for the selection tool:
 ```
@@ -232,11 +256,48 @@ Now you need to start the application:
 docker-compose up -d
 ```
 
+If you made some changes to the code, it is important that you rebuild, use the following command for that:
+```
+docker-compose up -d --build
+```
+
+
+If you want to restart all services you can use:
+```
+docker-compose restart
+```
+
+If you only want to restart one service, use one of the following commands:
+```
+docker restart osoc-backend
+docker restart osoc-mongodb
+docker restart osoc-redis
+docker restart osoc-frontend
+```
+
+If you want to stop all services you can use
+```
+docker-compose down
+```
+
+### 9.2. Automatic deployment
+Github Actions are used to automatically deploy the new codebase from the master or development branch to the server. A seperate docker-compose file is used by the Github Actions to deploy the application to the production server. This docker-compose file is made so the frontend and backend use the correct paths. This is needed because subdomains can't be used in the UGent network. Instead we use an extra prefixpath (/frontend and /api).
+
+These branch versions of the application can be accessed by:
+```
+frontend: https://sel2-4.ugent.be/{branchname}/frontend
+backend-api: https://sel2-4.ugent.be/{branchname}/api
+```
 
 ## 10. Troubleshooting section and instructions on how to solve problems
 
 ## 11. Maintenance information
 
-## 12. Technical specifications/requirements
+## 12. Testing
+Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
-## 13. Setting up a development environment and running tests
+```
+docker-compose -f test-docker-compose.yml up --build -d # this starts the test database and test redis server
+docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover # This executes the python -m ... command in the backend container
+docker-compose down
+```
