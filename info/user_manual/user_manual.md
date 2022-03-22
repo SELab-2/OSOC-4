@@ -26,7 +26,8 @@
 
 [8.1. Local installation](#81-local-installation) \
 [8.1.1. Requirements](#811-requirements) \
-[8.1.2. Local installation](#812-local-installation) \
+[8.1.2. Local installation](#812-local-installation)
+
 [8.2. Automatic deployment](#82-automatic-deployment)
 
 #### [9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems-1)
