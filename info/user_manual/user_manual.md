@@ -1,12 +1,8 @@
 # User manual for OSOC Selection tool 
-[1. Introduction](#1-introduction)
-
-[2. Product information](#2-product-information)
-
-[3. Intended use](#3-intended-use)
-
-[4. Description of the main product elements](#4-description-of-the-main-product-elements)
-
+#### [1. Introduction](#1-introduction)
+#### [2. Product information](#2-product-information)
+#### [3. Intended use](#3-intended-use)
+#### [4. Description of the main product elements](#4-description-of-the-main-product-elements)
 [4.1. Domain Model](#41-domain-model) \
 [4.1.1. User](#411-user) \
 [4.1.2. Project](#412-project) \
@@ -19,24 +15,15 @@
 [4.1.9. Suggestion](#41-suggestion) \
 [4.1.10. Participation](#41-participation) \
 [4.1.11. Default_email](#41-default-email)
-
-[5. Common use cases](#5-common-use-cases)
-
-[6. Description of the user interface](#6-description-of-the-user-interface)
-
-[7. Safety warnings](#7-safety-warnings)
-
-[8. Configuration](#8-configuration)
-
-[9. Installation instructions](#9-installation-instructions)
-
-[10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems)
-
-[11. Maintenance information](#11-maintenance-information)
-
-[12. Technical specifications/requirements](#12-technical-specificationsrequirements)
-
-[13. Setting up a development environment and running tests](#13-setting-up-a-development-environment-and-running-tests)
+#### [5. Common use cases](#5-common-use-cases)
+#### [6. Description of the user interface](#6-description-of-the-user-interface)
+#### [7. Safety warnings](#7-safety-warnings)
+#### [8. Configuration](#8-configuration)
+#### [9. Installation instructions](#9-installation-instructions)
+#### [10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems)
+#### [11. Maintenance information](#11-maintenance-information)
+#### [12. Technical specifications/requirements](#12-technical-specificationsrequirements)
+#### [13. Setting up a development environment and running tests](#13-setting-up-a-development-environment-and-running-tests)
 
 
 ## 1. Introduction
