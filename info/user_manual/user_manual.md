@@ -20,12 +20,11 @@
 
 #### [5. Common use cases](#5-common-use-cases-1)
 #### [6. Description of the user interface](#6-description-of-the-user-interface-1)
-#### [7. Safety warnings](#7-safety-warnings-1)
-#### [8. Configuration](#8-configuration-1)
-#### [9. Installation instructions](#9-installation-instructions-1)
-#### [10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems-1)
-#### [11. Maintenance information](#11-maintenance-information-1)
-#### [12. Testing](#12-testing-1)
+#### [7. Configuration](#7-configuration-1)
+#### [8. Installation instructions](#8-installation-instructions-1)
+#### [9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems-1)
+#### [10. Maintenance information](#10-maintenance-information-1)
+#### [11. Testing](#11-testing-1)
 
 
 ## 1. Introduction
@@ -206,9 +205,7 @@ Now we will describe how all these containers work toghetter in order to archiev
 
 ## 6. Description of the user interface
 
-## 7. Safety warnings
-
-## 8. Configuration
+## 7. Configuration
 While developing or before installing you can use your own environment variables by using a .env file in the backend directory of the application. It should look like this:
 ```
 # Mongo
@@ -233,17 +230,17 @@ INVITE_EXPIRE=4320 # in minutes
 PASSWORDRESET_EXPIRE=30 # in minutes
 ```
 
-## 9. Installation-instructions
+## 8. Installation-instructions
 
-### 9.1. Local installation
+### 8.1. Local installation
 
-#### 9.1.1. Requirements
+#### 8.1.1. Requirements
 - Docker (installation guide: https://docs.docker.com/get-docker/)
 - Docker Compose (installation guide: https://docs.docker.com/compose/install/)
 
 If you want to run docker without sudo, we recommend you check here: https://docs.docker.com/engine/install/linux-postinstall/
 
-#### 9.1.2. Installation
+#### 8.1.2. Installation
 
 You first need to clone the repository that contains the code for the selection tool:
 ```
@@ -280,7 +277,7 @@ If you want to stop all services you can use
 docker-compose down
 ```
 
-### 9.2. Automatic deployment
+### 8.2. Automatic deployment
 Github Actions are used to automatically deploy the new codebase from the master or development branch to the server. A seperate docker-compose file is used by the Github Actions to deploy the application to the production server. This docker-compose file is made so the frontend and backend use the correct paths. This is needed because subdomains can't be used in the UGent network. Instead we use an extra prefixpath (/frontend and /api).
 
 These branch versions of the application can be accessed by:
@@ -289,11 +286,11 @@ frontend: https://sel2-4.ugent.be/{branchname}/frontend
 backend-api: https://sel2-4.ugent.be/{branchname}/api
 ```
 
-## 10. Troubleshooting section and instructions on how to solve problems
+## 9. Troubleshooting section and instructions on how to solve problems
 
-## 11. Maintenance information
+## 10. Maintenance information
 
-## 12. Testing
+## 11. Testing
 Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
 ```
