@@ -2,8 +2,11 @@
 
 ## Table of contents
 - [User manual](info/user_manual/user_manual.md)
-- [Deployment](#deployment)
-- [Development & testing](#development--testing)
+- [Domain model](info/domain_model/domain_model.svg)
+- [Deployment scheme](info/deployment/deployment.svg)
+- [How to deploy](#deployment)
+- [How to further develop & test](#development--testing)
+
 
 
 ## Deployment
