@@ -21,7 +21,7 @@
 
 [11. Technical specifications/requirements](#11-technical-specificationsrequirements)
 
-[12. Setting up a development area and running tests](#12-setting-up-a-development-area-and-running-tests)
+[12. Setting up a development environment and running tests](#12-setting-up-a-development-environment-and-running-tests)
 
 ## 1. Introduction
 In this manual we'll explain everything there is to explain about the OSOC selection tool we've created. Going from installation and configuration, to usage of the version 1 selection tool. And we'll even go as far as showing you how to further develop this handy tool.
@@ -48,4 +48,4 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 
 ## 11. Technical specifications/requirements
 
-## 12. Setting up a development area and running tests
+## 12. Setting up a development environment and running tests
