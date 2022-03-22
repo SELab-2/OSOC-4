@@ -1,15 +1,25 @@
 # User manual for OSOC Selection tool 
-- [1. Introduction](#1-introduction)
-- [2. Product information](#2-product-information)
-- [3. Intended use](#3-intended-use)
-- [4. Description of the main product elements](#4-description-of-the-main-product-elements)
-- [5. Description of the user interface](#5-description-of-the-user-interface)
-- [6. Safety warnings](#6-safety-warnings)
-- [7. Configuration](#7-configuration)
-- [8. Installation instructions](#8-installation-instructions)
-- [9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems)
-- [10. Maintenance information](#10-maintenance-information)
-- [11. Technical specifications/requirements](#11-technical-specificationsrequirements)
+[1. Introduction](#1-introduction)
+
+[2. Product information](#2-product-information)
+
+[3. Intended use](#3-intended-use)
+
+[4. Description of the main product elements](#4-description-of-the-main-product-elements)
+
+[5. Description of the user interface](#5-description-of-the-user-interface)
+
+[6. Safety warnings](#6-safety-warnings)
+
+[7. Configuration](#7-configuration)
+
+[8. Installation instructions](#8-installation-instructions)
+
+[9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems)
+
+[10. Maintenance information](#10-maintenance-information)
+
+[11. Technical specifications/requirements](#11-technical-specificationsrequirements)
 
 ## 1. Introduction
 In this manual we'll explain everything there is to explain about the tool we've created. Going from installation and configuration, to usage of the version 1 selection tool. And we'll even go as far as showing you how to further develop this handy tool.
