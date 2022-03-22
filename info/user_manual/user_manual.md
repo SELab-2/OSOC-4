@@ -40,7 +40,7 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 
 
 ### 4.1 Domain model
-![Domain model](../domain_model/domain_model.svg)
+![Domain model](https://github.com/SELab-2/OSOC-4/blob/user_man/info/domain_model/domain_model.svg)
 
 Now folows a description of each element in the domain model.
 
