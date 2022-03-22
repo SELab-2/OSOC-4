@@ -5,7 +5,7 @@ from app.tests.test_base import TestBase, Status
 from app.utils.keygenerators import generate_new_invite_key
 
 
-class TestUsers(TestBase):
+class TestUserInvites(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -21,7 +21,7 @@ class TestUsers(TestBase):
         self.assertTrue((user.password == "") == password_empty,
                         f"Something was wrong with the password for {user.email}.\n")
 
-    async def test_get_users_roles(self):
+    async def test_invited_user(self):
         """ Example of post body
         {
             "name": "string",
