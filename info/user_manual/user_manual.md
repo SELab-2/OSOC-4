@@ -25,7 +25,7 @@
 #### [9. Installation instructions](#9-installation-instructions-1)
 #### [10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems-1)
 #### [11. Maintenance information](#11-maintenance-information-1)
-#### [12. Testing](#12-setting-up-a-development-environment-and-running-tests-1)
+#### [12. Testing](#12-testing-1)
 
 
 ## 1. Introduction
