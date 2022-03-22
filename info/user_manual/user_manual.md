@@ -46,13 +46,15 @@ Now folows a description of each element in the domain model.
 
 
 #### 4.1.1 User
+A user is a person who has an account on the tool, or is in the progress of getting an account.
+
 Now follows an in depth description of the attributes of a user.
 
 **id**: the id of the user, only used internally and unique for each user \
 **email**: the email address of the user, this is unique for each user \
 **name**: the name of the user, two or more users with the same name may exist \
 **password**: the password of the user, this will be saved in the database, hashed and salted for security reasons \
-**role**: there are 2 types of roles: coaches and admins. Admins can do anything any coach can do and more \
+**role**: there are 2 types of roles: coaches and admins, admins can do anything any coach can do and more \
 **role: coach**: ... \
 **role: admin**: can do anything any coach can do \
 **status: is_active, is_approved, is_disabled**: a user can either be active, approved, disabled or nothing \
@@ -63,6 +65,8 @@ Now follows an in depth description of the attributes of a user.
 
 
 #### 4.1.2 Project
+Represents a project that will be made by OSOC students, given by a partner. A project will also contain the the information of the partner.
+
 Now follows an in depth description of the attributes of a project.
 
 **id**: the id of the project, only used internally and unique for each project \
@@ -71,10 +75,16 @@ Now follows an in depth description of the attributes of a project.
 **goals**: the goals of the project, this is a list of goals (strings/text) that should be all be archieved at the end of the project \
 **partner**: the partner ordering the project. This consists of two more fields. In the database we do not store these two fields seperatily \
 **partner: name**: the name of the partner \
-**partner: about**: additional information about the partner
-
+**partner: about**: additional information about the partner \
+**users**: a list of user id's, these are the users which are assigned to this project \
+**required_skills**: a list of requiredSkills, this consists of two fields \
+**requiredSKills: skill_id**: the id of the skill that is needed \
+**requiredSKills: amount**: the amount of students, with this skill, that are required for this project. \
+**edition**: the id of the edition this project belongs to
 
 #### 4.1.3 Edition
+An edition of Open Summer Of Code
+
 Now follows an in depth description of the attributes of an edition.
 
 **id**: the id of the edition, only used internally and unique for each edition \
@@ -85,6 +95,8 @@ Now follows an in depth description of the attributes of an edition.
 
 
 #### 4.1.4 Skill
+A skill like ux-designer, backend-developper, communications-manager.
+
 Now follows an in depth description of the attributes of a skill.
 
 **id**: the id of the skill, only used internally and unique for each skill \
@@ -92,6 +104,8 @@ Now follows an in depth description of the attributes of a skill.
 
 
 #### 4.1.5 Question
+A question from the tally form that students are supposed to fill in
+
 Now follows an in depth description of the attributes of a question.
 
 **id**: the id of the question, only used internally and unique for each question \
@@ -100,6 +114,8 @@ Now follows an in depth description of the attributes of a question.
 
 
 #### 4.1.6 Answer
+An anwser from the tally form that a student filled in.
+
 Now follows an in depth description of the attributes of an answer.
 
 **id**: the id of the answer, only used internally and unique for each answer \
@@ -108,23 +124,27 @@ Now follows an in depth description of the attributes of an answer.
 
 
 #### 4.1.7 QuestionAnswer
+A combination of a question and an answer that a student made.
+
 Now follows an in depth description of the attributes of a question-answer.
 
 **id**: the id of the question-answer, only used internally and unique for each answer \
-**question_id**: the id of the question \
-**answer_id**: the id of the answer.
+**question**: the id of the question \
+**answer**: the id of the answer.
 
 
 #### 4.1.8 Student
-Now follows an in depth description of the attributes of a question-answer.
+A student, a representation of the tally form they filled out with the most basic info about them. 
+
+Now follows an in depth description of the attributes of a student.
 
 **id**: the id of the student, only used internally and unique for each student \
 **email**: the email address of the student \
 **name**: the name of the student \
 **nickname**: the nickname of the student \
 **phone_number**: the phone number of the student \
-**question_answers**: a list of questions-answers, the questions and answers which the student filled in \
-**skills**: a list of skills which the student has \
+**question_answers**: a list of questions-answers ids, the questions and answers which the student filled in \
+**skills**: a list of skills (represented by their id's) which the student has \
 **edition**: the edition in which the student filled in the form
 
 
