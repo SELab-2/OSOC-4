@@ -7,14 +7,14 @@
 [4.1.1. User](#411-user) \
 [4.1.2. Project](#412-project) \
 [4.1.3. Edition](#413-edition) \
-[4.1.4. Skill](#41-skill) \
-[4.1.5. Question](#41-question) \
-[4.1.6. Answer](#41-answer) \
-[4.1.7. QuestionAnswer](#41-questionanswer) \
-[4.1.8. Student](#41-student) \
-[4.1.9. Suggestion](#41-suggestion) \
-[4.1.10. Participation](#41-participation) \
-[4.1.11. Default_email](#41-default-email)
+[4.1.4. Skill](#414-skill) \
+[4.1.5. Question](#415-question) \
+[4.1.6. Answer](#416-answer) \
+[4.1.7. QuestionAnswer](#417-questionanswer) \
+[4.1.8. Student](#418-student) \
+[4.1.9. Suggestion](#419-suggestion) \
+[4.1.10. Participation](#4110-participation) \
+[4.1.11. Default_email](#4111-default-email)
 
 [4.2. Architecture and Design](#42-architecture-and-design)
 
@@ -212,6 +212,26 @@ Now we will describe how all these containers work toghetter in order to archiev
 ## 8. Configuration
 
 ## 9. Installation-instructions
+
+### 9.1. Requirements
+- Docker (installation guide: https://docs.docker.com/get-docker/)
+- Docker Compose (installation guide: https://docs.docker.com/compose/install/)
+
+If you want to run docker without sudo, we recommend you check here: https://docs.docker.com/engine/install/linux-postinstall/
+
+### 9.2 Installation
+
+You first need to clone the repository that contains the code for the selection tool:
+```
+git clone https://github.com/SELab-2/OSOC-4.git OSOC-selection-tool
+cd OSOC-selection-tool
+```
+
+Now you need to start the application:
+```
+docker-compose up -d
+```
+
 
 ## 10. Troubleshooting section and instructions on how to solve problems
 
