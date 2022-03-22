@@ -22,7 +22,7 @@ This manual concerns the OSOC Selection tool version 1
 ## 3. Intended use
 The tool is intended to be (and made to be) used by the selection-team of OSOC. With this we mean the people of OSOC itself that will supervise and conduct the selection-process (they are intended to be admins within our tool). And the people that will help the selection process by suggesting students (the coaches). These coaches will have to be invited every year, as these people mostly differ from edition to edition. 
 
-## 4. Features/accessories
+## 4. Description of the main product elements
 
 ## 5. Description of the user interface
 
