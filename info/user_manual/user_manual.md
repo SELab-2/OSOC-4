@@ -39,13 +39,13 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 ## 4. Description of the main product elements
 
 
-## 4.1 Domain model
+### 4.1 Domain model
 ![Domain model](../domain_model/domain_model.svg)
 
 Now folows a description of each element in the domain model.
 
 
-### 4.1.1 User
+#### 4.1.1 User
 Now follows an in depth description of the attributes of a user.
 
 **id**\
@@ -78,7 +78,7 @@ If a user is:
 - disabled, then the user does not take part in the current edition
 
 
-### 4.1.2 Project
+#### 4.1.2 Project
 Now follows an in depth description of the attributes of a project.
 
 **id**\
@@ -103,7 +103,7 @@ partner: **about**\
 Additional information about the partner.
 
 
-### 4.1.3 Edition
+#### 4.1.3 Edition
 Now follows an in depth description of the attributes of an edition.
 
 **id**\
@@ -122,7 +122,7 @@ The description of the edition. (like startdate and enddate, or brief overview o
 The id of the tally form for this year's edition. Notice that multiple years can use the same tally form.
 
 
-### 4.1.4 Skill
+#### 4.1.4 Skill
 Now follows an in depth description of the attributes of a skill.
 
 **id**\
@@ -132,7 +132,7 @@ The id of the skill, only used internally and unique for each skill.
 The name of the skill. (like ux-designer, backend developer, ...)
 
 
-### 4.1.5 Question
+#### 4.1.5 Question
 Now follows an in depth description of the attributes of a question.
 
 **id**\
@@ -145,7 +145,7 @@ The id of the question assigned by tally.
 The question itself.
 
 
-### 4.1.6 Answer
+#### 4.1.6 Answer
 Now follows an in depth description of the attributes of an answer.
 
 **id**\
@@ -158,7 +158,7 @@ The id of the answer assigned by tally.
 The answer itself.
 
 
-### 4.1.7 QuestionAnswer
+#### 4.1.7 QuestionAnswer
 Now follows an in depth description of the attributes of a question-answer.
 
 **id**\
@@ -171,7 +171,7 @@ The id of the question.
 The id of the answer.
 
 
-### 4.1.8 Student
+#### 4.1.8 Student
 Now follows an in depth description of the attributes of a question-answer.
 
 **id**\
