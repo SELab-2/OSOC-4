@@ -7,21 +7,23 @@
 
 [4. Description of the main product elements](#4-description-of-the-main-product-elements)
 
-[5. Description of the user interface](#5-description-of-the-user-interface)
+[5. Common use cases](#5-commom-use-cases)
 
-[6. Safety warnings](#6-safety-warnings)
+[6. Description of the user interface](#6-description-of-the-user-interface)
 
-[7. Configuration](#7-configuration)
+[7. Safety warnings](#7-safety-warnings)
 
-[8. Installation instructions](#8-installation-instructions)
+[8. Configuration](#8-configuration)
 
-[9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems)
+[9. Installation instructions](#9-installation-instructions)
 
-[10. Maintenance information](#10-maintenance-information)
+[10. Troubleshooting section and instructions on how to solve problems](#10-troubleshooting-section-and-instructions-on-how-to-solve-problems)
 
-[11. Technical specifications/requirements](#11-technical-specificationsrequirements)
+[11. Maintenance information](#11-maintenance-information)
 
-[12. Setting up a development environment and running tests](#12-setting-up-a-development-environment-and-running-tests)
+[12. Technical specifications/requirements](#12-technical-specificationsrequirements)
+
+[13. Setting up a development environment and running tests](#13-setting-up-a-development-environment-and-running-tests)
 
 
 ## 1. Introduction
@@ -165,20 +167,20 @@ Now follows an in depth description of the attributes of a participation.
 
 First of all we have a login system. If you already have an account on the tool (see the next section 'invite system' if you want to know how to obtain an account), you need to provide your email-adress and password in order to login. There is no support yet for github, but that will be added in a later version. There also is no 2FA, but it may be added in later versions.
 
+## 5. Common use cases
 
+## 6. Description of the user interface
 
-## 5. Description of the user interface
+## 7. Safety warnings
 
-## 6. Safety warnings
+## 8. Configuration
 
-## 7. Configuration
+## 9. Installation-instructions
 
-## 8. Installation-instructions
+## 10. Troubleshooting section and instructions on how to solve problems
 
-## 9. Troubleshooting section and instructions on how to solve problems
+## 11. Maintenance information
 
-## 10. Maintenance information
+## 12. Technical specifications/requirements
 
-## 11. Technical specifications/requirements
-
-## 12. Setting up a development environment and running tests
+## 13. Setting up a development environment and running tests
