@@ -58,7 +58,7 @@ Now follows an in depth description of the attributes of a user.
 **role: coach**: ... \
 **role: admin**: can do anything any coach can do \
 **status: is_active, is_approved, is_disabled**: a user can either be active, approved, disabled or nothing \
-**satus: nothing** (all are set false): the user has been created and an invite has been send to that user
+**satus: nothing** (all are set false): the user has been created and an invite has been send to that user \
 **status: active**: the user has set a name and password by using the invite link. \
 **status: approved**: the user was active, and an admin has approved the user (the user now has acces to the tool) \
 **status: disabled**: the user does not take part in the current edition and therefore shouldn't have acces to the tool, he is disabled
