@@ -16,7 +16,7 @@
     margin: 0;
 }
 
-.body-login .body-left img {
+.body-login .body-left .image-wrapper {
     width: 65%;
     max-width: 65%;
 }

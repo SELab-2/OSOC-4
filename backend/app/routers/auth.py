@@ -1,28 +1,34 @@
+import os
 from datetime import timedelta
 
 from app.crud import count_where, read_where, update
 from app.database import db
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.passwordreset import EmailInput
-from app.models.user import User, UserLogin, UserOutSimple, UserRole
+from app.models.tokens import TokenExtended
+from app.models.user import User, UserLogin, UserRole
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_reset_password_key
 from app.utils.mailsender import send_password_reset
 from app.utils.response import response
+from dotenv import load_dotenv
 from fastapi import APIRouter, Body, Depends
+from fastapi.security import OAuth2PasswordBearer
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+load_dotenv()
 
 
 class Settings(BaseModel):
     authjwt_secret_key: str = 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0'
     authjwt_denylist_enabled: bool = True
     authjwt_denylist_token_checks: set = {"access", "refresh"}
-    access_expires: int = timedelta(minutes=15)
-    refresh_expires: int = timedelta(days=30)
+    access_expires: int = timedelta(minutes=int(os.getenv('ACCESS_EXPIRE', 15)))
+    refresh_expires: int = timedelta(days=int(os.getenv("RESET_EXPIRE", 30 * 60)))
     authjwt_cookie_csrf_protect: bool = True
-    authjwt_token_location: set = {"headers", "cookies"}
-    authjwt_cookie_secure: bool = False
+    authjwt_token_location: set = {"headers"}
     authjwt_cookie_samesite: str = 'lax'
 
 
@@ -67,6 +73,8 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :rtype: dict
     """
 
+    print(user)
+
     # check if any user exist else make one
     user_count = await count_where(User)
     if not user_count:
@@ -89,10 +97,11 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
         access_token = Authorize.create_access_token(subject=str(u.id))
         refresh_token = Authorize.create_refresh_token(subject=str(u.id))
 
-        Authorize.set_access_cookies(access_token)
-        Authorize.set_refresh_cookies(refresh_token)
+        # Authorize.set_access_cookies(access_token)
+        # Authorize.set_refresh_cookies(refresh_token)
 
-        return response(UserOutSimple.parse_raw(u.json()), "Login successful")
+        # return response(UserOutSimple.parse_raw(u.json()), "Login successful")
+        return response(TokenExtended(id=str(u.id), accessToken=access_token, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)), refreshToken=refresh_token), "Login successful")
 
     raise InvalidEmailOrPasswordException()
 
@@ -112,8 +121,9 @@ def refresh(Authorize: AuthJWT = Depends()):
 
     current_user_id = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user_id)
-    Authorize.set_access_cookies(new_access_token)
-    return {"access_token": new_access_token}
+    # Authorize.set_access_cookies(new_access_token)
+    # return {"access_token": new_access_token}
+    return TokenExtended(accessToken=new_access_token, accessTokenExpiry=settings.access_expires, refreshToken=Authorize.get_raw_jwt()['jti'])
 
 
 @router.delete('/access-revoke')

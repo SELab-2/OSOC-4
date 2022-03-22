@@ -1,28 +1,22 @@
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
 import { logout } from "../utils/json-requests";
 import Link from 'next/link'
+import { signOut } from 'next-auth/react';
+import Image from 'next/image'
+
 
 export default function NavHeader(props) {
 
     async function logoutHandler(event) {
         event.preventDefault();
-        let r = await logout("/logout")
-        if (r.success) {
-            props.setLoggedInAs(null)
-        }
+        signOut()
     }
 
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Container>
                 <Navbar.Brand>
-                    <img
-                        src={process.env.PUBLIC_URL + "/assets/osoc-emblem.svg"}
-                        width="50"
-                        height="50"
-                        className="d-inline-block align-top"
-                        alt="React Bootstrap logo"
-                    />
+                    <Image className="d-inline-block align-top" src="/assets/osoc-emblem.svg" alt="osoc-logo" width="65px" height="50px" objectFit={'contain'} />
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
