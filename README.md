@@ -1,4 +1,11 @@
-# OSOC-4
+# OSOC Selection Tool
+
+## Table of contents
+- [User manual](info/user_manual/user_manual.md)
+- [Deployment](#deployment)
+- [Development & testing](#development)
+
+
 # Deployment
 
 ## Requirements
