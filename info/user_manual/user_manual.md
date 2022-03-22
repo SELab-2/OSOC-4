@@ -6,7 +6,7 @@
 - [5. Description of the user interface](#5-description-of-the-user-interface)
 - [6. Safety warnings](#6-safety-warnings)
 - [7. Installation-instructions](#7-installation-instructions)
-- [8. Description of how to use/operate the product](#8-description-of-how-to-use-operate-the-product)
+- [8. Description of how to use/operate the product](#8-description-of-how-to-useoperate-the-product)
 - [9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems)
 - [10. Maintenance information](#10-maintenance-information)
 - [11. Information on disposal of the product and packaging](#11-information-on-disposal-of-the-product-and-packaging)
