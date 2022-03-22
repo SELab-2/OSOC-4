@@ -145,10 +145,35 @@ Now follows an in depth description of the attributes of a student.
 **phone_number**: the phone number of the student \
 **question_answers**: a list of questions-answers ids, the questions and answers which the student filled in \
 **skills**: a list of skills (represented by their id's) which the student has \
-**edition**: the edition in which the student filled in the form
+**edition**: the edition in which the student filled in the form \
+**alumn**: true or false, depending on this student being an alumn student or not \
+**cv**: link to the cv of this student
 
 
-...
+#### 4.1.9 Suggestion
+A suggestion that a coach makes about a student, or a decision from an administrator.
+
+Now follows an in depth description of the attributes of a suggestion.
+
+**id**: the id of a suggestion, only used internally and unique for each student \
+**email_sent**: Has the student received an email of the decision, only relevant if the suggestion is a decision \
+**decision**: true if this suggestion represents a decision, otherwise it represents a suggestion \
+**reason**: the reason that the coach/administrator gives with the suggestion
+
+
+#### 4.1.10 Participation
+Defines which role a student will perform in a project.
+
+A participation has no attributes.
+
+#### 4.1.11 Default_email
+Default emails are stored in the database.
+
+Now follows an in depth description of the attributes of a default email.
+
+**id**: the id of a default email, only used internally and unique for each default email \
+**type**: the type of a default email, for example yes, maybe, no, invite \
+**content**: the content of the default email
 
 
 First of all we have a login system. If you already have an account on the tool (see the next section 'invite system' if you want to know how to obtain an account), you need to provide your email-adress and password in order to login. There is no support yet for github, but that will be added in a later version. There also is no 2FA, but it may be added in later versions.
