@@ -53,13 +53,13 @@ Now follows an in depth description of the attributes of a user.
 **name**: the name of the user, two or more users with the same name may exist \
 **password**: the password of the user, this will be saved in the database, hashed and salted for security reasons \
 **role**: there are 2 types of roles: coaches and admins. Admins can do anything any coach can do and more \
-role **coach**: ... \
-role **admin**: can do anything any coach can do \
-status **is_active, is_approved, is_disabled**: a user can either be active, approved, disabled or nothing \
-satus **nothing** (all are set false): the user has been created and an invite has been send to that user
-status **active**: the user has set a name and password by using the invite link. \
-status **approved**: the user was active, and an admin has approved the user (the user now has acces to the tool)
-status **disabled**: the user does not take part in the current edition and therefore shouldn't have acces to the tool, he is disabled
+**role: coach**: ... \
+**role: admin**: can do anything any coach can do \
+**status: is_active, is_approved, is_disabled**: a user can either be active, approved, disabled or nothing \
+**satus: nothing** (all are set false): the user has been created and an invite has been send to that user
+**status: active**: the user has set a name and password by using the invite link. \
+**status: approved**: the user was active, and an admin has approved the user (the user now has acces to the tool) \
+**status: disabled**: the user does not take part in the current edition and therefore shouldn't have acces to the tool, he is disabled
 
 
 #### 4.1.2 Project
@@ -70,8 +70,8 @@ Now follows an in depth description of the attributes of a project.
 **description**: the description of the project \
 **goals**: the goals of the project, this is a list of goals (strings/text) that should be all be archieved at the end of the project \
 **partner**: the partner ordering the project. This consists of two more fields. In the database we do not store these two fields seperatily \
-partner **name**: the name of the partner \
-partner: **about**: additional information about the partner
+**partner: name**: the name of the partner \
+**partner: about**: additional information about the partner
 
 
 #### 4.1.3 Edition
