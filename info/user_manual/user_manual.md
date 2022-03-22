@@ -15,6 +15,9 @@
 [4.1.9. Suggestion](#41-suggestion) \
 [4.1.10. Participation](#41-participation) \
 [4.1.11. Default_email](#41-default-email)
+
+[4.2. Architecture and Design](#42-architecture-and-design)
+
 #### [5. Common use cases](#5-common-use-cases)
 #### [6. Description of the user interface](#6-description-of-the-user-interface)
 #### [7. Safety warnings](#7-safety-warnings)
@@ -186,6 +189,19 @@ Now follows an in depth description of the attributes of a default email.
 
 
 First of all we have a login system. If you already have an account on the tool (see the next section 'invite system' if you want to know how to obtain an account), you need to provide your email-adress and password in order to login. There is no support yet for github, but that will be added in a later version. There also is no 2FA, but it may be added in later versions.
+
+
+### 4.2. Architecture and Design
+Now we're going to describe the architecture of how the OSOC selection tool works. 
+
+We're basicly using 4 containers (redis, mongodb, backend, frontend)
+
+*hier komt een prentje*
+
+Now we will describe how all these containers work toghetter in order to archieve a fully working selection tool.
+
+![Design](https://github.com/SELab-2/OSOC-4/blob/user_man/info/deployment/deployment.svg)
+
 
 ## 5. Common use cases
 
