@@ -26,13 +26,12 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 
 ## 6. Safety warnings
 
-## 7. Installation-instructions
+## 7. Configuration
 
-## 8. Description of how to use/operate the product
+## 8. Installation-instructions
 
 ## 9. Troubleshooting section and instructions on how to solve problems
 
 ## 10. Maintenance information
 
 ## 11. Technical specifications/requirements
-
