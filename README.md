@@ -30,7 +30,7 @@ This will also create a new data folder in the root directory. This contains the
 
 `docker-compose restart`
 
-This will restart the api, mongodb and redis.
+This will restart the api, mongodb, redis and frontend.
 When only one service must be restarted use one of the following commands:
 
 `docker restart osoc-backend`
@@ -38,6 +38,8 @@ When only one service must be restarted use one of the following commands:
 `docker restart osoc-mongodb`
 
 `docker restart osoc-redis`
+
+`docker restart osoc-frontend`
 
 ### Stop
 
