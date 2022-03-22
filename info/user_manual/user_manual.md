@@ -48,157 +48,87 @@ Now folows a description of each element in the domain model.
 #### 4.1.1 User
 Now follows an in depth description of the attributes of a user.
 
-**id**\
-The id of the user, only used internally and unique for each user.
-
-**email**\
-The email address of the user, this is unique for each user.
-
-**name**\
-The name of the user, two or more users with the same name may exist.
-
-**password**\
-The password of the user, this will be saved in the database, hashed and salted for security reasons.
-
-**role**\
-There are 2 types of roles: coaches and admins. Admins can do anything any coach can do and more.
-
-A coach can:
-
-An admin can:
-- do anything any coach can do
-
-**is_active, is_approved, is_disabled**\
-A user can either be active, approved, disabled or nothing. 
-
-If a user is:
-- nothing, then the user has been created and an invite has been send to that user.
-- active, then the user has set a name and password by using the invite link.
-- approved, then the user was active, and an admin has approved the user (the user now has acces to the tool). 
-- disabled, then the user does not take part in the current edition
+**id**: the id of the user, only used internally and unique for each user \
+**email**: the email address of the user, this is unique for each user \
+**name**: the name of the user, two or more users with the same name may exist \
+**password**: the password of the user, this will be saved in the database, hashed and salted for security reasons \
+**role**: there are 2 types of roles: coaches and admins. Admins can do anything any coach can do and more \
+role **coach**: ... \
+role **admin**: can do anything any coach can do \
+status **is_active, is_approved, is_disabled**: a user can either be active, approved, disabled or nothing \
+satus **nothing** (all are set false): the user has been created and an invite has been send to that user
+status **active**: the user has set a name and password by using the invite link. \
+status **approved**: the user was active, and an admin has approved the user (the user now has acces to the tool)
+status **disabled**: the user does not take part in the current edition and therefore shouldn't have acces to the tool, he is disabled
 
 
 #### 4.1.2 Project
 Now follows an in depth description of the attributes of a project.
 
-**id**\
-The id of the project, only used internally and unique for each project.
-
-**name**\
-The name of the project.
-
-**description**\
-The description of the project.
-
-**goals**\
-The goals of the project, this is a list of goals (strings/text) that should be all be archieved at the end of the project.
-
-**partner**\
-The partner ordering the project. This consists of two more fields. In the database we do not store these two fields seperatily
-
-partner: **name**\
-The name of the partner
-
-partner: **about**\
-Additional information about the partner.
+**id**: the id of the project, only used internally and unique for each project \
+**name**: the name of the project \
+**description**: the description of the project \
+**goals**: the goals of the project, this is a list of goals (strings/text) that should be all be archieved at the end of the project \
+**partner**: the partner ordering the project. This consists of two more fields. In the database we do not store these two fields seperatily \
+partner **name**: the name of the partner \
+partner: **about**: additional information about the partner
 
 
 #### 4.1.3 Edition
 Now follows an in depth description of the attributes of an edition.
 
-**id**\
-The id of the edition, only used internally and unique for each edition.
-
-**year**\
-The year in which the edition took place, this is unique for each edition.
-
-**name**\
-The name of the edition. (like "OSOC 2022 edition")
-
-**Description**\
-The description of the edition. (like startdate and enddate, or brief overview of the partners, ...)
-
-**form_id**\
-The id of the tally form for this year's edition. Notice that multiple years can use the same tally form.
+**id**: the id of the edition, only used internally and unique for each edition \
+**year**: the year in which the edition took place, this is unique for each edition \
+**name**: the name of the edition. (like "OSOC 2022 edition") \
+**Description**: the description of the edition. (like startdate and enddate, or brief overview of the partners, ...) \
+**form_id**: the id of the tally form for this year's edition. Notice that multiple years can use the same tally form 
 
 
 #### 4.1.4 Skill
 Now follows an in depth description of the attributes of a skill.
 
-**id**\
-The id of the skill, only used internally and unique for each skill.
-
-**name**\
-The name of the skill. (like ux-designer, backend developer, ...)
+**id**: the id of the skill, only used internally and unique for each skill \
+**name**: the name of the skill. (like ux-designer, backend developer, ...)
 
 
 #### 4.1.5 Question
 Now follows an in depth description of the attributes of a question.
 
-**id**\
-The id of the question, only used internally and unique for each question.
-
-**tally_id**\
-The id of the question assigned by tally.
-
-**question**\
-The question itself.
+**id**: the id of the question, only used internally and unique for each question \
+**tally_id**: the id of the question assigned by tally \
+**question**: the question itself
 
 
 #### 4.1.6 Answer
 Now follows an in depth description of the attributes of an answer.
 
-**id**\
-The id of the answer, only used internally and unique for each answer.
-
-**tally_id**\
-The id of the answer assigned by tally.
-
-**answer**\
-The answer itself.
+**id**: the id of the answer, only used internally and unique for each answer \
+**tally_id**: the id of the answer assigned by tally \
+**answer**: the answer itself
 
 
 #### 4.1.7 QuestionAnswer
 Now follows an in depth description of the attributes of a question-answer.
 
-**id**\
-The id of the question-answer, only used internally and unique for each answer.
-
-**question_id**\
-The id of the question.
-
-**answer_id**\
-The id of the answer.
+**id**: the id of the question-answer, only used internally and unique for each answer \
+**question_id**: the id of the question \
+**answer_id**: the id of the answer.
 
 
 #### 4.1.8 Student
 Now follows an in depth description of the attributes of a question-answer.
 
-**id**\
-The id of the student, only used internally and unique for each student.
-
-**email**\
-The email address of the student.
-
-**name**\
-The name of the student.
-
-**nickname**\
-The nickname of the student.
-
-**phone_number**\
-The phone number of the student.
-
-**question_answers**\
-A list of questions-answers, the questions and answers which the student filled in.
-
-**skills**\
-A list of skills which the student has.
-
-**edition**\
-The edition in which the student filled in the form.
+**id**: the id of the student, only used internally and unique for each student \
+**email**: the email address of the student \
+**name**: the name of the student \
+**nickname**: the nickname of the student \
+**phone_number**: the phone number of the student \
+**question_answers**: a list of questions-answers, the questions and answers which the student filled in \
+**skills**: a list of skills which the student has \
+**edition**: the edition in which the student filled in the form
 
 
+...
 
 
 First of all we have a login system. If you already have an account on the tool (see the next section 'invite system' if you want to know how to obtain an account), you need to provide your email-adress and password in order to login. There is no support yet for github, but that will be added in a later version. There also is no 2FA, but it may be added in later versions.
