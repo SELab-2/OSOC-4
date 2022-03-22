@@ -11,7 +11,7 @@
 - [10. Maintenance information](#10-maintenance-information)
 - [11. Information on disposal of the product and packaging](#11-information-on-disposal-of-the-product-and-packaging)
 - [12. Technical specifications](#12-technical-specifications)
-- [13. Index](13-index)
+- [13. Index](#13-index)
 
 ## 1. Introduction
 In this manual we'll explain everything there is to explain about the tool we've created. Going from installation and configuration, to usage of the version 1 selection tool. And we'll even go as far as showing you how to further develop this handy tool.
