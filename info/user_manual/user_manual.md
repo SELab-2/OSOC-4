@@ -150,6 +150,16 @@ Now follows an in depth description of the attributes of a student.
 **edition**: the edition in which the student filled in the form
 
 
+#### 4.1.8 Participation
+Defines a ternair relationship which is converted to an entity itself. It describes what student will take on what role in what project. 
+
+Now follows an in depth description of the attributes of a participation.
+
+**student**: the id of the student who will participate
+**project**: the id of the project in which the student will participate
+**skill**: the role (thus the skill the student has and will use) the student will take on in the project
+
+
 ...
 
 
