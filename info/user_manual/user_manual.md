@@ -23,23 +23,52 @@
 
 [12. Setting up a development environment and running tests](#12-setting-up-a-development-environment-and-running-tests)
 
+
 ## 1. Introduction
 In this manual we'll explain everything there is to explain about the OSOC selection tool we've created. Going from installation and configuration, to usage of the version 1 selection tool. And we'll even go as far as showing you how to further develop this handy tool.
+
 
 ## 2. Product information
 This manual concerns the Open Summer Of Code Selection tool, version 1
 
+
 ## 3. Intended use
 The tool is intended to be (and made to be) used by the selection-team of OSOC. With this we mean the people of OSOC itself that will supervise and conduct the selection-process (they are intended to be admins within our tool). And the people that will help the selection process by suggesting students (the coaches). These coaches will have to be invited every year, as these people mostly differ from edition to edition. 
 
+
 ## 4. Description of the main product elements
+
 
 ## 4.1 Domain model
 ![Domain model](../domain_model/domain_model.svg)
 
-### 4.1 Users
+Now folows a description of each element in the domain model.
 
-### 4.1.1 active approved disabled
+
+### 4.1.1 User
+Now follows an in depth description of the attributes of a user.
+
+**id**\
+The id of the user, only used internally and unique for each user.
+
+**email**\
+The email address of the user, this is unique for each user.
+
+**name**\
+The name of the user, two or more users with the same name may exist.
+
+**password**\
+The password of the user, this will be saved in the database, hashed and salted for security reasons.
+
+**role**\
+There are 2 types of roles: coaches and admins. Admins can do anything any coach can do and more.
+
+A coach can:
+
+An admin can:
+- do anything any coach can do
+
+**is_active, is_approved, is_disabled**\
 A user can either be active, approved, disabled or nothing. 
 
 If a user is:
@@ -48,17 +77,132 @@ If a user is:
 - approved, then the user was active, and an admin has approved the user (the user now has acces to the tool). 
 - disabled, then the user does not take part in the current edition
 
-### 4.1.1 roles
-There are 2 types of roles: coaches and admins. Admins can do anything any coach can do.
 
-**Coaches**
-Coaches are 
+### 4.1.2 Project
+Now follows an in depth description of the attributes of a project.
+
+**id**\
+The id of the project, only used internally and unique for each project.
+
+**name**\
+The name of the project.
+
+**description**\
+The description of the project.
+
+**goals**\
+The goals of the project, this is a list of goals (strings/text) that should be all be archieved at the end of the project.
+
+**partner**\
+The partner ordering the project. This consists of two more fields. In the database we do not store these two fields seperatily
+
+partner: **name**\
+The name of the partner
+
+partner: **about**\
+Additional information about the partner.
+
+
+### 4.1.3 Edition
+Now follows an in depth description of the attributes of an edition.
+
+**id**\
+The id of the edition, only used internally and unique for each edition.
+
+**year**\
+The year in which the edition took place, this is unique for each edition.
+
+**name**\
+The name of the edition. (like "OSOC 2022 edition")
+
+**Description**\
+The description of the edition. (like startdate and enddate, or brief overview of the partners, ...)
+
+**form_id**\
+The id of the tally form for this year's edition. Notice that multiple years can use the same tally form.
+
+
+### 4.1.4 Skill
+Now follows an in depth description of the attributes of a skill.
+
+**id**\
+The id of the skill, only used internally and unique for each skill.
+
+**name**\
+The name of the skill. (like ux-designer, backend developer, ...)
+
+
+### 4.1.5 Question
+Now follows an in depth description of the attributes of a question.
+
+**id**\
+The id of the question, only used internally and unique for each question.
+
+**tally_id**\
+The id of the question assigned by tally.
+
+**question**\
+The question itself.
+
+
+### 4.1.6 Answer
+Now follows an in depth description of the attributes of an answer.
+
+**id**\
+The id of the answer, only used internally and unique for each answer.
+
+**tally_id**\
+The id of the answer assigned by tally.
+
+**answer**\
+The answer itself.
+
+
+### 4.1.7 QuestionAnswer
+Now follows an in depth description of the attributes of a question-answer.
+
+**id**\
+The id of the question-answer, only used internally and unique for each answer.
+
+**question_id**\
+The id of the question.
+
+**answer_id**\
+The id of the answer.
+
+
+### 4.1.8 Student
+Now follows an in depth description of the attributes of a question-answer.
+
+**id**\
+The id of the student, only used internally and unique for each student.
+
+**email**\
+The email address of the student.
+
+**name**\
+The name of the student.
+
+**nickname**\
+The nickname of the student.
+
+**phone_number**\
+The phone number of the student.
+
+**question_answers**\
+A list of questions-answers, the questions and answers which the student filled in.
+
+**skills**\
+A list of skills which the student has.
+
+**edition**\
+The edition in which the student filled in the form.
+
+
+
 
 First of all we have a login system. If you already have an account on the tool (see the next section 'invite system' if you want to know how to obtain an account), you need to provide your email-adress and password in order to login. There is no support yet for github, but that will be added in a later version. There also is no 2FA, but it may be added in later versions.
 
-
-
-### 4.2 Invite system
 
 
 ## 5. Description of the user interface
