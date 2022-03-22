@@ -7,6 +7,19 @@
 
 [4. Description of the main product elements](#4-description-of-the-main-product-elements)
 
+[4.1. Domain Model](#41-domain-model) \
+[4.1.1. User](#411-user) \
+[4.1.2. Project](#412-project) \
+[4.1.3. Edition](#413-edition) \
+[4.1.4. Skill](#41-skill) \
+[4.1.5. Question](#41-question) \
+[4.1.6. Answer](#41-answer) \
+[4.1.7. QuestionAnswer](#41-questionanswer) \
+[4.1.8. Student](#41-student) \
+[4.1.9. Suggestion](#41-suggestion) \
+[4.1.10. Participation](#41-participation) \
+[4.1.11. Default_email](#41-default-email)
+
 [5. Common use cases](#5-common-use-cases)
 
 [6. Description of the user interface](#6-description-of-the-user-interface)
@@ -41,13 +54,13 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 ## 4. Description of the main product elements
 
 
-### 4.1 Domain model
+### 4.1. Domain model
 ![Domain model](https://github.com/SELab-2/OSOC-4/blob/user_man/info/domain_model/domain_model.svg)
 
 Now folows a description of each element in the domain model.
 
 
-#### 4.1.1 User
+#### 4.1.1. User
 A user is a person who has an account on the tool, or is in the progress of getting an account.
 
 Now follows an in depth description of the attributes of a user.
@@ -66,7 +79,7 @@ Now follows an in depth description of the attributes of a user.
 **status: disabled**: the user does not take part in the current edition and therefore shouldn't have acces to the tool, he is disabled
 
 
-#### 4.1.2 Project
+#### 4.1.2. Project
 Represents a project that will be made by OSOC students, given by a partner. A project will also contain the the information of the partner.
 
 Now follows an in depth description of the attributes of a project.
@@ -84,7 +97,7 @@ Now follows an in depth description of the attributes of a project.
 **requiredSKills: amount**: the amount of students, with this skill, that are required for this project. \
 **edition**: the id of the edition this project belongs to
 
-#### 4.1.3 Edition
+#### 4.1.3. Edition
 An edition of Open Summer Of Code
 
 Now follows an in depth description of the attributes of an edition.
@@ -96,7 +109,7 @@ Now follows an in depth description of the attributes of an edition.
 **form_id**: the id of the tally form for this year's edition. Notice that multiple years can use the same tally form 
 
 
-#### 4.1.4 Skill
+#### 4.1.4. Skill
 A skill like ux-designer, backend-developper, communications-manager.
 
 Now follows an in depth description of the attributes of a skill.
@@ -105,7 +118,7 @@ Now follows an in depth description of the attributes of a skill.
 **name**: the name of the skill. (like ux-designer, backend developer, ...)
 
 
-#### 4.1.5 Question
+#### 4.1.5. Question
 A question from the tally form that students are supposed to fill in
 
 Now follows an in depth description of the attributes of a question.
@@ -115,7 +128,7 @@ Now follows an in depth description of the attributes of a question.
 **question**: the question itself
 
 
-#### 4.1.6 Answer
+#### 4.1.6. Answer
 An anwser from the tally form that a student filled in.
 
 Now follows an in depth description of the attributes of an answer.
@@ -125,7 +138,7 @@ Now follows an in depth description of the attributes of an answer.
 **answer**: the answer itself
 
 
-#### 4.1.7 QuestionAnswer
+#### 4.1.7. QuestionAnswer
 A combination of a question and an answer that a student made.
 
 Now follows an in depth description of the attributes of a question-answer.
@@ -135,7 +148,7 @@ Now follows an in depth description of the attributes of a question-answer.
 **answer**: the id of the answer.
 
 
-#### 4.1.8 Student
+#### 4.1.8. Student
 A student, a representation of the tally form they filled out with the most basic info about them. 
 
 Now follows an in depth description of the attributes of a student.
@@ -154,7 +167,7 @@ Now follows an in depth description of the attributes of a student.
 **cv**: link to the cv of this student
 
 
-#### 4.1.9 Suggestion
+#### 4.1.9. Suggestion
 A suggestion that a coach makes about a student, or a decision from an administrator.
 
 Now follows an in depth description of the attributes of a suggestion.
@@ -165,7 +178,7 @@ Now follows an in depth description of the attributes of a suggestion.
 **reason**: the reason that the coach/administrator gives with the suggestion
 
 
-#### 4.1.10 Participation
+#### 4.1.10. Participation
 Defines a ternair relationship which is converted to an entity itself. It describes what student will take on what role in what project. 
 
 Now follows an in depth description of the attributes of a participation.
@@ -174,7 +187,8 @@ Now follows an in depth description of the attributes of a participation.
 **project**: the id of the project in which the student will participate
 **skill**: the role (thus the skill the student has and will use) the student will take on in the project
 
-#### 4.1.11 Default_email
+
+#### 4.1.11. Default_email
 Default emails are stored in the database.
 
 Now follows an in depth description of the attributes of a default email.
