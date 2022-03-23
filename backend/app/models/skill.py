@@ -1,5 +1,5 @@
 from odmantic import Model
 
 
-class Role(Model):
+class Skill(Model):
     name: str

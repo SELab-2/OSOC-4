@@ -2,9 +2,9 @@ from random import choice, randrange, sample
 
 from app.database import db
 from app.models.edition import Edition
-from app.models.project import Partner, Project, RequiredRole
-from app.models.role import Role
-from app.models.student_form import StudentForm
+from app.models.project import Partner, Project, RequiredSkills
+from app.models.skill import Skill
+from app.models.student import Student
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
@@ -12,7 +12,7 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/ddd2")
 
-roles = [Role(name="backend developer"), Role(name="frontend developer"), Role(name="UX designer")]
+roles = [Skill(name="backend developer"), Skill(name="frontend developer"), Skill(name="UX designer")]
 
 first_names = ["Eva", "Mark", "Jonathan", "Christine", "Sebatian", "Ava",
                "Blake", "Andrea", "Joanne", "Frank", "Emma", "Ruth", "Leah",
@@ -43,13 +43,13 @@ def generate_student(edition_id):
     last_name = choice(last_names)
     email = choice(emails)
     random_roles = sample(roles, k=randrange(1, len(roles)))
-    return StudentForm(name=f"{first_name} {last_name}",
-                       email=f"{first_name}.{last_name}@{email}".lower(),
-                       phonenumber=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
-                       nickname=first_name,
-                       questions=[],
-                       roles=[role.id for role in random_roles],
-                       edition=edition_id)
+    return Student(name=f"{first_name} {last_name}",
+                   email=f"{first_name}.{last_name}@{email}".lower(),
+                   phonenumber=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
+                   nickname=first_name,
+                   questions=[],
+                   roles=[role.id for role in random_roles],
+                   edition=edition_id)
 
 
 @router.get("", response_description="Data retrieved")
@@ -72,9 +72,9 @@ async def ddd():
         student_amount=7,
         partner=partner,
         user_ids=[coaches[i].id for i in range(2)],
-        required_roles=[RequiredRole(role=roles[0].id, number=2),
-                        RequiredRole(role=roles[1].id, number=3),
-                        RequiredRole(role=roles[2].id, number=1)],
+        required_roles=[RequiredSkills(role=roles[0].id, number=2),
+                        RequiredSkills(role=roles[1].id, number=3),
+                        RequiredSkills(role=roles[2].id, number=1)],
         edition=edition.id)
 
     students = [generate_student(edition.id) for _ in range(10)]

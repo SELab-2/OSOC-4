@@ -11,7 +11,7 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
 from app.models.project import Project
-from app.models.student_form import StudentForm
+from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
@@ -92,8 +92,8 @@ async def get_edition_students(year: int):
     if not edition:
         raise EditionNotFound()
 
-    students = await db.engine.find(StudentForm, {"edition": edition.id})
-    return list_modeltype_response(students, StudentForm)
+    students = await db.engine.find(Student, {"edition": edition.id})
+    return list_modeltype_response(students, Student)
 
 
 @router.post("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Students retrieved")
@@ -125,8 +125,8 @@ async def get_edition_students_with_filter(
         else:
             query["roles"] = {"$all": role_filter}
 
-    students = await db.engine.find(StudentForm, query)
-    return list_modeltype_response(students, StudentForm)
+    students = await db.engine.find(Student, query)
+    return list_modeltype_response(students, Student)
 
 
 @router.get("/{year}/projects", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Projects retrieved")
@@ -158,14 +158,14 @@ async def get_student(year: int, student_id: str):
     edition = await read_where(Edition, Edition.year == year)
     if not edition:
         raise EditionNotFound()
-    student = await db.engine.find(StudentForm, {"edition": edition.id, "_id": student_id})
+    student = await db.engine.find(Student, {"edition": edition.id, "_id": student_id})
     if not student:
         raise StudentNotFoundException()
     return response(student, "Student successfully retrieved")
 
 
 @router.post("/{year}/student/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Student edited")
-async def edit_student(student: StudentForm = Body(...)):
+async def edit_student(student: Student = Body(...)):
     """edit_student creates or modifies a student in the database
 
     :param year: year of the edition
@@ -175,7 +175,7 @@ async def edit_student(student: StudentForm = Body(...)):
     :return: data of newly created student
     :rtype: dict
     """
-    new_student = await update(StudentForm.parse_obj(student))
+    new_student = await update(Student.parse_obj(student))
     return response(new_student, "Student added successfully.")
 
 
@@ -199,7 +199,7 @@ async def get_conflicting_students(year: int):
     if not collection:
         raise SuggestionRetrieveException()
 
-    students = await db.engine.find(StudentForm, {"edition": edition.id})
+    students = await db.engine.find(Student, {"edition": edition.id})
     students = [student.id for student in students]
 
     pipeline = [
