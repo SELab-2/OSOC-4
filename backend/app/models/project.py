@@ -11,18 +11,18 @@ class Partner(EmbeddedModel):
     about: str
 
 
-class RequiredRole(EmbeddedModel):
-    role: ObjectId  # points to role from role.py
+class RequiredSkills(EmbeddedModel):
+    skill: ObjectId  # points to role from skill.py
     number: int = Field(gt=0)
 
 
 class Project(Model):
     name: str
-    goals: List[str]
     description: str
+    goals: List[str]
     partner: Partner
-    user_ids: List[ObjectId]
-    required_roles: List[RequiredRole]
+    required_skills: List[RequiredSkills]
+    users: List[ObjectId]
     edition: ObjectId
 
 
@@ -41,7 +41,7 @@ class ProjectOutExtended(BaseModel):
     description: str
     partner: Partner
     user_ids: List[str]
-    required_roles: List[RequiredRole]
+    required_roles: List[RequiredSkills]
     edition: str
 
     def __init__(self, **data):

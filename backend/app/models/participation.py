@@ -2,6 +2,6 @@ from odmantic import Model, ObjectId
 
 
 class Participation(Model):
-    student_form: ObjectId
+    student: ObjectId
     project: ObjectId
-    role: ObjectId
+    skill: ObjectId

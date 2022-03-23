@@ -4,11 +4,13 @@ from odmantic import Model
 from bson import ObjectId
 
 
-class StudentForm(Model):
-    name: str
+class Student(Model):
     email: str
-    phonenumber: str
+    name: str
     nickname: str
-    questions: List[QuestionAnswer]
-    roles: List[ObjectId]  # role from role.py
+    phone_number: str
+    # alumn = False
+    # cv: str
+    question_answers: List[ObjectId]
+    skills: List[ObjectId]  # role from skill.py
     edition: ObjectId

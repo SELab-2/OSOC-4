@@ -7,10 +7,10 @@ from pydantic import BaseModel
 
 
 class Edition(Model):
-    form_id: Optional[str] = None
-    name: Optional[str] = None
     year: int
+    name: Optional[str] = None
     description: Optional[str] = None
+    form_id: Optional[str] = None
     user_ids: List[ObjectId] = []
 
 

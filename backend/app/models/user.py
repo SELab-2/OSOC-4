@@ -16,8 +16,8 @@ class UserRole(int, Enum):
 
 
 class User(Model):
-    name: str = ""
     email: str
+    name: str = ""
     password: str = ""
     role: UserRole = 0
     active: bool = False
