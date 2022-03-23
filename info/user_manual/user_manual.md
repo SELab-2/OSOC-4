@@ -218,8 +218,8 @@ Now we will describe how all these containers work toghetter in order to archiev
 ![Login screen](https://github.com/SELab-2/OSOC-4/blob/user_man/info/screenshots/login_screen.png)
 
 Before logging in, your profile must be approved by an admin.
-1. A field to write your email address that is linked to your profile. \
-2. A field to write your password to enter the application. \
+1. A field to write your email address that is linked to your profile.
+2. A field to write your password to enter the application.
 3. This button will give you access to the application if the email address and password match a valid profile. Otherwise, you will get a warning message.
 4. If you forgot your password, this button will send you an email to reset your password.
 
