@@ -93,7 +93,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         password: str = self.saved_objects["passwords"][user]
         login = await self.client.post("/login", json={"email": email, "password": password},
                                        headers={"Content-Type": "application/json"})
-        return login.content["accessToken"]
+        return login.json()["data"]["accessToken"]
 
     async def get_response(self, path: str, user: str, expected_status: int = 200,
                            access_token: str = None, use_access_token: bool = True) -> Response:

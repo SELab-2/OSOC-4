@@ -3,7 +3,6 @@ import unittest
 from app.tests.test_base import Status, TestBase
 
 
-@unittest.skip('Authentication changed')
 class TestEndpointAuthorization(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
