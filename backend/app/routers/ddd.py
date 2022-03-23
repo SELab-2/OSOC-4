@@ -1,23 +1,23 @@
-from app.database import db
+from random import choice, randrange, sample
 
-from app.models.edition import Edition
-from app.models.project import Project, RequiredRole, Partner
-from app.models.role import Role
-from app.models.student_form import StudentForm
-from app.models.suggestion import Suggestion, SuggestionOption
-from app.models.participation import Participation
-from app.models.user import User, UserRole
-from app.models.question_answer import QuestionAnswer
-from app.models.question import Question
+from app.database import db
 from app.models.answer import Answer
-from app.utils.response import response
+from app.models.edition import Edition
+from app.models.participation import Participation
+from app.models.project import Partner, Project, RequiredSkills
+from app.models.question import Question
+from app.models.question_answer import QuestionAnswer
+from app.models.skill import Skill
+from app.models.student import Student
+from app.models.suggestion import Suggestion, SuggestionOption
+from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
+from app.utils.response import response
 from fastapi import APIRouter
-from random import choice, sample, randrange
 
 router = APIRouter(prefix="/ddd")
 
-roles = [Role(name=role) for role in
+roles = [Skill(name=role) for role in
          ["Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
              "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
              "Photographer"]]
@@ -41,7 +41,7 @@ questions_yes_no = [Question(question=q, field_id="", type="MULTIPLE_CHOICE") fo
                      "Have you participated in osoc before?",
                      "Would you like to be a student coach this year?"]]
 
-answers_yes_no = [[Answer(question_id=question.id, field_id="", text=yn)
+answers_yes_no = [[Answer(question_id=question.id, field_id="", answer=yn)
                    for yn in ["yes", "no"]] for question in questions_yes_no]
 
 questions_text = [Question(question=q, field_id="", type="TEXTAREA") for q in
@@ -52,7 +52,7 @@ questions_text = [Question(question=q, field_id="", type="TEXTAREA") for q in
                    "What is the name of your college or university?",
                    "Which skill would you list as your best one?"]]
 
-answers_text = [[Answer(question_id=question.id, field_id="", text=f"text{t}")
+answers_text = [[Answer(question_id=question.id, field_id="", answer=f"text{t}")
                  for t in range(1, 4)] for question in questions_text]
 
 qa_multiple_choice = [
@@ -79,7 +79,7 @@ answers_multiple_choice = []
 for qa in qa_multiple_choice:
     questions_multiple_choice.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
     answers_multiple_choice.append(
-        [Answer(question_id=questions_multiple_choice[-1].id, field_id="", text=answer_text)
+        [Answer(question_id=questions_multiple_choice[-1].id, field_id="", answer=answer_text)
             for answer_text in qa[1:]])
 
 # multiple choice questions with max 2 answers
@@ -99,7 +99,7 @@ answers_multiple_choice2 = []
 for qa in qa_multiple_choice2:
     questions_multiple_choice2.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
     answers_multiple_choice2.append(
-        [Answer(question_id=questions_multiple_choice2[-1].id, field_id="", text=answer_text)
+        [Answer(question_id=questions_multiple_choice2[-1].id, field_id="", answer=answer_text)
             for answer_text in qa[1:]])
 
 
@@ -121,13 +121,13 @@ def generate_student(edition_id):
     last_name = choice(last_names)
     email = choice(emails)
     random_roles = sample(roles, k=randrange(1, len(roles)))
-    return StudentForm(name=f"{first_name} {last_name}",
-                       email=f"{first_name}.{last_name}@{email}".lower(),
-                       phonenumber=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
-                       nickname=first_name,
-                       questions=[],
-                       roles=[role.id for role in random_roles],
-                       edition=edition_id)
+    return Student(name=f"{first_name} {last_name}",
+                   email=f"{first_name}.{last_name}@{email}".lower(),
+                   phonenumber=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
+                   nickname=first_name,
+                   questions=[],
+                   roles=[role.id for role in random_roles],
+                   edition=edition_id)
 
 
 def generate_suggestions(student, project, unconfirmed=3, confirmed_suggestion=None, admin=None):
@@ -198,7 +198,7 @@ async def add_dummy_data():
         description="Free real estate",
         partner=partner,
         user_ids=[coaches[i].id for i in range(2)],
-        required_roles=[RequiredRole(role=role.id, number=randrange(2, 5))
+        required_roles=[RequiredSkills(role=role.id, number=randrange(2, 5))
                         for role in roles],
         edition=edition.id)
 
@@ -208,7 +208,7 @@ async def add_dummy_data():
         description="Hackers & Cyborgs",
         partner=partner,
         user_ids=[coaches[i].id for i in range(2, 5)],
-        required_roles=[RequiredRole(role=role.id, number=randrange(1, 8))
+        required_roles=[RequiredSkills(role=role.id, number=randrange(1, 8))
                         for role in sample(roles, k=randrange(3, len(roles)))],
         edition=edition.id)
 

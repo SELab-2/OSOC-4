@@ -1,7 +1,7 @@
-from app.models.question_answer import QuestionAnswer
 from typing import List
-from odmantic import Model
+
 from bson import ObjectId
+from odmantic import Model
 
 
 class Student(Model):
