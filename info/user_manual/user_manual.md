@@ -19,20 +19,17 @@
 
 [4.2. Architecture and Design](#42-architecture-and-design)
 
-#### [5. Common use cases](#5-common-use-cases-1)
-#### [6. Description of the user interface](#6-description-of-the-user-interface-1)
-#### [7. Configuration](#7-configuration-1)
-#### [8. Installation instructions](#8-installation-instructions-1)
+#### [5. Description of the user interface and common use cases](#6-description-of-the-user-interface-and-common-use-cases-1)
+#### [6. Configuration](#6-configuration-1)
+#### [7. Installation instructions](#7-installation-instructions-1)
 
-[8.1. Local installation](#81-local-installation) \
-[8.1.1. Requirements](#811-requirements) \
-[8.1.2. Local installation](#812-local-installation)
+[7.1. Local installation](#71-local-installation) \
+[7.1.1. Requirements](#711-requirements) \
+[7.1.2. Local installation](#712-local-installation)
 
-[8.2. Automatic deployment](#82-automatic-deployment)
+[7.2. Automatic deployment](#72-automatic-deployment)
 
-#### [9. Troubleshooting section and instructions on how to solve problems](#9-troubleshooting-section-and-instructions-on-how-to-solve-problems-1)
-#### [10. Maintenance information](#10-maintenance-information-1)
-#### [11. Testing](#11-testing-1)
+#### [8. Testing](#8-testing-1)
 
 
 ## 1. Introduction
@@ -209,11 +206,9 @@ Now we will describe how all these containers work toghetter in order to archiev
 ![Design](https://github.com/SELab-2/OSOC-4/blob/user_man/info/deployment/deployment.svg)
 
 
-## 5. Common use cases
+## 5. Description of the user interface and common use cases
 
-## 6. Description of the user interface
-
-### 6.1 Login screen
+### 5.1 Login screen
 
 ![Login screen](https://github.com/SELab-2/OSOC-4/blob/user_man/info/screenshots/login_screen.png)
 
@@ -223,7 +218,7 @@ Before logging in, your profile must be approved by an admin.
 3. This button will give you access to the application if the email address and password match a valid profile. Otherwise, you will get a warning message.
 4. If you forgot your password, this button will send you an email to reset your password.
 
-## 7. Configuration
+## 6. Configuration
 While developing or before installing you can use your own environment variables by using a .env file in the backend directory of the application. It should look like this:
 ```
 # Mongo
@@ -248,17 +243,17 @@ INVITE_EXPIRE=4320 # in minutes
 PASSWORDRESET_EXPIRE=30 # in minutes
 ```
 
-## 8. Installation-instructions
+## 7. Installation-instructions
 
-### 8.1. Local installation
+### 7.1. Local installation
 
-#### 8.1.1. Requirements
+#### 7.1.1. Requirements
 - Docker (installation guide: https://docs.docker.com/get-docker/)
 - Docker Compose (installation guide: https://docs.docker.com/compose/install/)
 
 If you want to run docker without sudo, we recommend you check here: https://docs.docker.com/engine/install/linux-postinstall/
 
-#### 8.1.2. Local installation
+#### 7.1.2. Local installation
 
 You first need to clone the repository that contains the code for the selection tool:
 ```
@@ -297,7 +292,7 @@ If you want to stop all services you can use
 docker-compose down
 ```
 
-### 8.2. Automatic deployment
+### 7.2. Automatic deployment
 Github Actions are used to automatically deploy the new codebase from the master or development branch to the server. A seperate docker-compose file is used by the Github Actions to deploy the application to the production server. This docker-compose file is made so the frontend and backend use the correct paths. This is needed because subdomains can't be used in the UGent network. Instead we use an extra prefixpath (/frontend and /api).
 
 These branch versions of the application can be accessed by:
@@ -306,11 +301,7 @@ frontend: https://sel2-4.ugent.be/{branchname}/frontend
 backend-api: https://sel2-4.ugent.be/{branchname}/api
 ```
 
-## 9. Troubleshooting section and instructions on how to solve problems
-
-## 10. Maintenance information
-
-## 11. Testing
+## 8. Testing
 Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
 ```
