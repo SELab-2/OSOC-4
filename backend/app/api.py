@@ -18,7 +18,7 @@ from app.routers import (answers, auth, ddd, ddd2, editions, participation,
 app = FastAPI(root_path=config.api_path)
 
 origins = [
-    "http://localhost:3001",
+    "*",
 ]
 
 

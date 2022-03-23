@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getSession, getCsrfToken } from 'next-auth/react';
 
-const baseURL = process.env.NEXT_PUBLIC_URL || "http://localhost:8000";
+const baseURL = process.env.NEXT_API_URL || "http://localhost:8000";
 
 
 function AxiosClient(auth_headers = true) {
@@ -13,6 +13,7 @@ function AxiosClient(auth_headers = true) {
 
     instance.interceptors.request.use(async (request) => {
         request.headers["Content-Type"] = "application/json"
+        request.headers["Access-Control-Allow-Origin"] = "*"
         if (auth_headers) {
             const session = await getSession();
             const csrfToken = await getCsrfToken()

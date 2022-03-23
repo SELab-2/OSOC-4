@@ -26,7 +26,7 @@ class Settings(BaseModel):
     authjwt_denylist_enabled: bool = True
     authjwt_denylist_token_checks: set = {"access", "refresh"}
     access_expires: int = timedelta(minutes=int(os.getenv('ACCESS_EXPIRE', 15)))
-    refresh_expires: int = timedelta(minutes=int(os.getenv("RESET_EXPIRE", 30 * 60)))
+    refresh_expires: int = timedelta(days=int(os.getenv("RESET_EXPIRE", 30)))
     authjwt_cookie_csrf_protect: bool = True
     authjwt_token_location: set = {"headers"}
     authjwt_cookie_samesite: str = 'lax'

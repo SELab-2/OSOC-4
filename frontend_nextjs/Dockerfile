@@ -1,14 +1,14 @@
 FROM node:16-alpine
-# WORKDIR /app
-# COPY package.json .
-# RUN yarn install
-# COPY . .
-# RUN yarn global add serve
-# ARG PUBLIC_URL
-# ENV PUBLIC_URL=${PUBLIC_URL}
-# ARG API_URL
-# ENV API_URL=${API_URL}
-# RUN yarn build
-# CMD ["serve", "-s", "build"]
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+WORKDIR /app
+COPY package.json .
+RUN yarn install
+COPY . .
+
+ARG NEXTAUTH_URL
+ENV NEXTAUTH_URL=${NEXTAUTH_URL}
+ARG NEXT_API_URL
+ENV NEXT_API_URL=${NEXT_API_URL}
+ARG NEXT_BASE_PATH
+ENV NEXT_BASE_PATH=${NEXT_BASE_PATH}
+RUN yarn build
+CMD ["yarn", "start"]

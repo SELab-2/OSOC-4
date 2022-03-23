@@ -13,13 +13,13 @@ export default function RouteGuard(props) {
         if (status === 'loading') return // Do nothing while loading
         if (props.auth && !isUser) router.push('/login') //Redirect to login
 
-    }, [isUser, status])
+    }, [isUser, status, props.auth, router])
 
     if (isUser) {
         if (!props.auth) {
             router.push('/')
         } else {
-            return [<NavHeader />, ...props.children]
+            return [<NavHeader key="Navbar" />, ...props.children]
         }
     } else if (!props.auth && !isUser) {
         return props.children

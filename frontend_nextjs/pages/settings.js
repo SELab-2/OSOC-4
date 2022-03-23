@@ -25,7 +25,7 @@ function Settings(props) {
         }
 
 
-    }, []);
+    }, [session]);
 
     const handleChangeName = (event) => {
         event.preventDefault()
