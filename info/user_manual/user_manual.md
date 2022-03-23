@@ -61,6 +61,7 @@ A user is a person who has an account on the tool, or is in the progress of gett
 
 Now follows an in depth description of the attributes of a user.
 
+_attributes:_ \
 **id**: the id of the user, only used internally and unique for each user \
 **email**: the email address of the user, this is unique for each user \
 **name**: the name of the user, two or more users with the same name may exist \
@@ -75,11 +76,13 @@ Now follows an in depth description of the attributes of a user.
 **status: disabled**: the user does not take part in the current edition and therefore shouldn't have acces to the tool, he is disabled
 
 
+
 #### 4.1.2. Project
 Represents a project that will be made by OSOC students, given by a partner. A project will also contain the the information of the partner.
 
 Now follows an in depth description of the attributes of a project.
 
+_attributes:_ \
 **id**: the id of the project, only used internally and unique for each project \
 **name**: the name of the project \
 **description**: the description of the project \
@@ -87,22 +90,29 @@ Now follows an in depth description of the attributes of a project.
 **partner**: the partner ordering the project. This consists of two more fields. In the database we do not store these two fields seperatily \
 **partner: name**: the name of the partner \
 **partner: about**: additional information about the partner \
-**users**: a list of user id's, these are the users which are assigned to this project \
 **required_skills**: a list of requiredSkills, this consists of two fields \
 **requiredSKills: skill_id**: the id of the skill that is needed \
-**requiredSKills: amount**: the amount of students, with this skill, that are required for this project. \
+**requiredSKills: amount**: the amount of students, with this skill, that are required for this project.
+
+_attributes defining a relationship:_ \
+**users**: a list of user id's, these are the users which are assigned to this project \
 **edition**: the id of the edition this project belongs to
+
 
 #### 4.1.3. Edition
 An edition of Open Summer Of Code
 
 Now follows an in depth description of the attributes of an edition.
 
+_attributes:_ \
 **id**: the id of the edition, only used internally and unique for each edition \
 **year**: the year in which the edition took place, this is unique for each edition \
 **name**: the name of the edition. (like "OSOC 2022 edition") \
 **Description**: the description of the edition. (like startdate and enddate, or brief overview of the partners, ...) \
-**form_id**: the id of the tally form for this year's edition. Notice that multiple years can use the same tally form 
+**form_id**: the id of the tally form for this year's edition. Notice that multiple years can use the same tally form
+
+_attributes defining a relationship:_ \
+**user_ids**: a list of id's from the users that belong to this edition
 
 
 #### 4.1.4. Skill
@@ -110,6 +120,7 @@ A skill like ux-designer, backend-developper, communications-manager.
 
 Now follows an in depth description of the attributes of a skill.
 
+_attributes:_ \
 **id**: the id of the skill, only used internally and unique for each skill \
 **name**: the name of the skill. (like ux-designer, backend developer, ...)
 
@@ -119,9 +130,11 @@ A question from the tally form that students are supposed to fill in
 
 Now follows an in depth description of the attributes of a question.
 
+_attributes:_ \
 **id**: the id of the question, only used internally and unique for each question \
 **tally_id**: the id of the question assigned by tally \
 **question**: the question itself
+**type**: the type of question
 
 
 #### 4.1.6. Answer
@@ -129,6 +142,7 @@ An anwser from the tally form that a student filled in.
 
 Now follows an in depth description of the attributes of an answer.
 
+_attributes:_ \
 **id**: the id of the answer, only used internally and unique for each answer \
 **tally_id**: the id of the answer assigned by tally \
 **answer**: the answer itself
@@ -139,7 +153,10 @@ A combination of a question and an answer that a student made.
 
 Now follows an in depth description of the attributes of a question-answer.
 
+_attributes:_ \
 **id**: the id of the question-answer, only used internally and unique for each answer \
+
+_attributes defining a relationship:_ \
 **question**: the id of the question \
 **answer**: the id of the answer
 
@@ -149,6 +166,7 @@ A student, a representation of the tally form they filled out with the most basi
 
 Now follows an in depth description of the attributes of a student.
 
+_attributes:_ \
 **id**: the id of the student, only used internally and unique for each student \
 **email**: the email address of the student \
 **name**: the name of the student \
@@ -156,11 +174,11 @@ Now follows an in depth description of the attributes of a student.
 **phone_number**: the phone number of the student \
 **alumn**: whether the student has already participated in an edition of OSOC. \
 **cv**: a link to the students' cv
+
+_attributes defining a relationship:_ \
 **question_answers**: a list of questions-answers ids, the questions and answers which the student filled in \
 **skills**: a list of skills (represented by their id's) which the student has \
 **edition**: the edition in which the student filled in the form \
-**alumn**: true or false, depending on this student being an alumn student or not \
-**cv**: link to the cv of this student
 
 
 #### 4.1.9. Suggestion
@@ -168,17 +186,25 @@ A suggestion that a coach makes about a student, or a decision from an administr
 
 Now follows an in depth description of the attributes of a suggestion.
 
+_attributes:_ \
 **id**: the id of a suggestion, only used internally and unique for each student \
 **email_sent**: Has the student received an email of the decision, only relevant if the suggestion is a decision \
-**decision**: true if this suggestion represents a decision, otherwise it represents a suggestion \
+**decision**: Yes / No / Maybe \
+**definitive**: true if this suggestion represents a decision, otherwise it represents a suggestion \
 **reason**: the reason that the coach/administrator gives with the suggestion
 
+_attributes defining a relationship:_ \
+**student**: the student which the suggestion is about \
+**suggested_by**: the user who made the suggestion \
+**project**: the project which is suggested, optional attribute \
+**skill**: the skill which is suggested, optional attribute
 
 #### 4.1.10. Participation
 Defines a ternair relationship which is converted to an entity itself. It describes what student will take on what role in what project. 
 
 Now follows an in depth description of the attributes of a participation.
 
+_attributes defining a relationship:_ \
 **student**: the id of the student who will participate \
 **project**: the id of the project in which the student will participate \
 **skill**: the role (thus the skill the student has and will use) the student will take on in the project \
@@ -189,6 +215,7 @@ Default emails are stored in the database.
 
 Now follows an in depth description of the attributes of a default email.
 
+_attributes:_ \
 **id**: the id of a default email, only used internally and unique for each default email \
 **type**: the type of a default email, for example yes, maybe, no, invite \
 **content**: the content of the default email
