@@ -4,10 +4,11 @@ services:
 
   osoc-frontend:
     build:
-      context: ./frontend_react
+      context: ./frontend_nextjs
       args:
-        PUBLIC_URL: ${PATHPREFIX}/frontend
-        API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
+        NEXT_BASE_PATH: ${PATHPREFIX}/frontend
+        NEXTAUTH_URL: https://sel2-4.ugent.be${PATHPREFIX}/frontend
+        NEXT_API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
     ports:
       - 3000
     networks:
