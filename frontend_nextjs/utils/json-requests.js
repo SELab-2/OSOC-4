@@ -1,7 +1,7 @@
 import axios from "axios";
 import { log } from "./logger";
 import Cookies from 'js-cookie';
-import ApiClient from './ApiClient'
+import { ApiClient, AuthApiClient } from './ApiClient'
 
 const nobase = axios.create({
     withCredentials: true,
@@ -12,32 +12,6 @@ const nobase = axios.create({
 // axios.defaults.baseURL = process.env.PUBLIC_URL || "http://localhost:8000";
 
 
-let _config = {
-    "headers": {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost:3001"
-    }
-}
-
-export function headers() {
-    log("json-requests: updating headers")
-    let cookie = Cookies.get('next-auth.csrf-token');
-    if (cookie) {
-        _config["headers"]["X-CSRF-TOKEN"] = cookie;
-        log("json-requests: updating headers: now with cookie")
-    }
-    else {
-        delete _config["headers"]["X-CSRF-TOKEN"];
-        log("json-requests: updating headers: now without cookie")
-    }
-    return {};
-}
-
-export function isStillAuthenticated() {
-    const cookie = Cookies.get('csrf_access_token');
-    log("json-requests: isStillAuthenticated: " + Boolean(cookie));
-    return cookie
-}
 /**
  * redirects to another url
  * @param name the name where to redirect to, as defined in router/index.js
@@ -81,12 +55,10 @@ export async function catchError(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function getJson(url, useBase = true) {
+export async function getJson(url) {
     log("json-requests: getJson: " + url)
     try {
-        let response = undefined
-        response = await ApiClient.get(url, headers());
-        console.log(response)
+        let response = await AuthApiClient.get(url);
         return response.data;
     } catch (e) {
         return await catchError(e);
@@ -102,7 +74,7 @@ export async function getJson(url, useBase = true) {
 export async function sendDelete(url, getters, commit) {
     log("json-requests: sendDelete: " + url)
     try {
-        const req = await ApiClient.delete(url, headers(getters, commit));
+        const req = await ApiClient.delete(url);
         return req.data;
     } catch (e) {
         return await catchError(e);
@@ -116,19 +88,11 @@ export async function sendDelete(url, getters, commit) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function postCreate(url, json, useBase = true) {
+export async function postCreate(url, json) {
     log("json-requests: postCreate: " + url)
-    console.log(json)
     try {
-        let resp;
-        if (useBase) { resp = await ApiClient.post(url, json, headers()); }
-        else {
-            if (json) {
-                resp = await nobase.get(url, headers());
-            } else {
-                resp = await nobase.get(url, headers());
-            }
-        }
+        const resp = await ApiClient.post(url, json);
+
         return {
             success: true,
             data: resp.data
@@ -140,6 +104,7 @@ export async function postCreate(url, json, useBase = true) {
                 data: e.response.data.message
             };
         } else {
+
             await catchError(e);
             return "";
         }
@@ -158,7 +123,7 @@ export async function patchEdit(url, json, getters, commit) {
     try {
         return {
             success: true,
-            data: (await ApiClient.patch(url, json, headers(getters, commit))).data.url
+            data: (await ApiClient.patch(url, json)).data.url
         };
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
@@ -174,23 +139,33 @@ export async function patchEdit(url, json, getters, commit) {
 }
 
 
-export async function login(url, json) {
+export async function login(json) {
     log("json-requests: login")
     try {
-        console.log(headers())
-        let resp = await ApiClient.post(url, json, headers());
+        let resp = await ApiClient.post("/login", json);
         log(resp)
-        return { success: true, id: resp.data.data.id };
+        return { success: true, data: resp.data };
+    } catch (e) {
+        log(e)
+        return { success: false };
+    }
+}
+export async function forgot(json) {
+    log("json-requests: login")
+    try {
+        let resp = await ApiClient.post("/forgot", json);
+        log(resp)
+        return { success: true, msg: resp.data.msg };
     } catch (e) {
         log(e)
         return { success: false };
     }
 }
 
-export async function logout(url, getters, commit) {
+export async function logout(url) {
     log("json-requests: logout")
     try {
-        let resp = await ApiClient.delete(url, headers(getters, commit));
+        let resp = await AuthApiClient.delete(url);
         log(resp)
         return { success: true };
     } catch (e) {

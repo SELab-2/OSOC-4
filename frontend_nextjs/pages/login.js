@@ -25,6 +25,7 @@ const Login = props => {
     }
 
     const handleChangeEmailForgot = (event) => {
+        event.preventDefault();
         setEmailForgot(event.target.value);
     }
 
@@ -39,11 +40,11 @@ const Login = props => {
         log("handle forgot submit")
         event.preventDefault();
         let credentials = JSON.stringify({
-            "email": email,
+            "email": emailForgot,
         });
         log(credentials)
         // post, if any errors, show them
-        let output = await login("/forgot", credentials);
+        let output = await forgot(credentials);
         console.log(output)
         if (output.success) {
         }
@@ -63,19 +64,12 @@ const Login = props => {
                     <div className="login-container">
                         <p className="welcome-message">Please provide login credentials to proceed</p>
                         <div className="login-form">
-                            <form onSubmit={() => signIn('credentials', { email: email, password: password })}>
-                                <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address" />
-                                <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
-                                <input className="submit" type="submit" name="submit" value="Login" />
-                            </form>
 
+                            <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address" />
+                            <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
 
-                            <button
-                                onClick={() => {
-                                    signIn('credentials', { email: email, password: password });
-                                }}
-                            >
-                                Sign in with credentials
+                            <button className="submit" onClick={() => { signIn('credentials', { email: email, password: password }) }}>
+                                Login
                             </button>
 
                         </div>

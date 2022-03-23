@@ -26,7 +26,7 @@ class Settings(BaseModel):
     authjwt_denylist_enabled: bool = True
     authjwt_denylist_token_checks: set = {"access", "refresh"}
     access_expires: int = timedelta(minutes=int(os.getenv('ACCESS_EXPIRE', 15)))
-    refresh_expires: int = timedelta(days=int(os.getenv("RESET_EXPIRE", 30 * 60)))
+    refresh_expires: int = timedelta(minutes=int(os.getenv("RESET_EXPIRE", 30 * 60)))
     authjwt_cookie_csrf_protect: bool = True
     authjwt_token_location: set = {"headers"}
     authjwt_cookie_samesite: str = 'lax'
@@ -73,8 +73,6 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :rtype: dict
     """
 
-    print(user)
-
     # check if any user exist else make one
     user_count = await count_where(User)
     if not user_count:
@@ -94,8 +92,8 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
         if not verify_password(user.password, u.password):
             raise InvalidEmailOrPasswordException()
 
-        access_token = Authorize.create_access_token(subject=str(u.id))
-        refresh_token = Authorize.create_refresh_token(subject=str(u.id))
+        access_token = Authorize.create_access_token(subject=str(u.id), expires_time=settings.access_expires)
+        refresh_token = Authorize.create_refresh_token(subject=str(u.id), expires_time=settings.refresh_expires)
 
         # Authorize.set_access_cookies(access_token)
         # Authorize.set_refresh_cookies(refresh_token)
@@ -120,10 +118,10 @@ def refresh(Authorize: AuthJWT = Depends()):
     Authorize.jwt_refresh_token_required()
 
     current_user_id = Authorize.get_jwt_subject()
-    new_access_token = Authorize.create_access_token(subject=current_user_id)
+    new_access_token = Authorize.create_access_token(subject=current_user_id, expires_time=settings.access_expires)
     # Authorize.set_access_cookies(new_access_token)
     # return {"access_token": new_access_token}
-    return TokenExtended(accessToken=new_access_token, accessTokenExpiry=settings.access_expires, refreshToken=Authorize.get_raw_jwt()['jti'])
+    return TokenExtended(accessToken=new_access_token, id=current_user_id, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)), refreshToken=Authorize.get_raw_jwt()['jti'])
 
 
 @router.delete('/access-revoke')

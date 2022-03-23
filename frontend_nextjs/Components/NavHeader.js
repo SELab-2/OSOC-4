@@ -15,7 +15,7 @@ export default function NavHeader(props) {
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Container>
-                <Navbar.Brand>
+                <Navbar.Brand href="/">
                     <Image className="d-inline-block align-top" src="/assets/osoc-emblem.svg" alt="osoc-logo" width="65px" height="50px" objectFit={'contain'} />
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />

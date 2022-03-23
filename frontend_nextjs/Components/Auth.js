@@ -7,7 +7,7 @@ import NavHeader from "../Components/NavHeader"
 export default function RouteGuard(props) {
     const router = useRouter()
     const { data: session, status, token } = useSession()
-    const isUser = !!session?.user
+    const isUser = !!session?.user && session?.error !== "RefreshAccessTokenError"
 
     useEffect(() => {
         if (status === 'loading') return // Do nothing while loading

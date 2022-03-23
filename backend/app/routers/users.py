@@ -9,7 +9,8 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             UserAlreadyActiveException,
                                             UserNotFoundException)
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole, UserData
+from app.models.user import (User, UserCreate, UserData, UserOut,
+                             UserOutSimple, UserRole)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
@@ -68,7 +69,7 @@ async def add_user_data(user: UserCreate):
     return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
-@router.get("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def invite_user(id: str):
     """invite_user this functions invites a user
 
@@ -126,8 +127,8 @@ async def invite_users(ids: List[str]):
     return response(None, "Invites sent succesfull")
 
 
-@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_user(id: str):
+@router.get("/{id}")
+async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends()):
     """get_user this functions returns the user with given id (or None)
 
     :param id: the user id
@@ -140,8 +141,8 @@ async def get_user(id: str):
     if not user:
         raise UserNotFoundException()
 
-    if not user.approved:
-        return errorresponse(None, 400, "The user doesn't exist (yet)")
+    if not role == UserRole.ADMIN and not user.approved:
+        raise UserNotFoundException()
 
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 

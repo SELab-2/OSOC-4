@@ -9,7 +9,7 @@ function Home(props) {
   const isUser = session?.user
 
   if (isUser) {
-    return (<h1>HAHAHAHAHA</h1>)
+    return (<h1>COOL DASHBOARD</h1>)
   }
 
   // Session is being fetched, or no user.

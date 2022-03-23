@@ -12,20 +12,20 @@ function Settings(props) {
     const { data: session, status } = useSession()
 
     useEffect(() => {
-        if (!user) {
-            if (session) {
-                getJson(session.userid).then(res => {
-                    setUser(res.data);
-                    setName(res.data.name);
-                    setEmail(res.data.email);
-                    setRole(res.data.role);
 
-                }
-                )
+        if (session) {
+            getJson(session.userid).then(res => {
+                setUser(res.data);
+                setName(res.data.name);
+                setEmail(res.data.email);
+                setRole(res.data.role);
+
             }
+            )
         }
 
-    });
+
+    }, []);
 
     const handleChangeName = (event) => {
         event.preventDefault()
@@ -45,7 +45,7 @@ function Settings(props) {
             "name": name
         })
         //setSavedSuccess(true)
-        let response = await postCreate(props.loggedInAs, body)
+        let response = await postCreate(session.userid, body)
         if (response.success) { setSavedSuccess(true); }
     }
 

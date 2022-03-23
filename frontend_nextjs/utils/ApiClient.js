@@ -1,28 +1,29 @@
 import axios from 'axios';
 import { getSession, getCsrfToken } from 'next-auth/react';
 
-const baseURL = 'http://192.168.0.102:8000';
+const baseURL = process.env.NEXT_PUBLIC_URL || "http://localhost:8000";
 
-const ApiClient = () => {
+
+function AxiosClient(auth_headers = true) {
     const defaultOptions = {
-        baseURL,
+        baseURL: baseURL,
     };
 
     const instance = axios.create(defaultOptions);
 
     instance.interceptors.request.use(async (request) => {
-        const session = await getSession();
-        const csrfToken = await getCsrfToken()
+        request.headers["Content-Type"] = "application/json"
+        if (auth_headers) {
+            const session = await getSession();
+            const csrfToken = await getCsrfToken()
 
-        console.log("session")
-        console.log(session)
-        console.log(csrfToken)
-        if (session) {
-            request.headers.Authorization = `Bearer ${session.accessToken}`;
-            request.headers["X-CSRF-TOKEN"] = csrfToken
+            if (session) {
+
+                request.headers.Authorization = `Bearer ${session.accessToken}`;
+                request.headers["X-CSRF-TOKEN"] = csrfToken
+            }
         }
         console.log(request)
-        console.log(request.headers)
         return request;
     });
 
@@ -32,10 +33,13 @@ const ApiClient = () => {
         },
         (error) => {
             console.log(`error`, error);
+            return error;
         },
     );
 
     return instance;
 };
 
-export default ApiClient();
+export const ApiClient = AxiosClient(false);
+
+export const AuthApiClient = AxiosClient();

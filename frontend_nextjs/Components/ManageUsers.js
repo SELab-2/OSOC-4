@@ -11,18 +11,17 @@ export default function ManageUsers() {
     };
 
     useEffect(() => {
-        if (!users.length) {
-            getJson("/users").then(res => {
-                console.log("manage users:")
-                console.log(res)
-                for (let u of res.data) {
-                    getJson(u.id, false).then(async user => {
-                        if (user.data) { await setUsers(prevState => [...prevState, user.data]); }
-                    })
-                }
-            });
-        }
-    })
+        getJson("/users").then(res => {
+            console.log("manage users:")
+            console.log(res)
+            for (let u of res.data) {
+                getJson(u.id, false).then(user => {
+                    if (user.data) { setUsers(prevState => [...prevState, user.data]); }
+                })
+            }
+        });
+
+    }, [])
 
     const handleChangeToInvite = (event) => {
         event.preventDefault();
@@ -36,9 +35,8 @@ export default function ManageUsers() {
         emails.forEach(e => {
             // post to create
             postCreate("users/create", { "email": e }).then(resp => {
-                console.log(resp.data.data)
                 if (resp.data.data.id) {
-                    postCreate(resp.data.data.id + "/invite", undefined, false);
+                    postCreate(resp.data.data.id + "/invite", undefined);
                 }
             })
             // post to invite
