@@ -1,5 +1,3 @@
-import unittest
-
 from app.tests.test_base import Status, TestBase
 
 
