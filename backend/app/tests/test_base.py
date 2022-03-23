@@ -2,13 +2,12 @@ import asyncio
 import unittest
 from enum import IntEnum
 
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient, Response
-
 from app.api import app
 from app.database import db
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient, Response
 
 
 class Status(IntEnum):
@@ -94,7 +93,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         password: str = self.saved_objects["passwords"][user]
         login = await self.client.post("/login", json={"email": email, "password": password},
                                        headers={"Content-Type": "application/json"})
-        return login.cookies["csrf_access_token"]
+        return login.content["accessToken"]
 
     async def get_response(self, path: str, user: str, expected_status: int = 200,
                            access_token: str = None, use_access_token: bool = True) -> Response:
@@ -120,7 +119,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.get(path, headers={"X-CSRF-TOKEN": access_token})
+            response = await self.client.get(path, headers={"Authorization": "Bearer " + access_token})
         else:
             response = await self.client.get(path)
 
@@ -158,7 +157,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.post(path, json=json_body, headers={"X-CSRF-TOKEN": access_token,
+            response = await self.client.post(path, json=json_body, headers={"Authorize": "Bearer " + access_token,
                                                                              "Content-Type": "application/json"})
         else:
             response = await self.client.post(path, json=json_body, headers={"Content-Type": "application/json"})
