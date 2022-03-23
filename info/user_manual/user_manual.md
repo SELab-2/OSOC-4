@@ -138,7 +138,7 @@ Now follows an in depth description of the attributes of a question-answer.
 
 **id**: the id of the question-answer, only used internally and unique for each answer \
 **question**: the id of the question \
-**answer**: the id of the answer.
+**answer**: the id of the answer
 
 
 #### 4.1.8. Student
@@ -176,9 +176,9 @@ Defines a ternair relationship which is converted to an entity itself. It descri
 
 Now follows an in depth description of the attributes of a participation.
 
-**student**: the id of the student who will participate
-**project**: the id of the project in which the student will participate
-**skill**: the role (thus the skill the student has and will use) the student will take on in the project
+**student**: the id of the student who will participate \
+**project**: the id of the project in which the student will participate \
+**skill**: the role (thus the skill the student has and will use) the student will take on in the project \
 
 
 #### 4.1.11. Default_email
