@@ -123,13 +123,7 @@ export async function postCreate(url, json, useBase=true) {
     try {
         let resp;
         if (useBase) { resp = await axios.post(url, json, headers()); }
-        else {
-            if (json) {
-                resp = await nobase.get(url, headers());
-            } else {
-                resp = await nobase.get(url, headers());
-            }
-        }
+        else {resp = await nobase.post(url, json, headers());}
         return {
             success: true,
             data: resp.data

@@ -7,6 +7,8 @@ from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
+                                            UserBadStateException,
+                                            UserNotApprovedException,
                                             UserNotFoundException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import (User, UserCreate, UserData, UserOut,
@@ -15,7 +17,7 @@ from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
-from app.utils.response import errorresponse, list_modeltype_response, response
+from app.utils.response import list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from odmantic import ObjectId
@@ -44,13 +46,14 @@ async def get_user_me(Authorize: AuthJWT = Depends()):
     current_user_id = Authorize.get_jwt_subject()
 
     user = await read_where(User, User.id == ObjectId(current_user_id))
-    if not user:
-        raise UserNotFoundException()
+    # User will always be found since otherwise they can't be authorized
+    # No need to check whether user exists
 
     return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")
 
 
-@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="User data added into the database")
+@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
+             response_description="User data added into the database")
 async def add_user_data(user: UserCreate):
     """add_user_data add a new user
 
@@ -78,24 +81,19 @@ async def invite_user(id: str):
     :return: response
     :rtype: success or error
     """
-    print("inviting user")
     user = await read_where(User, User.id == ObjectId(id))
-    print("1")
 
-    if user.active:
-        print("2")
+    if user is None:
+        raise UserNotFoundException()
+    elif user.active:
         raise UserAlreadyActiveException()
-    print("3")
 
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key()
-    print("4")
     # save it
     db.redis.setex(invite_key, invite_expires, str(user.id))
-    print("5")
     # send email to user with the invite key
     send_invite(user.email, invite_key)
-    print("6")
     return response(None, "Invite sent successfully")
 
 
@@ -113,12 +111,14 @@ async def invite_users(ids: List[str]):
         users.append(await read_where(User, User.id == ObjectId(id)))
 
     # throw exception if any user is already active
-    if any([user.active for user in users]):
+    if None in users:
+        raise UserNotFoundException()
+    elif any([user.active for user in users]):
         raise UserAlreadyActiveException()
 
     for user in users:
         # create an invite key
-        invite_key, invite_expires = generate_new_invite_key(str(user.id))
+        invite_key, invite_expires = generate_new_invite_key()
         # save it
         db.redis.setex(invite_key, invite_expires, "true")
         # send email to user with the invite key
@@ -164,9 +164,14 @@ async def update_user(id: str, new_data: UserData):
     user = await read_where(User, User.id == ObjectId(id))
 
     user_w_email = await read_where(User, User.email == new_data.email)
-    if user_w_email.id != user.id:
+
+    if user is None:
+        raise UserNotFoundException()
+    if user_w_email is not None and user_w_email.id != user.id:
+        # The email is already in use
         raise EmailAlreadyUsedException()
     else:
+        # No other user with the new email address was found
         user.email = new_data.email
 
     user.name = new_data.name
@@ -187,10 +192,12 @@ async def approve_user(user_id: str):
     """
     user = await read_where(User, User.id == ObjectId(user_id))
 
-    if not user.active:
-        return errorresponse(None, 400, "The user is not activated")
-    if user.approved:
-        return errorresponse(None, 400, "The user is already approved")
+    if user is None:
+        raise UserNotFoundException()
+    elif not user.active:
+        raise UserBadStateException()  # The user isn't activated
+    elif user.approved:
+        raise UserBadStateException()  # The user is already approved
 
     user.approved = True
     await update(user)
@@ -198,7 +205,7 @@ async def approve_user(user_id: str):
 
 
 @router.post("/forgot/{reset_key}")
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...)):
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
     """change_password function that changes the user password
 
     :param reset_key: the reset key
@@ -216,14 +223,18 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
         raise InvalidResetKeyException()
 
     userid = db.redis.get(reset_key)
+
     if not userid:
         raise InvalidResetKeyException()
-
-    if passwords.password != passwords.validate_password:
+    elif passwords.password != passwords.validate_password:
         raise PasswordsDoNotMatchException()
 
     user = await read_where(User, User.id == ObjectId(userid))
-    if not user or user.disabled:
+
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+
+    if not user or user.disabled or current_user_id != userid:
         raise NotPermittedException()
 
     user.password = get_password_hash(passwords.password)

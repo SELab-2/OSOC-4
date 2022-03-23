@@ -13,8 +13,10 @@ from app.utils.cryptography import get_password_hash
 
 class Status(IntEnum):
     SUCCES = 200
+    BAD_REQUEST = 400
     UNAUTHORIZED = 401
     FORBIDDEN = 403
+    NOT_FOUND = 404
     UNPROCESSABLE = 422
 
 
@@ -28,35 +30,44 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 name="user_admin",
                 password="Test123!user_admin",
                 role=UserRole.ADMIN,
-                active=True, approved=True),
+                active=True,
+                approved=True,
+                disabled=False),
             "user_approved_coach": User(
                 email="user_approved_coach@test.be",
                 name="user_approved_coach",
                 password="Test123!user_approved_coach",
                 role=UserRole.COACH,
-                active=True, approved=True),
+                active=True,
+                approved=True,
+                disabled=False),
             "user_activated_coach": User(
                 email="user_activated_coach@test.be",
                 name="user_activated_coach",
                 password="Test123!user_activated_coach",
                 role=UserRole.COACH,
-                active=True, approved=False),
+                active=True,
+                approved=False,
+                disabled=False),
             "user_unactivated_coach": User(
                 email="user_unactivated_coach@test.be",
                 name="user_unactivated_coach",
                 password="Test123!user_unactivated_coach",
                 role=UserRole.COACH,
                 active=False,
-                approved=False),
+                approved=False,
+                disabled=False),
             "user_no_role": User(
                 email="user_no_role@test.be",
                 name="user_no_role",
                 password="Test123!user_no_role",
                 role=UserRole.NO_ROLE,
                 active=False,
-                approved=False)
+                approved=False,
+                disabled=False)
         }
-        self.saved_objects = {"passwords": {}}  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
+        self.saved_objects = {
+            "passwords": {}}  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         self.created = []
 
     async def asyncSetUp(self) -> None:
@@ -121,7 +132,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         """)
         return response
 
-    async def post_response(self, path: str, json_body: dict, user: str,
+    async def post_response(self, path: str, json_body, user: str,
                             expected_status: int = 200, access_token: str = None,
                             use_access_token: bool = True) -> Response:
         """POST request test template
@@ -131,7 +142,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         :param path: The path of the POST request
         :type path: str
         :param json_body: The POST body
-        :type json_body: dict
+        :type json_body: Depends on POST request, most of the time a dict
         :param user: The requesting user
         :type user: str
         :param expected_status: The expected status of the POST request, defaults to 200
