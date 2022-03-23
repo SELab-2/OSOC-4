@@ -20,6 +20,9 @@
 [4.2. Architecture and Design](#42-architecture-and-design)
 
 #### [5. Description of the user interface and common use cases](#5-description-of-the-user-interface-and-common-use-cases-1)
+
+[#5.1. Login screen](#51-login-screen)
+
 #### [6. Configuration](#6-configuration-1)
 #### [7. Installation instructions](#7-installation-instructions-1)
 
@@ -208,7 +211,7 @@ Now we will describe how all these containers work toghetter in order to archiev
 
 ## 5. Description of the user interface and common use cases
 
-### 5.1 Login screen
+### 5.1. Login screen
 
 ![Login screen](https://github.com/SELab-2/OSOC-4/blob/user_man/info/screenshots/login_screen.png)
 
