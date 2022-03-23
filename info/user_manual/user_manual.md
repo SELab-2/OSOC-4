@@ -19,7 +19,7 @@
 
 [4.2. Architecture and Design](#42-architecture-and-design)
 
-#### [5. Description of the user interface and common use cases](#6-description-of-the-user-interface-and-common-use-cases-1)
+#### [5. Description of the user interface and common use cases](#5-description-of-the-user-interface-and-common-use-cases-1)
 #### [6. Configuration](#6-configuration-1)
 #### [7. Installation instructions](#7-installation-instructions-1)
 
