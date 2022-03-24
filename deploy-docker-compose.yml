@@ -7,7 +7,7 @@ services:
       context: ./frontend_nextjs
       args:
         NEXT_BASE_PATH: ${PATHPREFIX}/frontend
-        NEXT_API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
+        NEXT_API_URL: http://osoc-bakcend:8000
         NEXTAUTH_URL: https://sel2-4.ugent.be${PATHPREFIX}/frontend/api/auth
     ports:
       - 3000
