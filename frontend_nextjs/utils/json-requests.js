@@ -74,7 +74,7 @@ export async function getJson(url) {
 export async function sendDelete(url, getters, commit) {
     log("json-requests: sendDelete: " + url)
     try {
-        const req = await ApiClient.delete(url);
+        const req = await AuthApiClient.delete(url);
         return req.data;
     } catch (e) {
         return await catchError(e);
@@ -91,7 +91,7 @@ export async function sendDelete(url, getters, commit) {
 export async function postCreate(url, json) {
     log("json-requests: postCreate: " + url)
     try {
-        const resp = await ApiClient.post(url, json);
+        const resp = await AuthApiClient.post(url, json);
 
         return {
             success: true,
@@ -123,7 +123,7 @@ export async function patchEdit(url, json, getters, commit) {
     try {
         return {
             success: true,
-            data: (await ApiClient.patch(url, json)).data.url
+            data: (await AuthApiClient.patch(url, json)).data.url
         };
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
