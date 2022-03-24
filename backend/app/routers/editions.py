@@ -30,7 +30,7 @@ async def get_editions():
     :rtype: dict
     """
     results = await read_all_where(Edition)
-    return list_modeltype_response([EditionOutSimple.parse_raw(r.json()) for r in results], Edition)
+    return list_modeltype_response([EditionOutExtended.parse_raw(r.json()) for r in results], Edition)
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")

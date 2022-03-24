@@ -1,17 +1,16 @@
 import React, {useEffect, useState} from "react";
-import {log} from "../utils/logger";
-import {getJson, isStillAuthenticated, postCreate} from "../utils/json-requests";
-import "../styles/settings.css"
+import {getJson, isStillAuthenticated} from "../utils/json-requests";
 import ManageUsers from "./ManageUsers";
 import ChangePassword from "./ChangePassword";
 import EditionDropdownButton from "./EditionDropdownButton";
 import ChangeName from "./ChangeName";
 import ChangeEmail from "./ChangeEmail";
 import SettingCards from "./SettingCards";
-import {Accordion, ListGroup, ListGroupItem} from "react-bootstrap";
+import {Accordion, Button} from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
+import "../styles/settings.css"
 
 
 
@@ -20,10 +19,6 @@ export default function Settings(props) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState(0);
-    const [savedSuccess, setSavedSuccess] = useState(false);
-    const [showChangePassword, setShowChangePassword] = useState(false);
-    const [showChangeName, setShowChangeName] = useState(false);
-    const [showChangeEmail, setShowChangeEmail] = useState(false);
 
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
@@ -37,30 +32,6 @@ export default function Settings(props) {
             }}
         )}
     });
-
-    let editionList = {}
-
-    const handleChangeName = (event) => {
-        event.preventDefault()
-        setName(event.target.value);
-    }
-
-    const handleChangeEmail = (event) => {
-        event.preventDefault()
-        setEmail(event.target.value);
-    }
-
-    async function handleSubmitChange(event) {
-        log("handle submit change name and email");
-        event.preventDefault()
-        let body = JSON.stringify({
-            "email": user.email,
-            "name": name
-        })
-        //setSavedSuccess(true)
-        let response = await postCreate(props.loggedInAs, body)
-        if (response.success) {setSavedSuccess(true);}
-    }
 
     //TODO make this actually change the theme
     const changeTheme = (event) => {
@@ -81,7 +52,7 @@ export default function Settings(props) {
                                 <ChangePassword/>
                             </SettingCards>
                             <SettingCards title={"Change email"} subtitle={"Change to a different email-adress"}>
-                                <ChangeEmail/>
+                                <ChangeEmail email={email}/>
                             </SettingCards>
                             <SettingCards title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
                                 <ChangeName name={name} loggedInAs={props.loggedInAs} email={email}/>
@@ -95,7 +66,7 @@ export default function Settings(props) {
                     </AccordionHeader>
                     <AccordionBody>
                         <div>
-                            <button onClick={changeTheme}>{darkTheme ? "Turn to light theme" : "turn to dark theme"}</button>
+                            <Button variant={"outline-secondary"} onClick={changeTheme}>{darkTheme ? "Turn to light theme" : "Turn to dark theme"}</Button>
                             <EditionDropdownButton/>
                         </div>
                     </AccordionBody>
@@ -120,3 +91,4 @@ export default function Settings(props) {
 
     )
 }
+

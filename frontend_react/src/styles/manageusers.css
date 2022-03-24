@@ -1,0 +1,10 @@
+.dropdown-button{
+    min-width:134px;
+    min-height:38px;
+}
+
+table{
+    overflow-y:auto;
+    width: 100%;
+    max-height: 60%;
+}

@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {getJson, postCreate} from "../utils/json-requests";
-import {Table} from "react-bootstrap";
-import data from "bootstrap/js/src/dom/data";
+import {Button, Form, Table} from "react-bootstrap";
+import UserTr from "./UserTr";
+import {log} from "../utils/logger";
 
 export default function ManageUsers() {
     const [search, setSearch] = useState("");
@@ -15,13 +16,14 @@ export default function ManageUsers() {
     useEffect(() => {
         if (!users.length) {
             getJson("/users").then(res => {
-                console.log("manage users:")
-                console.log(res)
-                for (let u of res.data) {
-                    getJson(u.id, false).then(async user => {
-                        if (user.data) {await setUsers(prevState => [...prevState, user.data]);}
-                    })
-                }
+                log("manage users:")
+                log(res)
+                setUsers(res.data)
+                // for (let u of res.data) {
+                //     getJson(u.id, false).then(async user => {
+                //         if (user.data) {await setUsers(prevState => [...prevState, user.data]);}
+                //     })
+                // }
             });
         }
     })
@@ -32,46 +34,68 @@ export default function ManageUsers() {
     }
 
     async function handleSubmitInvite(event) {
-        console.log("handle submit invite");
+        log("handle submit invite");
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
         emails.forEach(e => {
             // post to create
             postCreate("users/create", {"email": e}).then(resp => {
-                console.log(resp.data.data)
+                log(resp.data.data)
                 if (resp.data.data.id) {
                     postCreate(resp.data.data.id + "/invite", {}, false);
                 }
             })
             // post to invite
         })
-        console.log("submit invites");
-        console.log(toInvite);
+        log("submit invites");
+        log(toInvite);
+    }
+
+    async function handleSearchSubmit(event) {
+        event.preventDefault();
+        //TODO, does changing userlist happend here or at handleSearch?
     }
 
     return (
-        <div>
-
             <div>
-                <h3>User management</h3>
-                <h5>Invite new users</h5>
-                <form id="invite-users" onSubmit={handleSubmitInvite}>
-                    <textarea form="invite-users" value={toInvite}  onChange={handleChangeToInvite}/>
-                    <input type="submit"/>
-                </form>
-                <h5>Manage users</h5>
-                <label htmlFor="search">
-                    Search:
-                    <input id="search" type="text" onChange={handleSearch} />
-                </label>
-                <ul>
-                    {(users.length)? users.map(u => {
-                        return (<li>{u.name}</li>)
-                    }) : null}
-                </ul>
+                <h4>Invite new users</h4>
+
+                <Form id="invite-users" onSubmit={handleSubmitInvite}>
+                    <Form.Group controlId="inviteUserTextarea">
+                        <Form.Label>List of e-mailadres(ess) of users you want to invite </Form.Label>
+                        <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                    </Form.Group>
+                    <br/>
+                    <Button variant={"outline-secondary"} type="submit"> Invite users</Button>
+                </Form>
+                <br/>
+                <h4>Manage users</h4>
+                <Table className={"table"}>
+                    <thead>
+                        <tr>
+                            <th>
+                                <Form onSubmit={handleSearchSubmit}>
+                                    <Form.Group controlId="searchTable">
+                                        <Form.Control type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
+                                    </Form.Group>
+                                </Form>
+                            </th>
+                            <th>
+                                <p>
+                                    e-mailadres
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    account status
+                                </p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {(users.length) ? (users.map((item, index) => (<UserTr user={ item}/>))) : null}
+                    </tbody>
+                </Table>
             </div>
-
-
-        </div>
     );
 }

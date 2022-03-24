@@ -36,7 +36,7 @@ async def get_users():
     users = await read_all_where(User)
     out_users = []
     for user in users:
-        out_users.append(UserOutSimple.parse_raw(user.json()))
+        out_users.append(UserOut.parse_raw(user.json()))
     return list_modeltype_response(out_users, User)
 
 

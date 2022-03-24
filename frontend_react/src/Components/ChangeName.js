@@ -1,14 +1,17 @@
 import React, {useState} from "react";
 import {postCreate} from "../utils/json-requests";
 import {log} from "../utils/logger";
+import {Button, Form} from "react-bootstrap";
+import "../styles/settingcards.css"
 
 export default function ChangeName(props) {
 
     const [savedSuccess, setSavedSuccess] = useState(false)
+    const [name, setName] = useState(props.name)
 
     const handleChangeName = (event) => {
         event.preventDefault()
-        props.name = event.target.value
+        setName(event.target.value)
     }
 
     async function handleSubmitChange(event) {
@@ -16,23 +19,23 @@ export default function ChangeName(props) {
         event.preventDefault()
         let body = JSON.stringify({
             "email": props.email,
-            "name": props.name
+            "name": name
         })
-        //setSavedSuccess(true)
         let response = await postCreate(props.loggedInAs, body)
         if (response.success) {setSavedSuccess(true);}
     }
 
     return (
             <div>
-                <p>Your name will be displayed throughout the website when referencing you.</p>
-                <form onSubmit={handleSubmitChange}>
-                    <div>
-                        <input type="text" name="name" value={props.name} onChange={handleChangeName} />
-                    </div>
-                    {savedSuccess ? (<p>changed name successfully</p>): null}
-                    <input className="submit" type="submit" name="submitName" value="Save"/>
-                </form>
+                <p>Current name: <span className={"details-info"}>{props.name}</span></p>
+                <Form onSubmit={handleSubmitChange}>
+                    <Form.Group className="mb-3" controlId="newName">
+                        <Form.Label>Change name to:</Form.Label>
+                        <Form.Control type="text" value={name} onChange={handleChangeName} />
+                    </Form.Group>
+                    {savedSuccess ? (<p>Changed name successfully</p>): null}
+                    <Button variant={"outline-secondary"} type="submit">Change name</Button>
+                </Form>
             </div>
     )
 }

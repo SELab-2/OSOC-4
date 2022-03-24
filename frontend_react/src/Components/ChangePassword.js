@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
+import {log} from "../utils/logger";
 
-export default function ChangePassword(props) {
+export default function ChangePassword() {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -9,39 +10,33 @@ export default function ChangePassword(props) {
 
     const handleChangeCurrentPassword = (event) => {
         event.preventDefault()
+        setChangedSuccess(false)
         setCurrentPassword(event.target.value);
     }
 
     const handleChangeNewPassword = (event) => {
         event.preventDefault()
+        setChangedSuccess(false)
         setNewPassword(event.target.value);
     }
 
     const handleChangeConfirmPassword = (event) => {
         event.preventDefault()
+        setChangedSuccess(false)
         setConfirmPassword(event.target.value);
     }
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        console.log("works")
-        console.log(event.target.value)
-        console.log(newPassword)
+        //todo make this work with backend and implement more checks
+        if(newPassword === confirmPassword){
+            setChangedSuccess(true)
+        }
+        log(newPassword)
     }
 
     return(
         <Form onSubmit={handleSubmitChange}>
-            {/*<div>*/}
-            {/*    <input type="text" name="name" value={currentPassword} onChange={handleChangeCurrentPassword} />*/}
-            {/*</div>*/}
-            {/*<div>*/}
-            {/*    <input type="text" name="name" value={newPassword} onChange={handleChangeNewPassword} />*/}
-            {/*</div>*/}
-            {/*<div>*/}
-            {/*    <input type="text" name="name" value={confirmPassword} onChange={handleChangeConfirmPassword} />*/}
-            {/*    {(newPassword === confirmPassword) ? null : (<p>Password doesn't match!</p>)}*/}
-            {/*</div>*/}
-
             <Form.Group className="mb-3" controlId="currentPassword">
                 <Form.Label>Current password</Form.Label>
                 <Form.Control type="password" placeholder="Current password" value={currentPassword} onChange={handleChangeCurrentPassword} />
@@ -56,10 +51,11 @@ export default function ChangePassword(props) {
                 {(newPassword === confirmPassword) ? null : (<Form.Text className="text-muted">
                     Passwords don't match!
                 </Form.Text>)}
+                {(changedSuccess)? (<Form.Text className="text-muted">Changed password!</Form.Text>) : null}
 
             </Form.Group>
             <Button variant="outline-secondary" type="submit">Change password</Button>
-            {(changedSuccess)? (<label>Changed password!</label>) : null}
+
         </Form>
     )
 }
