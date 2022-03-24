@@ -143,7 +143,6 @@ class TestUsers(TestBase):
                 await self.post_response("/users/invites", to_invite, name, Status.FORBIDDEN)
                 await self.post_response("/users/invites", [bad_user_id], name, Status.FORBIDDEN)
 
-
     """
     GET /users/{id}
     """
@@ -220,7 +219,6 @@ class TestUsers(TestBase):
         # check that the user was not changed in the database
         user = await read_where(User, User.id == ObjectId(user_to_edit.id))
         self.assertNotEqual(user.name, new_name, f"{user_to_edit.name} was modified in the database")
-
 
     """
     POST /users/{id}/approve
