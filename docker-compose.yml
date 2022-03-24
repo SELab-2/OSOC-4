@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+#  osoc-frontend: 
+#    build: ./frontend
+#    ports:
+#      - "3000:3000"
+
+  osoc-backend:
+    # container_name: "osoc-backend"
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URL: mongodb_container
+      MONGO_PORT: 27017
+      MONGO_USER: root
+      MONGO_PASSWORD: justapassword
+      REDIS_URL: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: justapassword
+      # SMTP Mail
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_SSL_PORT: 465
+      SENDER_EMAIL: osoc.groep4@gmail.com
+      SENDER_PASSWORD: Justapassword123!
+      # Invite Settings
+      INVITE_EXPIRE: 4320 # in minutes
+      PASSWORDRESET_EXPIRE: 30 # in minutes
+
+  mongodb_container:
+    image: mongo:latest
+    # container_name: "osoc-mongodb"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: justapassword
+    volumes:
+      - ./data/mongo:/data/db
+
+  redis:
+    image: redis:latest
+    # container_name: osoc-redis
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
+    volumes:
+      - ./data/redis:/data

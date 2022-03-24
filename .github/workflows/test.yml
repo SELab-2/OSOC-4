@@ -1,0 +1,24 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the stack
+        run: docker-compose -f test-docker-compose.yml up -d --build
+      - name: Run tests
+        run: docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover
+      - name: Clean up
+        if: always()
+        run: |
+          docker-compose -f test-docker-compose.yml down
+          docker-compose -f test-docker-compose.yml rm -sf
