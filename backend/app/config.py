@@ -10,7 +10,7 @@ def get_api_path():
 
 
 def get_api_url():
-    return "http://192.168.0.102:8000"
+    return "http://localhost:8000"
 
 
 class Settings(BaseSettings):

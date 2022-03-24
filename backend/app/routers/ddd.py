@@ -17,10 +17,10 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/ddd")
 
-roles = [Skill(name=role) for role in
-         ["Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
-             "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
-             "Photographer"]]
+skills = [Skill(name=skill) for skill in
+          ["Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
+           "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
+           "Photographer"]]
 
 first_names = ["Eva", "Mark", "Jonathan", "Christine", "Sebatian", "Ava",
                "Blake", "Andrea", "Joanne", "Frank", "Emma", "Ruth", "Leah",
@@ -80,7 +80,7 @@ for qa in qa_multiple_choice:
     questions_multiple_choice.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
     answers_multiple_choice.append(
         [Answer(question_id=questions_multiple_choice[-1].id, field_id="", answer=answer_text)
-            for answer_text in qa[1:]])
+         for answer_text in qa[1:]])
 
 # multiple choice questions with max 2 answers
 qa_multiple_choice2 = [
@@ -100,7 +100,7 @@ for qa in qa_multiple_choice2:
     questions_multiple_choice2.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
     answers_multiple_choice2.append(
         [Answer(question_id=questions_multiple_choice2[-1].id, field_id="", answer=answer_text)
-            for answer_text in qa[1:]])
+         for answer_text in qa[1:]])
 
 
 def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=False):
@@ -120,35 +120,35 @@ def generate_student(edition_id):
     first_name = choice(first_names)
     last_name = choice(last_names)
     email = choice(emails)
-    random_roles = sample(roles, k=randrange(1, len(roles)))
+    random_skills = sample(skills, k=randrange(1, len(skills)))
     return Student(name=f"{first_name} {last_name}",
                    email=f"{first_name}.{last_name}@{email}".lower(),
-                   phonenumber=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
+                   phone_number=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
                    nickname=first_name,
-                   questions=[],
-                   roles=[role.id for role in random_roles],
+                   question_answers=[],
+                   skills=[skill.id for skill in random_skills],
                    edition=edition_id)
 
 
 def generate_suggestions(student, project, unconfirmed=3, confirmed_suggestion=None, admin=None):
     suggestions = [Suggestion(
-                   suggestion=choice(list(SuggestionOption)),
-                   reason="reason x",
-                   student_form=student.id,
-                   suggested_by=choice(project.user_ids),
-                   project=project.id,
-                   role=choice(student.roles),
-                   confirmed=False) for _ in range(unconfirmed)]
+        decision=choice(list(SuggestionOption)),
+        reason="reason x",
+        student=student.id,
+        suggested_by=choice(project.users),
+        project=project.id,
+        skill=choice(student.skills),
+        definitive=False) for _ in range(unconfirmed)]
 
     if confirmed_suggestion is not None and admin is not None:
         suggestions.append(Suggestion(
-            suggestion=confirmed_suggestion,
+            decision=confirmed_suggestion,
             reason="reason x",
-            student_form=student.id,
+            student=student.id,
             suggested_by=admin.id,
             project=project.id,
-            role=choice(student.roles),
-            confirmed=True))
+            skill=choice(student.skills),
+            definitive=True))
 
     return suggestions
 
@@ -180,8 +180,8 @@ async def add_dummy_data():
              generate_user(active=True, approved=True, disabled=False),
              generate_user(active=True, approved=True, disabled=True)]
 
-    admins = [generate_user(role=UserRole.ADMIN) for i in range(2)]
-    coaches = [generate_user() for i in range(5)]
+    admins = [generate_user(role=UserRole.ADMIN) for _ in range(2)]
+    coaches = [generate_user() for _ in range(5)]
 
     partner = Partner(
         name="UGent",
@@ -197,9 +197,9 @@ async def add_dummy_data():
         goals=["Free", "Real", "Estate"],
         description="Free real estate",
         partner=partner,
-        user_ids=[coaches[i].id for i in range(2)],
-        required_roles=[RequiredSkills(role=role.id, number=randrange(2, 5))
-                        for role in roles],
+        users=[coaches[i].id for i in range(2)],
+        required_skills=[RequiredSkills(skill=skill.id, number=randrange(2, 5))
+                         for skill in skills],
         edition=edition.id)
 
     project2 = Project(
@@ -207,12 +207,12 @@ async def add_dummy_data():
         goals=["Goal 1", "Goal 2"],
         description="Hackers & Cyborgs",
         partner=partner,
-        user_ids=[coaches[i].id for i in range(2, 5)],
-        required_roles=[RequiredSkills(role=role.id, number=randrange(1, 8))
-                        for role in sample(roles, k=randrange(3, len(roles)))],
+        users=[coaches[i].id for i in range(2, 5)],
+        required_skills=[RequiredSkills(skill=skill.id, number=randrange(1, 8))
+                         for skill in sample(skills, k=randrange(3, len(skills)))],
         edition=edition.id)
 
-    students = [generate_student(edition.id) for _ in range(10)]
+    students = [] # [generate_student(edition.id) for _ in range(10)]
     suggestions = []
     participations = []
     for student in students:
@@ -227,14 +227,14 @@ async def add_dummy_data():
             suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
 
     # generate students that participate in a project
-    for required_role in project.required_roles:
-        for _ in range(randrange(required_role.number)):
+    for required_skill in project.required_skills:
+        for _ in range(randrange(required_skill.number)):
             students.append(generate_student(edition.id))
-            participations.append(Participation(student_form=students[-1].id, project=project.id,
-                                  role=required_role.role))
+            participations.append(Participation(student=students[-1].id, project=project.id,
+                                                skill=required_skill.skill))
 
-    for student in students:
-        student.questions = generate_question_answers()
+    # for student in students:
+    #    student.question_answers = generate_question_answers()
 
     # save models to database
     await db.engine.save(user_admin)
@@ -266,16 +266,16 @@ async def add_dummy_data():
         for answer in answers:
             await db.engine.save(answer)
 
-    for role in roles:
-        await db.engine.save(role)
+    for skill in skills:
+        await db.engine.save(skill)
 
     await db.engine.save(edition)
     await db.engine.save(project)
     await db.engine.save(project2)
 
     for student in students:
-        for question_answer in student.questions:
-            await db.engine.save(question_answer)
+        # for question_answer in student.questions:
+        #    await db.engine.save(question_answer)
         await db.engine.save(student)
 
     for suggestion in suggestions:
