@@ -1,0 +1,60 @@
+table {
+    width: 100%;
+}
+
+.tr{
+    border-style:hidden;
+}
+
+.tfoot{
+    border: none;
+    height:0;
+}
+
+card{
+}
+
+.column-icon{
+    width:5%;
+}
+
+.column-text{
+    text-align:center;
+    width:90%;
+}
+
+.column-button{
+    width:5%;
+}
+
+/* hacky way to make close and change button same size */
+.button{
+    min-width:81px;
+    min-height:38px;
+}
+
+.card-title{
+    font-weight: bold;
+}
+
+.card-subtitle{
+    color:grey;
+}
+
+.details-text{
+    width:70%;
+    color: grey;
+}
+
+.center-div{
+    text-align: center;
+}
+
+.details-div{
+    padding: 0 5% 2.5%;
+}
+
+.details-info{
+    color:black;
+    font-weight: bold;
+}

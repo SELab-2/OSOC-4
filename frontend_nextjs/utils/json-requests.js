@@ -91,7 +91,7 @@ export async function sendDelete(url, getters, commit) {
 export async function postCreate(url, json) {
     log("json-requests: postCreate: " + url)
     try {
-        const resp = await ApiClient.post(url, json);
+        const resp = await AuthApiClient.post(url, json);
 
         return {
             success: true,
