@@ -157,7 +157,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.post(path, json=json_body, headers={"Authorize": "Bearer " + access_token,
+            response = await self.client.post(path, json=json_body, headers={"Authorization": "Bearer " + access_token,
                                                                              "Content-Type": "application/json"})
         else:
             response = await self.client.post(path, json=json_body, headers={"Content-Type": "application/json"})
