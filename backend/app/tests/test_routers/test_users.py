@@ -20,7 +20,8 @@ class TestUsers(TestBase):
     """
     async def test_get_user_me(self):
         # Correct GET
-        for user_title, user in self.objects.items():
+        for user_title in self.saved_objects["users"]:
+            user = self.objects[user_title]
             response = await self.get_response("/users/me", user_title, Status.SUCCES)
             response = json.loads(response.content)["data"]["id"].split("/")[-1]
 
@@ -38,7 +39,7 @@ class TestUsers(TestBase):
 
     async def test_create_user_as_forbidden(self):
         body: Dict[str, str] = {"email": "added_as_unauthorized@test.com"}
-        for user_title in self.objects:
+        for user_title in self.saved_objects["users"]:
             if user_title != "user_admin":
                 await self.post_response("/users/create", body, user_title, Status.FORBIDDEN)
 
@@ -72,7 +73,7 @@ class TestUsers(TestBase):
                         Was: {ep_users}""")
 
         # Test wrong roles
-        for user_title in self.objects:
+        for user_title in self.saved_objects["users"]:
             if user_title != "user_admin":
                 await self.get_response("/users", user_title, Status.FORBIDDEN)
 
@@ -86,11 +87,12 @@ class TestUsers(TestBase):
         to_invite.email = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
         bad_user_id = "00000a00a00aa00aa000aaaa"
 
-        for name, user in self.objects.items():
+        for user_title in self.saved_objects["users"]:
+            user = self.objects[user_title]
             if user.approved and user.role == UserRole.ADMIN:
-                await self.post_response(f"/users/{to_invite.id}/invite", {}, name, Status.SUCCES)
-                await self.post_response(f"/users/{active_user.id}/invite", {}, name, Status.BAD_REQUEST)
-                await self.post_response(f"/users/{bad_user_id}/invite", {}, name, Status.NOT_FOUND)
+                await self.post_response(f"/users/{to_invite.id}/invite", {}, user_title, Status.SUCCES)
+                await self.post_response(f"/users/{active_user.id}/invite", {}, user_title, Status.BAD_REQUEST)
+                await self.post_response(f"/users/{bad_user_id}/invite", {}, user_title, Status.NOT_FOUND)
 
     async def test_invite_user_as_forbidden(self):
         to_invite = self.objects["user_unactivated_coach"]
@@ -98,11 +100,12 @@ class TestUsers(TestBase):
         to_invite.email = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
         bad_user_id = "00000a00a00aa00aa000aaaa"
 
-        for name, user in self.objects.items():
+        for user_title in self.saved_objects["users"]:
+            user = self.objects[user_title]
             if user.active and user.role != UserRole.ADMIN:
-                await self.post_response(f"/users/{to_invite.id}/invite", {}, name, Status.FORBIDDEN)
-                await self.post_response(f"/users/{active_user.id}/invite", {}, name, Status.FORBIDDEN)
-                await self.post_response(f"/users/{bad_user_id}/invite", {}, name, Status.FORBIDDEN)
+                await self.post_response(f"/users/{to_invite.id}/invite", {}, user_title, Status.FORBIDDEN)
+                await self.post_response(f"/users/{active_user.id}/invite", {}, user_title, Status.FORBIDDEN)
+                await self.post_response(f"/users/{bad_user_id}/invite", {}, user_title, Status.FORBIDDEN)
 
     """
     POST /users/invites
@@ -121,11 +124,12 @@ class TestUsers(TestBase):
         to_invite = list(map(lambda user: set_email(user, test_mail), to_invite))
         active_users = list(map(lambda user: set_email(user, test_mail), active_users))
 
-        for name, user in self.objects.items():
+        for user_title in self.saved_objects["users"]:
+            user = self.objects[user_title]
             if user.approved and user.role == UserRole.ADMIN:
-                await self.post_response("/users/invites", to_invite, name, Status.SUCCES)
-                await self.post_response("/users/invites", active_users, name, Status.BAD_REQUEST)
-                await self.post_response("/users/invites", [bad_user_id], name, Status.NOT_FOUND)
+                await self.post_response("/users/invites", to_invite, user_title, Status.SUCCES)
+                await self.post_response("/users/invites", active_users, user_title, Status.BAD_REQUEST)
+                await self.post_response("/users/invites", [bad_user_id], user_title, Status.NOT_FOUND)
 
     async def test_invite_users_as_forbidden(self):
         to_invite = [self.objects["user_unactivated_coach"]]
@@ -138,10 +142,11 @@ class TestUsers(TestBase):
 
         to_invite = list(map(lambda user: set_email(user, test_mail), to_invite))
 
-        for name, user in self.objects.items():
+        for user_title in self.saved_objects["users"]:
+            user = self.objects[user_title]
             if user.active and user.role != UserRole.ADMIN:
-                await self.post_response("/users/invites", to_invite, name, Status.FORBIDDEN)
-                await self.post_response("/users/invites", [bad_user_id], name, Status.FORBIDDEN)
+                await self.post_response("/users/invites", to_invite, user_title, Status.FORBIDDEN)
+                await self.post_response("/users/invites", [bad_user_id], user_title, Status.FORBIDDEN)
 
     """
     GET /users/{id}
@@ -149,10 +154,11 @@ class TestUsers(TestBase):
     async def test_get_user_as_approved_user(self):
         expected = self.objects["user_admin"]
         bad_user_id = "00000a00a00aa00aa000aaaa"
-        for name, user in self.objects.items():
+        for user_title in self.saved_objects["users"]:
+            user = self.objects[user_title]
             if user.name != "user_admin":
                 if user.approved:
-                    response = await self.get_response(f"/users/{expected.id}", name, Status.SUCCES)
+                    response = await self.get_response(f"/users/{expected.id}", user_title, Status.SUCCES)
                     gotten_user = json.loads(response.content)["data"]
                     self.assertTrue(expected.email == gotten_user["email"],
                                     f"""The incorrect user was fetched
@@ -160,14 +166,14 @@ class TestUsers(TestBase):
                                     Was: {gotten_user}
                                     """)
 
-                    await self.get_response(f"/users/{self.objects['user_activated_coach'].id}", name, Status.BAD_REQUEST)
-                    await self.get_response(f"/users/{bad_user_id}", name, Status.NOT_FOUND)
+                    await self.get_response(f"/users/{self.objects['user_activated_coach'].id}", user_title, Status.BAD_REQUEST)
+                    await self.get_response(f"/users/{bad_user_id}", user_title, Status.NOT_FOUND)
 
     async def test_get_user_as_forbidden(self):
         user_id: str = str(self.objects["user_approved_coach"].id)
         bad_user_id = "00000a00a00aa00aa000aaaa"
 
-        for user_title in self.objects:
+        for user_title in self.saved_objects["users"]:
             if user_title != "user_admin" and user_title != "user_approved_coach":
                 await self.get_response(f"/users/{user_id}", user_title, Status.FORBIDDEN)
                 await self.get_response(f"/users/{bad_user_id}", user_title, Status.FORBIDDEN)
@@ -210,7 +216,7 @@ class TestUsers(TestBase):
         body: Dict[str, str] = {"email": "new+email@new.me", "name": new_name}
         bad_body: Dict[str, str] = {"email": self.objects["user_admin"].email, "name": "Rocky"}
 
-        for user_title in self.objects:
+        for user_title in self.saved_objects["users"]:
             if user_title != "user_admin":
                 await self.post_response(f"/users/{user_to_edit.id}", body, user_title, Status.FORBIDDEN)
                 await self.post_response(f"/users/{user_to_edit.id}", bad_body, user_title, Status.FORBIDDEN)
@@ -250,7 +256,7 @@ class TestUsers(TestBase):
         unactivated_user = self.objects["user_unactivated_coach"]
         bad_user_id = "00000a00a00aa00aa000aaaa"
 
-        for user_title in self.objects:
+        for user_title in self.saved_objects["users"]:
             if user_title != "user_admin":
                 await self.post_response(f"/users/{activated_user.id}/approve", {}, user_title, Status.FORBIDDEN)
                 await self.post_response(f"/users/{approved_user.id}/approve", {}, user_title, Status.FORBIDDEN)
@@ -283,7 +289,8 @@ class TestUsers(TestBase):
             "validate_password": new_pass + "oeps"
         }
 
-        for user_title, user in self.objects.items():
+        for user_title in self.saved_objects["users"]:
+            user = self.objects[user_title]
             key = generate_new_reset_password_key()
             db.redis.setex(key[0], key[1], str(user.id))
 
