@@ -225,24 +225,25 @@ First of all we have a login system. If you already have an account on the tool 
 
 
 ### 4.2. Architecture and Design
-Now we're going to describe the architecture of the OSOC selection tool.
-
-![Design](https://github.com/SELab-2/OSOC-4/blob/user_man/info/deployment/deployment.svg)
-
-Our architecture is a very standard client-server architecture. A frontend is
-used to access a backend, both of which are deployed on a server. This server is
-accessed through a reverse proxy. This is provided through Traefik. Traefik also
-provides a dashboard that allows us to monitor all the services.
-
-
-The backend can then access data, which is stored using MongoDB and Redis. Redis
-is used to for user invites and MongoDB for everything else.
-
+Now we're going to describe the architecture and design of the OSOC selection tool.
 
 In order to deploy everything, we use Docker. Using containers allows us to have
 an easily reproducible deployment. We have a seperate container for the
 frontend, the backend, MongoDB and Redis. This allows us to develop and scale
 each part of our application separately.
+
+![Architecture](https://github.com/SELab-2/OSOC-4/blob/development/info/architecture.svg)
+
+The design of our application is a very standard client-server architecture. A frontend is
+used to access a backend, both of which are deployed on a server (as shown above). This server is
+accessed through a reverse proxy. This is provided through Traefik. Traefik also
+provides a dashboard that allows us to monitor all the services.
+
+![Design](https://github.com/SELab-2/OSOC-4/blob/user_man/info/deployment/deployment.svg)
+
+The backend can then access data, which is stored using MongoDB and Redis. Redis
+is used to for user invites and MongoDB for everything else. This way the frontend doesn't have direct acces to the database, everything is controlled by the backend.
+
 
 ## 5. Description of the user interface and common use cases
 
