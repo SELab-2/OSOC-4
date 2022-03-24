@@ -10,9 +10,9 @@ async function refreshAccessToken(tokenObject) {
         console.log("sending refresh request")
         // Get a new set of tokens with a refreshToken
 
-        axios.defaults.baseURL = process.env.NEXT_INTERNAL_API_URL || "http://localhost:8000";
+        const url = process.env.NEXT_INTERNAL_API_URL || "http://localhost:8000";
 
-        const tokenResponse = await axios.post("/refresh", {}, { headers: { "Authorization": "Bearer " + tokenObject.refreshToken, 'X-CSRF-TOKEN': csrfToken } });
+        const tokenResponse = await axios.post(url + "/refresh", {}, { headers: { "Authorization": "Bearer " + tokenObject.refreshToken, 'X-CSRF-TOKEN': csrfToken } });
 
         return {
             ...tokenObject,
@@ -83,7 +83,7 @@ const callbacks = {
     },
     redirect: async ({ url, baseUrl }) => {
 
-        
+
         if (process.env.NEXTAUTH_URL) {
             return url.replace("http://localhost:3000", "https://sel2-4.ugent.be");
         }
