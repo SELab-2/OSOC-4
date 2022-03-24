@@ -8,7 +8,6 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
-                                            UserNotApprovedException,
                                             UserNotFoundException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import (User, UserCreate, UserData, UserOut,
@@ -73,7 +72,7 @@ async def add_user_data(user: UserCreate):
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def invite_user(id: str, body=Body(default=None)):
+async def invite_user(id: str):
     """invite_user this functions invites a user
 
     :param id: the user id
@@ -127,8 +126,8 @@ async def invite_users(ids: List[str]):
     return response(None, "Invites sent succesfull")
 
 
-@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_user(id: str):
+@router.get("/{id}")
+async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends()):
     """get_user this functions returns the user with given id (or None)
 
     :param id: the user id
@@ -140,8 +139,9 @@ async def get_user(id: str):
 
     if not user:
         raise UserNotFoundException()
-    elif not user.approved:
-        raise UserNotApprovedException()
+
+    if not role == UserRole.ADMIN and not user.approved:
+        raise UserNotFoundException()
 
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 

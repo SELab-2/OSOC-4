@@ -1,0 +1,14 @@
+FROM node:16-alpine
+WORKDIR /app
+COPY package.json .
+RUN yarn install
+COPY . .
+
+ARG NEXTAUTH_URL
+ENV NEXTAUTH_URL=${NEXTAUTH_URL}
+ARG NEXT_API_URL
+ENV NEXT_API_URL=${NEXT_API_URL}
+ARG NEXT_BASE_PATH
+ENV NEXT_BASE_PATH=${NEXT_BASE_PATH}
+RUN yarn build
+CMD ["yarn", "start"]
