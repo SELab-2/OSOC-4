@@ -10,7 +10,7 @@ async function refreshAccessToken(tokenObject) {
         console.log("sending refresh request")
         // Get a new set of tokens with a refreshToken
 
-        axios.defaults.baseURL = process.env.NEXT_API_URL || "http://localhost:8000";
+        axios.defaults.baseURL = process.env.NEXT_INTERNAL_API_URL || "http://localhost:8000";
 
         const tokenResponse = await axios.post("/refresh", {}, { headers: { "Authorization": "Bearer " + tokenObject.refreshToken, 'X-CSRF-TOKEN': csrfToken } });
 

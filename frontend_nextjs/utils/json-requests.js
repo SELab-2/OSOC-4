@@ -141,8 +141,9 @@ export async function patchEdit(url, json, getters, commit) {
 
 export async function login(json) {
     log("json-requests: login")
+    const base = process.env.NEXT_INTERNAL_API_URL || "";
     try {
-        let resp = await ApiClient.post("/login", json);
+        let resp = await ApiClient.post(base + "/login", json);
         log(resp)
         return { success: true, data: resp.data };
     } catch (e) {
