@@ -4,6 +4,8 @@ from enum import IntEnum
 
 from app.api import app
 from app.database import db
+from app.models.edition import Edition
+from app.models.project import Project, Partner
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 from asgi_lifespan import LifespanManager
@@ -63,10 +65,22 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 role=UserRole.NO_ROLE,
                 active=False,
                 approved=False,
-                disabled=False)
+                disabled=False),
+            "project_test": Project(
+                name="project_test",
+                description="A project aimed at being dummy data",
+                goals=["Testing this application", "Being dummy data"],
+                partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
+                required_skills=[],
+                users=[],
+                edition=Edition(year=2022, user_ids=[]).id
+            )
         }
         self.saved_objects = {
-            "passwords": {}}  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
+            "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
+            "projects": [],
+            "users": []
+        }
         self.created = []
 
     async def asyncSetUp(self) -> None:
@@ -79,11 +93,14 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 plain_password = obj.password
                 obj.password = get_password_hash(obj.password)
                 self.saved_objects["passwords"][key] = plain_password
+                self.saved_objects["users"].append(key)
+            elif isinstance(obj, Project):
+                self.saved_objects["projects"].append(key)
             self.saved_objects[key] = await db.engine.save(obj)
 
     async def asyncTearDown(self) -> None:
         for o in self.saved_objects.values():
-            if not isinstance(o, dict):
+            if not isinstance(o, dict) and not isinstance(o, list):
                 await db.engine.delete(o)
         await self.lf.__aexit__()
         await self.client.aclose()
@@ -157,7 +174,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.post(path, json=json_body, headers={"Authorize": "Bearer " + access_token,
+            response = await self.client.post(path, json=json_body, headers={"Authorization": "Bearer " + access_token,
                                                                              "Content-Type": "application/json"})
         else:
             response = await self.client.post(path, json=json_body, headers={"Content-Type": "application/json"})

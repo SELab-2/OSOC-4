@@ -7,7 +7,6 @@ services:
       context: ./frontend_nextjs
       args:
         NEXT_BASE_PATH: ${PATHPREFIX}/frontend
-        NEXTAUTH_URL: https://sel2-4.ugent.be${PATHPREFIX}/frontend
         NEXT_API_URL: https://sel2-4.ugent.be${PATHPREFIX}/api
     ports:
       - 3000
@@ -19,8 +18,8 @@ services:
       - traefik.http.routers.osoc-frontend.tls=true
       - traefik.http.routers.osoc-frontend.tls.certresolver=le
       - traefik.http.routers.osoc-frontend.entrypoints=websecure
-      - traefik.http.routers.osoc-frontend.middlewares=osocfrontendpathstrip
-      - traefik.http.middlewares.osocfrontendpathstrip.stripprefix.prefixes=${PATHPREFIX}/frontend
+      # - traefik.http.routers.osoc-frontend.middlewares=osocfrontendpathstrip
+      # - traefik.http.middlewares.osocfrontendpathstrip.stripprefix.prefixes=${PATHPREFIX}/frontend
       - traefik.port=3000
     user: "1000:1000"
 

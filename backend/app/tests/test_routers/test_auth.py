@@ -18,7 +18,6 @@ class TestAuth(TestBase):
     async def post_login_fail(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
         response = await self.post_response("/login", body, name, Status.UNAUTHORIZED, use_access_token=False)
-        print(response.json())
         self.assertTrue("message" in response.json())
 
     async def test_login(self):

@@ -16,7 +16,7 @@ function MyApp({ Component, pageProps }) {
 
 
   return (
-    <SessionProvider session={pageProps.session} refetchInterval={interval} >
+    <SessionProvider session={pageProps.session} refetchInterval={interval} basePath={`${process.env.NEXT_BASE_PATH}/api/auth`}>
 
       <RouteGuard auth={!no_auth.includes(Component)}>
         <Component {...pageProps} />

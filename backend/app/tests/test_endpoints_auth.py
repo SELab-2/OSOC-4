@@ -15,15 +15,15 @@ class TestEndpointAuthorization(TestBase):
             # No authorization
             await self.get_response(ep, "user_admin", Status.UNAUTHORIZED, use_access_token=False)
             # Wrong authorization
-            await self.get_response(ep, "user_admin", Status.UNAUTHORIZED, access_token="wrong token")
+            await self.get_response(ep, "user_admin", Status.UNPROCESSABLE, access_token="wrong token")
 
     async def test_post_endpoints(self):
         eps = {
-            "/users/create": {"email": "noAuth@test.be", "password": "JustaPassword!123"}
+            "/users/create": {"email": "noAuth@test.be"}
         }
 
         for ep, body in eps.items():
             # No authorization
             await self.post_response(ep, body, "user_admin", Status.UNAUTHORIZED, use_access_token=False)
             # Wrong authorization
-            await self.post_response(ep, body, "user_admin", Status.UNAUTHORIZED, access_token="wrong token")
+            await self.post_response(ep, body, "user_admin", Status.UNPROCESSABLE, access_token="wrong token")

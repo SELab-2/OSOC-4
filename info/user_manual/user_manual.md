@@ -225,16 +225,24 @@ First of all we have a login system. If you already have an account on the tool 
 
 
 ### 4.2. Architecture and Design
-Now we're going to describe the architecture of how the OSOC selection tool works. 
-
-We're basicly using 4 containers (redis, mongodb, backend, frontend)
-
-*hier komt een prentje*
-
-Now we will describe how all these containers work toghetter in order to archieve a fully working selection tool.
+Now we're going to describe the architecture of the OSOC selection tool.
 
 ![Design](https://github.com/SELab-2/OSOC-4/blob/user_man/info/deployment/deployment.svg)
 
+Our architecture is a very standard client-server architecture. A frontend is
+used to access a backend, both of which are deployed on a server. This server is
+accessed through a reverse proxy. This is provided through Traefik. Traefik also
+provides a dashboard that allows us to monitor all the services.
+
+
+The backend can then access data, which is stored using MongoDB and Redis. Redis
+is used to for user invites and MongoDB for everything else.
+
+
+In order to deploy everything, we use Docker. Using containers allows us to have
+an easily reproducible deployment. We have a seperate container for the
+frontend, the backend, MongoDB and Redis. This allows us to develop and scale
+each part of our application separately.
 
 ## 5. Description of the user interface and common use cases
 
