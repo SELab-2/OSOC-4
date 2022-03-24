@@ -241,8 +241,11 @@ provides a dashboard that allows us to monitor all the services.
 
 ![Design](https://github.com/SELab-2/OSOC-4/blob/user_man/info/deployment/deployment.svg)
 
-The backend can then access data, which is stored using MongoDB and Redis. Redis
-is used to for user invites and MongoDB for everything else. This way the frontend doesn't have direct acces to the database, everything is controlled by the backend.
+The backend can then access data, which is stored using MongoDB and Redis.
+Redis has built in features to let data automaticaly expire and is thus used
+for user invites, password resets and revokable tokens. MongoDB is used for
+everything else. This way the frontend doesn't have direct acces to the
+database, everything is controlled by the backend.
 
 
 ## 5. Description of the user interface and common use cases
