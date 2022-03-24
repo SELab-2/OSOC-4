@@ -3,9 +3,6 @@ import 'bootstrap/dist/css/bootstrap.css'
 import "../styles/colors.css"
 import "../styles/login.css"
 import "../styles/settings.css"
-import "../styles/settingcards.css"
-import "../styles/manageusers.css"
-
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import RefreshTokenHandler from '../Components/refreshTokenHandler';
