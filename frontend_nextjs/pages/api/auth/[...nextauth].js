@@ -63,9 +63,6 @@ const callbacks = {
             token.userid = user["id"]
         }
 
-        // If accessTokenExpires is 24 hours, we have to refresh token before 24 hours pass.
-        const shouldRefreshTime = Math.round((token.accessTokenExpires - 60 * 60 * 1000) - Date.now());
-
         // If the token is still valid, just return it.
         if (Date.now() < token.accessTokenExpires) {
             return Promise.resolve(token);
@@ -85,6 +82,8 @@ const callbacks = {
         return Promise.resolve(session);
     },
     redirect: async ({ url, baseUrl }) => {
+
+        
         if (process.env.NEXTAUTH_URL) {
             return url.replace("http://localhost:3000", "https://sel2-4.ugent.be");
         }
