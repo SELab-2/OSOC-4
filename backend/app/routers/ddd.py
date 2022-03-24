@@ -212,7 +212,7 @@ async def add_dummy_data():
                          for skill in sample(skills, k=randrange(3, len(skills)))],
         edition=edition.id)
 
-    students = [] # [generate_student(edition.id) for _ in range(10)]
+    students = []  # [generate_student(edition.id) for _ in range(10)]
     suggestions = []
     participations = []
     for student in students:
