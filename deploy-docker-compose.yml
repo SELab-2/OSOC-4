@@ -13,8 +13,8 @@ services:
     ports:
       - 3000
     environment:
-      - NEXT_INTERNAL_API_URL=http://osoc-backend:8000
-      - NEXT_API_URL=https://sel2-4.ugent.be${PATHPREFIX}/api
+      - NEXTAUTH_URL=https://sel2-4.ugent.be${PATHPREFIX}/frontend/api/auth
+      - NEXTAUTH_URL_INTERNAL=http://localhost:3000${PATHPREFIX}/frontend/api/auth
     networks:
         - proxynet
     labels:
