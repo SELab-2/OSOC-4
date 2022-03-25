@@ -98,34 +98,6 @@ export const options = {
     pages: {
         signIn: '/login',
     },
-    cookies: {
-        sessionToken: {
-            name: `__Secure-next-auth.session-token`,
-            options: {
-              httpOnly: true,
-              sameSite: 'lax',
-              path: process.env.NEXT_BASE_PATH,
-              secure: true
-            }
-          },
-          callbackUrl: {
-            name: `__Secure-next-auth.callback-url`,
-            options: {
-              sameSite: 'lax',
-              path: process.env.NEXT_BASE_PATH,
-              secure: true
-            }
-          },
-          csrfToken: {
-            name: `__Host-next-auth.csrf-token`,
-            options: {
-              httpOnly: true,
-              sameSite: 'lax',
-              path: process.env.NEXT_BASE_PATH,
-              secure: true
-            }
-        },
-    },
     secret: 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0',
 }
 
