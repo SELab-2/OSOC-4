@@ -26,7 +26,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && cd OSOC-deployments/${{ steps.extract_branch.outputs.branch }} && docker-compose -f deploy-docker-compose.yml down --remove-orphans) || echo "Containers don't exist"
-            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && mv OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || echo "Data doesn't exist"
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && mkdir -p /tmp/${{ steps.extract_branch.outputs.branch }}/data && mv OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || echo "Data doesn't exist"
 
       - name: Copy repo to the server
         uses: appleboy/scp-action@master
