@@ -40,7 +40,7 @@ In this manual we'll explain everything there is to explain about the OSOC selec
 
 
 ## 2. Product information
-This manual concerns the Open Summer Of Code Selection tool, version 1
+This manual concerns the Open Summer Of Code Selection tool, version 1.
 
 
 ## 3. Intended use
