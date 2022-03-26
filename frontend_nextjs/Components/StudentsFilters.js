@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../utils/json-requests";
-import {getRolesPath} from "../routes";
+import {getRolesPath, getStudentsPath} from "../routes";
 
 export default function StudentsFilters(props) {
 
@@ -15,8 +15,23 @@ export default function StudentsFilters(props) {
       })
     }
     if (filters === {}) {
+      let newFilters = {};
       let url = window.location.href;
-      let startindex = url.search()
+
+      let startindex = url.search(getStudentsPath()) + getStudentsPath().length;
+      url = url.slice(startindex);
+      let filterStrings = url.split("/");
+
+      for (let filter in filterStrings) {
+        filter = filter.split(":");
+        let filterValue = filter[1].split(",");
+        if (filterValue === ["true"]) {
+          filterValue = true;
+        }
+        newFilters[filter[0]] = filterValue;
+      }
+
+      setFilters(newFilters);
     }
   })
 
