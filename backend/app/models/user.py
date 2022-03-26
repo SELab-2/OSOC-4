@@ -16,13 +16,17 @@ class UserRole(int, Enum):
 
 
 class User(Model):
-    name: str = ""
     email: str
+    name: str = ""
     password: str = ""
     role: UserRole = 0
     active: bool = False
     approved: bool = False
     disabled: bool = True
+
+    @validator('email')
+    def email_lowercase(cls, v):
+        return v.lower()
 
 
 class UserCreate(BaseModel):
@@ -53,9 +57,20 @@ class UserOut(BaseModel):
     approved: bool
 
 
+class UserData(BaseModel):
+    email: str
+    name: str
+
+
 class UserLogin(BaseModel):
     email: str
     password: str
+
+    @validator('email')
+    def email_lowercase_with_format(cls, v):
+        if not valid_email(v):
+            raise InvalidEmailException()
+        return v.lower()
 
 
 class UserInvite(BaseModel):

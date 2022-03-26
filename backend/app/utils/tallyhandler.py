@@ -2,7 +2,7 @@ from app.crud import read_where, update
 from app.models.answer import Answer
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
-from app.models.student_form import StudentForm
+from app.models.student import Student
 
 
 async def process_tally(data):
@@ -14,7 +14,7 @@ async def process_tally(data):
     # [to implement] get edition by form id
     # form_id = res["data"]["formId"]
 
-    studentform: StudentForm = StudentForm(
+    studentform: Student = Student(
         name="", email="", phonenumber="", nickname="", questions=[])
 
     for field in data["data"]["fields"]:
@@ -40,7 +40,7 @@ async def process_tally(data):
                         answer = await update(a)
 
                     if option["id"] == field["value"]:
-                        studentform.questions.append(QuestionAnswer(
+                        studentform.question_answers.append(QuestionAnswer(
                             question=question.id, answer=answer.id))
 
             await update(studentform)

@@ -8,14 +8,14 @@ export default function NavHeader(props) {
         event.preventDefault();
         let r = await logout("/logout")
         if (r.success) {
-            props.setIsLoggedIn(false)
+            props.setLoggedInAs(null)
         }
     }
 
     return (
         <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Container>
-                <Navbar.Brand href="#home">
+                <Navbar.Brand>
                     <img
                         src={process.env.PUBLIC_URL + "/assets/osoc-emblem.svg"}
                         width="50"

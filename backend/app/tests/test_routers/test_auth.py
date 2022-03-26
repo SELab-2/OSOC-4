@@ -13,12 +13,12 @@ class TestAuth(TestBase):
     async def post_login_succes(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
         response = await self.post_response("/login", body, name, Status.SUCCES, use_access_token=False)
-        self.assertTrue("csrf_access_token" in response.cookies)
+        self.assertTrue("id" in response.json()["data"])
 
     async def post_login_fail(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
         response = await self.post_response("/login", body, name, Status.UNAUTHORIZED, use_access_token=False)
-        self.assertTrue("csrf_access_token" not in response.cookies)
+        self.assertTrue("message" in response.json())
 
     async def test_login(self):
         user_admin = self.objects["user_admin"]
