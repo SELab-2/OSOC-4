@@ -39,6 +39,18 @@ async def read_where(model: Type[ModelType], *args) -> Optional[ModelType]:
     return res if res else None
 
 
+async def count_where(model: Type[ModelType], *args) -> int:
+    """count_where Count the objects where in mongodb
+
+    :param model: _description_
+    :type model: Type[ModelType]
+    :return: the object count
+    :rtype: int
+    """
+    res = await db.engine.count(model, *args)
+    return res
+
+
 async def update(model: ModelType) -> Optional[ModelType]:
     """update this function updates one entry from a model (the one with the same id, or else it adds the id)
 

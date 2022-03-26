@@ -26,6 +26,8 @@ class RoleChecker:
         if user.role < self.role:
             raise NotPermittedException()
 
+        return user.role
+
 
 class EditionChecker:
     def __init__(self, always_allowed: List[UserRole] = [UserRole.ADMIN]):

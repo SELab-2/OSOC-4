@@ -1,10 +1,16 @@
 import axios from "axios";
 import { log } from "./logger";
 import Cookies from 'js-cookie';
+import data from "bootstrap/js/src/dom/data";
+
+const nobase = axios.create({
+    withCredentials: true,
+})
 
 axios.defaults.withCredentials = true
 // todo fix base url with env var
 axios.defaults.baseURL = process.env.PUBLIC_URL || "http://localhost:8000";
+
 
 let _config = {
     "headers": {
@@ -75,10 +81,12 @@ export async function catchError(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function getJson(url) {
+export async function getJson(url, useBase=true) {
     log("json-requests: getJson: " + url)
     try {
-        const response = await axios.get(url, headers());
+        let response = undefined
+        if (useBase) { response = await axios.get(url, headers()); }
+        else { response = await nobase.get(url, headers())}
         console.log(response)
         return response.data;
     } catch (e) {
@@ -109,11 +117,13 @@ export async function sendDelete(url, getters, commit) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function postCreate(url, json) {
+export async function postCreate(url, json, useBase=true) {
     log("json-requests: postCreate: " + url)
     console.log(json)
     try {
-        let resp = await axios.post(url, json, headers())
+        let resp;
+        if (useBase) { resp = await axios.post(url, json, headers()); }
+        else {resp = await nobase.post(url, json, headers());}
         return {
             success: true,
             data: resp.data
