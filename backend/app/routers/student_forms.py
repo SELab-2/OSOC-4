@@ -1,5 +1,5 @@
 from app.crud import read_all_where
-from app.models.student_form import StudentForm
+from app.models.student import Student
 from app.utils.response import list_modeltype_response
 from fastapi import APIRouter
 
@@ -13,5 +13,5 @@ async def get_student():
     :return: list of student forms
     :rtype: dict
     """
-    results = await read_all_where(StudentForm)
-    return list_modeltype_response(results, StudentForm)
+    results = await read_all_where(Student)
+    return list_modeltype_response(results, Student)

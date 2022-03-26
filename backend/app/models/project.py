@@ -11,19 +11,18 @@ class Partner(EmbeddedModel):
     about: str
 
 
-class RequiredRole(EmbeddedModel):
-    role: ObjectId  # points to role from role.py
+class RequiredSkills(EmbeddedModel):
+    skill: ObjectId  # points to role from skill.py
     number: int = Field(gt=0)
 
 
 class Project(Model):
     name: str
-    goals: List[str]
     description: str
-    student_amount: int = Field(ge=0)
+    goals: List[str]
     partner: Partner
-    user_ids: List[ObjectId]
-    required_roles: List[RequiredRole]
+    required_skills: List[RequiredSkills]
+    users: List[ObjectId]
     edition: ObjectId
 
 
@@ -38,16 +37,15 @@ class ProjectOutSimple(BaseModel):
 class ProjectOutExtended(BaseModel):
     id: str
     name: str
-    goals: List[str]
     description: str
-    student_amount: int = Field(ge=0)
+    goals: List[str]
     partner: Partner
-    user_ids: List[str]
-    required_roles: List[RequiredRole]
+    required_skills: List[RequiredSkills]
+    users: List[str]
     edition: str
 
     def __init__(self, **data):
         data["id"] = config.api_url + "projects/" + data["id"]
-        data["user_ids"] = [config.api_url + "users/" + user for user in data["user_ids"]]
+        data["users"] = [config.api_url + "users/" + user for user in data["users"]]
         data["edition"] = config.api_url + "editions/" + data["edition"]
         super().__init__(**data)

@@ -2,20 +2,21 @@ name: Deploy
 
 on:
   push:
-    branches: [ development ]
+    branches:
+      - main
+      - development
 
 jobs:
   deploy:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
-      
       - name: Move data to temp folder
         uses: appleboy/ssh-action@master
         with:
@@ -24,9 +25,9 @@ jobs:
           key: ${{ secrets.SSH_SERVER_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && cd OSOC-deployments/${{ steps.extract_branch.outputs.branch }} && docker-compose -f deploy-docker-compose.yml down) || echo "Containers don't exist"
-            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && mv OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || echo "Data doesn't exist"
-            
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && cd OSOC-deployments/${{ steps.extract_branch.outputs.branch }} && docker-compose -f deploy-docker-compose.yml down --remove-orphans) || echo "Containers don't exist"
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data ]] && mkdir -p /tmp/${{ steps.extract_branch.outputs.branch }} && mv OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data /tmp/${{ steps.extract_branch.outputs.branch }}/data) || echo "Data doesn't exist"
+
       - name: Copy repo to the server
         uses: appleboy/scp-action@master
         with:
@@ -37,7 +38,7 @@ jobs:
           source: "."
           target: "OSOC-deployments/${{ steps.extract_branch.outputs.branch }}"
           rm: true
-          
+
       - name: Copy database data back + deploy
         uses: appleboy/ssh-action@master
         with:
@@ -47,5 +48,4 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             ([[ -d /tmp/${{ steps.extract_branch.outputs.branch }}/data ]] && mv /tmp/${{ steps.extract_branch.outputs.branch }}/data ~/OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data) || (mkdir -p ~/OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data/mongo && mkdir -p ~/OSOC-deployments/${{ steps.extract_branch.outputs.branch }}/data/redis)
-            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && cd ~/OSOC-deployments/${{ steps.extract_branch.outputs.branch }} && echo "PATHPREFIX=/${{ steps.extract_branch.outputs.branch }}" > .env && docker-compose -f deploy-docker-compose.yml up --build -d) || echo "Repo not copied"
-     
+            ([[ -d OSOC-deployments/${{ steps.extract_branch.outputs.branch }} ]] && cd ~/OSOC-deployments/${{ steps.extract_branch.outputs.branch }} && echo "PATHPREFIX=${{ steps.extract_branch.outputs.branch }}" > .env && docker-compose -f deploy-docker-compose.yml up --build -d) || echo "Repo not copied"

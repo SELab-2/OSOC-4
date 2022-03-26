@@ -1,46 +1,41 @@
 import './App.css';
 import Login from './Components/Login'
-import { Route, Routes} from 'react-router-dom'
-import { useState } from "react";
+import { Route, Routes } from 'react-router-dom'
+import { useEffect, useState } from "react";
 import NavHeader from './Components/NavHeader.js'
 import SelectUsers from "./Components/SelectUsers";
 import Projects from "./Components/Projects";
-import RequireAuthentication from "./Components/authentication/RequireAuthentication";
 import EmailUsers from "./Components/EmailUsers";
-import Settings from "./Components/Settings"
+import Settings from "./Components/Settings";
+import ErrorPage from "./Components/ErrorPage";
+import {getJson, isStillAuthenticated} from "./utils/json-requests";
 
 function App() {
+    let [loggedInAs, setLoggedInAs] = useState(null);
 
-  let [isLoggedIn, setIsLoggedIn] = useState()
+    useEffect(() => { if (isStillAuthenticated()) {
+        getJson("/users/me").then(resp => setLoggedInAs(resp.data.id))
+    }});
 
-  return (
-    <div className="App">
-        {(isLoggedIn) ? <NavHeader setIsLoggedIn={setIsLoggedIn} /> : null}
-      <Routes>
-        <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path='/select-users' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <SelectUsers/>
-            </RequireAuthentication>
-        }/>
-        <Route path='/email-users' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <EmailUsers/>
-            </RequireAuthentication>
-        }/>
-        <Route path='/projects' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <Projects/>
-            </RequireAuthentication>
-        }/>
-        <Route path='/settings' element={
-            <RequireAuthentication isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}>
-                <Settings/>
-            </RequireAuthentication>
-        }/>
-        </Routes>
-    </div>
-  );
+
+    if (!loggedInAs) {
+        return <Login setLoggedInAs={setLoggedInAs} />
+    }
+
+    return (
+        <div className="App">
+            <NavHeader setLoggedInAs={setLoggedInAs} />
+            <Routes>
+                <Route path='/select-users' element={<SelectUsers />} />
+                <Route path='/email-users' element={<EmailUsers />} />
+                <Route path='/projects' element={<Projects />} />
+                <Route path='/settings' element={<Settings loggedInAs={loggedInAs} />} />
+                <Route path="*" element={
+                    <ErrorPage status={404} message={"Page not found"} />
+                } />
+            </Routes>
+        </div>
+    );
 }
 
 export default App;

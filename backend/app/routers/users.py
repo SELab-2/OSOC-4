@@ -7,15 +7,18 @@ from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
+                                            UserBadStateException,
                                             UserNotFoundException)
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import User, UserCreate, UserOut, UserOutSimple, UserRole
+from app.models.user import (User, UserCreate, UserData, UserOut,
+                             UserOutSimple, UserRole)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
-from app.utils.response import errorresponse, list_modeltype_response, response
+from app.utils.response import list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
+from fastapi_jwt_auth import AuthJWT
 from odmantic import ObjectId
 
 router = APIRouter(prefix="/users")
@@ -36,7 +39,20 @@ async def get_users():
     return list_modeltype_response(out_users, User)
 
 
-@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="User data added into the database")
+@router.get("/me")
+async def get_user_me(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+
+    user = await read_where(User, User.id == ObjectId(current_user_id))
+    # User will always be found since otherwise they can't be authorized
+    # No need to check whether user exists
+
+    return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")
+
+
+@router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
+             response_description="User data added into the database")
 async def add_user_data(user: UserCreate):
     """add_user_data add a new user
 
@@ -47,11 +63,12 @@ async def add_user_data(user: UserCreate):
     """
 
     # check if email already used
-    if await read_where(User, User.email == user.email):
-        raise EmailAlreadyUsedException()
+    u = await read_where(User, User.email == user.email)
+    if u:
+        return response(UserOutSimple.parse_raw(u.json()), "User with email already exists")
 
     new_user = await update(User.parse_obj(user))
-    return response(new_user, "User added successfully.")
+    return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
@@ -65,7 +82,9 @@ async def invite_user(id: str):
     """
     user = await read_where(User, User.id == ObjectId(id))
 
-    if user.active:
+    if user is None:
+        raise UserNotFoundException()
+    elif user.active:
         raise UserAlreadyActiveException()
 
     # create an invite key
@@ -91,12 +110,14 @@ async def invite_users(ids: List[str]):
         users.append(await read_where(User, User.id == ObjectId(id)))
 
     # throw exception if any user is already active
-    if any([user.active for user in users]):
+    if None in users:
+        raise UserNotFoundException()
+    elif any([user.active for user in users]):
         raise UserAlreadyActiveException()
 
     for user in users:
         # create an invite key
-        invite_key, invite_expires = generate_new_invite_key(str(user.id))
+        invite_key, invite_expires = generate_new_invite_key()
         # save it
         db.redis.setex(invite_key, invite_expires, "true")
         # send email to user with the invite key
@@ -105,8 +126,8 @@ async def invite_users(ids: List[str]):
     return response(None, "Invites sent succesfull")
 
 
-@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_user(id: str):
+@router.get("/{id}")
+async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends()):
     """get_user this functions returns the user with given id (or None)
 
     :param id: the user id
@@ -119,27 +140,44 @@ async def get_user(id: str):
     if not user:
         raise UserNotFoundException()
 
-    if not user.approved:
-        return errorresponse(None, 400, "The user doesn't exist (yet)")
+    if not role == UserRole.ADMIN and not user.approved:
+        raise UserBadStateException()
 
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 
 
 @router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_user(id: str):
+async def update_user(id: str, new_data: UserData):
     """update_user this updates a user
 
     :param id: the user id
     :type id: str
+    :param new_data: email and name, defaults to Body(...)
+    :type new_data: UserData, optional
+    :raises EmailAlreadyUsedException: email already in use
+    :raises NotPermittedException: Unauthorized
     :return: response
     :rtype: success or error
     """
+
     user = await read_where(User, User.id == ObjectId(id))
 
-    if not user.approved:
-        return errorresponse(None, 400, "The user doesn't exist (yet)")
+    user_w_email = await read_where(User, User.email == new_data.email)
 
-    return response(UserOut.parse_obj(user), "User retrieved successfully")
+    if user is None:
+        raise UserNotFoundException()
+    if user_w_email is not None and user_w_email.id != user.id:
+        # The email is already in use
+        raise EmailAlreadyUsedException()
+    else:
+        # No other user with the new email address was found
+        user.email = new_data.email
+
+    user.name = new_data.name
+
+    user = await update(user)
+
+    return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
 @router.post("/{user_id}/approve", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
@@ -153,10 +191,12 @@ async def approve_user(user_id: str):
     """
     user = await read_where(User, User.id == ObjectId(user_id))
 
-    if not user.active:
-        return errorresponse(None, 400, "The user is not activated")
-    if user.approved:
-        return errorresponse(None, 400, "The user is already approved")
+    if user is None:
+        raise UserNotFoundException()
+    elif not user.active:
+        raise UserBadStateException()  # The user isn't activated
+    elif user.approved:
+        raise UserBadStateException()  # The user is already approved
 
     user.approved = True
     await update(user)
@@ -164,7 +204,7 @@ async def approve_user(user_id: str):
 
 
 @router.post("/forgot/{reset_key}")
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...)):
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
     """change_password function that changes the user password
 
     :param reset_key: the reset key
@@ -182,14 +222,18 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
         raise InvalidResetKeyException()
 
     userid = db.redis.get(reset_key)
+
     if not userid:
         raise InvalidResetKeyException()
-
-    if passwords.password != passwords.validate_password:
+    elif passwords.password != passwords.validate_password:
         raise PasswordsDoNotMatchException()
 
     user = await read_where(User, User.id == ObjectId(userid))
-    if not user or user.disabled:
+
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+
+    if not user or user.disabled or current_user_id != userid:
         raise NotPermittedException()
 
     user.password = get_password_hash(passwords.password)

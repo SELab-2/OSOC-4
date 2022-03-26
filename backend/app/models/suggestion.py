@@ -11,10 +11,11 @@ class SuggestionOption(int, Enum):
 
 
 class Suggestion(Model):
-    suggestion: SuggestionOption
+    # mail_sent: bool
+    decision: SuggestionOption
+    definitive: bool
     reason: str
-    student_form: ObjectId
+    student: ObjectId
     suggested_by: ObjectId
     project: Optional[ObjectId]
-    role: Optional[ObjectId]
-    confirmed: bool
+    skill: Optional[ObjectId]

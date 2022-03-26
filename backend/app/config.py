@@ -1,6 +1,9 @@
 import os
 
+from dotenv import load_dotenv
 from pydantic import BaseSettings
+
+load_dotenv()
 
 
 def get_api_path():
@@ -10,7 +13,7 @@ def get_api_path():
 
 
 def get_api_url():
-    return "http://localhost:8000"
+    return os.getenv('DOMAIN', "http://localhost:8000")
 
 
 class Settings(BaseSettings):

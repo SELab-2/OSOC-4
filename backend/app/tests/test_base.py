@@ -2,19 +2,22 @@ import asyncio
 import unittest
 from enum import IntEnum
 
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient, Response
-
 from app.api import app
 from app.database import db
+from app.models.edition import Edition
+from app.models.project import Project, Partner
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient, Response
 
 
 class Status(IntEnum):
     SUCCES = 200
+    BAD_REQUEST = 400
     UNAUTHORIZED = 401
     FORBIDDEN = 403
+    NOT_FOUND = 404
     UNPROCESSABLE = 422
 
 
@@ -28,35 +31,56 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 name="user_admin",
                 password="Test123!user_admin",
                 role=UserRole.ADMIN,
-                active=True, approved=True),
+                active=True,
+                approved=True,
+                disabled=False),
             "user_approved_coach": User(
                 email="user_approved_coach@test.be",
                 name="user_approved_coach",
                 password="Test123!user_approved_coach",
                 role=UserRole.COACH,
-                active=True, approved=True),
+                active=True,
+                approved=True,
+                disabled=False),
             "user_activated_coach": User(
                 email="user_activated_coach@test.be",
                 name="user_activated_coach",
                 password="Test123!user_activated_coach",
                 role=UserRole.COACH,
-                active=True, approved=False),
+                active=True,
+                approved=False,
+                disabled=False),
             "user_unactivated_coach": User(
                 email="user_unactivated_coach@test.be",
                 name="user_unactivated_coach",
                 password="Test123!user_unactivated_coach",
                 role=UserRole.COACH,
                 active=False,
-                approved=False),
+                approved=False,
+                disabled=False),
             "user_no_role": User(
                 email="user_no_role@test.be",
                 name="user_no_role",
                 password="Test123!user_no_role",
                 role=UserRole.NO_ROLE,
                 active=False,
-                approved=False)
+                approved=False,
+                disabled=False),
+            "project_test": Project(
+                name="project_test",
+                description="A project aimed at being dummy data",
+                goals=["Testing this application", "Being dummy data"],
+                partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
+                required_skills=[],
+                users=[],
+                edition=Edition(year=2022, user_ids=[]).id
+            )
         }
-        self.saved_objects = {"passwords": {}}  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
+        self.saved_objects = {
+            "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
+            "projects": [],
+            "users": []
+        }
         self.created = []
 
     async def asyncSetUp(self) -> None:
@@ -69,11 +93,14 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 plain_password = obj.password
                 obj.password = get_password_hash(obj.password)
                 self.saved_objects["passwords"][key] = plain_password
+                self.saved_objects["users"].append(key)
+            elif isinstance(obj, Project):
+                self.saved_objects["projects"].append(key)
             self.saved_objects[key] = await db.engine.save(obj)
 
     async def asyncTearDown(self) -> None:
         for o in self.saved_objects.values():
-            if not isinstance(o, dict):
+            if not isinstance(o, dict) and not isinstance(o, list):
                 await db.engine.delete(o)
         await self.lf.__aexit__()
         await self.client.aclose()
@@ -83,7 +110,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         password: str = self.saved_objects["passwords"][user]
         login = await self.client.post("/login", json={"email": email, "password": password},
                                        headers={"Content-Type": "application/json"})
-        return login.cookies["csrf_access_token"]
+        return login.json()["data"]["accessToken"]
 
     async def get_response(self, path: str, user: str, expected_status: int = 200,
                            access_token: str = None, use_access_token: bool = True) -> Response:
@@ -109,7 +136,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.get(path, headers={"X-CSRF-TOKEN": access_token})
+            response = await self.client.get(path, headers={"Authorization": "Bearer " + access_token})
         else:
             response = await self.client.get(path)
 
@@ -121,7 +148,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         """)
         return response
 
-    async def post_response(self, path: str, json_body: dict, user: str,
+    async def post_response(self, path: str, json_body, user: str,
                             expected_status: int = 200, access_token: str = None,
                             use_access_token: bool = True) -> Response:
         """POST request test template
@@ -131,7 +158,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         :param path: The path of the POST request
         :type path: str
         :param json_body: The POST body
-        :type json_body: dict
+        :type json_body: Depends on POST request, most of the time a dict
         :param user: The requesting user
         :type user: str
         :param expected_status: The expected status of the POST request, defaults to 200
@@ -147,7 +174,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.post(path, json=json_body, headers={"X-CSRF-TOKEN": access_token,
+            response = await self.client.post(path, json=json_body, headers={"Authorization": "Bearer " + access_token,
                                                                              "Content-Type": "application/json"})
         else:
             response = await self.client.post(path, json=json_body, headers={"Content-Type": "application/json"})

@@ -1,10 +1,16 @@
 import axios from "axios";
 import { log } from "./logger";
 import Cookies from 'js-cookie';
+import data from "bootstrap/js/src/dom/data";
+
+const nobase = axios.create({
+    withCredentials: true,
+})
 
 axios.defaults.withCredentials = true
 // todo fix base url with env var
 axios.defaults.baseURL = process.env.PUBLIC_URL || "http://localhost:8000";
+
 
 let _config = {
     "headers": {
@@ -75,11 +81,14 @@ export async function catchError(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function getJson(url) {
+export async function getJson(url, useBase=true) {
     log("json-requests: getJson: " + url)
     try {
-        const req = await axios.get(url, headers());
-        return req.data;
+        let response = undefined
+        if (useBase) { response = await axios.get(url, headers()); }
+        else { response = await nobase.get(url, headers())}
+        console.log(response)
+        return response.data;
     } catch (e) {
         return await catchError(e);
     }
@@ -108,10 +117,13 @@ export async function sendDelete(url, getters, commit) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function postCreate(url, json, getters, commit) {
+export async function postCreate(url, json, useBase=true) {
     log("json-requests: postCreate: " + url)
+    console.log(json)
     try {
-        let resp = await axios.post(url, json, headers(getters, commit))
+        let resp;
+        if (useBase) { resp = await axios.post(url, json, headers()); }
+        else {resp = await nobase.post(url, json, headers());}
         return {
             success: true,
             data: resp.data
@@ -163,7 +175,7 @@ export async function login(url, json) {
         console.log(headers())
         let resp = await axios.post(url, json, headers());
         log(resp)
-        return { success: true };
+        return { success: true, id: resp.data.data.id };
     } catch (e) {
         log(e)
         return { success: false };
