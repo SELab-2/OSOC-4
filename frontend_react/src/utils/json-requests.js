@@ -89,6 +89,7 @@ export async function getJson(url, useBase=true) {
         else { response = await nobase.get(url, headers())}
         console.log(response)
         return response.data;
+
     } catch (e) {
         return await catchError(e);
     }
