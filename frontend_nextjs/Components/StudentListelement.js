@@ -1,6 +1,12 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../utils/json-requests";
-import {getRolesUrl, getStudentsPath, getSuggestionsPath} from "../routes";
+import {
+  getDegreeQuestionId, getFirstLanguageQuestionId, getLevelOfEnglishQuestionId,
+  getQuestionAnswersPath,
+  getRolesUrl,
+  getStudyQuestionId,
+  getSuggestionsPath
+} from "../routes";
 
 export default function StudentListelement(props) {
 
@@ -13,6 +19,10 @@ export default function StudentListelement(props) {
   const [suggestionsNo, setSuggestionsNo] = useState(0);
   const [decision,setDecision] = useState(-1)
   const [skills, setSkills] = useState([]);
+  const [studies, setStudies] = useState(undefined);
+  const [degree, setDegree] = useState(undefined);
+  const [fistLanguage, setFirstLanguage] = useState(undefined);
+  const [levelOfEnglish, setLevelOfEnglish] = useState(undefined);
 
   // This function inserts the data in the variables
   useEffect(() => {
@@ -23,14 +33,16 @@ export default function StudentListelement(props) {
       if (suggestions === []) {
         getJson(getSuggestionsPath()).then(res => {
           let possibleSuggestions = res.data;
-          setSuggestions(possibleSuggestions.filter(suggestion => suggestion.student = student.id));
+          setSuggestions(possibleSuggestions.filter(suggestion => suggestion.student === student.id));
+
           setSuggestionsYes(suggestions.filter(
             suggestion => suggestion.decision === 2 && suggestion.definitive === false).length);
           setSuggestionsMaybe(suggestions.filter(
             suggestion => suggestion.decision === 1 && suggestion.definitive === false).length);
           setSuggestionsNo(suggestions.filter(
             suggestion => suggestion.decision === 0 && suggestion.definitive === false).length);
-          let newDecision = suggestions.filter(suggestion => suggestion.definitive = true);
+
+          let newDecision = suggestions.filter(suggestion => suggestion.definitive === true);
           if (newDecision !== []) {
             setDecision(newDecision[0]);
           }
@@ -41,6 +53,23 @@ export default function StudentListelement(props) {
         getJson(getRolesUrl()).then(res => {
           let skillObjs = res.data.filter(skill => student.skills.includes(skill.id));
           setSkills(skillObjs.map(skill => skill.name));
+        })
+      }
+
+      if (studies === undefined) {
+        getJson(getQuestionAnswersPath()).then(res => {
+          let questionAnswers = res.data.filter(questionAnswer => questionAnswer.student === student.id);
+
+          setStudies(questionAnswers.find((questionAnswer => questionAnswer.question === getStudyQuestionId())));
+
+          setDegree(questionAnswers.find((questionAnswer => questionAnswer.question === getDegreeQuestionId())));
+
+          setFirstLanguage(questionAnswers.find((questionAnswer =>
+            questionAnswer.question === getFirstLanguageQuestionId())));
+
+          setLevelOfEnglish(questionAnswers.find((questionAnswer =>
+            questionAnswer.question === getLevelOfEnglishQuestionId())));
+
         })
       }
     }
@@ -57,6 +86,23 @@ export default function StudentListelement(props) {
   function getRoles() {
     return skills.map(skill =>
       <li className="role" style={{float: "right", bottom: 0}}>{skill}</li>
+    )
+  }
+
+  function getInfoTitles() {
+    let questions = ["Studies:", "Type of degree:", "First language:", "Level of English:"];
+    let answers = [studies, degree, fistLanguage, levelOfEnglish];
+    questions = questions.filter((question, index) => answers[index] !== undefined);
+    return questions.map(question =>
+      <p>{question}</p>
+    )
+  }
+
+  function getInfoAnswers() {
+    let answers = [studies, degree, fistLanguage, levelOfEnglish];
+    answers.filter(answer => answer !== undefined);
+    return answers.map(answer =>
+      <p>{answer}</p>
     )
   }
 
@@ -78,16 +124,14 @@ export default function StudentListelement(props) {
       <br/>
 
       <div id="info-titles" style={{float: "left"}}>
-        <p>Studies:<br/>
-        Type of degree:<br/>
-        First language:<br/>
-        Level of English:<br/>
-        Decision:
+        <p>
+          {getInfoTitles()}
+          Decision:
         </p>
       </div>
 
       <div id="info-answers">
-        <br/><br/><br/><br/>
+        {getInfoAnswers()}
         {getDecision()}
       </div>
 
