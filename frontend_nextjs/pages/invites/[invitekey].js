@@ -55,9 +55,9 @@ const Invite = () => {
     if (loading) {
         return <LoadingPage />
     }
-    //  else if (!validKey) {
-    //     return <h1>Not a valid invite</h1>
-    // }
+    else if (!validKey) {
+        return <h1>Not a valid invite</h1>
+    }
 
     return (
         <Form onSubmit={handleSubmit}>

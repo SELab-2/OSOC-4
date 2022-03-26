@@ -188,7 +188,7 @@ export async function check_invitekey(invitekey) {
 
 export async function set_password(invitekey, json) {
     try {
-        await ApiClient.get(`/invite/${invitekey}`, json)
+        await ApiClient.post(`/invite/${invitekey}`, json)
         return true;
     } catch (e) {
         log(e)
