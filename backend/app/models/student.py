@@ -26,7 +26,7 @@ class StudentOutSimple(BaseModel):
     edition: str
 
     def __init__(self, **data):
-        data["uri"] = config.api_url + "students/" + data["id"]
+        data["id"] = config.api_url + "students/" + data["id"]
         data["edition"] = config.api_url + "edition/" + str(data["edition"])
         super().__init__(**data)
 
