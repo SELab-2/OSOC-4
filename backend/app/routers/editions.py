@@ -6,7 +6,6 @@ from app.database import db
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
-                                               StudentNotFoundException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
@@ -132,36 +131,6 @@ async def get_edition_projects(year: int):
     """
     projects = await read_where(Project, Project.edition == year)
     return list_modeltype_response(projects, Project)
-
-
-@router.get("/{year}/students/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Student retrieved")
-async def get_student(year: int, student_id: str):
-    """get_student get the StudentForm with the corresponding id
-
-    :param year: year of the edition
-    :type year: int
-    :return: StudentForm
-    :rtype: dict
-    """
-    student = await db.engine.find(Student, {"edition": year, "_id": student_id})
-    if not student:
-        raise StudentNotFoundException()
-    return response(student, "Student successfully retrieved")
-
-
-@router.post("/{year}/students/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Student edited")
-async def edit_student(student: Student = Body(...)):
-    """edit_student creates or modifies a student in the database
-
-    :param year: year of the edition
-    :type year: int
-    :param student: defaults to Body(...)
-    :type student: StudentForm, optional
-    :return: data of newly created student
-    :rtype: dict
-    """
-    new_student = await update(Student.parse_obj(student))
-    return response(new_student, "Student added successfully.")
 
 
 @router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Students retrieved")

@@ -36,7 +36,7 @@ async def add_user_data(project: ProjectCreate):
     return response(ProjectOutSimple.parse_raw(new_project.json()), "Project added successfully.")
 
 
-@router.get("/{id}", response_description="project with id retrieved")
+@router.get("/{id}", response_description="Project with id retrieved")
 async def get_project_with_id(id):
     """get_project_with_id get Project instance with id from the database
 
