@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../utils/json-requests";
+
 import {
   getDegreeQuestionId, getFirstLanguageQuestionId, getLevelOfEnglishQuestionId,
-  getQuestionAnswersPath,
-  getRolesUrl,
+  getQuestionAnswersPath, getRolesPath,
   getStudyQuestionId,
   getSuggestionsPath
 } from "../routes";
@@ -29,11 +29,12 @@ export default function StudentListelement(props) {
     if (!student) {
       setStudent(props.student)
       setName(props.student.name)
+      let localStudent = props.student;
 
       if (suggestions === []) {
         getJson(getSuggestionsPath()).then(res => {
           let possibleSuggestions = res.data;
-          setSuggestions(possibleSuggestions.filter(suggestion => suggestion.student === student.id));
+          setSuggestions(possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id));
 
           setSuggestionsYes(suggestions.filter(
             suggestion => suggestion.decision === 2 && suggestion.definitive === false).length);
@@ -49,16 +50,18 @@ export default function StudentListelement(props) {
         })
       }
 
-      if (skills === []) {
-        getJson(getRolesUrl()).then(res => {
-          let skillObjs = res.data.filter(skill => student.skills.includes(skill.id));
+      if (skills.length === 0) {
+        getJson(getRolesPath()).then(res => {
+          let skillObjs = res.data.filter(skill => {
+            console.log(skill.id);
+            localStudent.skills.includes(skill.id)});
           setSkills(skillObjs.map(skill => skill.name));
         })
       }
 
       if (studies === undefined) {
         getJson(getQuestionAnswersPath()).then(res => {
-          let questionAnswers = res.data.filter(questionAnswer => questionAnswer.student === student.id);
+          let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
 
           setStudies(questionAnswers.find((questionAnswer => questionAnswer.question === getStudyQuestionId())));
 
@@ -93,41 +96,37 @@ export default function StudentListelement(props) {
     let questions = ["Studies:", "Type of degree:", "First language:", "Level of English:"];
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
     questions = questions.filter((question, index) => answers[index] !== undefined);
-    return questions.map(question =>
-      <p>{question}</p>
+    return questions.map((question,index) =>
+      <p key={index}>{question}</p>
     )
   }
 
   function getInfoAnswers() {
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
-    answers.filter(answer => answer !== undefined);
-    return answers.map(answer =>
-      <p>{answer}</p>
+    answers = answers.filter((answer) => answer !== undefined);
+    return answers.map((answer,index) =>
+      <p key={index}>{answer}</p>
     )
   }
 
   // The html representation of a list-element
   return(
-    <div id="list-element" className="list-element" style={{textAlign: "left", width: "800px", position: "relative"}}>
+    <div id="list-element" className="list-element" style={{width: "800px", position: "relative"}}>
 
-      <div id="upper-layer">
+      <div id="upper-layer" style={{height: "30px"}}>
         <div id="name" style={{float: "left"}} className="name">{name}</div>
         <div id="practical-problems" style={{float: "left"}} className="practical-problems">2 practical problems</div>
         <div id="suggestions" style={{float: "right"}} className="suggestions">
           Suggestions:
-          <div className="suggestionsYes">{suggestionsYes}</div>
-          <div className="suggestionsMaybe">{suggestionsMaybe}</div>
-          <div className="suggestionsNo">{suggestionsNo}</div>
+          <div style={{float: "right"}} className="suggestionsYes">{suggestionsYes}</div>
+          <div style={{float: "right"}} className="suggestionsMaybe">{suggestionsMaybe}</div>
+          <div style={{float: "right"}} className="suggestionsNo">{suggestionsNo}</div>
         </div>
       </div>
 
-      <br/>
-
       <div id="info-titles" style={{float: "left"}}>
-        <p>
           {getInfoTitles()}
           Decision:
-        </p>
       </div>
 
       <div id="info-answers">

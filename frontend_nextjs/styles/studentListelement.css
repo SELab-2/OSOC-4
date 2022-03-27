@@ -1,0 +1,17 @@
+.list-element {
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+    margin: 5px;
+    border-radius: 7px;
+    padding: 8px;
+    padding-left: 20px;
+}
+
+.name {
+    font-size: 20px;
+}
+
+.student-text {
+    font-size: 16px;
+}

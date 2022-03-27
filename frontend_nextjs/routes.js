@@ -7,7 +7,7 @@ export const getStudentsPath = () => '/students/'
 
 export const getSuggestionsPath = () => '/suggestions/'
 
-export const getRolesUrl = () => '/roles/'
+export const getRolesPath = () => '/roles'
 
 export const getStudyQuestionId = () => '623f083b969d6c69127ec697'
 
