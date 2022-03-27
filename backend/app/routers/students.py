@@ -7,9 +7,10 @@ from fastapi import APIRouter, Depends
 from odmantic import ObjectId
 
 router = APIRouter(prefix="/students")
+router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
-@router.get("/", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
+@router.get("/", response_description="Students retrieved")
 async def get_students():
     """get_students get all the Student instances from the database
 
@@ -20,7 +21,7 @@ async def get_students():
     return list_modeltype_response([StudentOutSimple.parse_raw(r.json()) for r in results], Student)
 
 
-@router.get("/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Student retrieved")
+@router.get("/{student_id}", response_description="Student retrieved")
 async def get_student(student_id):
     """get_student get the Student instances with id from the database
 
