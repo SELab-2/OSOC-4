@@ -141,7 +141,7 @@ export async function patchEdit(url, json, getters, commit) {
 
 export async function login(json) {
     log("json-requests: login")
-    const base = process.env.NEXT_INTERNAL_API_URL || "";
+    const base = process.env.NEXT_INTERNAL_API_URL;
     try {
         let resp = await ApiClient.post(base + "/login", json);
         log(resp)
@@ -175,7 +175,26 @@ export async function logout(url) {
     }
 }
 
+export async function check_invitekey(invitekey) {
+    try {
+        await ApiClient.get(`/invite/${invitekey}`)
+        return true;
+    } catch (e) {
+        log(e)
+        return false;
+    }
 
+}
+
+export async function set_password(invitekey, json) {
+    try {
+        await ApiClient.post(`/invite/${invitekey}`, json)
+        return true;
+    } catch (e) {
+        log(e)
+        return await catchError(e);
+    }
+}
 
 
 

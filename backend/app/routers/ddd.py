@@ -212,7 +212,8 @@ async def add_dummy_data():
                          for skill in sample(skills, k=randrange(3, len(skills)))],
         edition=edition.id)
 
-    students = []  # [generate_student(edition.id) for _ in range(10)]
+    # generate students without suggestions
+    students = [generate_student(edition.id) for _ in range(3)]
     suggestions = []
     participations = []
     for student in students:
@@ -233,8 +234,12 @@ async def add_dummy_data():
             participations.append(Participation(student=students[-1].id, project=project.id,
                                                 skill=required_skill.skill))
 
-    # for student in students:
-    #    student.question_answers = generate_question_answers()
+    question_answers = []
+
+    for student in students:
+        generated_question_answers = generate_question_answers()
+        question_answers += generated_question_answers
+        student.question_answers = [qa.id for qa in generated_question_answers]
 
     # save models to database
     await db.engine.save(user_admin)
@@ -266,6 +271,9 @@ async def add_dummy_data():
         for answer in answers:
             await db.engine.save(answer)
 
+    for question_answer in question_answers:
+        await db.engine.save(question_answer)
+
     for skill in skills:
         await db.engine.save(skill)
 
@@ -274,8 +282,6 @@ async def add_dummy_data():
     await db.engine.save(project2)
 
     for student in students:
-        # for question_answer in student.questions:
-        #    await db.engine.save(question_answer)
         await db.engine.save(student)
 
     for suggestion in suggestions:
