@@ -196,7 +196,15 @@ export async function set_password(invitekey, json) {
     }
 }
 
-
+export async function get_student(url) {
+    try {
+        const resp = await AuthApiClient.get(url)
+        return resp;
+    } catch (e) {
+        log(e)
+        return await catchError(e);
+    }
+}
 
 
 

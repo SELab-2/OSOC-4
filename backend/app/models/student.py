@@ -20,14 +20,9 @@ class Student(Model):
 
 class StudentOutSimple(BaseModel):
     id: str
-    email: str
-    name: str
-    nickname: Optional[str] = ""
-    edition: str
 
     def __init__(self, **data):
         data["id"] = config.api_url + "students/" + data["id"]
-        data["edition"] = config.api_url + "edition/" + str(data["edition"])
         super().__init__(**data)
 
 

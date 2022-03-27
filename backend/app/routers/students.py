@@ -1,5 +1,5 @@
-from app.crud import read_where, read_all_where
-from app.models.student import Student, StudentOutSimple, StudentOutExtended
+from app.crud import read_all_where, read_where
+from app.models.student import Student, StudentOutExtended, StudentOutSimple
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.response import list_modeltype_response
@@ -17,7 +17,7 @@ async def get_students():
     :rtype: dict
     """
     results = await read_all_where(Student)
-    return list_modeltype_response([StudentOutSimple.parse_raw(r.json()) for r in results], Student)
+    return list_modeltype_response([StudentOutSimple.parse_raw(r.json()).id for r in results], Student)
 
 
 @router.get("/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Student retrieved")
