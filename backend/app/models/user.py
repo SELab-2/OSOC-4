@@ -89,3 +89,15 @@ class UserInvite(BaseModel):
         if not valid_password(v):
             raise InvalidPasswordException()
         return v
+
+
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+    confirmation_password: str
+
+    @validator('new_password')
+    def password_format_check(cls, v):
+        if not valid_password(v):
+            raise InvalidPasswordException()
+        return v

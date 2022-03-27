@@ -6,12 +6,13 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
-                                            UserNotFoundException)
+                                            UserNotFoundException,
+                                            InvalidEmailOrPasswordException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import (User, UserCreate, UserData, UserOut,
-                             UserOutSimple, UserRole)
+                             UserOutSimple, UserRole, ChangePassword)
 from app.utils.checkers import RoleChecker
-from app.utils.cryptography import get_password_hash
+from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import list_modeltype_response, response
@@ -209,3 +210,67 @@ async def approve_user(user_id: str):
     user.approved = True
     await update(user)
     return response(None, "Approved the user successfully")
+
+
+@router.post("/forgot/{reset_key}")
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
+    """change_password function that changes the user password
+
+    :param reset_key: the reset key
+    :type reset_key: str
+    :param passwords: password and validate_password are needed, defaults to Body(...)
+    :type passwords: PasswordResetInput, optional
+    :raises InvalidResetKeyException: invalid reset key
+    :raises PasswordsDoNotMatchException: passwords don't match
+    :raises NotPermittedException: Unauthorized
+    :return: message to check the emails
+    :rtype: dict
+    """
+
+    if reset_key[0] != "R":
+        raise InvalidResetKeyException()
+
+    userid = db.redis.get(reset_key)
+
+    if not userid:
+        raise InvalidResetKeyException()
+    elif passwords.password != passwords.validate_password:
+        raise PasswordsDoNotMatchException()
+
+    user = await read_where(User, User.id == ObjectId(userid))
+
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
+
+    if not user or user.disabled or current_user_id != userid:
+        raise NotPermittedException()
+
+    user.password = get_password_hash(passwords.password)
+    db.redis.delete(reset_key)
+    await update(user)
+
+    return response(None, "Password updated successfully")
+
+
+@router.patch('{user_id}/change-password')
+async def change_password_given_current(user_id: str, passwords: ChangePassword):
+    """change_password_given_current this changes the password of the given user if the correct current password is given
+
+    :param user_id: the id of the user
+    :type user_id: str
+    :param passwords: current_password, new_password, confirmation_password
+    :type passwords: ChangePassword
+    :return: response
+    :rtype: _type_
+    """
+
+    if passwords.new_password != passwords.confirmation_password:
+        raise PasswordsDoNotMatchException()
+
+    user = await read_where(User, User.id == ObjectId(user_id))
+    if not verify_password(passwords.current_password, user.password):
+        raise InvalidEmailOrPasswordException()
+
+    user.password = get_password_hash(passwords.new_password)
+    await update(user)
+    return response(None, "Changed password successfully")

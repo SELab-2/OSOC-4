@@ -118,23 +118,16 @@ export async function postCreate(url, json) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function patchEdit(url, json, getters, commit) {
+export async function patchEdit(url, json) {
     log("json-requests: patchEdit: " + url)
+    const base = process.env.NEXT_INTERNAL_API_URL;
     try {
-        return {
-            success: true,
-            data: (await AuthApiClient.patch(url, json)).data.url
-        };
+        let resp = await ApiClient.patch(base + "/login", json);
+        log(resp)
+        return { success: true, data: resp.data };
     } catch (e) {
-        if (e.response.status === 400 && e.response.data.message) {
-            return {
-                success: false,
-                data: e.response.data.message
-            };
-        } else {
-            await catchError(e);
-            return "";
-        }
+        log(e)
+        return { success: false };
     }
 }
 
