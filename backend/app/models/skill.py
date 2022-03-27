@@ -1,5 +1,5 @@
-from odmantic import Model
+from odmantic import Model, Field
 
 
 class Skill(Model):
-    name: str
+    name: str = Field(primary_field=True)
