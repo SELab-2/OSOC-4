@@ -6,7 +6,6 @@ from app.database import db
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
-                                               StudentNotFoundException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
