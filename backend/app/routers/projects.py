@@ -19,7 +19,7 @@ async def get_projects():
     return list_modeltype_response([ProjectOutSimple.parse_raw(r.json()) for r in results], Project)
 
 
-@router.get("/{id}", response_description="project with id retrieved")
+@router.get("/{id}", response_description="Project with id retrieved")
 async def get_project_with_id(id):
     """get_project_with_id get Project instance with id from the database
 
