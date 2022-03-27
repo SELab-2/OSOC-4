@@ -2,13 +2,15 @@ import asyncio
 import unittest
 from enum import IntEnum
 
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient, Response
+
 from app.api import app
 from app.database import db
 from app.models.project import Project, Partner
+from app.models.skill import Skill
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient, Response
 
 
 class Status(IntEnum):
@@ -65,6 +67,13 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 active=False,
                 approved=False,
                 disabled=False),
+            "projectleider": Skill(name="projectleider"),
+            "Systeembeheerder": Skill(name="Systeembeheerder"),
+            "API-beheerder": Skill(name="API-beheerder"),
+            "testverantwoordelijke": Skill(name="testverantwoordelijke"),
+            "documentatie verantwoordelijke": Skill(name="documentatie verantwoordelijke"),
+            "customer relations": Skill(name="customer relations"),
+            "frontend": Skill(name="frontend"),
             "project_test": Project(
                 name="project_test",
                 description="A project aimed at being dummy data",
@@ -77,8 +86,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         }
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
-            "projects": [],
-            "users": []
         }
         self.created = []
 
@@ -92,9 +99,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 plain_password = obj.password
                 obj.password = get_password_hash(obj.password)
                 self.saved_objects["passwords"][key] = plain_password
-                self.saved_objects["users"].append(key)
-            elif isinstance(obj, Project):
-                self.saved_objects["projects"].append(key)
+
+            # update the corresponding object list
+            obj_list = self.saved_objects.get(str(type(obj))) or []
+            obj_list.append(key)
+            self.saved_objects[obj.__module__] = obj_list  # Key is the type of the obj (without extra)
+
             self.saved_objects[key] = await db.engine.save(obj)
 
     async def asyncTearDown(self) -> None:

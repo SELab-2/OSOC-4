@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getSession, getCsrfToken } from 'next-auth/react';
 
-const baseURL = process.env.NEXT_API_URL || "http://localhost:8000";
+const baseURL = process.env.NEXT_API_URL;
 
 
 function AxiosClient(auth_headers = true) {
@@ -34,7 +34,7 @@ function AxiosClient(auth_headers = true) {
         },
         (error) => {
             console.log(`error`, error);
-            return error;
+            throw error;
         },
     );
 

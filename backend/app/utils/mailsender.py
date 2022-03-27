@@ -12,6 +12,7 @@ SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_SSL_PORT = os.getenv('SMTP_SSL_PORT')
 SENDER_EMAIL = os.getenv('SENDER_EMAIL')
 SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
+FRONTEND_URL = os.getenv('FRONTEND_URL')
 
 
 def send_password_reset(email: str, resetkey: str):
@@ -25,7 +26,7 @@ def send_password_reset(email: str, resetkey: str):
     receiver_email = email  # Enter receiver address
 
     subject = "Forgot Password"
-    body = f"Use this link to reset the password of your account http://localhost:8000/resetpassword/{resetkey}"
+    body = f"Use this link to reset the password of your account {FRONTEND_URL}/resetpassword/{resetkey}"
 
     message = MIMEMultipart()
     message["From"] = SENDER_EMAIL
@@ -52,7 +53,7 @@ def send_invite(email: str, invitekey: str):
     receiver_email = email  # Enter receiver address
 
     subject = "Activate OSOC Account"
-    body = f"Use this link to activate your account http://localhost:8000/invite/{invitekey}"
+    body = f"Use this link to activate your account {FRONTEND_URL}/invites/{invitekey}"
 
     message = MIMEMultipart()
     message["From"] = SENDER_EMAIL

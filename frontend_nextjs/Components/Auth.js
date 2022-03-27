@@ -1,7 +1,7 @@
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
+import LoadingPage from "../Components/LoadingPage"
 import NavHeader from "../Components/NavHeader"
 
 export default function RouteGuard(props) {
@@ -26,5 +26,5 @@ export default function RouteGuard(props) {
     }
     // Session is being fetched, or no user.
     // If no user, useEffect() will redirect.
-    return <div>Loading...</div>
+    return <LoadingPage />
 }

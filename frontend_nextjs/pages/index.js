@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useSession } from "next-auth/react"
+import LoadingPage from "../Components/LoadingPage"
 
 function Home(props) {
 
@@ -14,7 +15,7 @@ function Home(props) {
 
   // Session is being fetched, or no user.
   // If no user, useEffect() will redirect.
-  return <div>Loading...</div>
+  return <LoadingPage />
 }
 
 export default Home

@@ -13,6 +13,16 @@ from odmantic import ObjectId
 router = APIRouter(prefix="/invite")
 
 
+@router.get("/{invitekey}")
+async def valid_invitekey(invitekey: str):
+    if invitekey[0] != "I":
+        raise InvalidInviteException()
+    userid = db.redis.get(invitekey)
+    if userid is None:
+        raise InvalidInviteException()
+    return response(None, "Valid invitekey")
+
+
 @router.post("/{invitekey}")
 async def invited_user(invitekey: str, userinvite: UserInvite):
     """invited_user this processes the passwords from the userinvite

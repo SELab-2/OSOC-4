@@ -30,7 +30,7 @@ class TestProjects(TestBase):
             projects.append(str(project.id))
 
         expected_projects = [str(project.id) for project in
-                             map(lambda p: self.objects[p], self.saved_objects["projects"])]
+                             map(lambda p: self.objects[p], self.saved_objects[Project.__module__])]
 
         self.assertEqual(expected_projects, projects)
 
