@@ -6,7 +6,7 @@ from fastapi import APIRouter
 router = APIRouter(prefix="/roles")
 
 
-@router.get("/", response_description="Roles retrieved")
+@router.get("", response_description="Roles retrieved")
 async def get_roles():
     """get_roles get all the Role instances from the database
 
