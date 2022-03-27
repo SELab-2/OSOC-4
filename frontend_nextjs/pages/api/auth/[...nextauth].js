@@ -81,15 +81,16 @@ const callbacks = {
 
         return Promise.resolve(session);
     },
-    redirect: async ({ url, baseUrl }) => {
+    // redirect: async ({ url, baseUrl }) => {
 
 
-        if (process.env.NEXTAUTH_URL) {
-            return url.replace("http://localhost:3000", "https://sel2-4.ugent.be");
-        }
+    //     if (process.env.NEXTAUTH_URL) {
+    //         // return url.replace("http://localhost:3000", "https://sel2-4.ugent.be");
+    //         return url;
+    //     }
 
-        return url;
-    }
+    //     return url;
+    // }
 }
 
 export const options = {
@@ -99,17 +100,7 @@ export const options = {
         signIn: '/login',
     },
     secret: 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0',
-    cookies: {
-        sessionToken: {
-          name: `__Secure-next-auth.session-token`,
-          options: {
-            httpOnly: true,
-            sameSite: 'lax',
-            path: process.env.NEXT_BASE_PATH || '/',
-            secure: true
-          }
-        },
-      },
+
 }
 
 const Auth = (req, res) => NextAuth(req, res, options)
