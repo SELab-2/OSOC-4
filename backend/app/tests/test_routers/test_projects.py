@@ -21,7 +21,7 @@ class TestProjects(TestBase):
 
     async def test_get_projects(self):
         # Should use access token but is not yet implemented
-        response = await self.get_response("/projects", "", Status.SUCCES, use_access_token=False)
+        response = await self.get_response("/projects", "user_admin", Status.SUCCES)
         projects = []
 
         for p in json.loads(response.content)["data"]:
@@ -41,7 +41,7 @@ class TestProjects(TestBase):
     async def test_get_project_with_id(self):
         # Should use access token but is not yet implemented
         project_id = self.objects["project_test"].id
-        response = await self.get_response(f"/projects/{str(project_id)}", "", Status.SUCCES, use_access_token=False)
+        response = await self.get_response(f"/projects/{str(project_id)}", "user_admin", Status.SUCCES)
 
         gotten_project = json.loads(response.content)["data"]
 

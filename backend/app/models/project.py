@@ -26,8 +26,19 @@ class Project(Model):
     edition: int
 
 
+class ProjectCreate(BaseModel):
+    name: str
+    description: str
+    goals: List[str]
+    partner: Partner
+    required_skills: List[RequiredSkills]
+    users: List[ObjectId] = []
+    edition: int
+
+
 class ProjectOutSimple(BaseModel):
     id: str
+    name: str
 
     def __init__(self, **data):
         data["id"] = config.api_url + "projects/" + data["id"]
@@ -42,10 +53,10 @@ class ProjectOutExtended(BaseModel):
     partner: Partner
     required_skills: List[RequiredSkills]
     users: List[str]
-    edition: int
+    edition: str
 
     def __init__(self, **data):
+        super().__init__(**data)
         data["id"] = config.api_url + "projects/" + data["id"]
         data["users"] = [config.api_url + "users/" + user for user in data["users"]]
         data["edition"] = config.api_url + "editions/" + str(data["edition"])
-        super().__init__(**data)
