@@ -21,7 +21,7 @@ export default function NavHeader(props) {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
-                        <Link href="/select-users">Select Users</Link>
+                        <Link href="/select-students">Select Students</Link>
                     </Nav>
                     <Nav className="me-auto">
                         <Link href="/email-users">Email Users</Link>
