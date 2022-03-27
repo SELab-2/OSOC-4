@@ -22,3 +22,14 @@ def valid_email(email: str) -> bool:
     """
     reg = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     return re.fullmatch(reg, email)
+
+
+def valid_role(role: int) -> bool:
+    """valid_email check if the entered role is valid
+
+    :param role: the role
+    :type email: int
+    :return: if role is valid
+    :rtype: bool
+    """
+    return 0 <= role <= 2

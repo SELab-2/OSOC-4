@@ -3,8 +3,9 @@ from enum import Enum
 from app.config import config
 from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
-                                                InvalidPasswordException)
-from app.utils.validators import valid_email, valid_password
+                                                InvalidPasswordException,
+                                                InvalidRoleException)
+from app.utils.validators import valid_email, valid_password, valid_role
 from odmantic import Model
 from pydantic import BaseModel, validator
 
@@ -88,4 +89,15 @@ class UserInvite(BaseModel):
     def password_format_check(cls, v):
         if not valid_password(v):
             raise InvalidPasswordException()
+        return v
+
+
+class UserChangeRole(BaseModel):
+    role: int
+    active: bool
+
+    @validator('role')
+    def role_in_range(cls, v):
+        if not valid_role(v):
+            raise InvalidRoleException()
         return v

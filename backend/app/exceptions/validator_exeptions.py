@@ -14,3 +14,8 @@ class InvalidPasswordException(BaseException):
 class EmptyNameException(BaseException):
     def __init__(self):
         super().__init__(400, "The entered name cannot be empty")
+
+
+class InvalidRoleException(BaseException):
+    def __init__(self):
+        super().__init__(401, "Invalid new role")
