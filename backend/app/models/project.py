@@ -23,7 +23,7 @@ class Project(Model):
     partner: Partner
     required_skills: List[RequiredSkills]
     users: List[ObjectId]
-    edition: ObjectId
+    edition: int
 
 
 class ProjectOutSimple(BaseModel):
@@ -42,7 +42,7 @@ class ProjectOutExtended(BaseModel):
     partner: Partner
     required_skills: List[RequiredSkills]
     users: List[str]
-    edition: str
+    edition: int
 
     def __init__(self, **data):
         data["id"] = config.api_url + "projects/" + data["id"]

@@ -116,7 +116,7 @@ def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=Fals
                 disabled=disabled)
 
 
-def generate_student(edition_id):
+def generate_student(edition):
     first_name = choice(first_names)
     last_name = choice(last_names)
     email = choice(emails)
@@ -127,7 +127,7 @@ def generate_student(edition_id):
                    nickname=first_name,
                    question_answers=[],
                    skills=[skill.id for skill in random_skills],
-                   edition=edition_id)
+                   edition=edition.year)
 
 
 def generate_suggestions(student, project, unconfirmed=3, confirmed_suggestion=None, admin=None):
@@ -200,7 +200,7 @@ async def add_dummy_data():
         users=[coaches[i].id for i in range(2)],
         required_skills=[RequiredSkills(skill=skill.id, number=randrange(2, 5))
                          for skill in skills],
-        edition=edition.id)
+        edition=edition.year)
 
     project2 = Project(
         name="Cyberfest",
@@ -210,10 +210,10 @@ async def add_dummy_data():
         users=[coaches[i].id for i in range(2, 5)],
         required_skills=[RequiredSkills(skill=skill.id, number=randrange(1, 8))
                          for skill in sample(skills, k=randrange(3, len(skills)))],
-        edition=edition.id)
+        edition=edition.year)
 
     # generate students without suggestions
-    students = [generate_student(edition.id) for _ in range(3)]
+    students = [generate_student(edition) for _ in range(3)]
     suggestions = []
     participations = []
     for student in students:
@@ -222,7 +222,7 @@ async def add_dummy_data():
     # generate students with conflicts in suggestions
     for s in SuggestionOption:
         for i in range(2):
-            students.append(generate_student(edition.id))
+            students.append(generate_student(edition))
             suggestions += generate_suggestions(students[-1], project, 5, s, choice(admins))
             suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
             suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
@@ -230,7 +230,7 @@ async def add_dummy_data():
     # generate students that participate in a project
     for required_skill in project.required_skills:
         for _ in range(randrange(required_skill.number)):
-            students.append(generate_student(edition.id))
+            students.append(generate_student(edition))
             participations.append(Participation(student=students[-1].id, project=project.id,
                                                 skill=required_skill.skill))
 
