@@ -86,6 +86,11 @@ export default function ManageUsers() {
                     </th>
                     <th>
                         <p>
+                            account role
+                        </p>
+                    </th>
+                    <th>
+                        <p>
                             account status
                         </p>
                     </th>
