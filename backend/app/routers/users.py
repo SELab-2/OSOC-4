@@ -226,7 +226,7 @@ async def change_role(user_id: str, new_role: UserChangeRole):
 
 
 @router.post("/{user_id}/active", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def change_role(user_id: str, new_status: UserChangeStatus):
+async def change_active(user_id: str, new_status: UserChangeStatus):
     """ change role of user
     :param user_id: the id of the user
     :type user_id: str
