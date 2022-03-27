@@ -94,10 +94,13 @@ class UserInvite(BaseModel):
 
 class UserChangeRole(BaseModel):
     role: int
-    active: bool
 
     @validator('role')
     def role_in_range(cls, v):
         if not valid_role(v):
             raise InvalidRoleException()
         return v
+
+
+class UserChangeStatus(BaseModel):
+    active: bool

@@ -11,7 +11,7 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             UserNotFoundException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import (User, UserCreate, UserData, UserOut,
-                             UserOutSimple, UserRole, UserChangeRole)
+                             UserOutSimple, UserRole, UserChangeRole, UserChangeStatus)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
@@ -220,10 +220,31 @@ async def change_role(user_id: str, new_role: UserChangeRole):
         raise UserNotFoundException()
 
     user.role = new_role.role
-    user.active = new_role.active
     user = await update(user)
 
     return response(UserOut.parse_raw(user.json()), "Role updated successfully")
+
+
+@router.post("/{user_id}/active", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def change_role(user_id: str, new_status: UserChangeStatus):
+    """ change role of user
+    :param user_id: the id of the user
+    :type user_id: str
+    :param new_status: the value for the status
+    :type new_status: UserChangeStatus
+    :return: response
+    :rtype: _type_
+    """
+
+    user = await read_where(User, User.id == ObjectId(user_id))
+
+    if user is None:
+        raise UserNotFoundException()
+
+    user.active = new_status.active
+    await update(user)
+
+    return response(None, "Active status updated successfully")
 
 
 @router.post("/forgot/{reset_key}")
