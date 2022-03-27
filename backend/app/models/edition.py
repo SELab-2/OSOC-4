@@ -2,12 +2,12 @@ from typing import List, Optional
 
 from app.config import config
 from bson import ObjectId
-from odmantic import Model
+from odmantic import Model, Field
 from pydantic import BaseModel
 
 
 class Edition(Model):
-    year: int
+    year: int = Field(primary_field=True)
     name: Optional[str] = None
     description: Optional[str] = None
     form_id: Optional[str] = None
@@ -15,22 +15,22 @@ class Edition(Model):
 
 
 class EditionOutSimple(BaseModel):
-    id: str
+    uri: str
+    name: Optional[str] = ""
 
     def __init__(self, **data):
-        data["id"] = config.api_url + "editions/" + data["id"]
+        data["uri"] = config.api_url + "editions/" + str(data["year"])
         super().__init__(**data)
 
 
 class EditionOutExtended(BaseModel):
-    id: str
+    uri: str
     name: Optional[str] = ""
-    year: int
     description: Optional[str] = ""
     user_ids: List[str]
 
     def __init__(self, **data):
-        data["id"] = config.api_url + "editions/" + data["id"]
+        data["uri"] = config.api_url + "editions/" + str(data["year"])
 
         data["user_ids"] = [config.api_url + "users/" + user for user in data["user_ids"]]
         super().__init__(**data)
