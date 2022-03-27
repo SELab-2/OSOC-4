@@ -7,7 +7,6 @@ from httpx import AsyncClient, Response
 
 from app.api import app
 from app.database import db
-from app.models.edition import Edition
 from app.models.project import Project, Partner
 from app.models.skill import Skill
 from app.models.user import User, UserRole
@@ -82,7 +81,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
                 required_skills=[],
                 users=[],
-                edition=Edition(year=2022, user_ids=[]).id
+                edition=2022
             )
         }
         self.saved_objects = {

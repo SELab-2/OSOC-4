@@ -13,4 +13,4 @@ class Student(Model):
     # cv: str
     question_answers: List[ObjectId]
     skills: List[ObjectId]  # role from skill.py
-    edition: ObjectId
+    edition: int
