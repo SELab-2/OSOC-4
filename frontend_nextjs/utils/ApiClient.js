@@ -34,7 +34,7 @@ function AxiosClient(auth_headers = true) {
         },
         (error) => {
             console.log(`error`, error);
-            return error;
+            throw error;
         },
     );
 

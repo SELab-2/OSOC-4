@@ -86,7 +86,6 @@ const callbacks = {
         if (process.env.NODE_ENV === "production") {
             return url.replace("http://localhost:3000", "https://sel2-4.ugent.be");
         }
-
         return url;
     }
 }

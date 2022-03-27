@@ -11,11 +11,12 @@ import { useState } from 'react';
 import RefreshTokenHandler from '../Components/refreshTokenHandler';
 import Login from "../pages/login";
 import RouteGuard from "../Components/Auth";
+import Invite from "./invites/[invitekey]";
 
 function MyApp({ Component, pageProps }) {
   const [interval, setInterval] = useState(0);
 
-  const no_auth = [Login];
+  const no_auth = [Login, Invite];
 
 
   return (
