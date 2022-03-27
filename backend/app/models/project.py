@@ -47,5 +47,5 @@ class ProjectOutExtended(BaseModel):
     def __init__(self, **data):
         data["id"] = config.api_url + "projects/" + data["id"]
         data["users"] = [config.api_url + "users/" + user for user in data["users"]]
-        data["edition"] = config.api_url + "editions/" + data["edition"]
+        data["edition"] = config.api_url + "editions/" + str(data["edition"])
         super().__init__(**data)

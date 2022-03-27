@@ -19,7 +19,7 @@ class EditionOutSimple(BaseModel):
     name: Optional[str] = ""
 
     def __init__(self, **data):
-        data["uri"] = config.api_url + "editions/" + data["year"]
+        data["uri"] = config.api_url + "editions/" + str(data["year"])
         super().__init__(**data)
 
 
@@ -30,7 +30,7 @@ class EditionOutExtended(BaseModel):
     user_ids: List[str]
 
     def __init__(self, **data):
-        data["uri"] = config.api_url + "editions/" + data["year"]
+        data["uri"] = config.api_url + "editions/" + str(data["year"])
 
         data["user_ids"] = [config.api_url + "users/" + user for user in data["user_ids"]]
         super().__init__(**data)
