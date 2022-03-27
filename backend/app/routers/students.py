@@ -15,16 +15,15 @@ async def get_students():
     :rtype: dict
     """
     results = await read_all_where(Student)
-    print(results)
     return list_modeltype_response([StudentOutSimple.parse_raw(r.json()) for r in results], Student)
 
 
-@router.get("/{id}", response_description="Student retrieved")
-async def get_student():
+@router.get("/{student_id}", response_description="Student retrieved")
+async def get_student(student_id):
     """get_student get the Student instances with id from the database
 
     :return: student with id
     :rtype: StudentOutExtended
     """
-    result = await read_where(Student, Student.id == ObjectId(id))
+    result = await read_where(Student, Student.id == ObjectId(student_id))
     return list_modeltype_response(StudentOutExtended.parse_raw(result.json()), Student)
