@@ -52,9 +52,7 @@ export default function StudentListelement(props) {
 
       if (skills.length === 0) {
         getJson(getRolesPath()).then(res => {
-          let skillObjs = res.data.filter(skill => {
-            console.log(skill.id);
-            localStudent.skills.includes(skill.id)});
+          let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
           setSkills(skillObjs.map(skill => skill.name));
         })
       }
