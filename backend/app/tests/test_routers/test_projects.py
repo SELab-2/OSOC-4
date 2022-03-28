@@ -41,7 +41,7 @@ class TestProjects(TestBase):
         project_id = str(self.objects["project_test"].id)
         path = "/projects/" + project_id
         allowed_users = {"user_admin", "user_approved_coach"}
-        
+
         # Test authorization & access-control
         await self.auth_access_get_test(path, allowed_users)
 

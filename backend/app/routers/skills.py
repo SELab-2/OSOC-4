@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends
 router = APIRouter(prefix="/skills")
 
 
-@router.get("", response_description="Skills retrieved",  dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.get("", response_description="Skills retrieved", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def get_skills():
     """get_roles get all the Skill instances from the database
 

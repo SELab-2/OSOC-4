@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 from enum import IntEnum
-from typing import List, Set, Dict
+from typing import Set, Dict
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response

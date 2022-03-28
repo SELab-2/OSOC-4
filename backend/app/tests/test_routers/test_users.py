@@ -6,7 +6,7 @@ from odmantic import ObjectId
 
 from app.crud import read_where
 from app.database import db
-from app.models.user import User, UserRole
+from app.models.user import User
 from app.tests.test_base import Status, TestBase
 from app.utils.keygenerators import generate_new_reset_password_key
 
@@ -166,9 +166,6 @@ class TestUsers(TestBase):
         approved_user = self.objects["user_approved_coach"].id
         unactivated_user = self.objects["user_unactivated_coach"].id
         bad_user = "00000a00a00aa00aa000aaaa"
-        path = f"/users/{activated_user}/approve"
-        allowed_users = {"user_admin"}
-        body = {}
 
         await self.post_response(f"/users/{approved_user}/approve", {}, "user_admin", Status.BAD_REQUEST)
         user = await read_where(User, User.id == ObjectId(approved_user))
