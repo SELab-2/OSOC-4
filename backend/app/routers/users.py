@@ -1,5 +1,3 @@
-from typing import List
-
 from app.crud import read_all_where, read_where, update
 from app.database import db
 from app.exceptions.key_exceptions import InvalidResetKeyException
@@ -39,7 +37,7 @@ async def get_users():
     return list_modeltype_response(out_users, User)
 
 
-@router.get("/me")
+@router.get("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def get_user_me(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
@@ -71,59 +69,44 @@ async def add_user_data(user: UserCreate):
     return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
-@router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def invite_user(id: str):
-    """invite_user this functions invites a user
+@router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
+    """change_password function that changes the user password
 
-    :param id: the user id
-    :type id: str
-    :return: response
-    :rtype: success or error
+    :param reset_key: the reset key
+    :type reset_key: str
+    :param passwords: password and validate_password are needed, defaults to Body(...)
+    :type passwords: PasswordResetInput, optional
+    :raises InvalidResetKeyException: invalid reset key
+    :raises PasswordsDoNotMatchException: passwords don't match
+    :raises NotPermittedException: Unauthorized
+    :return: message to check the emails
+    :rtype: dict
     """
-    user = await read_where(User, User.id == ObjectId(id))
 
-    if user is None:
-        raise UserNotFoundException()
-    elif user.active:
-        raise UserAlreadyActiveException()
+    if reset_key[0] != "R":
+        raise InvalidResetKeyException()
 
-    # create an invite key
-    invite_key, invite_expires = generate_new_invite_key()
-    # save it
-    db.redis.setex(invite_key, invite_expires, str(user.id))
-    # send email to user with the invite key
-    send_invite(user.email, invite_key)
-    return response(None, "Invite sent successfully")
+    userid = db.redis.get(reset_key)
 
+    if not userid:
+        raise InvalidResetKeyException()
+    elif passwords.password != passwords.validate_password:
+        raise PasswordsDoNotMatchException()
 
-@router.post("/invites", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def invite_users(ids: List[str]):
-    """invite_users this functions invites multiple users
+    user = await read_where(User, User.id == ObjectId(userid))
 
-    :param id: list of user ids
-    :type id: List[str]
-    :return: response
-    :rtype: success or error
-    """
-    users = []
-    for id in ids:
-        users.append(await read_where(User, User.id == ObjectId(id)))
+    Authorize.jwt_required()
+    current_user_id = Authorize.get_jwt_subject()
 
-    # throw exception if any user is already active
-    if None in users:
-        raise UserNotFoundException()
-    elif any([user.active for user in users]):
-        raise UserAlreadyActiveException()
+    if not user or user.disabled or current_user_id != userid:
+        raise NotPermittedException()
 
-    for user in users:
-        # create an invite key
-        invite_key, invite_expires = generate_new_invite_key()
-        # save it
-        db.redis.setex(invite_key, invite_expires, "true")
-        # send email to user with the invite key
-        send_invite(user.email, invite_key)
+    user.password = get_password_hash(passwords.password)
+    db.redis.delete(reset_key)
+    await update(user)
 
-    return response(None, "Invites sent succesfull")
+    return response(None, "Password updated successfully")
 
 
 @router.get("/{id}")
@@ -180,6 +163,31 @@ async def update_user(id: str, new_data: UserData):
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
+@router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def invite_user(id: str):
+    """invite_user this functions invites a user
+
+    :param id: the user id
+    :type id: str
+    :return: response
+    :rtype: success or error
+    """
+    user = await read_where(User, User.id == ObjectId(id))
+
+    if user is None:
+        raise UserNotFoundException()
+    elif user.active:
+        raise UserAlreadyActiveException()
+
+    # create an invite key
+    invite_key, invite_expires = generate_new_invite_key()
+    # save it
+    db.redis.setex(invite_key, invite_expires, str(user.id))
+    # send email to user with the invite key
+    send_invite(user.email, invite_key)
+    return response(None, "Invite sent successfully")
+
+
 @router.post("/{user_id}/approve", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def approve_user(user_id: str):
     """approve_user this approves the user if the user account is activated
@@ -201,43 +209,3 @@ async def approve_user(user_id: str):
     user.approved = True
     await update(user)
     return response(None, "Approved the user successfully")
-
-
-@router.post("/forgot/{reset_key}")
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
-    """change_password function that changes the user password
-
-    :param reset_key: the reset key
-    :type reset_key: str
-    :param passwords: password and validate_password are needed, defaults to Body(...)
-    :type passwords: PasswordResetInput, optional
-    :raises InvalidResetKeyException: invalid reset key
-    :raises PasswordsDoNotMatchException: passwords don't match
-    :raises NotPermittedException: Unauthorized
-    :return: message to check the emails
-    :rtype: dict
-    """
-
-    if reset_key[0] != "R":
-        raise InvalidResetKeyException()
-
-    userid = db.redis.get(reset_key)
-
-    if not userid:
-        raise InvalidResetKeyException()
-    elif passwords.password != passwords.validate_password:
-        raise PasswordsDoNotMatchException()
-
-    user = await read_where(User, User.id == ObjectId(userid))
-
-    Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-
-    if not user or user.disabled or current_user_id != userid:
-        raise NotPermittedException()
-
-    user.password = get_password_hash(passwords.password)
-    db.redis.delete(reset_key)
-    await update(user)
-
-    return response(None, "Password updated successfully")

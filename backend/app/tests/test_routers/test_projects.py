@@ -11,17 +11,20 @@ class TestProjects(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    """
-    GET /projects
-    """
-
-    async def project_parser(self, url: str) -> Project:
+    @staticmethod
+    async def project_parser(url: str) -> Project:
         url = url.split("/")[-1]
         return await read_where(Project, Project.id == ObjectId(url))
 
     async def test_get_projects(self):
+        path = "/projects"
+        allowed_users = {"user_admin"}
+
+        # Test authorization & access-control
+        await self.auth_access_get_test(path, allowed_users)
+
         # Should use access token but is not yet implemented
-        response = await self.get_response("/projects", "user_admin", Status.SUCCES)
+        response = await self.get_response(path, "user_admin", Status.SUCCES)
         projects = []
 
         for p in json.loads(response.content)["data"]:
@@ -34,15 +37,16 @@ class TestProjects(TestBase):
 
         self.assertEqual(expected_projects, projects)
 
-    """
-    GET /projects/{id}
-    """
+    async def test_get_projects_id(self):
+        project_id = str(self.objects["project_test"].id)
+        path = "/projects/" + project_id
+        allowed_users = {"user_admin", "user_approved_coach"}
 
-    async def test_get_project_with_id(self):
-        # Should use access token but is not yet implemented
-        project_id = self.objects["project_test"].id
-        response = await self.get_response(f"/projects/{str(project_id)}", "user_admin", Status.SUCCES)
+        # Test authorization & access-control
+        await self.auth_access_get_test(path, allowed_users)
+
+        response = await self.get_response(path, "user_admin", Status.SUCCES)
 
         gotten_project = json.loads(response.content)["data"]
 
-        self.assertEqual(str(project_id), gotten_project["id"].split("/")[-1])
+        self.assertEqual(project_id, gotten_project["id"].split("/")[-1])

@@ -23,6 +23,9 @@ class RoleChecker:
         if not user.approved:
             raise NotPermittedException()
 
+        if user.disabled:
+            raise NotPermittedException()
+
         if user.role < self.role:
             raise NotPermittedException()
 
