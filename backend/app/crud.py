@@ -5,7 +5,7 @@ from odmantic.engine import ModelType
 from app.database import db
 
 
-async def read_all_where(model: Type[ModelType], *args) -> List[ModelType]:
+async def read_all_where(model: Type[ModelType], sort=None, *args) -> List[ModelType]:
     """read_all_where this function reads all the entries from a specific model,
     if a key and a value are passed this will be checked on each instance of model
 
@@ -19,7 +19,10 @@ async def read_all_where(model: Type[ModelType], *args) -> List[ModelType]:
     :return: list with all data-entries of type model
     :rtype: List[ModelType]
     """
-    res = await db.engine.find(model, *args)
+    if sort:
+        res = await db.engine.find(model, *args, sort=sort)
+    else:
+        res = await db.engine.find(model, *args)
     return res
 
 

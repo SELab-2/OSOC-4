@@ -11,7 +11,7 @@ class Student(Model):
     name: str
     nickname: Optional[str] = None
     phone_number: str
-    # alumn = False
+    alumn: bool = False
     # cv: str
     question_answers: List[ObjectId]
     skills: List[ObjectId]  # role from skill.py

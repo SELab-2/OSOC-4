@@ -125,6 +125,7 @@ def generate_student(edition):
                    email=f"{first_name}.{last_name}@{email}".lower(),
                    phone_number=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
                    nickname=first_name,
+                   alumn=choice([True, False]),
                    question_answers=[],
                    skills=[skill.id for skill in random_skills],
                    edition=edition.year)

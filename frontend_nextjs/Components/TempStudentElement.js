@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get_student } from "../utils/json-requests";
+import { getJson } from "../utils/json-requests";
 
 export default function TempStudentListelement(props) {
 
@@ -7,8 +7,10 @@ export default function TempStudentListelement(props) {
 
     // This function inserts the data in the variables
     useEffect(async () => {
-        const data = await get_student(props.id);
-        setStudent(data["data"]["data"]);
+        getJson(props.id).then(res => {
+            setStudent(res.data);
+        })
+
     }, []);
 
 

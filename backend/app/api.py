@@ -7,13 +7,15 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
+from pymongo import TEXT
 
 from app.config import config
-from app.database import connect_db, disconnect_db
+from app.database import connect_db, db, disconnect_db
 from app.exceptions.base_exception import BaseException
-from app.routers import (answers, auth, ddd, editions, participation,
-                         projects, question_answers, questions, roles,
-                         students, suggestions, user_invites, users)
+from app.models.student import Student
+from app.routers import (answers, auth, ddd, editions, participation, projects,
+                         question_answers, questions, roles, students,
+                         suggestions, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -31,9 +33,17 @@ app.add_middleware(
 )
 
 
+async def set_text_indexes(model):
+    await db.engine.get_collection(model).create_index([("name", "text")])
+
+
 @app.on_event("startup")
 async def startup():
     connect_db()
+    await set_text_indexes(Student)
+
+
+
 
 
 @app.on_event("shutdown")
