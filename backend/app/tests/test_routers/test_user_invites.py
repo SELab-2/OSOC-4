@@ -9,10 +9,6 @@ class TestUserInvites(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    """
-    GET /invite/{invitekey}
-    """
-
     def check_user(self, user: User, expected_values: list, password_empty):
         user_values: list = [user.name, user.email, user.role.value,
                              user.active, user.approved, user.disabled]

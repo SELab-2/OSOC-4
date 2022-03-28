@@ -12,7 +12,7 @@ from app.config import config
 from app.database import connect_db, disconnect_db
 from app.exceptions.base_exception import BaseException
 from app.routers import (answers, auth, ddd, editions, participation,
-                         projects, question_answers, questions, roles,
+                         projects, question_answers, questions, skills,
                          students, suggestions, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
@@ -49,7 +49,7 @@ app.include_router(participation.router)
 app.include_router(projects.router)
 app.include_router(question_answers.router)
 app.include_router(questions.router)
-app.include_router(roles.router)
+app.include_router(skills.router)
 app.include_router(students.router)
 app.include_router(suggestions.router)
 # app.include_router(tally.router)

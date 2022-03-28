@@ -10,7 +10,7 @@ router = APIRouter(prefix="/projects")
 router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
-@router.get("", response_description="Projects retrieved")
+@router.get("", response_description="Projects retrieved",  dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def get_projects():
     """get_projects get all the Project instances from the database
 
