@@ -1,5 +1,7 @@
+from typing import List
+
 from app.crud import read_all_where, read_where, update
-from app.database import db
+from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
@@ -17,24 +19,22 @@ from app.utils.mailsender import send_invite
 from app.utils.response import list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
-from odmantic import ObjectId
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/users")
 
 
-@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved")
-async def get_users():
+@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved", response_model=List[UserOutSimple])
+async def get_users(session: AsyncSession = Depends(get_session)):
     """get_users get all the users from the database
 
     :return: list of users url
     :rtype: dict
     """
 
-    users = await read_all_where(User)
-    out_users = []
-    for user in users:
-        out_users.append(UserOutSimple.parse_raw(user.json()))
-    return list_modeltype_response(out_users, User)
+    users = await read_all_where(User, session=session)
+    print(users)
+    return users
 
 
 @router.get("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
@@ -42,7 +42,7 @@ async def get_user_me(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
 
-    user = await read_where(User, User.id == ObjectId(current_user_id))
+    user = await read_where(User, User.id == int(current_user_id))
     # User will always be found since otherwise they can't be authorized
     # No need to check whether user exists
 
@@ -70,7 +70,7 @@ async def add_user_data(user: UserCreate):
 
 
 @router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """change_password function that changes the user password
 
     :param reset_key: the reset key
@@ -94,7 +94,7 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
     elif passwords.password != passwords.validate_password:
         raise PasswordsDoNotMatchException()
 
-    user = await read_where(User, User.id == ObjectId(userid))
+    user = await read_where(User, User.id == userid, session=session)
 
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
@@ -110,7 +110,7 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
 
 
 @router.get("/{id}")
-async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends()):
+async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
     """get_user this functions returns the user with given id (or None)
 
     :param id: the user id
@@ -118,7 +118,7 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends()):
     :return: response
     :rtype: success or error
     """
-    user = await read_where(User, User.id == ObjectId(id))
+    user = await read_where(User, User.id == int(id), session=session)
 
     if not user:
         raise UserNotFoundException()
@@ -143,7 +143,7 @@ async def update_user(id: str, new_data: UserData):
     :rtype: success or error
     """
 
-    user = await read_where(User, User.id == ObjectId(id))
+    user = await read_where(User, User.id == int(id), session=session)
 
     user_w_email = await read_where(User, User.email == new_data.email)
 

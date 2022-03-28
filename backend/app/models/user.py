@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 from app.config import config
 from app.exceptions.validator_exeptions import (EmptyNameException,
@@ -7,6 +8,8 @@ from app.exceptions.validator_exeptions import (EmptyNameException,
 from app.utils.validators import valid_email, valid_password
 from odmantic import Model
 from pydantic import BaseModel, validator
+from pydantic.dataclasses import dataclass
+from sqlmodel import Field, SQLModel
 
 
 class UserRole(int, Enum):
@@ -15,7 +18,8 @@ class UserRole(int, Enum):
     ADMIN = 2
 
 
-class User(Model):
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
     email: str
     name: str = ""
     password: str = ""
@@ -39,13 +43,12 @@ class UserCreate(BaseModel):
             raise InvalidEmailException()
         return v
 
-
+@dataclass
 class UserOutSimple(BaseModel):
     id: str
 
-    def __init__(self, **data):
-        data["id"] = config.api_url + "users/" + data["id"]
-        super().__init__(**data)
+    def __post_init__(self):
+        self.id = config.api_url + "users/" + self.id
 
 
 class UserOut(BaseModel):
