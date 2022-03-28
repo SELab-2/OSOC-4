@@ -2,16 +2,67 @@
     border-width: 1px;
     border-style: solid;
     border-color: lightgray;
-    margin: 5px;
+    margin: 10px;
     border-radius: 7px;
-    padding: 8px;
-    padding-left: 20px;
+    padding: 8px 20px;
 }
 
 .name {
-    font-size: 20px;
+    font-size: 22px;
+    padding-right: 20px;
 }
 
-.student-text {
-    font-size: 16px;
+.info-titles {
+    font-size: 14px;
+    margin-right: 17px;
+}
+
+.info-answers {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.practical-problems {
+    font-size: 15px;
+    margin-top: 2px;
+    padding: 2px 6px;
+    border-radius: 5px;
+}
+
+.suggestions {
+    font-size: 15px;
+    margin-right: 5px;
+}
+
+.suggestionsYes {
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    background-color: var(--yes_green_65);
+}
+
+.suggestionsMaybe {
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    background-color: var(--maybe_yellow_65);
+}
+
+.suggestionsNo {
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    background-color: var(--no_red_65);
+}
+
+.role {
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: var(--background-gray);
+    margin: 2px 5px;
+    font-size: 12px;
+}
+
+.roles {
+    margin-top: 10px;
 }

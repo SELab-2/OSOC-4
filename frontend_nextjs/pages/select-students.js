@@ -2,6 +2,7 @@ import StudentListelement from "../Components/StudentListelement";
 import {useEffect, useState} from "react";
 import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
+import StudentsFilters from "../Components/StudentsFilters";
 
 export default function SelectStudents(props) {
 
@@ -32,9 +33,12 @@ export default function SelectStudents(props) {
 
     return(
       <div>
-          <ul className="students-list">
-              {getStudents()}
-          </ul>
+        <StudentsFilters className="filters" style={{display: "inline-block"}}/>
+        <div style={{width:"800px"}}>
+            <ul className="students_list">
+                {getStudents()}
+            </ul>
+        </div>
       </div>
     )
 }

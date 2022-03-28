@@ -23,6 +23,7 @@ export default function StudentListelement(props) {
   const [degree, setDegree] = useState(undefined);
   const [fistLanguage, setFirstLanguage] = useState(undefined);
   const [levelOfEnglish, setLevelOfEnglish] = useState(undefined);
+  const [practicalProblems, setPracticalProblems] = useState(0);
 
   // This function inserts the data in the variables
   useEffect(() => {
@@ -87,7 +88,7 @@ export default function StudentListelement(props) {
 
   function getRoles() {
     return skills.map((skill,index) =>
-      <li className="role" style={{float: "right", bottom: 0}} key={index}>{skill}</li>
+      <li className="role" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
@@ -108,38 +109,53 @@ export default function StudentListelement(props) {
     )
   }
 
+  function getBackground() {
+    if (decision === -1) {
+      return "white";
+    }
+
+    let colors = ["var(--no_red_20)", "var(--maybe_yellow_20)", "var(--yes_green_20)"];
+    return colors[decision];
+  }
+
+  function getProblemsColor() {
+    if (practicalProblems === 0) {
+      return "var(--yes_green_65)"
+    }
+    return "var(--no_red_65)"
+  }
+
   // The html representation of a list-element
   return(
-    <div id="list-element" className="list-element" style={{width: "800px", position: "relative"}}>
+    <div id="list-element" className="list-element"
+         style={{position: "relative", backgroundColor: getBackground()}}>
 
-      <div id="upper-layer" style={{height: "30px"}}>
+      <div id="upper-layer" style={{height: "35px"}}>
         <div id="name" style={{float: "left"}} className="name">{name}</div>
-        <div id="practical-problems" style={{float: "left"}} className="practical-problems">2 practical problems</div>
-        <div id="suggestions" style={{float: "right"}} className="suggestions">
-          Suggestions:
-          <div style={{float: "right"}} className="suggestionsYes">{suggestionsYes}</div>
-          <div style={{float: "right"}} className="suggestionsMaybe">{suggestionsMaybe}</div>
+        <div id="practical-problems" style={{float: "left", backgroundColor: getProblemsColor()}} className="practical-problems">No practical problems</div>
+        <div id="suggestions" style={{float: "right"}}>
           <div style={{float: "right"}} className="suggestionsNo">{suggestionsNo}</div>
+          <div style={{float: "right"}} className="suggestionsMaybe">{suggestionsMaybe}</div>
+          <div style={{float: "right"}} className="suggestionsYes">{suggestionsYes}</div>
+          <p style={{float: "right"}} className="suggestions">Suggestions:</p>
         </div>
       </div>
 
-      <div id="info-titles" style={{float: "left"}}>
+      <div id="info-titles" style={{float: "left"}} className="info-titles">
           {getInfoTitles()}
           Decision:
       </div>
 
-      <div id="info-answers">
+      <div id="info-answers" className="info-answers">
         {getInfoAnswers()}
         {getDecision()}
       </div>
 
-      <div id="roles" style={{float: "right"}}>
+      <div id="roles" align="right" className="roles">
         <ul>
           {getRoles()}
         </ul>
       </div>
-
-      <br/><br/>
 
     </div>
   )

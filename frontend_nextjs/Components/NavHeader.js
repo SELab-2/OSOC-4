@@ -13,7 +13,7 @@ export default function NavHeader(props) {
     }
 
     return (
-        <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+        <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" className="navbar_sticky">
             <Container>
                 <Navbar.Brand href="/">
                     <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="65px" height="50px" objectFit={'contain'} />

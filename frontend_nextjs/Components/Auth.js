@@ -19,7 +19,7 @@ export default function RouteGuard(props) {
         if (!props.auth) {
             router.push('/')
         } else {
-            return [<NavHeader key="Navbar" />, ...props.children]
+            return [<NavHeader key="Navbar"/>, ...props.children]
         }
     } else if (!props.auth && !isUser) {
         return props.children

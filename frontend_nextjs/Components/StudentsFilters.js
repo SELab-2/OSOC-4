@@ -83,8 +83,8 @@ export default function StudentsFilters(props) {
         shownRoles = roles.slice(0,5);
       }
 
-      return shownRoles.map(role =>
-        <div>
+      return shownRoles.map((role,index) =>
+        <div key={index}>
           <input id={role.id} type="checkbox" onChange={val => addRole(role.id, val.target.checked)}/>
           <label htmlFor={role.id}>{role.name}</label>
           <br/>
