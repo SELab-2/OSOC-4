@@ -18,13 +18,6 @@ class TestUserInvites(TestBase):
                         f"Something was wrong with the password for {user.email}.\n")
 
     async def test_invited_user(self):
-        """ Example of post body
-        {
-            "name": "string",
-            "password": "string",
-            "validate_password": "string"
-        }
-        """
         username = "The NewGuy"
         email = "The.NewGuy@test.test"
         password = "ValidPass?!123"
