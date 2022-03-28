@@ -1,7 +1,7 @@
-from odmantic import Model
+from odmantic import EmbeddedModel
 from odmantic.bson import ObjectId
 
 
-class QuestionAnswer(Model):
+class QuestionAnswer(EmbeddedModel):
     question: ObjectId
     answer: ObjectId

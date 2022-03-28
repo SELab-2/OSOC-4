@@ -10,7 +10,7 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
 from app.models.project import Project
-from app.models.student import Student
+from app.models.student import Student, StudentOutSimple
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
@@ -81,14 +81,72 @@ async def update_edition(year: int, edition: Edition = Body(...)):
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Students retrieved")
-async def get_edition_students(year: int):
+async def get_edition_students(year: int,
+                               search: Optional[str] = None):
     """get_edition_students get all the students in the edition with given year
 
+    :param year: year of the edition
+    :type year: int
+    :param search: search term to search for students
+    :type search: str
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-    students = await db.engine.find(Student, {"edition": year})
-    return list_modeltype_response(students, Student)
+    if search is None:
+        results = await read_all_where(Student)
+        return list_modeltype_response([StudentOutSimple.parse_raw(r.json()) for r in results], Student)
+
+    collection = db.engine.get_collection(Student)
+    if not collection:
+        raise SuggestionRetrieveException()
+
+    pipeline = [
+        # get students corresponding to this edition
+        {"$match": {"edition": year}},
+
+        # get answers containing the search string
+        {"$lookup": {
+            "from": "answer",
+            "let": {"answer_id": "$question_answers.answer"},
+            "pipeline": [{
+                "$match": {
+                    # get answers where id is in the student's answers
+                    "$expr": {"$in": ["$_id", "$$answer_id"]},
+                    # get answers where the search string is in the answerstring
+                    "answer": {"$regex": search, "$options": 'i'}}}],
+            # write matching answers to "answers" field
+            "as": "answers"}},
+
+        # get questions containing the search string
+        {"$lookup": {
+            "from": "question",
+            "let": {"question_id": "$question_answers.question"},
+            "pipeline": [{
+                "$match": {
+                    # get questions where id is in the student's questions
+                    "$expr": {"$in": ["$_id", "$$question_id"]},
+                    # get questions where the search string is in the questionstring
+                    "question": {"$regex": search, "$options": 'i'}}}],
+            # write matching questions to "questions" field
+            "as": "questions"}},
+
+        # look if the search term is in any of the fields
+        {"$match": {
+            "$or": [{"answers": {"$ne": []}},
+                    {"questions": {"$ne": []}},
+                    {"name": {"$regex": search, "$options": 'i'}},
+                    {"email": {"$regex": search, "$options": 'i'}},
+                    {"nickname": {"$regex": search, "$options": 'i'}}]}},
+
+        # only return the student id
+        # {"$project": {"_id": 1}}
+    ]
+
+    results = await collection.aggregate(pipeline).to_list(length=None)
+    for res in results:
+        res["id"] = str(res["_id"])
+
+    return list_modeltype_response([StudentOutSimple.parse_obj(r) for r in results], Student)
 
 
 @router.post("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Students retrieved")
@@ -151,7 +209,6 @@ async def get_conflicting_students(year: int):
 
     students = await db.engine.find(Student, {"edition": year})
     students = [student.id for student in students]
-    print(students)
 
     pipeline = [
         # get confirmed suggestions for students in the current edition that say yes
@@ -182,4 +239,4 @@ async def get_conflicting_students(year: int):
         students[-1]["student_id"] = str(students[-1]["student_id"])
         students[-1]["suggestion_ids"] = [str(s_id) for s_id in students[-1]["suggestion_ids"]]
 
-    return response(students, "Students with conflicting suggestions retrieved succesfully")
+    return response(students, "Students with conflicting suggestions retrieved successfully")

@@ -4,6 +4,7 @@ from app.config import config
 from bson import ObjectId
 from odmantic import Model
 from pydantic import BaseModel
+from app.models.question_answer import QuestionAnswer
 
 
 class Student(Model):
@@ -13,7 +14,7 @@ class Student(Model):
     phone_number: str
     # alumn = False
     # cv: str
-    question_answers: List[ObjectId]
+    question_answers: List[QuestionAnswer]
     skills: List[ObjectId]  # role from skill.py
     edition: int
 

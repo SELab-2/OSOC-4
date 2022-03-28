@@ -116,16 +116,30 @@ def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=Fals
                 disabled=disabled)
 
 
+def generate_question_answers():
+    qa = [QuestionAnswer(question=questions_yes_no[i].id, answer=choice(answers_yes_no[i]).id)
+          for i in range(len(questions_yes_no))]
+    qa += [QuestionAnswer(question=questions_text[i].id, answer=choice(answers_text[i]).id)
+           for i in range(len(questions_text))]
+    qa += [QuestionAnswer(question=questions_multiple_choice[i].id, answer=choice(answers_multiple_choice[i]).id)
+           for i in range(len(questions_multiple_choice))]
+    for i in range(len(questions_multiple_choice2)):
+        qa += [QuestionAnswer(question=questions_multiple_choice2[i].id, answer=answer.id)
+               for answer in sample(answers_multiple_choice2[i], k=randrange(1, 3))]
+    return qa
+
+
 def generate_student(edition):
     first_name = choice(first_names)
     last_name = choice(last_names)
     email = choice(emails)
     random_skills = sample(skills, k=randrange(1, len(skills)))
+
     return Student(name=f"{first_name} {last_name}",
                    email=f"{first_name}.{last_name}@{email}".lower(),
                    phone_number=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
                    nickname=first_name,
-                   question_answers=[],
+                   question_answers=generate_question_answers(),
                    skills=[skill.id for skill in random_skills],
                    edition=edition.year)
 
@@ -151,19 +165,6 @@ def generate_suggestions(student, project, unconfirmed=3, confirmed_suggestion=N
             definitive=True))
 
     return suggestions
-
-
-def generate_question_answers():
-    qa = [QuestionAnswer(question=questions_yes_no[i].id, answer=choice(answers_yes_no[i]).id)
-          for i in range(len(questions_yes_no))]
-    qa += [QuestionAnswer(question=questions_text[i].id, answer=choice(answers_text[i]).id)
-           for i in range(len(questions_text))]
-    qa += [QuestionAnswer(question=questions_multiple_choice[i].id, answer=choice(answers_multiple_choice[i]).id)
-           for i in range(len(questions_multiple_choice))]
-    for i in range(len(questions_multiple_choice2)):
-        qa += [QuestionAnswer(question=questions_multiple_choice2[i].id, answer=answer.id)
-               for answer in sample(answers_multiple_choice2[i], k=randrange(1, 3))]
-    return qa
 
 
 @router.get("/", response_description="Data retrieved")
@@ -234,13 +235,6 @@ async def add_dummy_data():
             participations.append(Participation(student=students[-1].id, project=project.id,
                                                 skill=required_skill.skill))
 
-    question_answers = []
-
-    for student in students:
-        generated_question_answers = generate_question_answers()
-        question_answers += generated_question_answers
-        student.question_answers = [qa.id for qa in generated_question_answers]
-
     # save models to database
     await db.engine.save(user_admin)
     for user in users:
@@ -270,9 +264,6 @@ async def add_dummy_data():
     for answers in answers_multiple_choice2:
         for answer in answers:
             await db.engine.save(answer)
-
-    for question_answer in question_answers:
-        await db.engine.save(question_answer)
 
     for skill in skills:
         await db.engine.save(skill)
