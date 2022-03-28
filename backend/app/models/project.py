@@ -26,6 +26,16 @@ class Project(Model):
     edition: int
 
 
+class PartnerOut(BaseModel):
+    name: str
+    about: str
+
+
+class RequiredSkillOut(BaseModel):
+    skill: str
+    number: int
+
+
 class ProjectCreate(BaseModel):
     name: str
     description: str
@@ -50,13 +60,13 @@ class ProjectOutExtended(BaseModel):
     name: str
     description: str
     goals: List[str]
-    partner: Partner
-    required_skills: List[RequiredSkills]
+    partner: PartnerOut
+    required_skills: List[RequiredSkillOut]
     users: List[str]
     edition: str
 
     def __init__(self, **data):
-        super().__init__(**data)
         data["id"] = config.api_url + "projects/" + data["id"]
         data["users"] = [config.api_url + "users/" + user for user in data["users"]]
         data["edition"] = config.api_url + "editions/" + str(data["edition"])
+        super().__init__(**data)
