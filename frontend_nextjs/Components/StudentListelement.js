@@ -17,7 +17,7 @@ export default function StudentListelement(props) {
   const [suggestionsYes, setSuggestionsYes] = useState(0);
   const [suggestionsMaybe, setSuggestionsMaybe] = useState(0);
   const [suggestionsNo, setSuggestionsNo] = useState(0);
-  const [decision,setDecision] = useState(-1)
+  const [decision,setDecision] = useState(-1);
   const [skills, setSkills] = useState([]);
   const [studies, setStudies] = useState(undefined);
   const [degree, setDegree] = useState(undefined);
@@ -31,21 +31,22 @@ export default function StudentListelement(props) {
       setName(props.student.name)
       let localStudent = props.student;
 
-      if (suggestions === []) {
+      if (suggestions.length === 0) {
         getJson(getSuggestionsPath()).then(res => {
           let possibleSuggestions = res.data;
-          setSuggestions(possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id));
+          let localSuggestions = possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id);
+          setSuggestions(localSuggestions);
 
-          setSuggestionsYes(suggestions.filter(
-            suggestion => suggestion.decision === 2 && suggestion.definitive === false).length);
-          setSuggestionsMaybe(suggestions.filter(
-            suggestion => suggestion.decision === 1 && suggestion.definitive === false).length);
-          setSuggestionsNo(suggestions.filter(
-            suggestion => suggestion.decision === 0 && suggestion.definitive === false).length);
+          setSuggestionsYes(localSuggestions.filter(
+            suggestion => suggestion.decision === 2 && (! suggestion.definitive)).length);
+          setSuggestionsMaybe(localSuggestions.filter(
+            suggestion => suggestion.decision === 1 && (! suggestion.definitive)).length);
+          setSuggestionsNo(localSuggestions.filter(
+            suggestion => suggestion.decision === 0 && (! suggestion.definitive)).length);
 
-          let newDecision = suggestions.filter(suggestion => suggestion.definitive === true);
-          if (newDecision !== []) {
-            setDecision(newDecision[0]);
+          let newDecision = localSuggestions.filter(suggestion => suggestion.definitive);
+          if (newDecision.length) {
+            setDecision(newDecision[0].decision);
           }
         })
       }
@@ -85,8 +86,8 @@ export default function StudentListelement(props) {
   }
 
   function getRoles() {
-    return skills.map(skill =>
-      <li className="role" style={{float: "right", bottom: 0}}>{skill}</li>
+    return skills.map((skill,index) =>
+      <li className="role" style={{float: "right", bottom: 0}} key={index}>{skill}</li>
     )
   }
 
