@@ -7,7 +7,7 @@ from odmantic import ObjectId
 from app.crud import read_where
 from app.database import db
 from app.models.user import User
-from app.tests.test_base import Status, TestBase
+from app.tests.test_base import Status, TestBase, Request
 from app.utils.keygenerators import generate_new_reset_password_key
 
 
@@ -20,10 +20,10 @@ class TestUsers(TestBase):
         allowed_users = {"user_admin"}
 
         # Test authorization & access-control
-        await self.auth_access_get_test(path, allowed_users)
+        await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Test response
-        response = await self.get_response(path, "user_admin", Status.SUCCES)
+        response = await self.do_request(Request.GET, path, "user_admin", Status.SUCCESS)
 
         ep_users = json.loads(response.content)["data"]  # collected from EndPoint
         ep_users = sorted([user["id"].split("/")[-1] for user in ep_users])
@@ -41,11 +41,11 @@ class TestUsers(TestBase):
         allowed_users = {"user_admin", "user_approved_coach"}
 
         # Test authorization & access-control
-        await self.auth_access_get_test(path, allowed_users)
+        await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Test response
         user = self.objects["user_admin"]
-        response = await self.get_response(path, "user_admin", Status.SUCCES)
+        response = await self.do_request(Request.GET, path, "user_admin", Status.SUCCESS)
         response = json.loads(response.content)["data"]["id"].split("/")[-1]
         self.assertEqual(str(user.id), response)
 
@@ -55,7 +55,7 @@ class TestUsers(TestBase):
         body = {"email": "added_user@test.com"}
 
         # Test authorization & access-control
-        await self.auth_access_post_test(path, allowed_users, body)
+        await self.auth_access_request_test(Request.POST, path, allowed_users, body)
 
         # Test response
         user = await db.engine.find_one(User, User.email == body["email"])
@@ -79,7 +79,8 @@ class TestUsers(TestBase):
             db.redis.setex(key[0], key[1], str(user.id))
 
             # Request using different validate_password
-            await self.post_response(f"/users/forgot/{key[0]}", bad_body, user_title, Status.BAD_REQUEST)
+            await self.do_request(Request.POST, f"/users/forgot/{key[0]}", user_title,
+                                  json_body=bad_body, expected_status=Status.BAD_REQUEST)
             self.assertEqual(user.password, self.saved_objects[user_title].password,
                              f"The password of {user_title} was {user.password}. "
                              f"Expected: {self.saved_objects[user_title].password}")
@@ -88,19 +89,23 @@ class TestUsers(TestBase):
             key = generate_new_reset_password_key()
             db.redis.setex(key[0], key[1], str(user.id))
 
-            await self.post_response(f"/users/forgot/{key[0]}", body, user_title, Status.SUCCES)
+            await self.do_request(Request.POST, f"/users/forgot/{key[0]}", user_title,
+                                  json_body=body, expected_status=Status.SUCCESS)
             # Since password is encrypted, we assert using a simple get with the new password
             self.saved_objects["passwords"][user_title] = new_pass
-            await self.get_response("/users/me", user_title, Status.SUCCES)
+            await self.do_request(Request.GET, "/users/me", user_title, Status.SUCCESS)
 
         # Request using invalid reset keys
-        await self.post_response("/users/forgot/Rohnonotsogood", body, "user_admin", Status.BAD_REQUEST)
-        await self.post_response("/users/forgot/Iohnoevenworse", body, "user_admin", Status.BAD_REQUEST)
+        await self.do_request(Request.POST, "/users/forgot/Rohnonotsogood", "user_admin",
+                              json_body=body, expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.POST, "/users/forgot/Iohnoevenworse", "user_admin",
+                              json_body=body, expected_status=Status.BAD_REQUEST)
 
         key = generate_new_reset_password_key()
         db.redis.setex(key[0], key[1], str(self.objects["user_approved_coach"].id))
 
-        await self.post_response(f"/users/forgot/{key[0]}", body, "user_admin", Status.FORBIDDEN)
+        await self.do_request(Request.POST, f"/users/forgot/{key[0]}", "user_admin",
+                              json_body=body, expected_status=Status.FORBIDDEN)
 
     async def test_get_users_id(self):
         expected_user = self.users["user_admin"]
@@ -109,16 +114,16 @@ class TestUsers(TestBase):
         allowed_users = {"user_admin", "user_approved_coach"}
 
         # Test authorization & access-control
-        await self.auth_access_get_test(path, allowed_users)
+        await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Test response
-        response = await self.get_response(path, "user_admin", Status.SUCCES)
+        response = await self.do_request(Request.GET, path, "user_admin", Status.SUCCESS)
         gotten_user = json.loads(response.content)["data"]
         self.assertTrue(expected_user.email == gotten_user["email"],
                         f"""The incorrect user was fetched
                              Expected: {expected_user}
                              Was: {gotten_user}""")
-        await self.get_response(bad_path, "user_admin", Status.NOT_FOUND)
+        await self.do_request(Request.GET, bad_path, "user_admin", Status.NOT_FOUND)
 
     async def test_post_users_id(self):
         user_to_edit = self.objects["user_no_role"]
@@ -129,7 +134,7 @@ class TestUsers(TestBase):
         allowed_users = {"user_admin"}
 
         # Test authorization & access-control
-        await self.auth_access_post_test(path, allowed_users, body)
+        await self.auth_access_request_test(Request.POST, path, allowed_users, body)
 
         # Test response
         user = await db.engine.find_one(User, User.id == user_to_edit.id and User.name == body["name"])
@@ -137,8 +142,10 @@ class TestUsers(TestBase):
                              {body} was not found in the database,
                              the user was not modified correctly.""")
 
-        await self.post_response(path, bad_body, "user_admin", Status.BAD_REQUEST)
-        await self.post_response(bad_path, body, "user_admin", Status.NOT_FOUND)
+        await self.do_request(Request.POST, path, "user_admin",
+                              json_body=bad_body, expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.POST, bad_path, "user_admin",
+                              json_body=body, expected_status=Status.NOT_FOUND)
 
     @unittest.skip("Prevent email spam")
     async def test_post_users_id_invite(self):
@@ -151,15 +158,20 @@ class TestUsers(TestBase):
         body = {}
 
         # Test authorization & access-control
-        await self.auth_access_post_test(path, allowed_users, body)
+        await self.auth_access_request_test(Request.POST, path, allowed_users, body)
 
         # Test response
-        await self.post_response(path, {}, "user_admin", Status.SUCCES)
-        await self.post_response(f"/users/{active_user}/invite", {}, "user_admin", Status.BAD_REQUEST)
-        await self.post_response(f"/users/{bad_user}/invite", {}, "user_admin", Status.NOT_FOUND)
+        await self.do_request(Request.POST, path, "user_admin",
+                              json_body={}, expected_status=Status.SUCCESS)
+        await self.do_request(Request.POST, f"/users/{active_user}/invite", "user_admin",
+                              json_body={}, expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_admin",
+                              json_body={}, expected_status=Status.NOT_FOUND)
 
-        await self.post_response(f"/users/{active_user}/invite", {}, "user_approved_coach", Status.FORBIDDEN)
-        await self.post_response(f"/users/{bad_user}/invite", {}, "user_approved_coach", Status.FORBIDDEN)
+        await self.do_request(Request.POST, f"/users/{active_user}/invite", "user_approved_coach",
+                              json_body={}, expected_status=Status.FORBIDDEN)
+        await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_approved_coach",
+                              json_body={}, expected_status=Status.FORBIDDEN)
 
     async def test_post_users_id_approve(self):
         activated_user = self.objects["user_activated_coach"].id
@@ -167,23 +179,30 @@ class TestUsers(TestBase):
         unactivated_user = self.objects["user_unactivated_coach"].id
         bad_user = "00000a00a00aa00aa000aaaa"
 
-        await self.post_response(f"/users/{approved_user}/approve", {}, "user_admin", Status.BAD_REQUEST)
+        await self.do_request(Request.POST, f"/users/{approved_user}/approve", "user_admin",
+                              json_body={}, expected_status=Status.BAD_REQUEST)
         user = await read_where(User, User.id == ObjectId(approved_user))
         self.assertTrue(user.approved)
 
-        await self.post_response(f"/users/{unactivated_user}/approve", {}, "user_admin", Status.BAD_REQUEST)
+        await self.do_request(Request.POST, f"/users/{unactivated_user}/approve", "user_admin",
+                              json_body={}, expected_status=Status.BAD_REQUEST)
         user = await read_where(User, User.id == ObjectId(unactivated_user))
         self.assertFalse(user.approved)
         self.assertFalse(user.active)
 
-        await self.post_response(f"/users/{bad_user}/approve", {}, "user_admin", Status.NOT_FOUND)
+        await self.do_request(Request.POST, f"/users/{bad_user}/approve", "user_admin",
+                              json_body={}, expected_status=Status.NOT_FOUND)
 
-        for user_title in self.saved_objects[User.__module__]:
+        for user_title in self.saved_objects["User"]:
             if user_title != "user_admin":
-                await self.post_response(f"/users/{activated_user}/approve", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{approved_user}/approve", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{unactivated_user}/approve", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{bad_user}/approve", {}, user_title, Status.FORBIDDEN)
+                await self.do_request(Request.POST, f"/users/{activated_user}/approve", user_title,
+                                      json_body={}, expected_status=Status.FORBIDDEN)
+                await self.do_request(Request.POST, f"/users/{approved_user}/approve", user_title,
+                                      json_body={}, expected_status=Status.FORBIDDEN)
+                await self.do_request(Request.POST, f"/users/{unactivated_user}/approve", user_title,
+                                      json_body={}, expected_status=Status.FORBIDDEN)
+                await self.do_request(Request.POST, f"/users/{bad_user}/approve", user_title,
+                                      json_body={}, expected_status=Status.FORBIDDEN)
 
         # check that the user was not changed in the database
         user = await read_where(User, User.id == ObjectId(activated_user))
@@ -197,6 +216,7 @@ class TestUsers(TestBase):
         self.assertFalse(user.active)
 
         # Test correct
-        await self.post_response(f"/users/{activated_user}/approve", {}, "user_admin", Status.SUCCES)
+        await self.do_request(Request.POST, f"/users/{activated_user}/approve", "user_admin",
+                              json_body={}, expected_status=Status.SUCCESS)
         user = await read_where(User, User.id == ObjectId(activated_user))
         self.assertTrue(user.approved)

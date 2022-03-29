@@ -1,6 +1,6 @@
 from typing import Dict
 
-from app.tests.test_base import TestBase, Status
+from app.tests.test_base import TestBase, Status, Request
 
 
 class TestAuth(TestBase):
@@ -9,12 +9,14 @@ class TestAuth(TestBase):
 
     async def post_login_succes(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
-        response = await self.post_response("/login", body, name, Status.SUCCES, use_access_token=False)
+        response = await self.do_request(Request.POST, "/login", name, Status.SUCCESS,
+                                         json_body=body, use_access_token=False)
         self.assertTrue("id" in response.json()["data"])
 
     async def post_login_fail(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
-        response = await self.post_response("/login", body, name, Status.UNAUTHORIZED, use_access_token=False)
+        response = await self.do_request(Request.POST, "/login", name, Status.UNAUTHORIZED,
+                                         json_body=body, use_access_token=False)
         self.assertTrue("message" in response.json())
 
     async def test_post_login(self):

@@ -2,7 +2,7 @@ import json
 
 from app.crud import read_all_where
 from app.models.skill import Skill
-from app.tests.test_base import TestBase, Status
+from app.tests.test_base import TestBase, Status, Request
 
 
 class TestSkills(TestBase):
@@ -14,10 +14,10 @@ class TestSkills(TestBase):
         allowed_users = {"user_admin"}
 
         # Test authorization & access-control
-        await self.auth_access_get_test(path, allowed_users)
+        await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         skills = set()
-        response = await self.get_response(path, "user_admin", Status.SUCCES)
+        response = await self.do_request(Request.GET, path, "user_admin", Status.SUCCESS)
         for skill in json.loads(response.content)["data"]:
             skills.add(skill["id"])
 

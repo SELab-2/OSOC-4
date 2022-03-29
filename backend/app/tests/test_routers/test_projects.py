@@ -4,7 +4,7 @@ from bson import ObjectId
 
 from app.crud import read_where
 from app.models.project import Project
-from app.tests.test_base import TestBase, Status
+from app.tests.test_base import TestBase, Status, Request
 
 
 class TestProjects(TestBase):
@@ -21,10 +21,10 @@ class TestProjects(TestBase):
         allowed_users = {"user_admin"}
 
         # Test authorization & access-control
-        await self.auth_access_get_test(path, allowed_users)
+        await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Should use access token but is not yet implemented
-        response = await self.get_response(path, "user_admin", Status.SUCCES)
+        response = await self.do_request(Request.GET, path, "user_admin", Status.SUCCESS)
         projects = []
 
         for p in json.loads(response.content)["data"]:
@@ -33,7 +33,7 @@ class TestProjects(TestBase):
             projects.append(str(project.id))
 
         expected_projects = [str(project.id) for project in
-                             map(lambda p: self.objects[p], self.saved_objects[Project.__module__])]
+                             map(lambda p: self.objects[p], self.saved_objects["Project"])]
 
         self.assertEqual(expected_projects, projects)
 
@@ -43,9 +43,9 @@ class TestProjects(TestBase):
         allowed_users = {"user_admin", "user_approved_coach"}
 
         # Test authorization & access-control
-        await self.auth_access_get_test(path, allowed_users)
+        await self.auth_access_request_test(Request.GET, path, allowed_users)
 
-        response = await self.get_response(path, "user_admin", Status.SUCCES)
+        response = await self.do_request(Request.GET, path, "user_admin", Status.SUCCESS)
 
         gotten_project = json.loads(response.content)["data"]
 

@@ -1,7 +1,7 @@
 import asyncio
 import unittest
-from enum import IntEnum
-from typing import Set, Dict
+from enum import IntEnum, Enum, auto
+from typing import Set, Dict, Any
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
@@ -21,8 +21,23 @@ from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 
 
+class Request(Enum):
+    DELETE = auto()
+    GET = auto()
+    POST = auto()
+    PUT = auto()
+
+    async def do_request(self, client: AsyncClient, path: str, headers: Dict[str, str], body: Any = None) -> Response:
+        if self.name == "POST":
+            return await client.post(path, json=body, headers=headers)
+        elif self.name == "GET":
+            return await client.get(path, headers=headers)
+        else:
+            raise NotImplementedError
+
+
 class Status(IntEnum):
-    SUCCES = 200
+    SUCCESS = 200
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
     FORBIDDEN = 403
@@ -111,7 +126,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self) -> None:
         asyncio.get_running_loop().set_debug(False)  # silent mode
-        self.client = AsyncClient(app=app, base_url="http://test")
+        self.client: AsyncClient = AsyncClient(app=app, base_url="http://test")
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
         for key, obj in self.objects.items():
@@ -121,9 +136,9 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 self.saved_objects["passwords"][key] = plain_password
 
             # update the corresponding object list
-            obj_list = self.saved_objects.get(str(type(obj))) or []
+            obj_list = self.saved_objects.get(obj.__repr_name__()) or []
             obj_list.append(key)
-            self.saved_objects[obj.__module__] = obj_list  # Key is the type of the obj (without extra)
+            self.saved_objects[obj.__repr_name__()] = obj_list  # Key is the type of the obj (without extra)
 
             self.saved_objects[key] = await db.engine.save(obj)
 
@@ -143,76 +158,41 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                                        headers={"Content-Type": "application/json"})
         return login.json()["data"]["accessToken"]
 
-    async def get_response(self, path: str, user: str, expected_status: int = 200,
-                           access_token: str = None, use_access_token: bool = True) -> Response:
-        """GET request test template
+    async def do_request(self, request_type: Request, path: str, user: str,
+                         expected_status: int = 200, access_token: str = None,
+                         use_access_token: bool = True, json_body: Any = None) -> Response:
+        """request test template
 
         Tests whether a request with the given data matches the expected status and returns the response.
 
-        Args:
-        :param path: The path of the GET request
+        :param request_type: The type of request
+        :param path: The path of the request
         :type path: str
         :param user: The requesting user
         :type user: str
         :param expected_status: The expected status of the request, defaults to 200
         :type expected_status: int
+        :param json_body: The request body
+        :type json_body: Depends on the request, most of the time a dict
         :param access_token: The access token of the request, defaults to token of user
         :type access_token: str
         :param use_access_token: Toggle whether an access token is used in the request
         :type use_access_token: bool
 
-        :return: The response of the GET request
+        :return: The response of the request
         :rtype: Response
         """
+        headers: Dict[str, str] = {}
+
         if use_access_token:
             if access_token is None:
                 access_token = await self.get_access_token(user)
-            response = await self.client.get(path, headers={"Authorization": "Bearer " + access_token})
-        else:
-            response = await self.client.get(path)
+            headers["Authorization"] = "Bearer " + access_token
 
+        response = await request_type.do_request(self.client, path, headers, json_body)
         self.assertTrue(response.status_code == expected_status,
-                        f"""While doing GET to '{path}':
-                        Unexpected status for {user},
-                        status code was {response.status_code},
-                        expected {expected_status}
-                        """)
-        return response
-
-    async def post_response(self, path: str, json_body, user: str,
-                            expected_status: int = 200, access_token: str = None,
-                            use_access_token: bool = True) -> Response:
-        """POST request test template
-
-        Tests whether a request with the given data matches the expected status and returns the response.
-
-        :param path: The path of the POST request
-        :type path: str
-        :param json_body: The POST body
-        :type json_body: Depends on POST request, most of the time a dict
-        :param user: The requesting user
-        :type user: str
-        :param expected_status: The expected status of the POST request, defaults to 200
-        :type expected_status: int
-        :param access_token: The access token of the request, defaults to token of user
-        :type access_token: str
-        :param use_access_token: Toggle whether an access token is used in the request
-        :type use_access_token: bool
-
-        :return: The response of the POST request
-        :rtype: Response
-        """
-        if use_access_token:
-            if access_token is None:
-                access_token = await self.get_access_token(user)
-            response = await self.client.post(path, json=json_body, headers={"Authorization": "Bearer " + access_token,
-                                                                             "Content-Type": "application/json"})
-        else:
-            response = await self.client.post(path, json=json_body, headers={"Content-Type": "application/json"})
-
-        self.assertTrue(response.status_code == expected_status,
-                        f"""While doing POST of
-                        {json_body}
+                        f"""While doing {request_type.name} request with body =
+                        '{json_body}'
                         to '{path}':
                         Unexpected status for {user},
                         status code was {response.status_code},
@@ -220,34 +200,32 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         """)
         return response
 
-    async def _auth_test_get(self, path: str):
-        await self.get_response(path, "user_admin", Status.UNAUTHORIZED, use_access_token=False)
-        await self.get_response(path, "user_admin", Status.UNPROCESSABLE, access_token="wrong token")
+    async def _auth_test_request(self, request_type: Request, path: str, body: Dict):
+        await self.do_request(request_type, path, "user_admin", Status.UNAUTHORIZED,
+                              json_body=body, use_access_token=False)
+        await self.do_request(request_type, path, "user_admin", Status.UNPROCESSABLE,
+                              json_body=body, access_token="wrong token")
 
-    async def _auth_test_post(self, path: str, body: Dict):
-        await self.post_response(path, body, "user_admin", Status.UNAUTHORIZED, use_access_token=False)
-        await self.post_response(path, body, "user_admin", Status.UNPROCESSABLE, access_token="wrong token")
-
-    async def _access_test_get(self, path, allowed_users: Set[str]):
+    async def _access_test_request(self, request_type: Request, path, allowed_users: Set[str], body: Dict = None):
         # Allowed users
         for user in allowed_users:
-            await self.get_response(path, user, Status.SUCCES)
+            await self.do_request(request_type, path, user, Status.SUCCESS, json_body=body)
         # Disallowed users
         for user in set(self.users.keys()).difference(allowed_users):
-            await self.get_response(path, user, Status.FORBIDDEN)
+            await self.do_request(request_type, path, user, Status.FORBIDDEN, json_body=body)
 
-    async def _access_test_post(self, path, allowed_users: Set[str], body: Dict):
-        # Allowed users
-        for user in allowed_users:
-            await self.post_response(path, body, user, Status.SUCCES)
-        # Disallowed users
-        for user in set(self.users.keys()).difference(allowed_users):
-            await self.post_response(path, body, user, Status.FORBIDDEN)
+    async def auth_access_request_test(self, request_type: Request, path: str, allowed_users: Set[str],
+                                       body: Dict = None) -> None:
+        """
+        Assert for all users whether only allowed_users are allowed request access to the given path.
 
-    async def auth_access_get_test(self, path: str, allowed_users: Set[str]):
-        await self._auth_test_get(path)
-        await self._access_test_get(path, allowed_users)
+        :param request_type: type of the request
+        :param path: The path for the request
+        :param allowed_users: All allowed users
+        :param body: The body of the request
+        """
 
-    async def auth_access_post_test(self, path: str, allowed_users: Set[str], body: Dict):
-        await self._auth_test_post(path, body)
-        await self._access_test_post(path, allowed_users, body)
+        # Check bad access tokens
+        await self._auth_test_request(request_type, path, body)
+        # Check all users with their access tokens:
+        await self._access_test_request(request_type, path, allowed_users, body)
