@@ -70,46 +70,6 @@ async def add_user_data(user: UserCreate):
     return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
-@router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
-    """change_password function that changes the user password
-
-    :param reset_key: the reset key
-    :type reset_key: str
-    :param passwords: password and validate_password are needed, defaults to Body(...)
-    :type passwords: PasswordResetInput, optional
-    :raises InvalidResetKeyException: invalid reset key
-    :raises PasswordsDoNotMatchException: passwords don't match
-    :raises NotPermittedException: Unauthorized
-    :return: message to check the emails
-    :rtype: dict
-    """
-
-    if reset_key[0] != "R":
-        raise InvalidResetKeyException()
-
-    userid = db.redis.get(reset_key)
-
-    if not userid:
-        raise InvalidResetKeyException()
-    elif passwords.password != passwords.validate_password:
-        raise PasswordsDoNotMatchException()
-
-    user = await read_where(User, User.id == ObjectId(userid))
-
-    Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-
-    if not user or user.disabled or current_user_id != userid:
-        raise NotPermittedException()
-
-    user.password = get_password_hash(passwords.password)
-    db.redis.delete(reset_key)
-    await update(user)
-
-    return response(None, "Password updated successfully")
-
-
 @router.get("/{id}")
 async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends()):
     """get_user this functions returns the user with given id (or None)
@@ -212,7 +172,7 @@ async def approve_user(user_id: str):
     return response(None, "Approved the user successfully")
 
 
-@router.post("/forgot/{reset_key}")
+@router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends()):
     """change_password function that changes the user password
 
