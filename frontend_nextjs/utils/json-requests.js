@@ -120,9 +120,8 @@ export async function postCreate(url, json) {
  */
 export async function patchEdit(url, json) {
     log("json-requests: patchEdit: " + url)
-    const base = process.env.NEXT_INTERNAL_API_URL;
     try {
-        let resp = await ApiClient.patch(base + "/login", json);
+        let resp = await ApiClient.patch(url, json);
         log(resp)
         return { success: true, data: resp.data };
     } catch (e) {
