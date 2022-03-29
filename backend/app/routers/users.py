@@ -252,7 +252,7 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
     return response(None, "Password updated successfully")
 
 
-@router.patch('{user_id}/change-password')
+@router.patch('/{user_id}/change-password')
 async def change_password_given_current(user_id: str, passwords: ChangePassword):
     """change_password_given_current this changes the password of the given user if the correct current password is given
 
