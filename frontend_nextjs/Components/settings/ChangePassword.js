@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import {log} from "../../utils/logger";
-import {postCreate} from "../../utils/json-requests";
+import {patchEdit, postCreate} from "../../utils/json-requests";
 
 export default function ChangePassword(props) {
     const [currentPassword, setCurrentPassword] = useState("");
@@ -34,7 +34,7 @@ export default function ChangePassword(props) {
             let body = {"current_password": currentPassword, "new_password": newPassword, "confirmation_password":confirmPassword}
             let url = props.userid + "/change-password"
             log(url)
-            let response = await postCreate(url, body)
+            let response = await patchEdit(url, body)
             log(response)
             if (response.success) { setChangedSuccess(true); }
             log(newPassword)
