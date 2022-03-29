@@ -123,9 +123,6 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends()):
     if not user:
         raise UserNotFoundException()
 
-    if not role == UserRole.ADMIN and not user.approved:
-        raise UserBadStateException()
-
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 
 

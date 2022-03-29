@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 from enum import IntEnum, Enum, auto
-from typing import Set, Dict, Any
+from typing import Set, Dict, Any, List
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
@@ -108,7 +108,10 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             "documentatie verantwoordelijke": Skill(name="documentatie verantwoordelijke"),
             "customer relations": Skill(name="customer relations"),
             "frontend": Skill(name="frontend"),
-            "project_test": Project(
+            **self.users
+        }
+
+        self.objects["project_test"] = Project(
                 name="project_test",
                 description="A project aimed at being dummy data",
                 goals=["Testing this application", "Being dummy data"],
@@ -116,9 +119,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 required_skills=[],
                 users=[],
                 edition=2022
-            ),
-            **self.users
-        }
+            )
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         }
@@ -206,16 +207,21 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         await self.do_request(request_type, path, "user_admin", Status.UNPROCESSABLE,
                               json_body=body, access_token="wrong token")
 
-    async def _access_test_request(self, request_type: Request, path, allowed_users: Set[str], body: Dict = None):
+    async def _access_test_request(
+            self, request_type: Request, path, allowed_users: Set[str], body: Dict = None
+    ) -> Dict[str, Response]:
+        responses: Dict[str, Response] = {}
         # Allowed users
         for user in allowed_users:
-            await self.do_request(request_type, path, user, Status.SUCCESS, json_body=body)
+            responses[user] = await self.do_request(request_type, path, user, Status.SUCCESS, json_body=body)
         # Disallowed users
         for user in set(self.users.keys()).difference(allowed_users):
             await self.do_request(request_type, path, user, Status.FORBIDDEN, json_body=body)
 
+        return responses
+
     async def auth_access_request_test(self, request_type: Request, path: str, allowed_users: Set[str],
-                                       body: Dict = None) -> None:
+                                       body: Dict = None) -> Dict[str, Response]:
         """
         Assert for all users whether only allowed_users are allowed request access to the given path.
 
@@ -228,4 +234,4 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         # Check bad access tokens
         await self._auth_test_request(request_type, path, body)
         # Check all users with their access tokens:
-        await self._access_test_request(request_type, path, allowed_users, body)
+        return await self._access_test_request(request_type, path, allowed_users, body)
