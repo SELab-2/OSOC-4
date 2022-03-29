@@ -52,7 +52,7 @@ export default function Settings(props) {
                     <AccordionBody>
                         <div className="personal-settings">
                             <SettingCards title={"Change password"} subtitle={"Having a strong password is a good idea"}>
-                                <ChangePassword/>
+                                <ChangePassword userid={session.userid} />
                             </SettingCards>
                             <SettingCards title={"Change email"} subtitle={"Change to a different email-adress"}>
                                 <ChangeEmail email={email}/>

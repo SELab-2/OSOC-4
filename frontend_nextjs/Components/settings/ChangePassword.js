@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import {log} from "../../utils/logger";
+import {postCreate} from "../../utils/json-requests";
 
-export default function ChangePassword() {
+export default function ChangePassword(props) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -28,11 +29,16 @@ export default function ChangePassword() {
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        //todo make this work with backend and implement more checks
+
         if(newPassword === confirmPassword){
-            setChangedSuccess(true)
+            let body = {"current_password": currentPassword, "new_password": newPassword, "confirmation_password":confirmPassword}
+            let url = props.userid + "/change-password"
+            log(url)
+            let response = await postCreate(url, body)
+            log(response)
+            if (response.success) { setChangedSuccess(true); }
+            log(newPassword)
         }
-        log(newPassword)
     }
 
     return(
