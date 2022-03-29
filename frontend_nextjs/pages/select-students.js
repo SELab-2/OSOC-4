@@ -1,40 +1,27 @@
 import StudentListelement from "../Components/StudentListelement";
-import {useEffect, useState} from "react";
-import {getStudentsPath} from "../routes";
-import {getJson} from "../utils/json-requests";
+import { useEffect, useState } from "react";
+import { getStudentsPath } from "../routes";
+import { getJson } from "../utils/json-requests";
+import TempStudentListelement from "../Components/TempStudentElement";
 
 export default function SelectStudents(props) {
 
     // These constants are initialized empty, the data will be inserted in useEffect
-    const [students, setStudents] = useState(undefined);
+    const [students, setStudents] = useState([]);
 
     // This function inserts the data in the variables
-    useEffect( () => {
-        if (!students) {
-            getJson(getStudentsPath()).then(res => {
-                setStudents(res.data);
-            })
-        }
-    })
+    useEffect(() => {
 
-    // function to get a list of students
-    function getStudents() {
-        if (students) {
-            return students.map(student =>
-              // generate a list of students, each student needs 'student' as a prop
-              <li key={student.id}>
-                  <StudentListelement student={student} />
-              </li>
-            );
-        }
-        return null;
-    }
+        getJson(getStudentsPath()).then(res => {
+            setStudents(res);
+        })
 
-    return(
-      <div>
-          <ul className="students-list">
-              {getStudents()}
-          </ul>
-      </div>
+    }, [])
+
+    return (
+        <div>
+            <h1>Students</h1>
+            {students.map(student => <TempStudentListelement key={student} id={student.id} />)}
+        </div>
     )
 }

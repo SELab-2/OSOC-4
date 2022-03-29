@@ -1,6 +1,7 @@
 from random import choice, randrange, sample
 
-from app.database import db
+from app.crud import update
+from app.database import db, get_session
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
@@ -13,7 +14,8 @@ from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/ddd")
 
@@ -127,7 +129,7 @@ def generate_student(edition):
                    nickname=first_name,
                    question_answers=[],
                    skills=[skill.id for skill in random_skills],
-                   edition=edition.year)
+                   edition=1999)
 
 
 def generate_suggestions(student, project, unconfirmed=3, confirmed_suggestion=None, admin=None):
@@ -166,8 +168,8 @@ def generate_question_answers():
     return qa
 
 
-@router.get("/", response_description="Data retrieved")
-async def add_dummy_data():
+@router.get("/", response_description="Data inserted")
+async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     user_admin = User(
         email="user_admin@test.be",
         name="admin",
@@ -183,111 +185,111 @@ async def add_dummy_data():
     admins = [generate_user(role=UserRole.ADMIN) for _ in range(2)]
     coaches = [generate_user() for _ in range(5)]
 
-    partner = Partner(
-        name="UGent",
-        about="De C in UGent staat voor communicatie")
+    # partner = Partner(
+    #     name="UGent",
+    #     about="De C in UGent staat voor communicatie")
 
-    edition = Edition(
-        name="2019 Summer Fest",
-        year=2019,
-        user_ids=[coach.id for coach in coaches])
+    # edition = Edition(
+    #     name="2019 Summer Fest",
+    #     year=2019,
+    #     user_ids=[coach.id for coach in coaches])
 
-    project = Project(
-        name="Student Volunteer Project",
-        goals=["Free", "Real", "Estate"],
-        description="Free real estate",
-        partner=partner,
-        users=[coaches[i].id for i in range(2)],
-        required_skills=[RequiredSkills(skill=skill.id, number=randrange(2, 5))
-                         for skill in skills],
-        edition=edition.year)
+    # project = Project(
+    #     name="Student Volunteer Project",
+    #     goals=["Free", "Real", "Estate"],
+    #     description="Free real estate",
+    #     partner=partner,
+    #     users=[coaches[i].id for i in range(2)],
+    #     required_skills=[RequiredSkills(skill=skill.id, number=randrange(2, 5))
+    #                      for skill in skills],
+    #     edition=edition.year)
 
-    project2 = Project(
-        name="Cyberfest",
-        goals=["Goal 1", "Goal 2"],
-        description="Hackers & Cyborgs",
-        partner=partner,
-        users=[coaches[i].id for i in range(2, 5)],
-        required_skills=[RequiredSkills(skill=skill.id, number=randrange(1, 8))
-                         for skill in sample(skills, k=randrange(3, len(skills)))],
-        edition=edition.year)
+    # project2 = Project(
+    #     name="Cyberfest",
+    #     goals=["Goal 1", "Goal 2"],
+    #     description="Hackers & Cyborgs",
+    #     partner=partner,
+    #     users=[coaches[i].id for i in range(2, 5)],
+    #     required_skills=[RequiredSkills(skill=skill.id, number=randrange(1, 8))
+    #                      for skill in sample(skills, k=randrange(3, len(skills)))],
+    #     edition=edition.year)
 
     # generate students without suggestions
-    students = [generate_student(edition) for _ in range(3)]
+    students = [generate_student(0) for _ in range(3)]
     suggestions = []
     participations = []
-    for student in students:
-        suggestions += generate_suggestions(student, project)
+    # for student in students:
+    #    suggestions += generate_suggestions(student, project)
 
     # generate students with conflicts in suggestions
-    for s in SuggestionOption:
-        for i in range(2):
-            students.append(generate_student(edition))
-            suggestions += generate_suggestions(students[-1], project, 5, s, choice(admins))
-            suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
-            suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
+    # for s in SuggestionOption:
+    #     for i in range(2):
+    #         students.append(generate_student(edition))
+    #         suggestions += generate_suggestions(students[-1], project, 5, s, choice(admins))
+    #         suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
+    #         suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
 
     # generate students that participate in a project
-    for required_skill in project.required_skills:
-        for _ in range(randrange(required_skill.number)):
-            students.append(generate_student(edition))
-            participations.append(Participation(student=students[-1].id, project=project.id,
-                                                skill=required_skill.skill))
+    # for required_skill in project.required_skills:
+    #     for _ in range(randrange(required_skill.number)):
+    #         students.append(generate_student(edition))
+    #         participations.append(Participation(student=students[-1].id, project=project.id,
+    #                                             skill=required_skill.skill))
 
-    question_answers = []
+    # question_answers = []
 
-    for student in students:
-        generated_question_answers = generate_question_answers()
-        question_answers += generated_question_answers
-        student.question_answers = [qa.id for qa in generated_question_answers]
+    # for student in students:
+    #     generated_question_answers = generate_question_answers()
+    #     question_answers += generated_question_answers
+    #     student.question_answers = [qa.id for qa in generated_question_answers]
 
     # save models to database
-    await db.engine.save(user_admin)
+    await update(user_admin, session)
     for user in users:
-        await db.engine.save(user)
+        await update(user, session)
     for admin in admins:
-        await db.engine.save(admin)
+        await update(admin, session)
     for coach in coaches:
-        await db.engine.save(coach)
+        await update(coach, session)
 
-    for question in questions_yes_no:
-        await db.engine.save(question)
-    for answers in answers_yes_no:
-        for answer in answers:
-            await db.engine.save(answer)
-    for question in questions_text:
-        await db.engine.save(question)
-    for answers in answers_text:
-        for answer in answers:
-            await db.engine.save(answer)
-    for question in questions_multiple_choice:
-        await db.engine.save(question)
-    for answers in answers_multiple_choice:
-        for answer in answers:
-            await db.engine.save(answer)
-    for question in questions_multiple_choice2:
-        await db.engine.save(question)
-    for answers in answers_multiple_choice2:
-        for answer in answers:
-            await db.engine.save(answer)
+    # for question in questions_yes_no:
+    #     await update(question, session)
+    # for answers in answers_yes_no:
+    #     for answer in answers:
+    #         await update(answer, session)
+    # for question in questions_text:
+    #     await update(question, session)
+    # for answers in answers_text:
+    #     for answer in answers:
+    #         await update(answer, session)
+    # for question in questions_multiple_choice:
+    #     await update(question, session)
+    # for answers in answers_multiple_choice:
+    #     for answer in answers:
+    #         await update(answer, session)
+    # for question in questions_multiple_choice2:
+    #     await update(question, session)
+    # for answers in answers_multiple_choice2:
+    #     for answer in answers:
+    #         await update(answer, session)
 
-    for question_answer in question_answers:
-        await db.engine.save(question_answer)
+    # for question_answer in question_answers:
+    #     await update(question_answer, session)
 
-    for skill in skills:
-        await db.engine.save(skill)
+    # for skill in skills:
+    #     await update(skill, session)
 
-    await db.engine.save(edition)
-    await db.engine.save(project)
-    await db.engine.save(project2)
+    # await update(edition, session)
+    # await update(project, session)
+    # await update(project2, session)
 
     for student in students:
-        await db.engine.save(student)
+        await update(student, session)
 
-    for suggestion in suggestions:
-        await db.engine.save(suggestion)
+    # for suggestion in suggestions:
+    #     await update(suggestion, session)
 
-    for participation in participations:
-        await db.engine.save(participation)
+    # for participation in participations:
+    #     await update(participation, session)
 
     return response(None, "Dummy data inserted")

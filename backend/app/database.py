@@ -22,7 +22,7 @@ REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 MONGO_DETAILS = f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_URL}:{MONGO_PORT}"
 
 DATABASE_URL = f"postgresql+asyncpg://postgres:justapassword@192.168.0.102:5432/OSOC"
-engine = create_async_engine(DATABASE_URL)
+engine = create_async_engine(DATABASE_URL, echo=True)
 
 
 async def init_db():

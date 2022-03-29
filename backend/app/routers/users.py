@@ -16,7 +16,7 @@ from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
-from app.utils.response import list_modeltype_response, response
+from app.utils.response import response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,7 +33,6 @@ async def get_users(session: AsyncSession = Depends(get_session)):
     """
 
     users = await read_all_where(User, session=session)
-    print(users)
     return users
 
 

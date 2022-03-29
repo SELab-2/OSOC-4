@@ -41,7 +41,7 @@ async def startup():
 #     disconnect_db()
 
 
-# app.include_router(ddd.router)
+app.include_router(ddd.router)
 # app.include_router(answers.router)
 app.include_router(auth.router)
 # app.include_router(editions.router)
@@ -50,7 +50,7 @@ app.include_router(auth.router)
 # app.include_router(question_answers.router)
 # app.include_router(questions.router)
 # app.include_router(skills.router)
-# app.include_router(students.router)
+app.include_router(students.router)
 # app.include_router(suggestions.router)
 # app.include_router(tally.router)
 # app.include_router(user_invites.router)

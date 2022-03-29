@@ -6,9 +6,7 @@ from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
                                                 InvalidPasswordException)
 from app.utils.validators import valid_email, valid_password
-from odmantic import Model
 from pydantic import BaseModel, validator
-from pydantic.dataclasses import dataclass
 from sqlmodel import Field, SQLModel
 
 
@@ -43,12 +41,13 @@ class UserCreate(BaseModel):
             raise InvalidEmailException()
         return v
 
-@dataclass
+
 class UserOutSimple(BaseModel):
     id: str
 
-    def __post_init__(self):
-        self.id = config.api_url + "users/" + self.id
+    def __init__(self, **data):
+        data["id"] = config.api_url + "users/" + str(data["id"])
+        super().__init__(**data)
 
 
 class UserOut(BaseModel):
