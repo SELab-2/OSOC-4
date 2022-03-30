@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
-from odmantic import Model
-from bson import ObjectId
+
+from sqlmodel import Field, SQLModel
 
 
 class SuggestionOption(int, Enum):
@@ -10,12 +10,13 @@ class SuggestionOption(int, Enum):
     YES = 2
 
 
-class Suggestion(Model):
+class Suggestion(SQLModel):
     # mail_sent: bool
+    id: Optional[int] = Field(default=None, primary_key=True)
     decision: SuggestionOption
     definitive: bool
     reason: str
-    student: ObjectId
-    suggested_by: ObjectId
-    project: Optional[ObjectId]
-    skill: Optional[ObjectId]
+    student: int = Field(default=None, foreign_key="student.id")
+    suggested_by: int = Field(default=None, foreign_key="user.id")
+    # project: Optional[ObjectId]
+    # skill: Optional[ObjectId]

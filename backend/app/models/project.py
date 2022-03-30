@@ -1,29 +1,31 @@
-from typing import List
+from typing import List, Optional
 
 from app.config import config
-from bson import ObjectId
-from odmantic import EmbeddedModel, Field, Model
 from pydantic import BaseModel
+from sqlmodel import Field, SQLModel
 
 
-class Partner(EmbeddedModel):
+class Partner(BaseModel):
     name: str
     about: str
 
 
-class RequiredSkills(EmbeddedModel):
-    skill: ObjectId  # points to role from skill.py
-    number: int = Field(gt=0)
+# class RequiredSkills(EmbeddedModel):
+#     skill: ObjectId  # points to role from skill.py
+#     number: int = Field(gt=0)
 
 
-class Project(Model):
+class Project(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
     name: str
     description: str
-    goals: List[str]
-    partner: Partner
-    required_skills: List[RequiredSkills]
-    users: List[ObjectId]
-    edition: int
+    goals: str
+    # partner: Partner
+    # required_skills: List[RequiredSkills]
+    # users: List[int]
+    edition: int = Field(
+        default=None, foreign_key="edition.year"
+    )
 
 
 class ProjectCreate(BaseModel):
@@ -31,8 +33,8 @@ class ProjectCreate(BaseModel):
     description: str
     goals: List[str]
     partner: Partner
-    required_skills: List[RequiredSkills]
-    users: List[ObjectId] = []
+    # required_skills: List[RequiredSkills]
+    users: List[int] = []
     edition: int
 
 
@@ -51,7 +53,7 @@ class ProjectOutExtended(BaseModel):
     description: str
     goals: List[str]
     partner: Partner
-    required_skills: List[RequiredSkills]
+    # required_skills: List[RequiredSkills]
     users: List[str]
     edition: str
 

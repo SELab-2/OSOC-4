@@ -15,7 +15,6 @@ from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from app.utils.response import list_modeltype_response, response
-from bson import ObjectId
 from fastapi import APIRouter, Body, Depends
 
 router = APIRouter(prefix="/editions")
@@ -95,7 +94,7 @@ async def get_edition_students(year: int):
 async def get_edition_students_with_filter(
         year: int,
         search: Optional[str] = None,
-        role_filter: Optional[List[ObjectId]] = None):
+        role_filter: Optional[List[int]] = None):
     """get_edition_students_with_filter get all the students in the edition with given year and filters
 
     :param year: year of the edition

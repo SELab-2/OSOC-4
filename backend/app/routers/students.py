@@ -1,7 +1,11 @@
 from typing import List
 
+from app.config import config
 from app.crud import read_all_where, read_where
 from app.database import get_session
+from app.models.answer import Answer
+from app.models.question import Question
+from app.models.question_answer import QuestionAnswer
 from app.models.student import Student, StudentOutExtended, StudentOutSimple
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
@@ -20,8 +24,8 @@ def get_sorting(sortstr: str):
     return {t[0]: 1 if t[1] == "asc" else -1 for t in sorting}
 
 
-@router.get("/", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved", response_model=List[StudentOutSimple])
-async def get_students(orderby: str = "name+asc", skills: str = "", alumn: bool = None, search: str = "a", session: AsyncSession = Depends(get_session)):
+@router.get("/", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
+async def get_students(orderby: str = "name+asc", skills: str = "", alumn: bool = None, search: str = "", session: AsyncSession = Depends(get_session)):
     """get_students get all the Student instances from the database
     :query parameters:
         :orderby -> str of keys of student + direction to sort by
@@ -29,27 +33,34 @@ async def get_students(orderby: str = "name+asc", skills: str = "", alumn: bool 
     :rtype: dict
     """
 
-    studs = await read_all_where(Student, session=session)
-    print(studs)
 
-    statement = select(Student).where(Student.__ts_vector__.match("lea"))
 
-    res = await session.execute(statement)
-    res = [value for (value,) in res.all()]
+    query = select(QuestionAnswer.student).join(Answer).where(Answer.answer.ilike("%" + search + "%")).distinct()
+    res = await session.execute(query)
+    res = res.all()
     print(res)
-    return res
 
-    res = await session.execute()
-    print(res)
-    return res
-    return await read_all_where(Student, session=session)
+    return [config.api_url + "students/" + str(id) for (id,) in res]
+    # eturn studs
+    # return await read_all_where(Student, session=session)
 
-@router.get("/{student_id}", response_description="Student retrieved", response_model=StudentOutExtended)
+@router.get("/{student_id}", response_description="Student retrieved")
 async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     """get_student get the Student instances with id from the database
 
     :return: student with id
     :rtype: StudentOutExtended
     """
-    result = await read_where(Student, Student.id == int(student_id), session=session)
-    return result
+
+    print("getting student ...")
+
+    tags = ["name"]
+
+    # get the studentname
+    query = select(QuestionAnswer, Question.tag, Answer.answer).where(QuestionAnswer.student == int(student_id)).join(Question).where(Question.tag.in_(tags)).join(Answer)
+    res = await session.execute(query)
+    res = res.all()
+    print(res)
+    res_dict = {tag: answer for (_, tag, answer,) in res}
+    print(res_dict)
+    return res_dict

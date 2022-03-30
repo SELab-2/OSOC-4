@@ -1,17 +1,16 @@
 from typing import List, Optional
 
 from app.config import config
-from bson import ObjectId
-from odmantic import Model, Field
 from pydantic import BaseModel
+from sqlmodel import Field, SQLModel
 
 
-class Edition(Model):
-    year: int = Field(primary_field=True)
+class Edition(SQLModel, table=True):
+    year: Optional[int] = Field(default=None, primary_key=True)
     name: Optional[str] = None
     description: Optional[str] = None
     form_id: Optional[str] = None
-    user_ids: List[ObjectId] = []
+    # user_ids: List[int] = []
 
 
 class EditionOutSimple(BaseModel):

@@ -14,37 +14,42 @@ class TSVector(sa.types.TypeDecorator):
 
 class Student(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    email: str
-    name: str
-    nickname: Optional[str] = ""
-    phone_number: str
+    edition: int = Field(
+        default=None, foreign_key="edition.year"
+    )
+
+    # email: str
+    # name: str
+    # nickname: Optional[str] = ""
+    # phone_number: str
     # alumn = False
     # cv: str
     # question_answers: List[int]
     # skills: List[int]  # role from skill.py
-    edition: int
+    # edition: int
 
-    __ts_vector__ = Column(TSVector(), Computed("to_tsvector('english', name || ' ' || email || ' ' || nickname)", persisted=True))
-    __table_args__ = (Index('ix_student___ts_vector__', __ts_vector__, postgresql_using='gin'), )
+    # __ts_vector__ = Column(TSVector(), Computed("to_tsvector('english', name || ' ' || email || ' ' || nickname)", persisted=True))
+    # __table_args__ = (Index('ix_student___ts_vector__', __ts_vector__, postgresql_using='gin'), )
 
 
 class StudentOutSimple(BaseModel):
     id: str
 
     def __init__(self, **data):
+        print(data)
         data["id"] = config.api_url + "students/" + str(data["id"])
         super().__init__(**data)
 
 
 class StudentOutExtended(BaseModel):
     id: str
-    email: str
+    # email: str
     name: str
-    nickname: Optional[str] = ""
-    phone_number: str
-    question_answers: Optional[List[str]]
-    skills: Optional[List[str]]
-    edition: Optional[str]
+    # nickname: Optional[str] = ""
+    # phone_number: str
+    # question_answers: Optional[List[str]]
+    # skills: Optional[List[str]]
+    # edition: Optional[str]
 
     def __init__(self, **data):
         data["id"] = config.api_url + "students/" + str(data["id"])

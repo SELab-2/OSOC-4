@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from odmantic import AIOEngine
 from redis import Redis
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
@@ -22,13 +23,14 @@ REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 MONGO_DETAILS = f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@{MONGO_URL}:{MONGO_PORT}"
 
 DATABASE_URL = f"postgresql+asyncpg://postgres:justapassword@192.168.0.102:5432/OSOC"
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL)
 
 
 async def init_db():
     db.redis = Redis(host=REDIS_URL, port=REDIS_PORT, db=0, decode_responses=True, password=REDIS_PASSWORD)
     async with engine.begin() as conn:
         # await conn.run_sync(SQLModel.metadata.drop_all)
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))
         await conn.run_sync(SQLModel.metadata.create_all)
 
 

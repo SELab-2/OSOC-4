@@ -14,6 +14,7 @@ export default function SelectStudents(props) {
 
         getJson(getStudentsPath()).then(res => {
             setStudents(res);
+            console.log(res)
         })
 
     }, [])
@@ -21,7 +22,7 @@ export default function SelectStudents(props) {
     return (
         <div>
             <h1>Students</h1>
-            {students.map(student => <TempStudentListelement key={student} id={student.id} />)}
+            {students.map(student => <TempStudentListelement key={student} id={student} />)}
         </div>
     )
 }
