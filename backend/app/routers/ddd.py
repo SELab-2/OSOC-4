@@ -192,6 +192,24 @@ async def add_dummy_data():
         year=2019,
         user_ids=[coach.id for coach in coaches])
 
+    edition2 = Edition(
+        name="2020 Summer Fest",
+        year=2020,
+        user_ids=[]
+    )
+
+    edition3 = Edition(
+        name="2021 Summer Fest",
+        year=2021,
+        user_ids=[]
+    )
+
+    edition4 = Edition(
+        name="2022 Summer Fest",
+        year=2022,
+        user_ids=[]
+    )
+
     project = Project(
         name="Student Volunteer Project",
         goals=["Free", "Real", "Estate"],
@@ -277,7 +295,11 @@ async def add_dummy_data():
     for skill in skills:
         await db.engine.save(skill)
 
+    await db.engine.save(edition3)
     await db.engine.save(edition)
+    await db.engine.save(edition4)
+    await db.engine.save(edition2)
+
     await db.engine.save(project)
     await db.engine.save(project2)
 
