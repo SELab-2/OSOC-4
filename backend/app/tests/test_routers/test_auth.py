@@ -7,7 +7,7 @@ class TestAuth(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def post_login_succes(self, email, name, password):
+    async def post_login_success(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
         response = await self.do_request(Request.POST, "/login", name, Status.SUCCESS,
                                          json_body=body, use_access_token=False)
@@ -26,8 +26,8 @@ class TestAuth(TestBase):
         user_approved_pass = self.saved_objects["passwords"][user_approved.name]
 
         # correct login admin & approved user
-        await self.post_login_succes(user_admin.email, user_admin.name, user_admin_pass)
-        await self.post_login_succes(user_approved.email, user_approved.name, user_approved_pass)
+        await self.post_login_success(user_admin.email, user_admin.name, user_admin_pass)
+        await self.post_login_success(user_approved.email, user_approved.name, user_approved_pass)
 
         # incorrect email or non existing email
         await self.post_login_fail(user_admin.email, user_approved.name, user_approved_pass)

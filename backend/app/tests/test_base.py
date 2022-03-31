@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 from enum import IntEnum, Enum, auto
-from typing import Set, Dict, Any, List
+from typing import Set, Dict, Any, Tuple
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
@@ -112,14 +112,14 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         }
 
         self.objects["project_test"] = Project(
-                name="project_test",
-                description="A project aimed at being dummy data",
-                goals=["Testing this application", "Being dummy data"],
-                partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
-                required_skills=[],
-                users=[],
-                edition=2022
-            )
+            name="project_test",
+            description="A project aimed at being dummy data",
+            goals=["Testing this application", "Being dummy data"],
+            partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
+            required_skills=[],
+            users=[],
+            edition=2022
+        )
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         }
@@ -235,3 +235,28 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         await self._auth_test_request(request_type, path, body)
         # Check all users with their access tokens:
         return await self._access_test_request(request_type, path, allowed_users, body)
+
+    async def auth_access_request_test_per_user(
+            self, request_type: Request,
+            allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]],
+            blocked_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]]
+    ) -> Dict[str, Response]:
+        """
+        Assert for all users whether only allowed_users are allowed request access to the given path and body.
+
+        :param request_type: type of the request
+        :param allowed_users_path_and_body:
+        A dict containing a map from the allowed users to their specific path and body
+        :param blocked_users_path_and_body:
+        A dict containing a map from the blocked users to their specific path and body
+        """
+        responses: Dict[str, Response] = {}
+
+        for user, (path, body) in allowed_users_path_and_body.items():
+            await self._auth_test_request(request_type, path, body)
+            responses[user] = await self.do_request(request_type, path, user, Status.SUCCESS, json_body=body)
+
+        for user, (path, body) in blocked_users_path_and_body.items():
+            await self.do_request(request_type, path, user, Status.FORBIDDEN, json_body=body)
+
+        return responses
