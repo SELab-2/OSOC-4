@@ -1,3 +1,5 @@
+from bson.errors import InvalidId
+
 from app.crud import read_where, update
 from app.database import db
 from app.exceptions.key_exceptions import InvalidInviteException
@@ -13,11 +15,19 @@ from odmantic import ObjectId
 router = APIRouter(prefix="/invite")
 
 
+
+
 @router.get("/{invitekey}")
 async def valid_invitekey(invitekey: str):
     if invitekey[0] != "I":
         raise InvalidInviteException()
-    userid = db.redis.get(invitekey)
+
+    try:  # Check whether the id is valid
+        ObjectId(db.redis.get(invitekey))
+    except InvalidId:
+        raise InvalidInviteException()
+
+    userid = await read_where(User, User.id == ObjectId(db.redis.get(invitekey)))
     if userid is None:
         raise InvalidInviteException()
     return response(None, "Valid invitekey")

@@ -9,6 +9,32 @@ class TestUserInvites(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    async def test_valid_invitekey(self):
+        path = "/invite/"
+
+        new_user: User = await update(User.parse_obj({"email": "new.mail@test.test"}))
+
+        # correct key
+        key = generate_new_invite_key()
+        db.redis.setex(key[0], key[1], str(new_user.id))
+        await self.do_request(Request.GET, f"{path}{key[0]}", "", Status.SUCCESS, use_access_token=False)
+
+        # key with bad user id
+        key = generate_new_invite_key()
+        db.redis.setex(key[0], key[1], "bad_user_id")
+        await self.do_request(Request.GET, f"{path}{key[0]}", "", Status.BAD_REQUEST, use_access_token=False)
+
+        # key without user connected to id
+        key = generate_new_invite_key()
+        db.redis.setex(key[0], key[1], "00000a00a00aa00aa000aaaa")
+        await self.do_request(Request.GET, f"{path}{key[0]}", "", Status.BAD_REQUEST, use_access_token=False)
+
+        # Bad key
+        key = generate_new_invite_key()
+        bad_key = "R" + key[0][1:]
+        db.redis.setex(bad_key, key[1], str(new_user.id))
+        await self.do_request(Request.GET, f"{path}{bad_key}", "", Status.BAD_REQUEST, use_access_token=False)
+
     async def test_invited_user(self):
         path = "/invite/"
 
