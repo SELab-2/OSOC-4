@@ -5,7 +5,7 @@ from app.database import db, get_session
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
-from app.models.project import Partner, Project
+from app.models.project import Project
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.skill import Skill
@@ -176,9 +176,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     admins = [generate_user(role=UserRole.ADMIN) for _ in range(2)]
     coaches = [generate_user() for _ in range(5)]
 
-    # partner = Partner(
-    #     name="UGent",
-    #     about="De C in UGent staat voor communicatie")
 
     edition = Edition(
         name="2019 Summer Fest",

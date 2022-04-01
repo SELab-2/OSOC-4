@@ -11,7 +11,6 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from app.config import config
 from app.database import init_db
 from app.exceptions.base_exception import BaseException
-from app.models.tags import Tags
 from app.routers import (answers, auth, ddd, editions, participation, projects,
                          skills, students, suggestions, user_invites, users)
 

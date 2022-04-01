@@ -25,21 +25,23 @@ REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:justapassword@{POSTGRES_URL}:{POSTGRES_PORT}/{POSTGRES_DATABASE}"
 engine = create_async_engine(DATABASE_URL)
 
-
 async def init_db():
     db.redis = Redis(host=REDIS_URL, port=REDIS_PORT, db=0, decode_responses=True, password=REDIS_PASSWORD)
 
-    init = False
-    while not init:
+    connection = False
+    for _ in range(25):
         try: 
             async with engine.begin() as conn:
                 # await conn.run_sync(SQLModel.metadata.drop_all)
                 await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))
                 await conn.run_sync(SQLModel.metadata.create_all)
-                init = True
-        except:
+                connection = True
+                break
+        except _:
+            print("trying to connect ...")
             time.sleep(1)
-
+    if not connection:
+        exit(1)
 
 async def get_session() -> AsyncSession:
     async_session = sessionmaker(
