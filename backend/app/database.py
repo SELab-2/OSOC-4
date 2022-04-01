@@ -22,14 +22,15 @@ REDIS_URL = os.getenv('REDIS_URL')
 REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 
-DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:justapassword@{POSTGRES_URL}:{POSTGRES_PORT}/{POSTGRES_DATABASE}"
+DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_URL}:{POSTGRES_PORT}/{POSTGRES_DATABASE}"
+print(DATABASE_URL)
 engine = create_async_engine(DATABASE_URL)
 
 async def init_db():
     db.redis = Redis(host=REDIS_URL, port=REDIS_PORT, db=0, decode_responses=True, password=REDIS_PASSWORD)
 
     connection = False
-    for _ in range(25):
+    for _ in range(15):
         try: 
             async with engine.begin() as conn:
                 # await conn.run_sync(SQLModel.metadata.drop_all)
@@ -37,8 +38,9 @@ async def init_db():
                 await conn.run_sync(SQLModel.metadata.create_all)
                 connection = True
                 break
-        except Exception:
+        except Exception as e:
             print("trying to connect ...")
+            print(e)
             time.sleep(1)
     if not connection:
         exit(1)
