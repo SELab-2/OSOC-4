@@ -15,3 +15,4 @@ httpx
 pytest-asyncio
 sqlalchemy
 asyncpg
+sqlmodel

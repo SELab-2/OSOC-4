@@ -7,6 +7,3 @@ class Question(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     field_id: str
     question: str
-    tag: str = ""
-    edition: int = Field(default=None, foreign_key="edition.year")
-    type: Optional[str]

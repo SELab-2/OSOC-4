@@ -74,6 +74,8 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
     :rtype: dict
     """
 
+    print("test")
+
     # check if any user exist else make one
     user_count = await count_where(User, session=session)
     if not user_count:

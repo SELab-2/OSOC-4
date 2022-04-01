@@ -27,6 +27,8 @@ services:
       # - traefik.http.middlewares.osocfrontendpathstrip.stripprefix.prefixes=${PATHPREFIX}/frontend
       - traefik.port=3000
     user: "1000:1000"
+    depends_on:
+      - osoc-backend
 
 
   osoc-backend:
@@ -35,10 +37,11 @@ services:
     ports:
       - 8000
     environment:
-      MONGO_URL: mongodb
-      MONGO_PORT: 27017
-      MONGO_USER: root
-      MONGO_PASSWORD: justapassword
+      POSTGRES_URL: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: justapassword
+      POSTGRES_DATABASE: OSOC
       REDIS_URL: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: justapassword
@@ -67,16 +70,20 @@ services:
       - traefik.http.middlewares.${PATHPREFIX}-osocbackendpathstrip.stripprefix.prefixes=/${PATHPREFIX}/api
       - traefik.port=8000
     user: "1000:1000"
+    depends_on:
+      - postgres
+      - redis
     
-  mongodb:
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: justapassword
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
     ports:
-      - 27017
+      - 5432
+    environment:
+      - POSTGRES_PASSWORD=justapassword
+      - POSTGRES_DB=OSOC
     volumes:
-      - ./data/mongo:/data/db
+      - ./data/postgres:/var/lib/postgresql/data/
     user: "1000:1000"
  
   redis:

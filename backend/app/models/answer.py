@@ -6,7 +6,6 @@ from sqlmodel import Field, SQLModel
 
 class Answer(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    field_id: Optional[str]  # id from the form
     answer: str
     __table_args__ = (
         Index('answer_idx', "answer",
