@@ -37,7 +37,7 @@ async def init_db():
                 await conn.run_sync(SQLModel.metadata.create_all)
                 connection = True
                 break
-        except _:
+        except Exception:
             print("trying to connect ...")
             time.sleep(1)
     if not connection:
