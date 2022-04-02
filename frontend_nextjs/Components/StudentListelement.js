@@ -7,6 +7,7 @@ import {
   getStudyQuestionId,
   getSuggestionsPath
 } from "../routes";
+import {Col, Container, Row} from "react-bootstrap";
 
 export default function StudentListelement(props) {
 
@@ -27,17 +28,21 @@ export default function StudentListelement(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
+    // only insert data if the student in still undefined
     if (!student) {
       setStudent(props.student)
       setName(props.student.name)
       let localStudent = props.student;
 
+      // check if there are no suggestions yet
       if (suggestions.length === 0) {
         getJson(getSuggestionsPath()).then(res => {
           let possibleSuggestions = res.data;
+          // only get the suggestions of the current student
           let localSuggestions = possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id);
           setSuggestions(localSuggestions);
 
+          // filter the suggestions on yes, maybe or no
           setSuggestionsYes(localSuggestions.filter(
             suggestion => suggestion.decision === 2 && (! suggestion.definitive)).length);
           setSuggestionsMaybe(localSuggestions.filter(
@@ -45,6 +50,7 @@ export default function StudentListelement(props) {
           setSuggestionsNo(localSuggestions.filter(
             suggestion => suggestion.decision === 0 && (! suggestion.definitive)).length);
 
+          // get the decision from the suggestions if there is one
           let newDecision = localSuggestions.filter(suggestion => suggestion.definitive);
           if (newDecision.length) {
             setDecision(newDecision[0].decision);
@@ -52,6 +58,7 @@ export default function StudentListelement(props) {
         })
       }
 
+      // check if there are no skills yet
       if (skills.length === 0) {
         getJson(getRolesPath()).then(res => {
           let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
@@ -59,6 +66,7 @@ export default function StudentListelement(props) {
         })
       }
 
+      
       if (studies === undefined) {
         getJson(getQuestionAnswersPath()).then(res => {
           let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
@@ -78,6 +86,7 @@ export default function StudentListelement(props) {
     }
   });
 
+  // get the decision for the student (yes, maybe, no or undecided)
   function getDecision() {
     if (decision === -1) {
       return "Undecided";
@@ -86,12 +95,14 @@ export default function StudentListelement(props) {
     return possibleDecisions[decision];
   }
 
+  // get a list of the roles of the student in HTML format
   function getRoles() {
     return skills.map((skill,index) =>
       <li className="role" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
+  // get the titles of the basic questions shown in the list element
   function getInfoTitles() {
     let questions = ["Studies:", "Type of degree:", "First language:", "Level of English:"];
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
@@ -101,6 +112,7 @@ export default function StudentListelement(props) {
     )
   }
 
+  // get the answers on the basic questions in HTML format
   function getInfoAnswers() {
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
     answers = answers.filter((answer) => answer !== undefined);
@@ -109,6 +121,7 @@ export default function StudentListelement(props) {
     )
   }
 
+  // get the background color of the student, based on the decision
   function getBackground() {
     if (decision === -1) {
       return "white";
@@ -118,6 +131,7 @@ export default function StudentListelement(props) {
     return colors[decision];
   }
 
+  // get the background color of practical problems
   function getProblemsColor() {
     if (practicalProblems === 0) {
       return "var(--yes_green_65)"
@@ -126,37 +140,36 @@ export default function StudentListelement(props) {
   }
 
   // The html representation of a list-element
-  return(
-    <div id="list-element" className="list-element"
-         style={{position: "relative", backgroundColor: getBackground()}}>
+  return (
+    <Container id="list-element" className="list-element" style={{backgroundColor: getBackground()}}>
+      <Row>
+        <Col id="name" className="name" md="auto">{name}</Col>
+        <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
+          No practical problems
+        </Col>
+        <Col/>
+        <Col className="suggestions" md="auto">Suggestions:</Col>
+        <Col className="suggestionsYes" md="auto">{suggestionsYes}</Col>
+        <Col className="suggestionsMaybe" md="auto">{suggestionsMaybe}</Col>
+        <Col className="suggestionsNo" md="auto">{suggestionsNo}</Col>
+      </Row>
 
-      <div id="upper-layer" style={{height: "35px"}}>
-        <div id="name" style={{float: "left"}} className="name">{name}</div>
-        <div id="practical-problems" style={{float: "left", backgroundColor: getProblemsColor()}} className="practical-problems">No practical problems</div>
-        <div id="suggestions" style={{float: "right"}}>
-          <div style={{float: "right"}} className="suggestionsNo">{suggestionsNo}</div>
-          <div style={{float: "right"}} className="suggestionsMaybe">{suggestionsMaybe}</div>
-          <div style={{float: "right"}} className="suggestionsYes">{suggestionsYes}</div>
-          <p style={{float: "right"}} className="suggestions">Suggestions:</p>
-        </div>
-      </div>
-
-      <div id="info-titles" style={{float: "left"}} className="info-titles">
+      <Row id="info" className="info">
+        <Col id="info-titles" className="info-titles" md="auto">
           {getInfoTitles()}
           Decision:
-      </div>
+        </Col>
+        <Col id="info-answers" className="info-answers">
+          {getInfoAnswers()}
+          {getDecision()}
+        </Col>
 
-      <div id="info-answers" className="info-answers">
-        {getInfoAnswers()}
-        {getDecision()}
-      </div>
-
-      <div id="roles" align="right" className="roles">
-        <ul>
-          {getRoles()}
-        </ul>
-      </div>
-
-    </div>
+        <Col id="roles" md="auto" align="right">
+          <ul>
+            {getRoles()}
+          </ul>
+        </Col>
+      </Row>
+    </Container>
   )
 }
