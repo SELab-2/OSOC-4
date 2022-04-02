@@ -24,6 +24,7 @@ export default function StudentListelement(props) {
   const [fistLanguage, setFirstLanguage] = useState(undefined);
   const [levelOfEnglish, setLevelOfEnglish] = useState(undefined);
 
+  
   // This function inserts the data in the variables
   useEffect(() => {
     if (!student) {
