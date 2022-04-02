@@ -1,15 +1,13 @@
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 
 
 class QuestionAnswer(SQLModel, table=True):
-    student: int = Field(
-        default=None, foreign_key="student.id", primary_key=True
-    )
-    question: int = Field(
-        default=None, foreign_key="question.id", primary_key=True
-    )
-    answer: int = Field(
-        default=None, foreign_key="answer.id", primary_key=True
-    )
+    student_id: int = Field(foreign_key="student.id", primary_key=True)
+    question_id: int = Field(foreign_key="question.id", primary_key=True)
+    answer_id: int = Field(foreign_key="answer.id", primary_key=True)
+
+    student: "Student" = Relationship(back_populates="question_answers")
+    question: "Question" = Relationship(back_populates="question_answers")
+    answer: "Answer" = Relationship(back_populates="question_answers")

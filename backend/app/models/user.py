@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from app.config import config
 from app.exceptions.validator_exeptions import (EmptyNameException,
@@ -7,7 +7,10 @@ from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidPasswordException)
 from app.utils.validators import valid_email, valid_password
 from pydantic import BaseModel, validator
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
+from app.models.edition import EditionCoach, Edition
+from app.models.project import ProjectCoach, Project
+from app.models.suggestion import Suggestion
 
 
 class UserRole(int, Enum):
@@ -25,6 +28,9 @@ class User(SQLModel, table=True):
     active: bool = False
     approved: bool = False
     disabled: bool = True
+    editions: List[Edition] = Relationship(back_populates="coaches", link_model=EditionCoach)
+    projects: List[Project] = Relationship(back_populates="coaches", link_model=ProjectCoach)
+    suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
     @validator('email')
     def email_lowercase(cls, v):

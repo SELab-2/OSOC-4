@@ -5,7 +5,11 @@ from app.config import config
 from pydantic import BaseModel
 from sqlalchemy import Column, Computed, Index, desc
 from sqlalchemy.dialects.postgresql import TSVECTOR
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
+from app.models.suggestion import Suggestion
+from app.models.participation import Participation
+from app.models.edition import Edition
+from app.models.question_answer import QuestionAnswer
 
 
 class TSVector(sa.types.TypeDecorator):
@@ -14,9 +18,12 @@ class TSVector(sa.types.TypeDecorator):
 
 class Student(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    edition: int = Field(
-        default=None, foreign_key="edition.year"
-    )
+    edition_year: Optional[int] = Field(default=None, foreign_key="edition.year")
+    edition: Optional[Edition] = Relationship(back_populates="students")
+
+    suggestions: List[Suggestion] = Relationship(back_populates="student")
+    participations: List[Participation] = Relationship(back_populates="student")
+    question_answers: List[QuestionAnswer] = Relationship(back_populates="student")
 
     # email: str
     # name: str

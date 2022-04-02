@@ -1,10 +1,12 @@
 from typing import Optional
-
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 
 
 class Participation(SQLModel, table=True):
-    id: Optional[int] = Field(primary_key=True)
-    student_id: int = Field(default=None, foreign_key="student.id")
-    project_id: int = Field(default=None, foreign_key="project.id")
-    skill_id: int = Field(default=None, foreign_key="skill.id")
+    student_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="student.id")
+    project_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="project.id")
+    skill_name: str = Field(foreign_key="skill.name")
+
+    student: "Student" = Relationship(back_populates="participations")
+    project: "Project" = Relationship(back_populates="participations")
+    skill: "Skill" = Relationship(back_populates="participations")
