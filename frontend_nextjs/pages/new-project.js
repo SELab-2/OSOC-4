@@ -1,11 +1,12 @@
-import {Button, Card, Col, Dropdown, Form, Row} from "react-bootstrap";
+import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {log} from "../utils/logger";
 import {useRouter} from "next/router";
 import {getJson} from "../utils/json-requests";
+import SelectSearch, {fuzzySearch} from "react-select-search";
 
 
-export default function NewProjects(props) {
+export default function NewProjects() {
     const [projectName, setProjectName] = useState()
     const [partnerName, setPartnerName] = useState()
     const [partnerBio, setPartnerBio] = useState()
@@ -15,11 +16,12 @@ export default function NewProjects(props) {
     const [tools, setTools] = useState()
     const [codeLanguages, setCodeLanguages] = useState()
 
-    const [students, setStudents] = useState([{"role":"Role", "amount":1}])
+    const [students, setStudents] = useState([{"skill":"", "amount":1}])
+
+    const [skills, setSkills] = useState([])
 
     const router = useRouter()
 
-    const [skills, setSkills] = useState([])
 
     useEffect(() => {
         if (skills.length === 0) {
@@ -27,32 +29,32 @@ export default function NewProjects(props) {
                 log("load skills")
                 log(res)
                 if(res.data){
-                    setSkills(res.data)
+                    // scuffed way to get unique skills (should be fixed in backend soon)
+                    let uniq = [...new Set(res.data.map(skill => skill.name))];
+                    let array = [];
+                    uniq.map(skill => array.push({"value":skill, "name":skill}));
+                    setSkills(array);
                 }
             })
         }
     })
 
-    // TODO get roles from backend get all possible roles
-    // const skills = [{"name":"Frontend", "id": "123"}, {"name":"Backend", "id": "456"}, {"name":"Manager", "id": "789"}]
-
-    function DeleteStudent(index){
-        if(students.length > 0){
-            setStudents(prevState => prevState.filter((_ , i) => i !== index))
+    async function DeleteStudent(index) {
+        log("delete student")
+        if (students.length > 1) {
+            await setStudents(students.filter((_, i) => i !== index))
         }
+        log(students)
     }
 
-    function changeRoleStudent(index, role){
+    function changeSkillStudent(index, value){
         let newArr = [...students]
-        log(newArr)
-        log(newArr[index])
-        log(index)
-        newArr[index].role = role.name
+        newArr[index].skill = value
         setStudents(newArr)
     }
 
     function AddToStudent(index, amount){
-        if (0 < students[index].amount + amount < 99){
+        if (0 < (students[index].amount + amount) &&  (students[index].amount + amount) < 100){
             let newArr = [...students]
             newArr[index]["amount"] += amount
             setStudents(newArr)
@@ -60,14 +62,25 @@ export default function NewProjects(props) {
     }
 
     function AddStudent(){
-        setStudents(prevState => [...prevState, {"role":"Role", "amount": 1}])
+        // can't have more different type of students then amount of skills
+        if (students.length <= skills.length){
+            setStudents(prevState => [...prevState, {"skill": "", "amount": 1}])
+        }
     }
 
-    return(
+    async function handleSubmitChange(event){
+        event.preventDefault()
+        log("Creating new project")
+        // TODO make this work with backend
+    }
+
+
+        return(
         <div>
+            {/*TODO are you sure you want to leave any changes made on this page will be lost*/}
             <Button onClick={() => router.push("/projects")}>Go back to projects</Button>
             <h1>New project</h1>
-            <Form>
+            <Form onSubmit={handleSubmitChange}>
                 <Form.Label>Project name:</Form.Label>
                 <Form.Control type="text" value={projectName} placeholder={"Project name"} onChange={e => setProjectName(e.target.value)} />
 
@@ -96,16 +109,17 @@ export default function NewProjects(props) {
                 {(students.length) ? (students.map((student,index) => (
                     <Row key={index}>
                         <Col>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                                    {student.role}
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    {(skills.length) ? (skills.map((role, i) => (
-                                        <Dropdown.Item  onClick={() => changeRoleStudent(index, role)} key={role.id} value={role.name}>{role.name}</Dropdown.Item>
-                                    ))) : null}
-                                </Dropdown.Menu>
-                            </Dropdown>
+
+                            <SelectSearch
+                                options={skills}
+                                value={student.skill}
+                                search
+                                filterOptions={fuzzySearch}
+                                onChange={value => changeSkillStudent(index, value)}
+                                emptyMessage={() => <div style={{ textAlign: 'center', fontSize: '0.8em' }}>Skill not found</div>}
+                                placeholder="Select the required skill"
+                            />
+
                         </Col>
                         <Col>
                             <Card>
@@ -127,6 +141,7 @@ export default function NewProjects(props) {
                 ))) : null}
 
                 <Button onClick={AddStudent}> Add extra student role</Button>
+                <Button type="submit">Create new project</Button>
             </Form>
 
         </div>
