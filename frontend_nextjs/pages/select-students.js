@@ -33,8 +33,7 @@ export default function SelectStudents(props) {
 
     return(
       <div>
-        <StudentsFilters className="filters" style={{display: "inline-block"}}/>
-        <div style={{width:"800px"}}>
+        <div>
             <ul className="students_list">
                 {getStudents()}
             </ul>
