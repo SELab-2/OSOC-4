@@ -11,6 +11,7 @@ export default function Projects(props) {
     const [loaded, setLoaded] = useState(false)
     const [search, handleSearch] = useState("")
     const [peopleNeeded, setPeopleNeeded] = useState(false)
+    const [visibleProjects, setVisibleProjects] = useState([])
 
     const router = useRouter()
 
@@ -21,7 +22,11 @@ export default function Projects(props) {
                 log(res)
                 for (let p of res.data) {
                     getJson(p.id).then(async project => {
-                        if (project.data) {await setProjects(prevState => [...prevState, project.data]);}
+                        if (project.data) {
+                            await setProjects(prevState => [...prevState, project.data]);
+                            // TODO clean this up (currently only works if updated here
+                            await setVisibleProjects(prevState => [...prevState, project.data]);
+                        }
                     })
                 }
                 setLoaded(true)
@@ -31,12 +36,14 @@ export default function Projects(props) {
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
+        setVisibleProjects(projects.filter((project) => project.name.includes(search)))
+        log("SUBMIT")
     }
 
     async function changePeopleNeeded(event){
         event.preventDefault()
         log(peopleNeeded)
-        setPeopleNeeded(prevState => ! prevState)
+        setPeopleNeeded(event.target.checked)
     }
 
     const handleNewProject = () => {
@@ -50,7 +57,7 @@ export default function Projects(props) {
                 <Col>
                     <Form onSubmit={handleSearchSubmit}>
                         <Form.Group controlId="searchProjects">
-                            <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={handleSearch} />
+                            <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
                         </Form.Group>
                     </Form>
                 </Col>
@@ -70,7 +77,7 @@ export default function Projects(props) {
             </Row>
             <div>
                 {
-                    loaded ? (projects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
+                    loaded ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
                 }
             </div>
         </div>
