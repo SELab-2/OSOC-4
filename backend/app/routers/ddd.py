@@ -8,6 +8,7 @@ from app.models.participation import Participation
 from app.models.project import Project, ProjectGoal, ProjectRequiredSkill
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
+from app.models.question_tag import QuestionTag
 from app.models.skill import Skill
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
@@ -29,6 +30,8 @@ last_names = ["Andrews", "Hayes", "Martinez", "Evans", "Pratt", "Vaughan",
               "Langdon", "McLean", "James", "Anderson", "Clark", "Henderson",
               "Scott"]
 emails = ["gmail.com", "outlook.com", "yahoo.com", "hotmail.com"]
+
+question_name = Question(question="What is your name", field_id="")
 
 questions_yes_no = [Question(question=q, field_id="") for q in
                     ["Will you live in Belgium in July 2022?",
@@ -151,6 +154,8 @@ def generate_question_answers(student):
     for i in range(len(questions_multiple_choice2)):
         qa += [QuestionAnswer(student=student, question=questions_multiple_choice2[i], answer=answer)
                for answer in sample(answers_multiple_choice2[i], k=randrange(1, 3))]
+    qa += [Answer(answer=f"{choice(first_names)} {choice(last_names)}")]
+    qa += [QuestionAnswer(student=student, question=question_name, answer=qa[-1])]
     return qa
 
 
@@ -238,6 +243,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         generated_question_answers = generate_question_answers(student)
         question_answers += generated_question_answers
 
+    question_tags = [QuestionTag(question=question_name, edition=edition.year, tag="name")]
     # save models to database
     await update(edition, session)
 
@@ -276,8 +282,13 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         for answer in answers:
             await update(answer, session)
 
+    await update(question_name, session)
+
     for question_answer in question_answers:
         await update(question_answer, session)
+
+    for question_tag in question_tags:
+        await update(question_tag, session)
 
     for skill in skills:
         await update(skill, session)
