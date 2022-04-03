@@ -97,3 +97,30 @@ class UserInvite(BaseModel):
         if not valid_password(v):
             raise InvalidPasswordException()
         return v
+
+
+class ChangeUser(BaseModel):
+    name: str = ""
+    role: UserRole = 0
+    active: bool = False
+    approved: bool = False
+    disabled: bool = True
+
+
+    @validator('name')
+    def name_not_empty(cls, v):
+        if v == "":
+            raise EmptyNameException()
+        return v
+
+
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+
+    @validator('password')
+    def password_format_check(cls, v):
+        if not valid_password(v):
+            raise InvalidPasswordException()
+        return v

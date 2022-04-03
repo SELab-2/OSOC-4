@@ -8,12 +8,12 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
-                                            UserNotFoundException)
+                                            UserNotFoundException, InvalidEmailOrPasswordException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import (User, UserCreate, UserData, UserOut,
-                             UserOutSimple, UserRole)
+                             UserOutSimple, UserRole, ChangeUser, ChangePassword)
 from app.utils.checkers import RoleChecker
-from app.utils.cryptography import get_password_hash
+from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import response
@@ -128,38 +128,61 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(), sessi
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 
 
-@router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_user(id: str, new_data: UserData, session: AsyncSession = Depends(get_session)):
+@router.patch("/{user_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession = Depends(get_session)):
     """update_user this updates a user
 
-    :param id: the user id
-    :type id: str
-    :param new_data: email and name, defaults to Body(...)
-    :type new_data: UserData, optional
-    :raises EmailAlreadyUsedException: email already in use
+    :param user_id: the user id
+    :type user_id: str
+    :param new_data: name, active, approved, disabled and role
+    :type new_data: ChangeUser
     :raises NotPermittedException: Unauthorized
     :return: response
     :rtype: success or error
     """
 
-    user = await read_where(User, User.id == int(id), session=session)
-
-    user_w_email = await read_where(User, User.email == new_data.email, session=session)
+    user = await read_where(User, User.id == int(user_id), session=session)
 
     if user is None:
         raise UserNotFoundException()
-    if user_w_email is not None and user_w_email.id != user.id:
-        # The email is already in use
-        raise EmailAlreadyUsedException()
-    else:
-        # No other user with the new email address was found
-        user.email = new_data.email
 
     user.name = new_data.name
+    user.active = new_data.active
+    user.approved = new_data.approved
+    user.disabled = new_data.disabled
+    user.role = new_data.role
 
     user = await update(user, session=session)
 
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
+
+
+@router.patch("/{user_id}/password", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def update_password(user_id: str, passwords: ChangePassword, session: AsyncSession = Depends(get_session)):
+    """"update_password this changes the password of given user if previous password is given
+        :param user_id: the user id
+    :type user_id: str
+    :param passwords: current_password, new_password and confirm_password
+    :type passwords: ChangePassword
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    if passwords.new_password != passwords.confirm_password:
+        raise PasswordsDoNotMatchException()
+
+    user = await read_where(User, User.id == int(user_id), session=session)
+
+    if user is None:
+        raise UserNotFoundException()
+
+    if not verify_password(passwords.current_password, user.password):
+        raise InvalidEmailOrPasswordException()
+
+    user.password = get_password_hash(passwords.new_password)
+    await update(user, session=session)
+    return response(None, "Updated password successfully")
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
