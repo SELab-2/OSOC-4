@@ -1,17 +1,17 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../utils/json-requests";
-import {getRolesPath, getStudentsPath} from "../routes";
+import {getSkillsPath, getStudentsPath} from "../routes";
 
 export default function StudentsFilters(props) {
 
   const [extendedRoleList, setExtendedRoleList] = useState(false);
-  const [roles, setRoles] = useState(undefined);
+  const [skills, setSkills] = useState(undefined);
   const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    if (!roles) {
-      getJson(getRolesPath()).then(res => {
-        setRoles(res.data)
+    if (!skills) {
+      getJson(getSkillsPath()).then(res => {
+        setSkills(res.data)
       })
     }
     if (filters === {}) {
@@ -75,15 +75,15 @@ export default function StudentsFilters(props) {
     setExtendedRoleList(false);
   }
 
-  function getRoles() {
-    if (roles) {
-      let shownRoles = roles;
+  function getSkills() {
+    if (skills) {
+      let shownSkills = skills;
 
       if (! extendedRoleList) {
-        shownRoles = roles.slice(0,5);
+        shownSkills = skills.slice(0,5);
       }
 
-      return shownRoles.map((role,index) =>
+      return shownSkills.map((role,index) =>
         <div key={index}>
           <input id={role.id} type="checkbox" onChange={val => addRole(role.id, val.target.checked)}/>
           <label htmlFor={role.id}>{role.name}</label>
@@ -96,9 +96,9 @@ export default function StudentsFilters(props) {
 
   function moreOrLessButton() {
     if (extendedRoleList) {
-      return <button id="less-roles-button" onClick={showLess}>Less</button>
+      return <button id="less-skills-button" onClick={showLess}>Less</button>
     }
-    return <button id="more-roles-button" onClick={showMore}>More</button>
+    return <button id="more-skills-button" onClick={showMore}>More</button>
   }
 
   // The HTML representation of the filters in the 'Select students' tab
@@ -113,7 +113,7 @@ export default function StudentsFilters(props) {
 
       <div id="general-filters">
         <input id="alumni-checkbox" type="checkbox" onChange={val => onlyAlumni(val.target.checked)}/>
-        <label htmlFor="alumni-checkbox">only alumni</label>
+        <label htmlFor="alumni-checkbox">Only alumni</label>
         <br/>
 
         <input id="student-coach-volunteers-checkbox" type="checkbox"
@@ -133,14 +133,14 @@ export default function StudentsFilters(props) {
 
         <input id="practical-problems-checkbox" type="checkbox"
                onChange={val => onlyStudentsWithoutPracticalProblems(val.target.checked)}/>
-        <label htmlFor="practical-problems-checkbox">only students without practical problems</label>
+        <label htmlFor="practical-problems-checkbox">Only students without practical problems</label>
         <br/><br/>
       </div>
 
-      <div id="roles-filters">
-        <h3>Roles</h3>
-        <input type="text" id="search-roles-filters" className="search" placeholder="Search roles"/>
-        {getRoles()}
+      <div id="skills-filters">
+        <h3>Skills</h3>
+        <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"/>
+        {getSkills()}
         {moreOrLessButton()}
         <br/>
       </div>
