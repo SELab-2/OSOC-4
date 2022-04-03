@@ -2,20 +2,23 @@ import datetime
 from typing import List, Optional
 
 from app.crud import read_all_where, read_where, update
-from app.database import db
+from app.database import db, get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
-from app.models.project import Project
+from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from app.utils.response import list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
+from fastapi_jwt_auth import AuthJWT
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 
 router = APIRouter(prefix="/editions")
 
@@ -119,17 +122,23 @@ async def get_edition_students_with_filter(
     return list_modeltype_response(students, Student)
 
 
-@router.get("/{year}/projects", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Projects retrieved")
-async def get_edition_projects(year: int):
-    """get_edition_projects get all the projects in the edition with the given year
+@router.get("/{year}/projects", response_description="Projects retrieved")
+async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+    """get_projects get all the Project instances from the database
 
-    :param year: year of the edition
-    :type year: int
     :return: list of projects
     :rtype: dict
     """
-    projects = await read_where(Project, Project.edition == year)
-    return list_modeltype_response(projects, Project)
+    if role == UserRole.ADMIN:
+        print(year)
+        results = await read_all_where(Project, Project.edition == year, session=session)
+    else:
+        Authorize.jwt_required()
+        current_user_id = Authorize.get_jwt_subject()
+        stat = select(Project).select_from(ProjectCoach).where(ProjectCoach.coach_id == int(current_user_id)).join(Project).where(Project.edition==int(year))
+        res = await session.execute(stat)
+        results = [r for (r,) in res.all()]
+    return list_modeltype_response([ProjectOutSimple.parse_raw(r.json()) for r in results], Project)
 
 
 @router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Students retrieved")
