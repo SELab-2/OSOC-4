@@ -7,7 +7,6 @@ import "../styles/settingcards.css"
 import "../styles/manageusers.css"
 import "../styles/studentListelement.css"
 import "../styles/select-students.css"
-import "../styles/navbar.css"
 
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
