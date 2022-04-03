@@ -11,7 +11,7 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             UserNotFoundException, InvalidEmailOrPasswordException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import (User, UserCreate, UserData, UserOut,
-                             UserOutSimple, UserRole, ChangeUser, ChangePassword)
+                             UserOutSimple, UserRole, ChangeUser, ChangePassword, UserMe)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
@@ -37,15 +37,14 @@ async def get_users(session: AsyncSession = Depends(get_session)):
 
 
 @router.get("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_user_me(Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
+async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     current_user_id = Authorize.get_jwt_subject()
 
-    user = await read_where(User, User.id == int(current_user_id))
+    user = await read_where(User, User.id == int(current_user_id), session=session)
     # User will always be found since otherwise they can't be authorized
     # No need to check whether user exists
 
-    return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")
+    return response(UserMe.parse_raw(user.json()), "User retrieved successfully")
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],

@@ -106,7 +106,6 @@ class ChangeUser(BaseModel):
     approved: bool = False
     disabled: bool = True
 
-
     @validator('name')
     def name_not_empty(cls, v):
         if v == "":
@@ -119,8 +118,14 @@ class ChangePassword(BaseModel):
     new_password: str
     confirm_password: str
 
-    @validator('password')
+    @validator('new_password')
     def password_format_check(cls, v):
         if not valid_password(v):
             raise InvalidPasswordException()
         return v
+
+
+class UserMe(BaseModel):
+    name: str
+    email: str
+    role: UserRole
