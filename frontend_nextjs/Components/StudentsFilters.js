@@ -85,8 +85,8 @@ export default function StudentsFilters(props) {
       }
 
       return shownSkills.map((role,index) =>
-        <Row key={index}>
-          <Col md="auto">
+        <Row key={index} className="filter-row">
+          <Col md="auto" className="checkbox-filters">
             <input id={role.id} type="checkbox" onChange={val => addRole(role.id, val.target.checked)}/>
           </Col>
           <Col>
@@ -100,35 +100,35 @@ export default function StudentsFilters(props) {
 
   function moreOrLessButton() {
     if (extendedRoleList) {
-      return <button id="less-skills-button" onClick={showLess}>Less</button>
+      return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
     }
-    return <button id="more-skills-button" onClick={showMore}>More</button>
+    return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
   }
 
   // The HTML representation of the filters in the 'Select students' tab
   return(
     <Container>
-      <Row>
+      <Row className="title-row-filters">
         <Col>
-          <h2>Filters</h2>
+          <h2 className="filters-title">Filters</h2>
         </Col>
         <Col/>
         <Col md="auto" style={{alignSelf: "center"}}>
-          <button className={"reset-filters-button"} onClick={resetFilters}>
+          <button onClick={resetFilters}>
             Reset filters
           </button>
         </Col>
       </Row>
 
-      <Row>
-        <Col md="auto">
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
           <input id="alumni-checkbox" type="checkbox" onChange={val => onlyAlumni(val.target.checked)}/>
         </Col>
         <Col><label htmlFor="alumni-checkbox">Only alumni</label></Col>
       </Row>
 
-      <Row>
-        <Col md="auto">
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
           <input id="student-coach-volunteers-checkbox" type="checkbox"
                  onChange={val => onlyCoachVolunteers(val.target.checked)}/>
         </Col>
@@ -137,8 +137,8 @@ export default function StudentsFilters(props) {
         </Col>
       </Row>
 
-      <Row>
-        <Col md="auto">
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
           <input id="include-suggested-students-checkbox" type="checkbox"
                  onChange={val => includeStudentsYouSuggestedFor(val.target.checked)}/>
         </Col>
@@ -147,8 +147,8 @@ export default function StudentsFilters(props) {
         </Col>
       </Row>
 
-      <Row>
-        <Col md="auto">
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
           <input id="unmatched-students-checkbox" type="checkbox"
                  onChange={val => onlyUnmatchedStudents(val.target.checked)}/>
         </Col>
@@ -157,8 +157,8 @@ export default function StudentsFilters(props) {
         </Col>
       </Row>
 
-      <Row>
-        <Col md="auto">
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
           <input id="practical-problems-checkbox" type="checkbox"
                  onChange={val => onlyStudentsWithoutPracticalProblems(val.target.checked)}/>
         </Col>
@@ -167,54 +167,60 @@ export default function StudentsFilters(props) {
         </Col>
       </Row>
 
-      <div id="skills-filters">
-        <h3>Skills</h3>
-        <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"/>
-        {getSkills()}
-        {moreOrLessButton()}
-        <br/>
-      </div>
+      <Row className="filter-title">
+        <Col><h3>Skills</h3></Col>
+      </Row>
+      <Row className="skills-search-filters">
+        <Col>
+          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"/>
+        </Col>
+      </Row>
+      {getSkills()}
+      <Row>
+        <Col>{moreOrLessButton()}</Col>
+      </Row>
 
-      <div id="decisions-filters">
-        <h3>Decision</h3>
+      <Row className="filter-title">
+        <Col><h3>Decision</h3></Col>
+      </Row>
 
-        <Row>
-          <Col md="auto">
-            <input id="yes-checkbox" type="checkbox" onChange={val => decision("yes", val.target.checked)}/>
-          </Col>
-          <Col>
-            <label htmlFor="yes-checkbox">Yes</label>
-          </Col>
-        </Row>
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
+          <input id="yes-checkbox" type="checkbox" onChange={val => decision("yes", val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="yes-checkbox">Yes</label>
+        </Col>
+      </Row>
 
-        <Row>
-          <Col md="auto">
-            <input id="maybe-checkbox" type="checkbox" onChange={val => decision("maybe", val.target.checked)}/>
-          </Col>
-          <Col>
-            <label htmlFor="maybe-checkbox">Maybe</label>
-          </Col>
-        </Row>
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
+          <input id="maybe-checkbox" type="checkbox" onChange={val => decision("maybe", val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="maybe-checkbox">Maybe</label>
+        </Col>
+      </Row>
 
-        <Row>
-          <Col md="auto">
-            <input id="no-checkbox" type="checkbox" onChange={val => decision("no",val.target.checked)}/>
-          </Col>
-          <Col>
-            <label htmlFor="no-checkbox">No</label>
-          </Col>
-        </Row>
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
+          <input id="no-checkbox" type="checkbox" onChange={val => decision("no",val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="no-checkbox">No</label>
+        </Col>
+      </Row>
 
-        <Row>
-          <Col md="auto">
-            <input id="undecided-checkbox" type="checkbox" onChange={val => decision("undecided", val.target.checked)}/>
-          </Col>
-          <Col>
-            <label htmlFor="undecided-checkbox">Undecided</label>
-          </Col>
-        </Row>
+      <Row className="filter-row">
+        <Col md="auto" className="checkbox-filters">
+          <input id="undecided-checkbox" type="checkbox" onChange={val => decision("undecided", val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="undecided-checkbox">Undecided</label>
+        </Col>
+      </Row>
 
-      </div>
+
 
     </Container>
 
