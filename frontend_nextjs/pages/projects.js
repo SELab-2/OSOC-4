@@ -3,7 +3,6 @@ import {getJson} from "../utils/json-requests";
 import {log} from "../utils/logger";
 import ProjectCard from "../Components/ProjectCard";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
-import {router} from "next/client";
 import {useRouter} from "next/router";
 
 export default function Projects(props) {
