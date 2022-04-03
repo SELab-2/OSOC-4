@@ -5,7 +5,6 @@ from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.response import errorresponse, response
 from fastapi import APIRouter, Depends
-from odmantic import ObjectId
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/answers")

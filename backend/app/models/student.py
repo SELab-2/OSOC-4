@@ -1,14 +1,11 @@
 from typing import List, Optional
 
-import sqlalchemy as sa
 from app.config import config
 from app.models.edition import Edition
 from app.models.participation import Participation
 from app.models.question_answer import QuestionAnswer
 from app.models.suggestion import Suggestion
 from pydantic import BaseModel
-from sqlalchemy import Column, Computed, Index, desc
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlmodel import Field, Relationship, SQLModel
 
 
