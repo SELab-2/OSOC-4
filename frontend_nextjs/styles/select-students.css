@@ -1,7 +1,8 @@
 .filters {
     height: 700px;
-    margin: 20px 0 20px 20px;
+    margin: 20px;
     padding-right: 40px;
+    padding-left: 20px;
     border-right-width: 1px;
     border-right-style: solid;
     border-right-color: lightgray;

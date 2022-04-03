@@ -19,7 +19,6 @@ ul {
   list-style-type: none;
 }
 
-.container-fluid{
-  padding-left: 0;
-  padding-right: 0;
+.no_padding {
+  padding: 0;
 }

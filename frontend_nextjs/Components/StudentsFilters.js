@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../utils/json-requests";
 import {getSkillsPath, getStudentsPath} from "../routes";
+import {Col, Container, Row} from "react-bootstrap";
 
 export default function StudentsFilters(props) {
 
@@ -84,11 +85,14 @@ export default function StudentsFilters(props) {
       }
 
       return shownSkills.map((role,index) =>
-        <div key={index}>
-          <input id={role.id} type="checkbox" onChange={val => addRole(role.id, val.target.checked)}/>
-          <label htmlFor={role.id}>{role.name}</label>
-          <br/>
-        </div>
+        <Row key={index}>
+          <Col md="auto">
+            <input id={role.id} type="checkbox" onChange={val => addRole(role.id, val.target.checked)}/>
+          </Col>
+          <Col>
+            <label htmlFor={role.id}>{role.name}</label>
+          </Col>
+        </Row>
       );
     }
     return null;
@@ -103,39 +107,65 @@ export default function StudentsFilters(props) {
 
   // The HTML representation of the filters in the 'Select students' tab
   return(
-    <div id="filters" style={{textAlign: "left", width: "300px"}}>
-      <div id="filters-header" style={{position: "relative", height: "50px"}}>
-        <h2 style={{bottom: 0, left: 0, position: "absolute", marginBottom: 0}}>Filters</h2>
-        <button className={"reset-filters-button"} style={{bottom: 0, position: "absolute", right: 0}} onClick={resetFilters}>
-          Reset filters
-        </button>
-      </div>
+    <Container>
+      <Row>
+        <Col>
+          <h2>Filters</h2>
+        </Col>
+        <Col/>
+        <Col md="auto" style={{alignSelf: "center"}}>
+          <button className={"reset-filters-button"} onClick={resetFilters}>
+            Reset filters
+          </button>
+        </Col>
+      </Row>
 
-      <div id="general-filters">
-        <input id="alumni-checkbox" type="checkbox" onChange={val => onlyAlumni(val.target.checked)}/>
-        <label htmlFor="alumni-checkbox">Only alumni</label>
-        <br/>
+      <Row>
+        <Col md="auto">
+          <input id="alumni-checkbox" type="checkbox" onChange={val => onlyAlumni(val.target.checked)}/>
+        </Col>
+        <Col><label htmlFor="alumni-checkbox">Only alumni</label></Col>
+      </Row>
 
-        <input id="student-coach-volunteers-checkbox" type="checkbox"
-               onChange={val => onlyCoachVolunteers(val.target.checked)}/>
-        <label htmlFor="student-coach-volunteers-checkbox">Only student coach volunteers</label>
-        <br/>
+      <Row>
+        <Col md="auto">
+          <input id="student-coach-volunteers-checkbox" type="checkbox"
+                 onChange={val => onlyCoachVolunteers(val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="student-coach-volunteers-checkbox">Only student coach volunteers</label>
+        </Col>
+      </Row>
 
-        <input id="include-suggested-students-checkbox" type="checkbox"
-               onChange={val => includeStudentsYouSuggestedFor(val.target.checked)}/>
-        <label htmlFor="include-suggested-students-checkbox">Only students you've not suggested for</label>
-        <br/>
+      <Row>
+        <Col md="auto">
+          <input id="include-suggested-students-checkbox" type="checkbox"
+                 onChange={val => includeStudentsYouSuggestedFor(val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="include-suggested-students-checkbox">Only students you've not suggested for</label>
+        </Col>
+      </Row>
 
-        <input id="unmatched-students-checkbox" type="checkbox"
-               onChange={val => onlyUnmatchedStudents(val.target.checked)}/>
-        <label htmlFor="unmatched-students-checkbox">Only unmatched students</label>
-        <br/>
+      <Row>
+        <Col md="auto">
+          <input id="unmatched-students-checkbox" type="checkbox"
+                 onChange={val => onlyUnmatchedStudents(val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="unmatched-students-checkbox">Only unmatched students</label>
+        </Col>
+      </Row>
 
-        <input id="practical-problems-checkbox" type="checkbox"
-               onChange={val => onlyStudentsWithoutPracticalProblems(val.target.checked)}/>
-        <label htmlFor="practical-problems-checkbox">Only students without practical problems</label>
-        <br/><br/>
-      </div>
+      <Row>
+        <Col md="auto">
+          <input id="practical-problems-checkbox" type="checkbox"
+                 onChange={val => onlyStudentsWithoutPracticalProblems(val.target.checked)}/>
+        </Col>
+        <Col>
+          <label htmlFor="practical-problems-checkbox">Only students without practical problems</label>
+        </Col>
+      </Row>
 
       <div id="skills-filters">
         <h3>Skills</h3>
@@ -148,23 +178,45 @@ export default function StudentsFilters(props) {
       <div id="decisions-filters">
         <h3>Decision</h3>
 
-        <input id="yes-checkbox" type="checkbox" onChange={val => decision("yes", val.target.checked)}/>
-        <label htmlFor="yes-checkbox">Yes</label>
-        <br/>
+        <Row>
+          <Col md="auto">
+            <input id="yes-checkbox" type="checkbox" onChange={val => decision("yes", val.target.checked)}/>
+          </Col>
+          <Col>
+            <label htmlFor="yes-checkbox">Yes</label>
+          </Col>
+        </Row>
 
-        <input id="maybe-checkbox" type="checkbox" onChange={val => decision("maybe", val.target.checked)}/>
-        <label htmlFor="maybe-checkbox">Maybe</label>
-        <br/>
+        <Row>
+          <Col md="auto">
+            <input id="maybe-checkbox" type="checkbox" onChange={val => decision("maybe", val.target.checked)}/>
+          </Col>
+          <Col>
+            <label htmlFor="maybe-checkbox">Maybe</label>
+          </Col>
+        </Row>
 
-        <input id="no-checkbox" type="checkbox" onChange={val => decision("no",val.target.checked)}/>
-        <label htmlFor="no-checkbox">No</label>
-        <br/>
+        <Row>
+          <Col md="auto">
+            <input id="no-checkbox" type="checkbox" onChange={val => decision("no",val.target.checked)}/>
+          </Col>
+          <Col>
+            <label htmlFor="no-checkbox">No</label>
+          </Col>
+        </Row>
 
-        <input id="undecided-checkbox" type="checkbox" onChange={val => decision("undecided", val.target.checked)}/>
-        <label htmlFor="undecided-checkbox">Undecided</label>
-        <br/>
+        <Row>
+          <Col md="auto">
+            <input id="undecided-checkbox" type="checkbox" onChange={val => decision("undecided", val.target.checked)}/>
+          </Col>
+          <Col>
+            <label htmlFor="undecided-checkbox">Undecided</label>
+          </Col>
+        </Row>
+
       </div>
 
-    </div>
+    </Container>
+
   )
 }
