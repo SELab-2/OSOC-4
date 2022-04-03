@@ -65,16 +65,15 @@ async def auth_exception_handler(request: Request, exception: AuthJWTException):
     return JSONResponse(status_code=exception.status_code, content={"message": exception.message})
 
 
-
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title = "My Auth API",
-        version = "1.0",
-        description = "An API with an Authorize Button",
-        routes = app.routes,
+        title="My Auth API",
+        version="1.0",
+        description="An API with an Authorize Button",
+        routes=app.routes,
         servers=[{"url": config.api_path}]
     )
 
@@ -92,16 +91,16 @@ def custom_openapi():
 
     for route in api_router:
         path = getattr(route, "path")
-        endpoint = getattr(route,"endpoint")
+        endpoint = getattr(route, "endpoint")
         methods = [method.lower() for method in getattr(route, "methods")]
 
         for method in methods:
             # access_token
             if (
-                re.search("RoleChecker", inspect.getsource(endpoint)) or
-                re.search("jwt_required", inspect.getsource(endpoint)) or
-                re.search("fresh_jwt_required", inspect.getsource(endpoint)) or
-                re.search("jwt_optional", inspect.getsource(endpoint))
+                re.search("RoleChecker", inspect.getsource(endpoint))
+                or re.search("jwt_required", inspect.getsource(endpoint))
+                or re.search("fresh_jwt_required", inspect.getsource(endpoint))
+                or re.search("jwt_optional", inspect.getsource(endpoint))
             ):
                 openapi_schema["paths"][path][method]["security"] = [
                     {

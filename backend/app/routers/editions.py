@@ -135,7 +135,7 @@ async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = De
     else:
         Authorize.jwt_required()
         current_user_id = Authorize.get_jwt_subject()
-        stat = select(Project).select_from(ProjectCoach).where(ProjectCoach.coach_id == int(current_user_id)).join(Project).where(Project.edition==int(year))
+        stat = select(Project).select_from(ProjectCoach).where(ProjectCoach.coach_id == int(current_user_id)).join(Project).where(Project.edition == int(year))
         res = await session.execute(stat)
         results = [r for (r,) in res.all()]
     return list_modeltype_response([ProjectOutSimple.parse_raw(r.json()) for r in results], Project)

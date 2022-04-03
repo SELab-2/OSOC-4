@@ -5,10 +5,9 @@ from app.models.project import (Project, ProjectCoach, ProjectCreate,
                                 ProjectOutExtended, ProjectOutSimple)
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
-from app.utils.response import list_modeltype_response, response
+from app.utils.response import response
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
-from odmantic import ObjectId
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
