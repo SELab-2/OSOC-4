@@ -47,6 +47,16 @@ class ProjectGoal(SQLModel, table=True):
     project: Optional[Project] = Relationship(back_populates="goals")
 
 
+class PartnerOut(BaseModel):
+    name: str
+    about: str
+
+
+class RequiredSkillOut(BaseModel):
+    skill: str
+    number: int
+
+
 class ProjectCreate(BaseModel):
     name: str
     description: str
@@ -79,7 +89,7 @@ class ProjectOutExtended(BaseModel):
     edition: str
 
     def __init__(self, **data):
-        super().__init__(**data)
         data["id"] = config.api_url + "projects/" + data["id"]
         data["users"] = [config.api_url + "users/" + user for user in data["users"]]
         data["edition"] = config.api_url + "editions/" + str(data["edition"])
+        super().__init__(**data)
