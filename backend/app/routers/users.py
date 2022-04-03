@@ -50,7 +50,7 @@ async def get_user_me(Authorize: AuthJWT = Depends()):
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
              response_description="User data added into the database")
-async def add_user_data(user: UserCreate):
+async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_session)):
     """add_user_data add a new user
 
     :param user: defaults to Body(...)
@@ -60,11 +60,11 @@ async def add_user_data(user: UserCreate):
     """
 
     # check if email already used
-    u = await read_where(User, User.email == user.email)
+    u = await read_where(User, User.email == user.email, session=session)
     if u:
         return response(UserOutSimple.parse_raw(u.json()), "User with email already exists")
 
-    new_user = await update(User.parse_obj(user))
+    new_user = await update(User.parse_obj(user), session=session)
     return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
@@ -103,7 +103,7 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
 
     user.password = get_password_hash(passwords.password)
     db.redis.delete(reset_key)
-    await update(user)
+    await update(user, session=session)
 
     return response(None, "Password updated successfully")
 
@@ -129,7 +129,7 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(), sessi
 
 
 @router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_user(id: str, new_data: UserData):
+async def update_user(id: str, new_data: UserData, session: AsyncSession = Depends(get_session)):
     """update_user this updates a user
 
     :param id: the user id
@@ -144,7 +144,7 @@ async def update_user(id: str, new_data: UserData):
 
     user = await read_where(User, User.id == int(id), session=session)
 
-    user_w_email = await read_where(User, User.email == new_data.email)
+    user_w_email = await read_where(User, User.email == new_data.email, session=session)
 
     if user is None:
         raise UserNotFoundException()
@@ -157,13 +157,13 @@ async def update_user(id: str, new_data: UserData):
 
     user.name = new_data.name
 
-    user = await update(user)
+    user = await update(user, session=session)
 
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def invite_user(id: str):
+async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
     """invite_user this functions invites a user
 
     :param id: the user id
@@ -171,7 +171,7 @@ async def invite_user(id: str):
     :return: response
     :rtype: success or error
     """
-    user = await read_where(User, User.id == ObjectId(id))
+    user = await read_where(User, User.id == int(id), session=session)
 
     if user is None:
         raise UserNotFoundException()
@@ -188,7 +188,7 @@ async def invite_user(id: str):
 
 
 @router.post("/{user_id}/approve", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def approve_user(user_id: str):
+async def approve_user(user_id: str, session: AsyncSession = Depends(get_session)):
     """approve_user this approves the user if the user account is activated
 
     :param user_id: the id of the user
@@ -196,7 +196,7 @@ async def approve_user(user_id: str):
     :return: response
     :rtype: _type_
     """
-    user = await read_where(User, User.id == ObjectId(user_id))
+    user = await read_where(User, User.id == int(user_id), session=session)
 
     if user is None:
         raise UserNotFoundException()
@@ -206,5 +206,5 @@ async def approve_user(user_id: str):
         raise UserBadStateException()  # The user is already approved
 
     user.approved = True
-    await update(user)
+    await update(user, session=session)
     return response(None, "Approved the user successfully")
