@@ -143,7 +143,7 @@ export default function StudentsFilters(props) {
                  onChange={val => includeStudentsYouSuggestedFor(val.target.checked)}/>
         </Col>
         <Col>
-          <label htmlFor="include-suggested-students-checkbox">Only students you've not suggested for</label>
+          <label htmlFor="include-suggested-students-checkbox">Only students you haven't suggested for</label>
         </Col>
       </Row>
 
