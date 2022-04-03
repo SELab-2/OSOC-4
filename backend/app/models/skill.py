@@ -1,8 +1,9 @@
 from typing import List
-from sqlmodel import Field, SQLModel, Relationship
+
+from app.models.participation import Participation
 from app.models.project import ProjectRequiredSkill
 from app.models.suggestion import Suggestion
-from app.models.participation import Participation
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class Skill(SQLModel, table=True):

@@ -1,10 +1,10 @@
 from typing import List, Optional
 
 from app.config import config
-from pydantic import BaseModel
-from sqlmodel import Field, SQLModel, Relationship
-from app.models.suggestion import Suggestion
 from app.models.participation import Participation
+from app.models.suggestion import Suggestion
+from pydantic import BaseModel
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class ProjectCoach(SQLModel, table=True):

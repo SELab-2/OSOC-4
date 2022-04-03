@@ -1,9 +1,8 @@
 from typing import List, Optional, Type
 
-from fastapi import Depends
 from odmantic.engine import ModelType
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import Session, select
+from sqlmodel import select
 
 
 async def read_all_where(model: Type[ModelType], *args, session: AsyncSession) -> List[ModelType]:
