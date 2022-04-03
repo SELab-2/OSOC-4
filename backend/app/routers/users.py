@@ -37,11 +37,10 @@ async def get_users(session: AsyncSession = Depends(get_session)):
 
 
 @router.get("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_user_me(Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
+async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     current_user_id = Authorize.get_jwt_subject()
 
-    user = await read_where(User, User.id == int(current_user_id))
+    user = await read_where(User, User.id == int(current_user_id), session=session)
     # User will always be found since otherwise they can't be authorized
     # No need to check whether user exists
 
