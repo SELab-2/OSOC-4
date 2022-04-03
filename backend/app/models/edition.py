@@ -1,17 +1,22 @@
 from typing import List, Optional
 
 from app.config import config
-from bson import ObjectId
-from odmantic import Model, Field
 from pydantic import BaseModel
+from sqlmodel import Field, SQLModel, Relationship
 
 
-class Edition(Model):
-    year: int = Field(primary_field=True)
-    name: Optional[str] = None
+class EditionCoach(SQLModel, table=True):
+    edition: Optional[int] = Field(default=None, primary_key=True, foreign_key="edition.year")
+    coach_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="user.id")
+
+
+class Edition(SQLModel, table=True):
+    year: int = Field(primary_key=True)
+    name: str
     description: Optional[str] = None
     form_id: Optional[str] = None
-    user_ids: List[ObjectId] = []
+    coaches: List["User"] = Relationship(back_populates="editions", link_model=EditionCoach)
+    students: List["Student"] = Relationship(back_populates="edition")
 
 
 class EditionOutSimple(BaseModel):

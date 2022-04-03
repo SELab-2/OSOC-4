@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 
 from app.crud import count_where, read_where, update
-from app.database import db
+from app.database import db, get_session
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.passwordreset import EmailInput
 from app.models.tokens import TokenExtended
@@ -16,6 +16,7 @@ from fastapi import APIRouter, Body, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 load_dotenv()
@@ -61,7 +62,7 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
 
 
 @router.post('/login')
-async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
+async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """login endpoint for login
 
     :param user: login info for user
@@ -73,8 +74,10 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
     :rtype: dict
     """
 
+    print("test")
+
     # check if any user exist else make one
-    user_count = await count_where(User)
+    user_count = await count_where(User, session=session)
     if not user_count:
         new_user = User(
             email=user.email,
@@ -84,16 +87,19 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
             active=True,
             approved=True,
             disabled=False)
-        u = await update(new_user)
+        u = await update(new_user, session)
     else:
-        u = await read_where(User, User.email == user.email)
+        u = await read_where(User, User.email == user.email, session=session)
+
+    print(user)
+    print(u)
 
     if u:
         if not verify_password(user.password, u.password):
             raise InvalidEmailOrPasswordException()
 
-        access_token = Authorize.create_access_token(subject=str(u.id), expires_time=settings.access_expires)
-        refresh_token = Authorize.create_refresh_token(subject=str(u.id), expires_time=settings.refresh_expires)
+        access_token = Authorize.create_access_token(subject=u.id, expires_time=settings.access_expires)
+        refresh_token = Authorize.create_refresh_token(subject=u.id, expires_time=settings.refresh_expires)
 
         # Authorize.set_access_cookies(access_token)
         # Authorize.set_refresh_cookies(refresh_token)

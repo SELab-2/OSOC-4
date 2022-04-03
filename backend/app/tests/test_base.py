@@ -1,17 +1,14 @@
 import asyncio
 import unittest
 from enum import IntEnum
-from typing import Set, Dict
-
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient, Response
+from typing import Dict, Set
 
 from app.api import app
 from app.database import db
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
-from app.models.project import Project, Partner
+from app.models.project import Project
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.skill import Skill
@@ -19,6 +16,8 @@ from app.models.student import Student
 from app.models.suggestion import Suggestion
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient, Response
 
 
 class Status(IntEnum):
@@ -97,7 +96,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 name="project_test",
                 description="A project aimed at being dummy data",
                 goals=["Testing this application", "Being dummy data"],
-                partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
                 required_skills=[],
                 users=[],
                 edition=2022
