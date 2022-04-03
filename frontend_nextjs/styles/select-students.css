@@ -1,7 +1,16 @@
 .filters {
-
+    height: 700px;
+    margin: 20px 0 20px 20px;
+    padding-right: 40px;
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-right-color: lightgray;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
 }
 
 .students_list {
-
+    margin: 20px;
+    padding: 0;
 }

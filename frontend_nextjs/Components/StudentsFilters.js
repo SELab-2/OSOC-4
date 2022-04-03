@@ -103,7 +103,7 @@ export default function StudentsFilters(props) {
 
   // The HTML representation of the filters in the 'Select students' tab
   return(
-    <div id="filters" className="filters" style={{textAlign: "left", width: "300px"}}>
+    <div id="filters" style={{textAlign: "left", width: "300px"}}>
       <div id="filters-header" style={{position: "relative", height: "50px"}}>
         <h2 style={{bottom: 0, left: 0, position: "absolute", marginBottom: 0}}>Filters</h2>
         <button className={"reset-filters-button"} style={{bottom: 0, position: "absolute", right: 0}} onClick={resetFilters}>
@@ -121,9 +121,9 @@ export default function StudentsFilters(props) {
         <label htmlFor="student-coach-volunteers-checkbox">Only student coach volunteers</label>
         <br/>
 
-        <input id="include-suggested-students-checkbox" type="checkbox" checked
+        <input id="include-suggested-students-checkbox" type="checkbox"
                onChange={val => includeStudentsYouSuggestedFor(val.target.checked)}/>
-        <label htmlFor="include-suggested-students-checkbox">Include students you've suggested for</label>
+        <label htmlFor="include-suggested-students-checkbox">Only students you've not suggested for</label>
         <br/>
 
         <input id="unmatched-students-checkbox" type="checkbox"

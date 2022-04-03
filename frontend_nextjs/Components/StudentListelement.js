@@ -3,7 +3,7 @@ import {getJson} from "../utils/json-requests";
 
 import {
   getDegreeQuestionId, getFirstLanguageQuestionId, getLevelOfEnglishQuestionId,
-  getQuestionAnswersPath, getRolesPath,
+  getQuestionAnswersPath, getSkillsPath,
   getStudyQuestionId,
   getSuggestionsPath
 } from "../routes";
@@ -60,7 +60,7 @@ export default function StudentListelement(props) {
 
       // check if there are no skills yet
       if (skills.length === 0) {
-        getJson(getRolesPath()).then(res => {
+        getJson(getSkillsPath()).then(res => {
           let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
           setSkills(skillObjs.map(skill => skill.name));
         })
@@ -95,10 +95,10 @@ export default function StudentListelement(props) {
     return possibleDecisions[decision];
   }
 
-  // get a list of the roles of the student in HTML format
-  function getRoles() {
+  // get a list of the skills of the student in HTML format
+  function getSkills() {
     return skills.map((skill,index) =>
-      <li className="role" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
+      <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
@@ -141,8 +141,8 @@ export default function StudentListelement(props) {
 
   // The html representation of a list-element
   return (
-    <Container id="list-element" className="list-element" style={{backgroundColor: getBackground()}}>
-      <Row>
+    <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}>
+      <Row className="upper-layer">
         <Col id="name" className="name" md="auto">{name}</Col>
         <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
           No practical problems
@@ -164,9 +164,9 @@ export default function StudentListelement(props) {
           {getDecision()}
         </Col>
 
-        <Col id="roles" align="right" className="roles">
+        <Col id="skills" align="right" className="skills">
           <ul>
-            {getRoles()}
+            {getSkills()}
           </ul>
         </Col>
       </Row>

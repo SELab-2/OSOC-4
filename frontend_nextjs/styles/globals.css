@@ -18,3 +18,8 @@ a {
 ul {
   list-style-type: none;
 }
+
+.container-fluid{
+  padding-left: 0;
+  padding-right: 0;
+}

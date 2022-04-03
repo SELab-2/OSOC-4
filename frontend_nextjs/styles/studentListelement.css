@@ -9,7 +9,12 @@
 
 .name {
     font-size: 22px;
-    padding-right: 20px;
+    padding: 0;
+    margin-right: 20px;
+}
+
+.upper-layer {
+    margin-bottom: 10px;
 }
 
 .info-titles {
@@ -61,7 +66,7 @@
     background-color: var(--no_red_65);
 }
 
-.role {
+.skill {
     padding-left: 15px;
     padding-right: 15px;
     background-color: var(--background-gray);
@@ -69,7 +74,7 @@
     font-size: 12px;
 }
 
-.roles {
+.skill {
     margin-top: 10px;
     padding: 0;
 }

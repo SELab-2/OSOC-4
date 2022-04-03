@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/StudentsFilters";
+import {Container, Row, Col} from "react-bootstrap";
 
 export default function SelectStudents(props) {
 
@@ -32,12 +33,17 @@ export default function SelectStudents(props) {
     }
 
     return(
-      <div>
-        <div>
-            <ul className="students_list">
-                {getStudents()}
-            </ul>
-        </div>
-      </div>
+      <Container fluid>
+        <Row>
+            <Col md="auto" className="filters">
+                <StudentsFilters/>
+            </Col>
+            <Col>
+                <ul className="students_list">
+                    {getStudents()}
+                </ul>
+            </Col>
+        </Row>
+      </Container>
     )
 }
