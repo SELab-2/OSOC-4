@@ -159,12 +159,12 @@ export default function StudentListelement(props) {
           {getInfoTitles()}
           Decision:
         </Col>
-        <Col id="info-answers" className="info-answers">
+        <Col id="info-answers" md="auto" className="info-answers">
           {getInfoAnswers()}
           {getDecision()}
         </Col>
 
-        <Col id="roles" md="auto" align="right">
+        <Col id="roles" align="right" className="roles">
           <ul>
             {getRoles()}
           </ul>
