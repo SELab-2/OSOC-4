@@ -1,4 +1,4 @@
-import {Button, Card, Col, Form, Row} from "react-bootstrap";
+import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {log} from "../utils/logger";
 import {useRouter} from "next/router";
@@ -19,6 +19,8 @@ export default function NewProjects() {
     const [students, setStudents] = useState([{"skill":"", "amount":1}])
 
     const [skills, setSkills] = useState([])
+    const [show, setShow] = useState(false);
+
 
     const router = useRouter()
 
@@ -77,8 +79,26 @@ export default function NewProjects() {
 
         return(
         <div>
-            {/*TODO are you sure you want to leave any changes made on this page will be lost*/}
-            <Button onClick={() => router.push("/projects")}>Go back to projects</Button>
+            <Button onClick={() => setShow(true)}>Go back to projects</Button>
+
+            <Modal show={show} onHide={() => setShow(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Leave page?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Doing so will lose all your current progress.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => {
+                        setShow(false)
+                        router.push("/projects")
+                    }}>
+                        Leave page
+                    </Button>
+                    <Button variant="primary" onClick={() => setShow(false)}>
+                        Stay on page
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
             <h1>New project</h1>
             <Form onSubmit={handleSubmitChange}>
                 <Form.Label>Project name:</Form.Label>

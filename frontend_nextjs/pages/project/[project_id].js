@@ -1,14 +1,16 @@
 import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Col, Modal, Row} from "react-bootstrap";
 
 const Project = () => {
     const router = useRouter()
     const { project_id } = router.query
     const [loaded, setLoaded] = useState(false)
     const [project, setProject] = useState(undefined)
+    const [showDelete, setShowDelete] = useState(false);
+
 
     useEffect(() => {
         if (! loaded) {
@@ -36,7 +38,25 @@ const Project = () => {
                             <Button>Edit</Button>
                         </Col>
                         <Col>
-                            <Button>Delete</Button>
+                            <Button onClick={() => setShowDelete(true)}>Delete</Button>
+                            <Modal show={showDelete} onHide={() => setShowDelete(false)}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Delete project?</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>Are you sure you want to delete this project? Doing so will not be reversible. </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={() => {
+                                        setShowDelete(false)
+                                        log("DELETE PROJECT")
+                                        router.push("/projects")
+                                    }}>
+                                        Delete project
+                                    </Button>
+                                    <Button variant="primary" onClick={() => setShowDelete(false)}>
+                                        Keep project
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>
                         </Col>
                     </Row>
                     <h2>Project by: {project.partner.name}</h2>
