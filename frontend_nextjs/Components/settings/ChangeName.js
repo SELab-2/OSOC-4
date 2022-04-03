@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import {log} from "../../utils/logger";
-import {postCreate} from "../../utils/json-requests";
+import {patchEdit, postCreate} from "../../utils/json-requests";
 import {useSession} from "next-auth/react";
 
 export default function ChangeName(props) {
@@ -17,14 +17,21 @@ export default function ChangeName(props) {
 
     async function handleSubmitChange(event) {
         log("handle submit change name");
-        event.preventDefault()
-        let body = JSON.stringify({
-            "email": props.email,
-            "name": name
-        })
-        //setSavedSuccess(true)
-        let response = await postCreate(props.userid, body)
-        if (response.success) { setSavedSuccess(true); }
+        event.preventDefault();
+
+        let body = {
+            "name": name,
+            "role": props.user.role,
+            "active": props.user.active,
+            "approved": props.user.approved,
+            "disabled": props.user.disabled
+        }
+
+        let response = await patchEdit(props.userid, body);
+        if (response.success) {
+            setSavedSuccess(true);
+            setName(name);
+        }
     }
 
     return (

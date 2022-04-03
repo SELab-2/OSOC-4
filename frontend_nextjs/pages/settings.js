@@ -11,6 +11,7 @@ import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
 import {useSession} from "next-auth/react";
+import {log} from "../utils/logger";
 
 
 
@@ -24,8 +25,11 @@ export default function Settings(props) {
     const [darkTheme, setDarkTheme] = useState(false);
 
     const { data: session, status } = useSession()
+
     useEffect(() => {
+        log(session)
         if (session) {
+            // TODO change to /users/me
             getJson(session.userid).then(res => {
                     setUser(res.data);
                     setName(res.data.name);
@@ -58,7 +62,7 @@ export default function Settings(props) {
                                 <ChangeEmail email={email}/>
                             </SettingCards>
                             <SettingCards title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
-                                <ChangeName userid={session.userid} name={name} email={email}/>
+                                <ChangeName userid={session.userid} user={user}/>
                             </SettingCards>
                         </div>
                     </AccordionBody>
