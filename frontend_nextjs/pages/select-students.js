@@ -1,11 +1,11 @@
-import StudentListelement from "../Components/StudentListelement";
+import StudentListelement from "../Components/select_students/StudentListelement";
 import {useEffect, useState} from "react";
 import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
-import StudentsFilters from "../Components/StudentsFilters";
+import StudentsFilters from "../Components/select_students/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
-import TempStudentListelement from "../Components/TempStudentElement";
+import TempStudentListelement from "../Components/select_students/TempStudentElement";
 
 
 export default function SelectStudents(props) {
@@ -34,17 +34,13 @@ export default function SelectStudents(props) {
         }
         return null;
     }
-     /*
-     <Container fluid>
+
+    return(
+      <Container fluid>
         <Row>
             <Col md="auto" className="filters">
                 <StudentsFilters/>
             </Col>
-        </Row>
-      </Container>*/
-    return(
-      <Container fluid>
-        <Row>
             <Col>
                 <ul className="students_list">
                     {getStudents()}

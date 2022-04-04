@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
+import {getJson} from "../../utils/json-requests";
 
 import {
   getDegreeQuestionId, getFirstLanguageQuestionId, getLevelOfEnglishQuestionId,
   getQuestionAnswersPath, getSkillsPath,
   getStudyQuestionId,
   getSuggestionsPath
-} from "../routes";
+} from "../../routes";
 import {Col, Container, Row} from "react-bootstrap";
 
 export default function StudentListelement(props) {
@@ -27,10 +27,8 @@ export default function StudentListelement(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
-    // only insert data if the student in still undefined
     getJson(props.student).then(res => {
       setStudent(res);
-      console.log(res);
       /*setStudent(props.student)
       setName(props.student.name)
       let localStudent = props.student;

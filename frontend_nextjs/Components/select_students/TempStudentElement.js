@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getJson } from "../utils/json-requests";
+import { getJson } from "../../utils/json-requests";
 
 export default function TempStudentListelement(props) {
 
