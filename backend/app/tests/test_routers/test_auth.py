@@ -7,9 +7,6 @@ class TestAuth(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    """
-    POST /login
-    """
     async def post_login_succes(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
         response = await self.post_response("/login", body, name, Status.SUCCES, use_access_token=False)
@@ -20,7 +17,7 @@ class TestAuth(TestBase):
         response = await self.post_response("/login", body, name, Status.UNAUTHORIZED, use_access_token=False)
         self.assertTrue("message" in response.json())
 
-    async def test_login(self):
+    async def test_post_login(self):
         user_admin = self.objects["user_admin"]
         user_admin_pass = self.saved_objects["passwords"][user_admin.name]
         user_approved = self.objects["user_approved_coach"]

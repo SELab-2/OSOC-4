@@ -1,12 +1,16 @@
 from enum import Enum
+from typing import Optional, List
 
 from app.config import config
 from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
                                                 InvalidPasswordException)
 from app.utils.validators import valid_email, valid_password
-from odmantic import Model
 from pydantic import BaseModel, validator
+from sqlmodel import Field, SQLModel, Relationship
+from app.models.edition import EditionCoach, Edition
+from app.models.project import ProjectCoach, Project
+from app.models.suggestion import Suggestion
 
 
 class UserRole(int, Enum):
@@ -15,7 +19,8 @@ class UserRole(int, Enum):
     ADMIN = 2
 
 
-class User(Model):
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
     email: str
     name: str = ""
     password: str = ""
@@ -23,6 +28,9 @@ class User(Model):
     active: bool = False
     approved: bool = False
     disabled: bool = True
+    editions: List[Edition] = Relationship(back_populates="coaches", link_model=EditionCoach)
+    projects: List[Project] = Relationship(back_populates="coaches", link_model=ProjectCoach)
+    suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
     @validator('email')
     def email_lowercase(cls, v):
@@ -44,7 +52,7 @@ class UserOutSimple(BaseModel):
     id: str
 
     def __init__(self, **data):
-        data["id"] = config.api_url + "users/" + data["id"]
+        data["id"] = config.api_url + "users/" + str(data["id"])
         super().__init__(**data)
 
 

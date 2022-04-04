@@ -3,6 +3,7 @@ import {getJson} from "../utils/json-requests";
 import {getSkillsPath, getStudentsPath} from "../routes";
 import {Col, Container, Row} from "react-bootstrap";
 
+
 export default function StudentsFilters(props) {
 
   const [extendedRoleList, setExtendedRoleList] = useState(false);
@@ -223,6 +224,5 @@ export default function StudentsFilters(props) {
 
 
     </Container>
-
   )
 }

@@ -6,7 +6,6 @@ from app.database import db
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
-                                               StudentNotFoundException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
@@ -16,7 +15,6 @@ from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from app.utils.response import list_modeltype_response, response
-from bson import ObjectId
 from fastapi import APIRouter, Body, Depends
 
 router = APIRouter(prefix="/editions")
@@ -42,7 +40,7 @@ async def create_edition(edition: Edition = Body(...)):
     :return: data of newly created edition
     :rtype: dict
     """
-    if edition.year is None or edition.year == "" or int(edition.year) < datetime.date.today().year:
+    if int(edition.year) < datetime.date.today().year:
         raise YearAlreadyOverException()
     # check if an edition with the same year is already present
     if await read_where(Edition, Edition.year == edition.year):
@@ -75,7 +73,7 @@ async def update_edition(year: int, edition: Edition = Body(...)):
     if not year == edition.year:
         raise EditionYearModifyException()
 
-    result = await read_where(Edition, Edition.id == edition.id)
+    result = await read_where(Edition, Edition.year == edition.year)
     if not result:
         raise EditionNotFound()
     return response(EditionOutExtended.parse_raw(result.json()), "Edition successfully retrieved")
@@ -88,11 +86,7 @@ async def get_edition_students(year: int):
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-    edition = await read_where(Edition, Edition.year == year)
-    if not edition:
-        raise EditionNotFound()
-
-    students = await db.engine.find(Student, {"edition": edition.id})
+    students = await db.engine.find(Student, {"edition": year})
     return list_modeltype_response(students, Student)
 
 
@@ -100,7 +94,7 @@ async def get_edition_students(year: int):
 async def get_edition_students_with_filter(
         year: int,
         search: Optional[str] = None,
-        role_filter: Optional[List[ObjectId]] = None):
+        role_filter: Optional[List[int]] = None):
     """get_edition_students_with_filter get all the students in the edition with given year and filters
 
     :param year: year of the edition
@@ -112,11 +106,7 @@ async def get_edition_students_with_filter(
     :return: list of all the students matching the criteria
     :rtype: dict
     """
-    edition = await read_where(Edition, Edition.year == year)
-    if not edition:
-        raise EditionNotFound()
-
-    query = {"edition": edition.id}
+    query = {"edition": year}
     if search is not None:
         query["name"] = {"$regex": search, "$options": "i"}
     if role_filter is not None and len(role_filter) > 0:
@@ -138,50 +128,13 @@ async def get_edition_projects(year: int):
     :return: list of projects
     :rtype: dict
     """
-    edition = await read_where(Edition, Edition.year == year)
-    if not edition:
-        raise EditionNotFound()
-
-    projects = await read_where(Project, Project.editions == edition.id)
+    projects = await read_where(Project, Project.edition == year)
     return list_modeltype_response(projects, Project)
 
 
-@router.get("/{year}/student/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Student retrieved")
-async def get_student(year: int, student_id: str):
-    """get_student get the StudentForm with the corresponding id
-
-    :param year: year of the edition
-    :type year: int
-    :return: StudentForm
-    :rtype: dict
-    """
-    edition = await read_where(Edition, Edition.year == year)
-    if not edition:
-        raise EditionNotFound()
-    student = await db.engine.find(Student, {"edition": edition.id, "_id": student_id})
-    if not student:
-        raise StudentNotFoundException()
-    return response(student, "Student successfully retrieved")
-
-
-@router.post("/{year}/student/{student_id}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Student edited")
-async def edit_student(student: Student = Body(...)):
-    """edit_student creates or modifies a student in the database
-
-    :param year: year of the edition
-    :type year: int
-    :param student: defaults to Body(...)
-    :type student: StudentForm, optional
-    :return: data of newly created student
-    :rtype: dict
-    """
-    new_student = await update(Student.parse_obj(student))
-    return response(new_student, "Student added successfully.")
-
-
-@router.get("/{year}/student/students/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Projects retrieved")
+@router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Students retrieved")
 async def get_conflicting_students(year: int):
-    """get_conflicting_projects gets all students with conflicts in their confirmed suggestions
+    """get_conflicting_students gets all students with conflicts in their confirmed suggestions
     within an edition
 
     :param year: year of the edition
@@ -191,26 +144,23 @@ async def get_conflicting_students(year: int):
     :rtype: dict
     """
 
-    edition = await read_where(Edition, Edition.year == year)
-    if not edition:
-        raise EditionNotFound()
-
     collection = db.engine.get_collection(Suggestion)
     if not collection:
         raise SuggestionRetrieveException()
 
-    students = await db.engine.find(Student, {"edition": edition.id})
+    students = await db.engine.find(Student, {"edition": year})
     students = [student.id for student in students]
+    print(students)
 
     pipeline = [
         # get confirmed suggestions for students in the current edition that say yes
         {"$match": {
-            "confirmed": True,
-            "student_form": {"$in": students},
-            "suggestion": SuggestionOption.YES}},
+            "definitive": True,
+            "student": {"$in": students},
+            "decision": SuggestionOption.YES}},
         # group by student_form, create set of suggestions and get count of suggestions
         {"$group": {
-            "_id": "$student_form",
+            "_id": "$student",
             "suggestion_ids": {"$addToSet": "$_id"},
             "count": {"$sum": 1}}},
         # only match if count of suggestions > 0, since this means there is a conflict

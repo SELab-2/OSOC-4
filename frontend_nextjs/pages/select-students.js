@@ -5,35 +5,24 @@ import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
+import TempStudentListelement from "../Components/TempStudentElement";
+
+
 export default function SelectStudents(props) {
 
     // These constants are initialized empty, the data will be inserted in useEffect
-    const [students, setStudents] = useState(undefined);
+    const [students, setStudents] = useState([]);
 
     // This function inserts the data in the variables
-    useEffect( () => {
-        if (!students) {
-            getJson(getStudentsPath()).then(res => {
-                setStudents(res.data);
-            })
-        }
-    })
+    useEffect(() => {
 
-    // function to get a list of students
-    function getStudents() {
-        if (students) {
-            return students.map(student =>
-              // generate a list of students, each student needs 'student' as a prop
-              <li key={student.id}>
-                  <StudentListelement student={student} />
-              </li>
-            );
-        }
-        return null;
-    }
-
-    return(
-      <Container fluid>
+        getJson(getStudentsPath()).then(res => {
+            setStudents(res);
+            console.log(res)
+        })
+    })    
+     /*
+     <Container fluid>
         <Row>
             <Col md="auto" className="filters">
                 <StudentsFilters/>
@@ -44,6 +33,16 @@ export default function SelectStudents(props) {
                 </ul>
             </Col>
         </Row>
+      </Container>*/
+    return(
+      <Container fluid>
+        <Row>
+            <Col>
+              {students.map(student => <TempStudentListelement key={student} id={student} />)}
+            </Col>
+        </Row>
       </Container>
+
     )
+    
 }

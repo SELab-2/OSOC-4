@@ -9,10 +9,6 @@ class TestUserInvites(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    """
-    GET /invite/{invitekey}
-    """
-
     def check_user(self, user: User, expected_values: list, password_empty):
         user_values: list = [user.name, user.email, user.role.value,
                              user.active, user.approved, user.disabled]
@@ -22,13 +18,6 @@ class TestUserInvites(TestBase):
                         f"Something was wrong with the password for {user.email}.\n")
 
     async def test_invited_user(self):
-        """ Example of post body
-        {
-            "name": "string",
-            "password": "string",
-            "validate_password": "string"
-        }
-        """
         username = "The NewGuy"
         email = "The.NewGuy@test.test"
         password = "ValidPass?!123"

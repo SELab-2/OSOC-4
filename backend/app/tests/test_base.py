@@ -1,17 +1,23 @@
 import asyncio
 import unittest
 from enum import IntEnum
-
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient, Response
+from typing import Dict, Set
 
 from app.api import app
 from app.database import db
+from app.models.answer import Answer
 from app.models.edition import Edition
-from app.models.project import Project, Partner
+from app.models.participation import Participation
+from app.models.project import Project
+from app.models.question import Question
+from app.models.question_answer import QuestionAnswer
 from app.models.skill import Skill
+from app.models.student import Student
+from app.models.suggestion import Suggestion
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient, Response
 
 
 class Status(IntEnum):
@@ -27,7 +33,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.objects = {
+        self.users = {
             "user_admin": User(
                 email="user_admin@test.be",
                 name="user_admin",
@@ -35,22 +41,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 role=UserRole.ADMIN,
                 active=True,
                 approved=True,
-                disabled=False),
-            "user_approved_coach": User(
-                email="user_approved_coach@test.be",
-                name="user_approved_coach",
-                password="Test123!user_approved_coach",
-                role=UserRole.COACH,
-                active=True,
-                approved=True,
-                disabled=False),
-            "user_activated_coach": User(
-                email="user_activated_coach@test.be",
-                name="user_activated_coach",
-                password="Test123!user_activated_coach",
-                role=UserRole.COACH,
-                active=True,
-                approved=False,
                 disabled=False),
             "user_unactivated_coach": User(
                 email="user_unactivated_coach@test.be",
@@ -60,6 +50,30 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 active=False,
                 approved=False,
                 disabled=False),
+            "user_activated_coach": User(
+                email="user_activated_coach@test.be",
+                name="user_activated_coach",
+                password="Test123!user_activated_coach",
+                role=UserRole.COACH,
+                active=True,
+                approved=False,
+                disabled=False),
+            "user_approved_coach": User(
+                email="user_approved_coach@test.be",
+                name="user_approved_coach",
+                password="Test123!user_approved_coach",
+                role=UserRole.COACH,
+                active=True,
+                approved=True,
+                disabled=False),
+            "user_disabled_coach": User(
+                email="user_disabled_coach@test.be",
+                name="user_disabled_coach",
+                password="Test123!user_disabled_coach",
+                role=UserRole.COACH,
+                active=True,
+                approved=True,
+                disabled=True),
             "user_no_role": User(
                 email="user_no_role@test.be",
                 name="user_no_role",
@@ -67,7 +81,10 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 role=UserRole.NO_ROLE,
                 active=False,
                 approved=False,
-                disabled=False),
+                disabled=False)
+        }
+
+        self.objects = {
             "projectleider": Skill(name="projectleider"),
             "Systeembeheerder": Skill(name="Systeembeheerder"),
             "API-beheerder": Skill(name="API-beheerder"),
@@ -79,11 +96,11 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 name="project_test",
                 description="A project aimed at being dummy data",
                 goals=["Testing this application", "Being dummy data"],
-                partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
                 required_skills=[],
                 users=[],
-                edition=Edition(year=2022, user_ids=[]).id
-            )
+                edition=2022
+            ),
+            **self.users
         }
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
@@ -109,9 +126,11 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             self.saved_objects[key] = await db.engine.save(obj)
 
     async def asyncTearDown(self) -> None:
-        for o in self.saved_objects.values():
-            if not isinstance(o, dict) and not isinstance(o, list):
-                await db.engine.delete(o)
+        for model in [Answer, Edition, Participation, Project, Question,
+                      QuestionAnswer, Skill, Student, Suggestion, User]:
+            instances = await db.engine.find(model)
+            for instance in instances:
+                await db.engine.delete(instance)
         await self.lf.__aexit__()
         await self.client.aclose()
 
@@ -198,3 +217,35 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         expected {expected_status}
                         """)
         return response
+
+    async def _auth_test_get(self, path: str):
+        await self.get_response(path, "user_admin", Status.UNAUTHORIZED, use_access_token=False)
+        await self.get_response(path, "user_admin", Status.UNPROCESSABLE, access_token="wrong token")
+
+    async def _auth_test_post(self, path: str, body: Dict):
+        await self.post_response(path, body, "user_admin", Status.UNAUTHORIZED, use_access_token=False)
+        await self.post_response(path, body, "user_admin", Status.UNPROCESSABLE, access_token="wrong token")
+
+    async def _access_test_get(self, path, allowed_users: Set[str]):
+        # Allowed users
+        for user in allowed_users:
+            await self.get_response(path, user, Status.SUCCES)
+        # Disallowed users
+        for user in set(self.users.keys()).difference(allowed_users):
+            await self.get_response(path, user, Status.FORBIDDEN)
+
+    async def _access_test_post(self, path, allowed_users: Set[str], body: Dict):
+        # Allowed users
+        for user in allowed_users:
+            await self.post_response(path, body, user, Status.SUCCES)
+        # Disallowed users
+        for user in set(self.users.keys()).difference(allowed_users):
+            await self.post_response(path, body, user, Status.FORBIDDEN)
+
+    async def auth_access_get_test(self, path: str, allowed_users: Set[str]):
+        await self._auth_test_get(path)
+        await self._access_test_get(path, allowed_users)
+
+    async def auth_access_post_test(self, path: str, allowed_users: Set[str], body: Dict):
+        await self._auth_test_post(path, body)
+        await self._access_test_post(path, allowed_users, body)
