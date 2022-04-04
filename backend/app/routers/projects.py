@@ -47,5 +47,26 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
             project = result[0]
         except Exception:
             raise ProjectNotFoundException()
+    if not project:
+        raise ProjectNotFoundException()
 
     return ProjectOutExtended.parse_raw(project.json())
+
+
+@router.patch("/{id}", response_description="Project with id updated", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def update_project_with_id(id: int, updated_project: ProjectCreate, session: AsyncSession = Depends(get_session)):
+    """update_project_with_id get Project instance with id from the database
+
+    :return: project with id
+    :rtype: ProjectOutExtended
+    """
+
+    project = await read_where(Project, Project.id == id, session=session)
+    if project:
+        new_project_data = updated_project.dict(exclude_unset=True)
+        for key, value in new_project_data.items():
+            setattr(project, key, value)
+        await update(project, session)
+        return response(None, "Project updated succesfully")
+
+    raise ProjectNotFoundException()
