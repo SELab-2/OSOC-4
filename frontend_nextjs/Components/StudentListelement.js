@@ -12,8 +12,7 @@ import {Col, Container, Row} from "react-bootstrap";
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [student, setStudent] = useState(undefined);
-  const [name, setName] = useState("");
+  const [student, setStudent] = useState({});
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionsYes, setSuggestionsYes] = useState(0);
   const [suggestionsMaybe, setSuggestionsMaybe] = useState(0);
@@ -29,8 +28,10 @@ export default function StudentListelement(props) {
   // This function inserts the data in the variables
   useEffect(() => {
     // only insert data if the student in still undefined
-    if (!student) {
-      setStudent(props.student)
+    getJson(props.student).then(res => {
+      setStudent(res);
+      console.log(res);
+      /*setStudent(props.student)
       setName(props.student.name)
       let localStudent = props.student;
 
@@ -66,7 +67,7 @@ export default function StudentListelement(props) {
         })
       }
 
-      
+
       if (studies === undefined) {
         getJson(getQuestionAnswersPath()).then(res => {
           let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
@@ -82,8 +83,8 @@ export default function StudentListelement(props) {
             questionAnswer.question === getLevelOfEnglishQuestionId())));
 
         })
-      }
-    }
+      }*/
+    })
   });
 
   // get the decision for the student (yes, maybe, no or undecided)
@@ -143,7 +144,7 @@ export default function StudentListelement(props) {
   return (
     <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}>
       <Row className="upper-layer">
-        <Col id="name" className="name" md="auto">{name}</Col>
+        <Col id="name" className="name" md="auto">{student["name"]}</Col>
         <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
           No practical problems
         </Col>
