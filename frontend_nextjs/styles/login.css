@@ -97,6 +97,7 @@
 /* ----  Responsiveness   ----  */
 @media (orientation: portrait) {
     .body-login {
+        width: 90%;
         grid-template-columns: 1fr;
     }
 
