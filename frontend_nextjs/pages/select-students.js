@@ -6,6 +6,7 @@ import StudentsFilters from "../Components/select_students/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
 import TempStudentListelement from "../Components/select_students/TempStudentElement";
+import StudentList from "../Components/select_students/StudentList";
 
 
 export default function SelectStudents(props) {
@@ -22,30 +23,13 @@ export default function SelectStudents(props) {
         }
     })
 
-    // function to get a list of students
-    function getStudents() {
-        if (students) {
-            return students.map(student =>
-              // generate a list of students, each student needs 'student' as a prop
-              <li key={student.id}>
-                  <StudentListelement student={student} />
-              </li>
-            );
-        }
-        return null;
-    }
-
     return(
       <Container fluid>
         <Row>
             <Col md="auto" className="filters">
                 <StudentsFilters/>
             </Col>
-            <Col>
-                <ul className="students_list">
-                    {getStudents()}
-                </ul>
-            </Col>
+            <StudentList students={students} />
         </Row>
       </Container>
 

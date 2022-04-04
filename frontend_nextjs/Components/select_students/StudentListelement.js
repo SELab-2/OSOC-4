@@ -2,12 +2,10 @@ import {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
 
 import {
-  getDegreeQuestionId, getFirstLanguageQuestionId, getLevelOfEnglishQuestionId,
-  getQuestionAnswersPath, getSkillsPath,
-  getStudyQuestionId,
-  getSuggestionsPath
+  getStudentPath,
 } from "../../routes";
 import {Col, Container, Row} from "react-bootstrap";
+import {router} from "next/client";
 
 export default function StudentListelement(props) {
 
@@ -138,19 +136,30 @@ export default function StudentListelement(props) {
     return "var(--no_red_65)"
   }
 
+  function studentDetails() {
+    let i = props.student.lastIndexOf('/');
+    let id = props.student.substring(i + 1);
+    router.push(getStudentPath(id))
+  }
+
   // The html representation of a list-element
   return (
-    <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}>
+    <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}
+               onClick={() => studentDetails()}>
       <Row className="upper-layer">
         <Col id="name" className="name" md="auto">{student["name"]}</Col>
         <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
           No practical problems
         </Col>
         <Col/>
-        <Col className="suggestions" md="auto">Suggestions:</Col>
-        <Col className="suggestionsYes" md="auto">{suggestionsYes}</Col>
-        <Col className="suggestionsMaybe" md="auto">{suggestionsMaybe}</Col>
-        <Col className="suggestionsNo" md="auto">{suggestionsNo}</Col>
+        <Col md="auto">
+          <Row md="auto">
+            <Col className="suggestions" md="auto">Suggestions:</Col>
+            <Col className="suggestionsYes" md="auto">{suggestionsYes}</Col>
+            <Col className="suggestionsMaybe" md="auto">{suggestionsMaybe}</Col>
+            <Col className="suggestionsNo" md="auto">{suggestionsNo}</Col>
+          </Row>
+        </Col>
       </Row>
 
       <Row id="info" className="info">
