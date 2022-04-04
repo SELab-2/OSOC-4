@@ -14,11 +14,6 @@ router = APIRouter(prefix="/students")
 router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
-def get_sorting(sortstr: str):
-    sorting = [t.split("+") if "+" in t else [t, "asc"] for t in sortstr.split(",")]
-    return {t[0]: 1 if t[1] == "asc" else -1 for t in sorting}
-
-
 @router.get("/", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
 async def get_students(orderby: str = "name+asc", skills: str = "", alumn: bool = None, search: str = "", session: AsyncSession = Depends(get_session)):
     """get_students get all the Student instances from the database

@@ -1,6 +1,7 @@
 import datetime
 from typing import List, Optional
 
+from app.config import config
 from app.crud import read_all_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
@@ -8,8 +9,11 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionYearModifyException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
+from app.models.answer import Answer
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
+from app.models.question_answer import QuestionAnswer
+from app.models.question_tag import QuestionTag
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
@@ -18,24 +22,30 @@ from app.utils.response import list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 from sqlmodel import select
 
 router = APIRouter(prefix="/editions")
 
 
+def get_sorting(sortstr: str):
+    sorting = [t.split("+") if "+" in t else [t, "asc"] for t in sortstr.split(",")]
+    return {t[0]: False if t[1] == "asc" else True for t in sorting}
+
+
 @router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Editions retrieved")
-async def get_editions():
+async def get_editions(session: AsyncSession = Depends(get_session)):
     """get_editions get all the Edition instances from the database
 
     :return: list of editions
     :rtype: dict
     """
-    results = await read_all_where(Edition)
+    results = await read_all_where(Edition, session)
     return list_modeltype_response([EditionOutSimple.parse_raw(r.json()) for r in results], Edition)
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
-async def create_edition(edition: Edition = Body(...)):
+async def create_edition(edition: Edition = Body(...), session: AsyncSession = Depends(get_session)):
     """create_edition creates a new edition in the database
 
     :param edition: defaults to Body(...)
@@ -46,28 +56,28 @@ async def create_edition(edition: Edition = Body(...)):
     if int(edition.year) < datetime.date.today().year:
         raise YearAlreadyOverException()
     # check if an edition with the same year is already present
-    if await read_where(Edition, Edition.year == edition.year):
+    if await read_where(Edition, Edition.year == edition.year, session=session):
         raise AlreadyEditionWithYearException(edition.year)
 
-    new_edition = await update(Edition.parse_obj(edition))
+    new_edition = await update(Edition.parse_obj(edition), session=session)
     return response(new_edition, "Edition added successfully.")
 
 
 @router.get("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Editions retrieved")
-async def get_edition(year: int):
+async def get_edition(year: int, session: AsyncSession = Depends(get_session)):
     """get_edition get the Edition instance with given year
 
     :return: list of editions
     :rtype: dict
     """
-    edition = await read_where(Edition, Edition.year == year)
+    edition = await read_where(Edition, Edition.year == year, session=session)
     if not edition:
         raise EditionNotFound()
     return response(EditionOutExtended.parse_raw(edition.json()), "Edition successfully retrieved")
 
 
-@router.post("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Editions retrieved")
-async def update_edition(year: int, edition: Edition = Body(...)):
+@router.patch("/{year}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="updated edition")
+async def update_edition(year: int, edition: Edition = Body(...), session: AsyncSession = Depends(get_session)):
     """update_edition update the Edition instance with given year
 
     :return: the updated edition
@@ -76,50 +86,50 @@ async def update_edition(year: int, edition: Edition = Body(...)):
     if not year == edition.year:
         raise EditionYearModifyException()
 
-    result = await read_where(Edition, Edition.year == edition.year)
+    result = await read_where(Edition, Edition.year == edition.year, session=session)
     if not result:
         raise EditionNotFound()
-    return response(EditionOutExtended.parse_raw(result.json()), "Edition successfully retrieved")
+
+    new_edition_data = edition.dict(exclude_unset=True)
+    for key, value in new_edition_data.items():
+        setattr(result, key, value)
+    await update(result, session)
+    return response(None, "Edition updated succesfully")
 
 
-@router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Students retrieved")
-async def get_edition_students(year: int):
+@router.get("/{year}/students", response_description="Students retrieved")
+async def get_edition_students(year: int, orderby: str = "", search: str = "", session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-    students = await db.engine.find(Student, {"edition": year})
-    return list_modeltype_response(students, Student)
 
+    student_query = select(Student).where(Student.edition_year == year).subquery()
+    print("test")
+    if search:
+        student_query = select(Student).where(Student.edition_year == year).join(QuestionAnswer).join(Answer)
+        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
+        student_query = student_query.distinct().subquery()
 
-@router.post("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Students retrieved")
-async def get_edition_students_with_filter(
-        year: int,
-        search: Optional[str] = None,
-        role_filter: Optional[List[int]] = None):
-    """get_edition_students_with_filter get all the students in the edition with given year and filters
+    ua = aliased(Student, student_query)
+    res = await session.execute(select(ua.id))
+    res = res.all()
 
-    :param year: year of the edition
-    :type year: int
-    :param search: search term to search for students
-    :type search: str
-    :param role_filter: roles which the student should have
-    :type role_filter: Optional[List[ObjectId]]
-    :return: list of all the students matching the criteria
-    :rtype: dict
-    """
-    query = {"edition": year}
-    if search is not None:
-        query["name"] = {"$regex": search, "$options": "i"}
-    if role_filter is not None and len(role_filter) > 0:
-        if len(role_filter) == 1:
-            query["roles"] = role_filter[0]
-        else:
-            query["roles"] = {"$all": role_filter}
+    students = [r for (r,) in res]
 
-    students = await db.engine.find(Student, query)
-    return list_modeltype_response(students, Student)
+    if orderby:
+        sorting = {}
+        for key, val in get_sorting(orderby).items():
+            res = await session.execute(select(ua.id, QuestionTag.tag, Answer.answer).join(QuestionAnswer, ua.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == key).join(Answer))
+            res = res.all()
+            sorting[tuple([r for (_, _, r) in res])] = val
+
+        for k, val in reversed(sorting.items()):
+            students = [x for _, x in sorted(zip(list(k), students), reverse=val)]
+
+    return [config.api_url + "students/" + str(id) for id in students]
+
 
 
 @router.get("/{year}/projects", response_description="Projects retrieved")
