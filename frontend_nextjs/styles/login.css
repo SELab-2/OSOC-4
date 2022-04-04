@@ -97,11 +97,7 @@
 /* ----  Responsiveness   ----  */
 @media (orientation: portrait) {
     .body-login {
-        width: 90%;
-        display: grid;
         grid-template-columns: 1fr;
-        /* center body */
-        margin: 5% auto 0;
     }
 
     .body-login .body-right {
