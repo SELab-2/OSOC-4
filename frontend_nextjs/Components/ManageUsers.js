@@ -12,13 +12,14 @@ export default function ManageUsers() {
 
     useEffect(() => {
         getJson("/users").then(res => {
-            console.log("manage users:")
+            // console.log("manage users:")
             console.log(res)
-            for (let u of res.data) {
-                getJson(u.id, false).then(user => {
-                    if (user.data) { setUsers(prevState => [...prevState, user.data]); }
-                })
-            }
+            // for (let u of res) {
+            //     console.log(u["id"])
+            //     // getJson(u["id"]).then(user => {
+            //     //     if (user.data) { setUsers(prevState => [...prevState, user.data]); }
+            //     // })
+            // }
         });
 
     }, [])

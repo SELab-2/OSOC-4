@@ -1,26 +1,24 @@
 from random import choice, randrange, sample
 
-from app.database import db
+from app.crud import update
+from app.database import get_session
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
-from app.models.project import Partner, Project, RequiredSkills
+from app.models.project import Project, ProjectRequiredSkill
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
+from app.models.question_tag import QuestionTag
 from app.models.skill import Skill
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/ddd")
-
-skills = [Skill(name=skill) for skill in
-          ["Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
-           "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
-           "Photographer"]]
 
 first_names = ["Eva", "Mark", "Jonathan", "Christine", "Sebatian", "Ava",
                "Blake", "Andrea", "Joanne", "Frank", "Emma", "Ruth", "Leah",
@@ -33,7 +31,9 @@ last_names = ["Andrews", "Hayes", "Martinez", "Evans", "Pratt", "Vaughan",
               "Scott"]
 emails = ["gmail.com", "outlook.com", "yahoo.com", "hotmail.com"]
 
-questions_yes_no = [Question(question=q, field_id="", type="MULTIPLE_CHOICE") for q in
+question_name = Question(question="What is your name", field_id="")
+
+questions_yes_no = [Question(question=q, field_id="") for q in
                     ["Will you live in Belgium in July 2022?",
                      "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
                      "Would you like to be called by a different name than your birth name?",
@@ -41,10 +41,10 @@ questions_yes_no = [Question(question=q, field_id="", type="MULTIPLE_CHOICE") fo
                      "Have you participated in osoc before?",
                      "Would you like to be a student coach this year?"]]
 
-answers_yes_no = [[Answer(question_id=question.id, field_id="", answer=yn)
+answers_yes_no = [[Answer(answer=yn)
                    for yn in ["yes", "no"]] for question in questions_yes_no]
 
-questions_text = [Question(question=q, field_id="", type="TEXTAREA") for q in
+questions_text = [Question(question=q, field_id="") for q in
                   ["Are there any responsibilities you might have which could hinder you during the day?",
                    "Tell us a fun fact about yourself.",
                    "How many years does your degree take?",
@@ -52,7 +52,7 @@ questions_text = [Question(question=q, field_id="", type="TEXTAREA") for q in
                    "What is the name of your college or university?",
                    "Which skill would you list as your best one?"]]
 
-answers_text = [[Answer(question_id=question.id, field_id="", answer=f"text{t}")
+answers_text = [[Answer(answer=f"text{t}")
                  for t in range(1, 4)] for question in questions_text]
 
 qa_multiple_choice = [
@@ -77,9 +77,9 @@ questions_multiple_choice = []
 answers_multiple_choice = []
 
 for qa in qa_multiple_choice:
-    questions_multiple_choice.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
+    questions_multiple_choice.append(Question(question=qa[0], field_id=""))
     answers_multiple_choice.append(
-        [Answer(question_id=questions_multiple_choice[-1].id, field_id="", answer=answer_text)
+        [Answer(answer=answer_text)
          for answer_text in qa[1:]])
 
 # multiple choice questions with max 2 answers
@@ -97,19 +97,19 @@ questions_multiple_choice2 = []
 answers_multiple_choice2 = []
 
 for qa in qa_multiple_choice2:
-    questions_multiple_choice2.append(Question(question=qa[0], field_id="", type="MULTIPLE_CHOICE"))
+    questions_multiple_choice2.append(Question(question=qa[0], field_id=""))
     answers_multiple_choice2.append(
-        [Answer(question_id=questions_multiple_choice2[-1].id, field_id="", answer=answer_text)
+        [Answer(answer=answer_text)
          for answer_text in qa[1:]])
 
 
 def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=False):
     first_name = choice(first_names)
     last_name = choice(last_names)
-    email = choice(emails)
-    return User(email=f"{first_name}.{last_name}@{email}".lower(),
+    email = "user_coach@test.be"
+    return User(email=email,
                 name=f"{first_name} {last_name}",
-                password="a",
+                password=get_password_hash("justapassword"),
                 role=role,
                 active=active,
                 approved=approved,
@@ -117,57 +117,50 @@ def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=Fals
 
 
 def generate_student(edition):
-    first_name = choice(first_names)
-    last_name = choice(last_names)
-    email = choice(emails)
-    random_skills = sample(skills, k=randrange(1, len(skills)))
-    return Student(name=f"{first_name} {last_name}",
-                   email=f"{first_name}.{last_name}@{email}".lower(),
-                   phone_number=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}",
-                   nickname=first_name,
-                   question_answers=[],
-                   skills=[skill.id for skill in random_skills],
-                   edition=edition.year)
+    # phone_number=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}"
+    return Student(edition=edition)
 
 
-def generate_suggestions(student, project, unconfirmed=3, confirmed_suggestion=None, admin=None):
+def generate_suggestions(student, student_skills, project, unconfirmed=3, confirmed_suggestion=None, admin=None):
     suggestions = [Suggestion(
         decision=choice(list(SuggestionOption)),
         reason="reason x",
-        student=student.id,
-        suggested_by=choice(project.users),
-        project=project.id,
-        skill=choice(student.skills),
+        student=student,
+        suggested_by=choice(project.coaches),
+        project=project,
+        skill=choice(student_skills),
         definitive=False) for _ in range(unconfirmed)]
 
     if confirmed_suggestion is not None and admin is not None:
         suggestions.append(Suggestion(
             decision=confirmed_suggestion,
             reason="reason x",
-            student=student.id,
-            suggested_by=admin.id,
-            project=project.id,
-            skill=choice(student.skills),
+            student=student,
+            suggested_by=admin,
+            project=project,
+            skill=choice(student_skills),
             definitive=True))
 
     return suggestions
 
 
-def generate_question_answers():
-    qa = [QuestionAnswer(question=questions_yes_no[i].id, answer=choice(answers_yes_no[i]).id)
+def generate_question_answers(student):
+    qa = [QuestionAnswer(student=student, question=questions_yes_no[i], answer=choice(answers_yes_no[i]))
           for i in range(len(questions_yes_no))]
-    qa += [QuestionAnswer(question=questions_text[i].id, answer=choice(answers_text[i]).id)
+    qa += [QuestionAnswer(student=student, question=questions_text[i], answer=choice(answers_text[i]))
            for i in range(len(questions_text))]
-    qa += [QuestionAnswer(question=questions_multiple_choice[i].id, answer=choice(answers_multiple_choice[i]).id)
+    qa += [QuestionAnswer(student=student, question=questions_multiple_choice[i], answer=choice(answers_multiple_choice[i]))
            for i in range(len(questions_multiple_choice))]
     for i in range(len(questions_multiple_choice2)):
-        qa += [QuestionAnswer(question=questions_multiple_choice2[i].id, answer=answer.id)
+        qa += [QuestionAnswer(student=student, question=questions_multiple_choice2[i], answer=answer)
                for answer in sample(answers_multiple_choice2[i], k=randrange(1, 3))]
+    qa += [Answer(answer=f"{choice(first_names)} {choice(last_names)}")]
+    qa += [QuestionAnswer(student=student, question=question_name, answer=qa[-1])]
     return qa
 
 
-@router.get("/", response_description="Data retrieved")
-async def add_dummy_data():
+@router.get("/", response_description="Data inserted")
+async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     user_admin = User(
         email="user_admin@test.be",
         name="admin",
@@ -183,111 +176,127 @@ async def add_dummy_data():
     admins = [generate_user(role=UserRole.ADMIN) for _ in range(2)]
     coaches = [generate_user() for _ in range(5)]
 
-    partner = Partner(
-        name="UGent",
-        about="De C in UGent staat voor communicatie")
-
     edition = Edition(
         name="2019 Summer Fest",
         year=2019,
-        user_ids=[coach.id for coach in coaches])
+        coaches=coaches
+    )
+
+    skills = [Skill(name=skill) for skill in
+              ["Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
+               "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
+               "Photographer"]]
 
     project = Project(
         name="Student Volunteer Project",
-        goals=["Free", "Real", "Estate"],
+        goals="Free\nReal\nEstate",
         description="Free real estate",
-        partner=partner,
-        users=[coaches[i].id for i in range(2)],
-        required_skills=[RequiredSkills(skill=skill.id, number=randrange(2, 5))
-                         for skill in skills],
+        partner_name="UGent",
+        partner_description="De C in UGent staat voor communicatie",
+        coaches=coaches[:2],
         edition=edition.year)
+
+    project_skills = [ProjectRequiredSkill(
+        number=randrange(2, 5),
+        project=project,
+        skill=skill)
+        for skill in skills]
 
     project2 = Project(
         name="Cyberfest",
-        goals=["Goal 1", "Goal 2"],
+        goals="Goal 1\nGoal 2",
         description="Hackers & Cyborgs",
-        partner=partner,
-        users=[coaches[i].id for i in range(2, 5)],
-        required_skills=[RequiredSkills(skill=skill.id, number=randrange(1, 8))
-                         for skill in sample(skills, k=randrange(3, len(skills)))],
+        partner_name="HoGent",
+        partner_description="Like UGent but worse",
+        coaches=coaches[2:],
         edition=edition.year)
+
+    project_skills += [ProjectRequiredSkill(
+        number=randrange(1, 8),
+        project=project2,
+        skill=skill)
+        for skill in sample(skills, k=randrange(3, len(skills)))]
 
     # generate students without suggestions
     students = [generate_student(edition) for _ in range(3)]
     suggestions = []
     participations = []
-    for student in students:
-        suggestions += generate_suggestions(student, project)
 
     # generate students with conflicts in suggestions
     for s in SuggestionOption:
         for i in range(2):
             students.append(generate_student(edition))
-            suggestions += generate_suggestions(students[-1], project, 5, s, choice(admins))
-            suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
-            suggestions += generate_suggestions(students[-1], project2, 5, s, choice(admins))
+            suggestions += generate_suggestions(students[-1], skills, project, 5, s, choice(admins))
+            suggestions += generate_suggestions(students[-1], skills, project2, 5, s, choice(admins))
+            suggestions += generate_suggestions(students[-1], skills, project2, 5, s, choice(admins))
 
     # generate students that participate in a project
     for required_skill in project.required_skills:
         for _ in range(randrange(required_skill.number)):
             students.append(generate_student(edition))
-            participations.append(Participation(student=students[-1].id, project=project.id,
+            participations.append(Participation(student=students[-1], project=project,
                                                 skill=required_skill.skill))
 
+    # generate QuestionAnswers for each student
     question_answers = []
+    for student in students:
+        generated_question_answers = generate_question_answers(student)
+        question_answers += generated_question_answers
+
+    question_tags = [QuestionTag(question=question_name, edition=edition.year, tag="name")]
+    # save models to database
+    await update(edition, session)
+
+    await update(user_admin, session)
+    for user in users:
+        await update(user, session)
+    for admin in admins:
+        await update(admin, session)
+
+    await update(project, session)
+    await update(project2, session)
+    for skill in project_skills:
+        await update(skill, session)
 
     for student in students:
-        generated_question_answers = generate_question_answers()
-        question_answers += generated_question_answers
-        student.question_answers = [qa.id for qa in generated_question_answers]
-
-    # save models to database
-    await db.engine.save(user_admin)
-    for user in users:
-        await db.engine.save(user)
-    for admin in admins:
-        await db.engine.save(admin)
-    for coach in coaches:
-        await db.engine.save(coach)
+        await update(student, session)
 
     for question in questions_yes_no:
-        await db.engine.save(question)
+        await update(question, session)
     for answers in answers_yes_no:
         for answer in answers:
-            await db.engine.save(answer)
+            await update(answer, session)
     for question in questions_text:
-        await db.engine.save(question)
+        await update(question, session)
     for answers in answers_text:
         for answer in answers:
-            await db.engine.save(answer)
+            await update(answer, session)
     for question in questions_multiple_choice:
-        await db.engine.save(question)
+        await update(question, session)
     for answers in answers_multiple_choice:
         for answer in answers:
-            await db.engine.save(answer)
+            await update(answer, session)
     for question in questions_multiple_choice2:
-        await db.engine.save(question)
+        await update(question, session)
     for answers in answers_multiple_choice2:
         for answer in answers:
-            await db.engine.save(answer)
+            await update(answer, session)
+
+    await update(question_name, session)
 
     for question_answer in question_answers:
-        await db.engine.save(question_answer)
+        await update(question_answer, session)
+
+    for question_tag in question_tags:
+        await update(question_tag, session)
 
     for skill in skills:
-        await db.engine.save(skill)
-
-    await db.engine.save(edition)
-    await db.engine.save(project)
-    await db.engine.save(project2)
-
-    for student in students:
-        await db.engine.save(student)
+        await update(skill, session)
 
     for suggestion in suggestions:
-        await db.engine.save(suggestion)
+        await update(suggestion, session)
 
     for participation in participations:
-        await db.engine.save(participation)
+        await update(participation, session)
 
     return response(None, "Dummy data inserted")

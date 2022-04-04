@@ -7,10 +7,11 @@ services:
       context: ./backend
       dockerfile: TestDockerfile
     environment:
-      MONGO_URL: test-osoc-mongodb
-      MONGO_PORT: 27017
-      MONGO_USER: root
-      MONGO_PASSWORD: justapassword
+      POSTGRES_URL: test-osoc-postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: justapassword
+      POSTGRES_DATABASE: OSOC
       REDIS_URL: test-osoc-redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: justapassword
@@ -23,12 +24,13 @@ services:
       INVITE_EXPIRE: 4320 #in minutes
       PASSWORDRESET_EXPIRE: 30 # in minutes
 
-  test-osoc-mongodb:
-    image: mongo:latest
-    container_name: "test-osoc-mongodb"
+
+  test-osoc-postgres:
+    image: postgres:latest
+    restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: justapassword
+      - POSTGRES_PASSWORD=justapassword
+      - POSTGRES_DB=OSOC
 
   test-osoc-redis:
     image: redis:latest
