@@ -5,13 +5,12 @@ from typing import Set, Dict, Any, Tuple
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
-
 from app.api import app
 from app.database import db
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
-from app.models.project import Project, Partner
+from app.models.project import Project
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.skill import Skill
@@ -19,6 +18,8 @@ from app.models.student import Student
 from app.models.suggestion import Suggestion
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
+from asgi_lifespan import LifespanManager
+from httpx import AsyncClient, Response
 
 
 class Request(Enum):

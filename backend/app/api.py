@@ -9,11 +9,9 @@ from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app.config import config
-from app.database import connect_db, disconnect_db
+from app.database import init_db
 from app.exceptions.base_exception import BaseException
-from app.routers import (answers, auth, ddd, editions, participation,
-                         projects, question_answers, questions, skills,
-                         students, suggestions, user_invites, users)
+from app.routers import auth, ddd, students, users
 
 app = FastAPI(root_path=config.api_path)
 
@@ -33,27 +31,27 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
-    connect_db()
+    await init_db()
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    disconnect_db()
+# @app.on_event("shutdown")
+# async def shutdown():
+#     disconnect_db()
 
 
 app.include_router(ddd.router)
-app.include_router(answers.router)
+# app.include_router(answers.router)
 app.include_router(auth.router)
-app.include_router(editions.router)
-app.include_router(participation.router)
-app.include_router(projects.router)
-app.include_router(question_answers.router)
-app.include_router(questions.router)
-app.include_router(skills.router)
+# app.include_router(editions.router)
+# app.include_router(participation.router)
+# app.include_router(projects.router)
+# app.include_router(question_answers.router)
+# app.include_router(questions.router)
+# app.include_router(skills.router)
 app.include_router(students.router)
-app.include_router(suggestions.router)
+# app.include_router(suggestions.router)
 # app.include_router(tally.router)
-app.include_router(user_invites.router)
+# app.include_router(user_invites.router)
 app.include_router(users.router)
 
 

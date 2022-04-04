@@ -12,10 +12,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      MONGO_URL: mongodb_container
-      MONGO_PORT: 27017
-      MONGO_USER: root
-      MONGO_PASSWORD: justapassword
+      POSTGRES_URL: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: justapassword
+      POSTGRES_DATABASE: OSOC
       REDIS_URL: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: justapassword
@@ -29,20 +30,23 @@ services:
       PASSWORDRESET_EXPIRE: 30 # in minutes
       # Frontend URL
       FRONTEND_URL: https://localhost:3000
+    
+    depends_on:
+      - postgres
+      - redis
 
-  mongodb_container:
-    image: mongo:latest
-    # container_name: "osoc-mongodb"
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: justapassword
+      - POSTGRES_PASSWORD=justapassword
+      - POSTGRES_DB=OSOC
     volumes:
-      - ./data/mongo:/data/db
+      - ./data/postgres:/var/lib/postgresql/data/
 
   redis:
     image: redis:latest
-    # container_name: osoc-redis
-    restart: always
+    restart: unless-stopped
     command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
     volumes:
       - ./data/redis:/data

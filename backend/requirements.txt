@@ -13,3 +13,6 @@ requests
 asgi_lifespan
 httpx
 pytest-asyncio
+sqlalchemy
+asyncpg
+sqlmodel
