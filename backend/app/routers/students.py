@@ -13,6 +13,8 @@ from sqlmodel import select
 
 router = APIRouter(prefix="/students")
 
+router.dependencies.append(RoleChecker(UserRole.COACH))
+
 
 def get_sorting(sortstr: str):
     sorting = [t.split("+") if "+" in t else [t, "asc"] for t in sortstr.split(",")]
