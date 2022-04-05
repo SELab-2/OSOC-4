@@ -27,64 +27,66 @@ export default function StudentListelement(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
-    // only insert data if the student in still undefined
-    getJson(props.student).then(res => {
-      setStudent(res);
-      console.log(res);
-      /*setStudent(props.student)
-      setName(props.student.name)
-      let localStudent = props.student;
+    if (!student) {
+      // only insert data if the student in still undefined
+      getJson(props.student).then(res => {
+        setStudent(res);
+        console.log(res);
+        /*setStudent(props.student)
+        setName(props.student.name)
+        let localStudent = props.student;
 
-      // check if there are no suggestions yet
-      if (suggestions.length === 0) {
-        getJson(getSuggestionsPath()).then(res => {
-          let possibleSuggestions = res.data;
-          // only get the suggestions of the current student
-          let localSuggestions = possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id);
-          setSuggestions(localSuggestions);
+        // check if there are no suggestions yet
+        if (suggestions.length === 0) {
+          getJson(getSuggestionsPath()).then(res => {
+            let possibleSuggestions = res.data;
+            // only get the suggestions of the current student
+            let localSuggestions = possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id);
+            setSuggestions(localSuggestions);
 
-          // filter the suggestions on yes, maybe or no
-          setSuggestionsYes(localSuggestions.filter(
-            suggestion => suggestion.decision === 2 && (! suggestion.definitive)).length);
-          setSuggestionsMaybe(localSuggestions.filter(
-            suggestion => suggestion.decision === 1 && (! suggestion.definitive)).length);
-          setSuggestionsNo(localSuggestions.filter(
-            suggestion => suggestion.decision === 0 && (! suggestion.definitive)).length);
+            // filter the suggestions on yes, maybe or no
+            setSuggestionsYes(localSuggestions.filter(
+              suggestion => suggestion.decision === 2 && (! suggestion.definitive)).length);
+            setSuggestionsMaybe(localSuggestions.filter(
+              suggestion => suggestion.decision === 1 && (! suggestion.definitive)).length);
+            setSuggestionsNo(localSuggestions.filter(
+              suggestion => suggestion.decision === 0 && (! suggestion.definitive)).length);
 
-          // get the decision from the suggestions if there is one
-          let newDecision = localSuggestions.filter(suggestion => suggestion.definitive);
-          if (newDecision.length) {
-            setDecision(newDecision[0].decision);
-          }
-        })
-      }
+            // get the decision from the suggestions if there is one
+            let newDecision = localSuggestions.filter(suggestion => suggestion.definitive);
+            if (newDecision.length) {
+              setDecision(newDecision[0].decision);
+            }
+          })
+        }
 
-      // check if there are no skills yet
-      if (skills.length === 0) {
-        getJson(getSkillsPath()).then(res => {
-          let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
-          setSkills(skillObjs.map(skill => skill.name));
-        })
-      }
+        // check if there are no skills yet
+        if (skills.length === 0) {
+          getJson(getSkillsPath()).then(res => {
+            let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
+            setSkills(skillObjs.map(skill => skill.name));
+          })
+        }
 
 
-      if (studies === undefined) {
-        getJson(getQuestionAnswersPath()).then(res => {
-          let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
+        if (studies === undefined) {
+          getJson(getQuestionAnswersPath()).then(res => {
+            let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
 
-          setStudies(questionAnswers.find((questionAnswer => questionAnswer.question === getStudyQuestionId())));
+            setStudies(questionAnswers.find((questionAnswer => questionAnswer.question === getStudyQuestionId())));
 
-          setDegree(questionAnswers.find((questionAnswer => questionAnswer.question === getDegreeQuestionId())));
+            setDegree(questionAnswers.find((questionAnswer => questionAnswer.question === getDegreeQuestionId())));
 
-          setFirstLanguage(questionAnswers.find((questionAnswer =>
-            questionAnswer.question === getFirstLanguageQuestionId())));
+            setFirstLanguage(questionAnswers.find((questionAnswer =>
+              questionAnswer.question === getFirstLanguageQuestionId())));
 
-          setLevelOfEnglish(questionAnswers.find((questionAnswer =>
-            questionAnswer.question === getLevelOfEnglishQuestionId())));
+            setLevelOfEnglish(questionAnswers.find((questionAnswer =>
+              questionAnswer.question === getLevelOfEnglishQuestionId())));
 
-        })
-      }*/
-    })
+          })
+        }*/
+      })
+    }
   });
 
   // get the decision for the student (yes, maybe, no or undecided)
@@ -99,7 +101,7 @@ export default function StudentListelement(props) {
   // get a list of the skills of the student in HTML format
   function getSkills() {
     return skills.map((skill,index) =>
-      <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
+      <li className="skill" style={{display: "inline-block"}} key={index + skill}>{skill.toUpperCase()}</li>
     )
   }
 
