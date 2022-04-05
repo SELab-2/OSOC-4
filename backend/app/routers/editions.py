@@ -1,6 +1,5 @@
 import datetime
 import json
-from typing import List, Optional
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
@@ -19,7 +18,7 @@ from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
-from app.utils.response import list_modeltype_response, response
+from app.utils.response import response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
