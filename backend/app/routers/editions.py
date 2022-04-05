@@ -1,4 +1,5 @@
 import datetime
+import json
 from typing import List, Optional
 
 from app.config import config
@@ -16,7 +17,7 @@ from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
-from app.models.user import UserRole
+from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from app.utils.response import list_modeltype_response, response
 from fastapi import APIRouter, Body, Depends
@@ -40,8 +41,8 @@ async def get_editions(session: AsyncSession = Depends(get_session)):
     :return: list of editions
     :rtype: dict
     """
-    results = await read_all_where(Edition, session)
-    return list_modeltype_response([EditionOutSimple.parse_raw(r.json()) for r in results], Edition)
+    results = await read_all_where(Edition, session=session)
+    return [r.uri for r in [EditionOutSimple.parse_raw(r.json()) for r in results]]
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
@@ -60,20 +61,27 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
         raise AlreadyEditionWithYearException(edition.year)
 
     new_edition = await update(Edition.parse_obj(edition), session=session)
-    return response(new_edition, "Edition added successfully.")
+    return EditionOutSimple.parse_raw(new_edition.json()).uri
 
 
-@router.get("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Editions retrieved")
-async def get_edition(year: int, session: AsyncSession = Depends(get_session)):
+@router.get("/{year}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Editions retrieved")
+async def get_edition(year: int, edition: EditionChecker() = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition get the Edition instance with given year
 
     :return: list of editions
     :rtype: dict
     """
-    edition = await read_where(Edition, Edition.year == year, session=session)
-    if not edition:
-        raise EditionNotFound()
-    return response(EditionOutExtended.parse_raw(edition.json()), "Edition successfully retrieved")
+
+    user_ids = [u.id for u in edition.coaches]
+
+    # get the admins
+    res = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
+    user_ids += [admin.id for admin in res]
+
+    edition_json = json.loads(edition.json())
+    edition_json["user_ids"] = user_ids
+
+    return EditionOutExtended.parse_raw(json.dumps(edition_json))
 
 
 @router.patch("/{year}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="updated edition")
@@ -94,10 +102,10 @@ async def update_edition(year: int, edition: Edition = Body(...), session: Async
     for key, value in new_edition_data.items():
         setattr(result, key, value)
     await update(result, session)
-    return response(None, "Edition updated succesfully")
+    return EditionOutSimple.parse_raw(result.json()).uri
 
 
-@router.get("/{year}/students", response_description="Students retrieved")
+@router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
 async def get_edition_students(year: int, orderby: str = "", search: str = "", session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
@@ -106,7 +114,6 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     """
 
     student_query = select(Student).where(Student.edition_year == year).subquery()
-    print("test")
     if search:
         student_query = select(Student).where(Student.edition_year == year).join(QuestionAnswer).join(Answer)
         student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
@@ -131,7 +138,6 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     return [config.api_url + "students/" + str(id) for id in students]
 
 
-
 @router.get("/{year}/projects", response_description="Projects retrieved")
 async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
     """get_projects get all the Project instances from the database
@@ -140,7 +146,6 @@ async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = De
     :rtype: dict
     """
     if role == UserRole.ADMIN:
-        print(year)
         results = await read_all_where(Project, Project.edition == year, session=session)
     else:
         Authorize.jwt_required()
@@ -148,7 +153,7 @@ async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = De
         stat = select(Project).select_from(ProjectCoach).where(ProjectCoach.coach_id == int(current_user_id)).join(Project).where(Project.edition == int(year))
         res = await session.execute(stat)
         results = [r for (r,) in res.all()]
-    return list_modeltype_response([ProjectOutSimple.parse_raw(r.json()) for r in results], Project)
+    return [ProjectOutSimple.parse_raw(r.json()).id for r in results]
 
 
 @router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Students retrieved")
