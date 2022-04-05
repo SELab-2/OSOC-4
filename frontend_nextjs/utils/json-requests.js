@@ -39,7 +39,7 @@ export async function catchError(e) {
         params.status = e.status
     }
     // Add status text in case it exists
-    if (e.response.statusText !== undefined) {
+    if (e.response && e.response.statusText !== undefined) {
         params.status = `${params.status} | ${e.response.statusText}`
     }
 
