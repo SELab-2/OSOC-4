@@ -13,7 +13,7 @@ from sqlmodel import select
 
 router = APIRouter(prefix="/students")
 
-router.dependencies.append(RoleChecker(UserRole.COACH))
+router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
 def get_sorting(sortstr: str):
