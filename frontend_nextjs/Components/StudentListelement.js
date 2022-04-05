@@ -27,7 +27,7 @@ export default function StudentListelement(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
-    if (!student) {
+    if (!Object.keys(student).length) {
       // only insert data if the student in still undefined
       getJson(props.student).then(res => {
         setStudent(res);
