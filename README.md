@@ -68,11 +68,12 @@ backend-api: https://sel2-4.ugent.be/{branchname}/api
 While developing you can use your own environment variables by using a .env file in the backend directory of the application.
 
 ```
-# Mongo
-MONGO_URL=192.168.0.102
-MONGO_PORT=27017
-MONGO_USER=root
-MONGO_PASSWORD=justapassword
+# Postgres
+POSTGRES_URL=192.168.0.102
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=justapassword
+POSTGRES_DATABASE=OSOC
 
 # Redis
 REDIS_URL=192.168.0.102

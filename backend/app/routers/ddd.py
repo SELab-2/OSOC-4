@@ -5,7 +5,7 @@ from app.database import get_session
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
-from app.models.project import Project, ProjectGoal, ProjectRequiredSkill
+from app.models.project import Project, ProjectRequiredSkill
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
@@ -106,10 +106,10 @@ for qa in qa_multiple_choice2:
 def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=False):
     first_name = choice(first_names)
     last_name = choice(last_names)
-    email = choice(emails)
-    return User(email=f"{first_name}.{last_name}@{email}".lower(),
+    email = "user_coach@test.be"
+    return User(email=email,
                 name=f"{first_name} {last_name}",
-                password="a",
+                password=get_password_hash("justapassword"),
                 role=role,
                 active=active,
                 approved=approved,
@@ -189,7 +189,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     project = Project(
         name="Student Volunteer Project",
-        goals=[ProjectGoal(goal=goal) for goal in ["Free", "Real", "Estate"]],
+        goals="Free\nReal\nEstate",
         description="Free real estate",
         partner_name="UGent",
         partner_description="De C in UGent staat voor communicatie",
@@ -204,7 +204,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     project2 = Project(
         name="Cyberfest",
-        goals=[ProjectGoal(goal=goal) for goal in ["Goal 1", "Goal 2"]],
+        goals="Goal 1\nGoal 2",
         description="Hackers & Cyborgs",
         partner_name="HoGent",
         partner_description="Like UGent but worse",
