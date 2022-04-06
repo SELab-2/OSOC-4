@@ -1,8 +1,8 @@
-import {Navbar, Col, Row} from 'react-bootstrap';
+import {Navbar, Row, Col, Nav, Button} from 'react-bootstrap';
 import { signOut } from 'next-auth/react';
 import Image from 'next/image'
 import osocEmblem from '../public/assets/osoc-emblem.svg';
-import {router} from "next/client";
+import Link from 'next/link'
 
 export default function NavHeader(props) {
 
@@ -11,34 +11,34 @@ export default function NavHeader(props) {
         signOut()
     }
 
-    function loadpage(path) {
-        router.push(path)
-    }
-
     return (
-        <Row>
-            <Col>
-                <Navbar.Brand href="/">
-                    <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="65px" height="50px" objectFit={'contain'} />
-                </Navbar.Brand>
-            </Col>
-            <Col />
+      <Row className="navheader">
+        <Col md="auto">
+          <Navbar.Brand href="/" className="logo_header">
+            <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="95px" height="50px" objectFit={'contain'} />
+          </Navbar.Brand>
+        </Col>
+        <Col />
 
-            <Col md="auto" className="navbar-item" onClick={() => loadpage('/select-students')}>
-                <p>Select Students</p>
-            </Col>
-            <Col md="auto" className="navbar-item" onClick={() => loadpage('/email-students')}>
-                <p>Email students</p>
-            </Col>
-            <Col md="auto" className="navbar-item" onClick={() => loadpage('/projects')}>
-                <p>Projects</p>
-            </Col>
-            <Col md="auto" className="navbar-item" onClick={() => loadpage('/settings')}>
-                <p>Settings</p>
-            </Col>
-            <Col md="auto" className="navbar-item" onClick={logoutHandler}>
-                <p>Logout</p>
-            </Col>
-        </Row>
+        <Col md="auto" className="navbar-item">
+          <Link href="/select-students" className="fill_parent">Select students</Link>
+        </Col>
+
+        <Col md="auto" className="navbar-item">
+          <Link href="/email-students" className="fill_parent">Email students</Link>
+        </Col>
+
+        <Col md="auto" className="navbar-item">
+          <Link href="/projects" className="fill_parent">Projects</Link>
+        </Col>
+
+        <Col md="auto" className="navbar-item">
+          <Link href="/settings" className="fill_parent">Settings</Link>
+        </Col>
+
+        <Col md="auto" className="navbar-item" onClick={logoutHandler}>
+          Logout
+        </Col>
+      </Row>
     )
 }

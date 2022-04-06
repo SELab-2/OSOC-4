@@ -21,14 +21,12 @@ export default function RouteGuard(props) {
             router.push('/')
         } else {
             return (
-              <Container>
-                <Row>
-                  <NavHeader key="Navbar" className="navheader" />
-                </Row>
-                <Row>
-                  {props.children}
-                </Row>
-              </Container>
+                <Container>
+                    <NavHeader key="Navbar" className="navheader" />
+                    <Row>
+                        {props.children}
+                    </Row>
+                </Container>
             )
         }
     } else if (!props.auth && !isUser) {
