@@ -1,6 +1,4 @@
-import {Navbar, Nav, NavDropdown, Container, Col, Button} from 'react-bootstrap';
-import { logout } from "../utils/json-requests";
-import Link from 'next/link'
+import {Navbar, Container, Col} from 'react-bootstrap';
 import { signOut } from 'next-auth/react';
 import Image from 'next/image'
 import osocEmblem from '../public/assets/osoc-emblem.svg';
@@ -13,6 +11,10 @@ export default function NavHeader(props) {
         signOut()
     }
 
+    function loadpage(path) {
+        router.push(path)
+    }
+
     return (
         <Navbar collapseOnSelect className="navheader">
             <Container>
@@ -23,16 +25,16 @@ export default function NavHeader(props) {
                 </Col>
                 <Col />
 
-                <Col md="auto" className="navbar-item">
+                <Col md="auto" className="navbar-item" onClick={() => loadpage('/select-students')}>
                     <p>Select Students</p>
                 </Col>
-                <Col md="auto" className="navbar-item">
-                    <p>Email Users</p>
+                <Col md="auto" className="navbar-item" onClick={() => loadpage('/email-students')}>
+                    <p>Email students</p>
                 </Col>
-                <Col md="auto" className="navbar-item">
+                <Col md="auto" className="navbar-item" onClick={() => loadpage('/projects')}>
                     <p>Projects</p>
                 </Col>
-                <Col md="auto" className="navbar-item">
+                <Col md="auto" className="navbar-item" onClick={() => loadpage('/settings')}>
                     <p>Settings</p>
                 </Col>
                 <Col md="auto" className="navbar-item" onClick={logoutHandler}>
