@@ -1,11 +1,13 @@
-import '../styles/globals.css'
 import 'bootstrap/dist/css/bootstrap.css'
+import '../styles/globals.css'
 import "../styles/colors.css"
 import "../styles/login.css"
 import "../styles/settings.css"
 import "../styles/settingcards.css"
 import "../styles/manageusers.css"
 import "../styles/studentListelement.css"
+import "../styles/select-students.css"
+import "../styles/filters.css"
 
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';

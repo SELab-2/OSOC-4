@@ -3,81 +3,93 @@ import {getJson} from "../utils/json-requests";
 
 import {
   getDegreeQuestionId, getFirstLanguageQuestionId, getLevelOfEnglishQuestionId,
-  getQuestionAnswersPath, getRolesPath,
+  getQuestionAnswersPath, getSkillsPath,
   getStudyQuestionId,
   getSuggestionsPath
 } from "../routes";
+import {Col, Container, Row} from "react-bootstrap";
 
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [student, setStudent] = useState(undefined);
-  const [name, setName] = useState("");
+  const [student, setStudent] = useState({});
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionsYes, setSuggestionsYes] = useState(0);
   const [suggestionsMaybe, setSuggestionsMaybe] = useState(0);
   const [suggestionsNo, setSuggestionsNo] = useState(0);
-  const [decision,setDecision] = useState(-1)
+  const [decision,setDecision] = useState(-1);
   const [skills, setSkills] = useState([]);
   const [studies, setStudies] = useState(undefined);
   const [degree, setDegree] = useState(undefined);
   const [fistLanguage, setFirstLanguage] = useState(undefined);
   const [levelOfEnglish, setLevelOfEnglish] = useState(undefined);
+  const [practicalProblems, setPracticalProblems] = useState(0);
 
   // This function inserts the data in the variables
   useEffect(() => {
-    if (!student) {
-      setStudent(props.student)
-      setName(props.student.name)
-      let localStudent = props.student;
+    if (!Object.keys(student).length) {
+      // only insert data if the student in still undefined
+      getJson(props.student).then(res => {
+        setStudent(res);
+        console.log(res);
+        /*setStudent(props.student)
+        setName(props.student.name)
+        let localStudent = props.student;
 
-      if (suggestions === []) {
-        getJson(getSuggestionsPath()).then(res => {
-          let possibleSuggestions = res.data;
-          setSuggestions(possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id));
+        // check if there are no suggestions yet
+        if (suggestions.length === 0) {
+          getJson(getSuggestionsPath()).then(res => {
+            let possibleSuggestions = res.data;
+            // only get the suggestions of the current student
+            let localSuggestions = possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id);
+            setSuggestions(localSuggestions);
 
-          setSuggestionsYes(suggestions.filter(
-            suggestion => suggestion.decision === 2 && suggestion.definitive === false).length);
-          setSuggestionsMaybe(suggestions.filter(
-            suggestion => suggestion.decision === 1 && suggestion.definitive === false).length);
-          setSuggestionsNo(suggestions.filter(
-            suggestion => suggestion.decision === 0 && suggestion.definitive === false).length);
+            // filter the suggestions on yes, maybe or no
+            setSuggestionsYes(localSuggestions.filter(
+              suggestion => suggestion.decision === 2 && (! suggestion.definitive)).length);
+            setSuggestionsMaybe(localSuggestions.filter(
+              suggestion => suggestion.decision === 1 && (! suggestion.definitive)).length);
+            setSuggestionsNo(localSuggestions.filter(
+              suggestion => suggestion.decision === 0 && (! suggestion.definitive)).length);
 
-          let newDecision = suggestions.filter(suggestion => suggestion.definitive === true);
-          if (newDecision !== []) {
-            setDecision(newDecision[0]);
-          }
-        })
-      }
+            // get the decision from the suggestions if there is one
+            let newDecision = localSuggestions.filter(suggestion => suggestion.definitive);
+            if (newDecision.length) {
+              setDecision(newDecision[0].decision);
+            }
+          })
+        }
 
-      if (skills.length === 0) {
-        getJson(getRolesPath()).then(res => {
-          let skillObjs = res.data.filter(skill => {
-            console.log(skill.id);
-            localStudent.skills.includes(skill.id)});
-          setSkills(skillObjs.map(skill => skill.name));
-        })
-      }
+        // check if there are no skills yet
+        if (skills.length === 0) {
+          getJson(getSkillsPath()).then(res => {
+            let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
+            setSkills(skillObjs.map(skill => skill.name));
+          })
+        }
 
-      if (studies === undefined) {
-        getJson(getQuestionAnswersPath()).then(res => {
-          let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
 
-          setStudies(questionAnswers.find((questionAnswer => questionAnswer.question === getStudyQuestionId())));
+        if (studies === undefined) {
+          getJson(getQuestionAnswersPath()).then(res => {
+            let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
 
-          setDegree(questionAnswers.find((questionAnswer => questionAnswer.question === getDegreeQuestionId())));
+            setStudies(questionAnswers.find((questionAnswer => questionAnswer.question === getStudyQuestionId())));
 
-          setFirstLanguage(questionAnswers.find((questionAnswer =>
-            questionAnswer.question === getFirstLanguageQuestionId())));
+            setDegree(questionAnswers.find((questionAnswer => questionAnswer.question === getDegreeQuestionId())));
 
-          setLevelOfEnglish(questionAnswers.find((questionAnswer =>
-            questionAnswer.question === getLevelOfEnglishQuestionId())));
+            setFirstLanguage(questionAnswers.find((questionAnswer =>
+              questionAnswer.question === getFirstLanguageQuestionId())));
 
-        })
-      }
+            setLevelOfEnglish(questionAnswers.find((questionAnswer =>
+              questionAnswer.question === getLevelOfEnglishQuestionId())));
+
+          })
+        }*/
+      })
     }
   });
 
+  // get the decision for the student (yes, maybe, no or undecided)
   function getDecision() {
     if (decision === -1) {
       return "Undecided";
@@ -86,12 +98,14 @@ export default function StudentListelement(props) {
     return possibleDecisions[decision];
   }
 
-  function getRoles() {
-    return skills.map(skill =>
-      <li className="role" style={{float: "right", bottom: 0}}>{skill}</li>
+  // get a list of the skills of the student in HTML format
+  function getSkills() {
+    return skills.map((skill,index) =>
+      <li className="skill" style={{display: "inline-block"}} key={index + skill}>{skill.toUpperCase()}</li>
     )
   }
 
+  // get the titles of the basic questions shown in the list element
   function getInfoTitles() {
     let questions = ["Studies:", "Type of degree:", "First language:", "Level of English:"];
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
@@ -101,6 +115,7 @@ export default function StudentListelement(props) {
     )
   }
 
+  // get the answers on the basic questions in HTML format
   function getInfoAnswers() {
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
     answers = answers.filter((answer) => answer !== undefined);
@@ -109,39 +124,55 @@ export default function StudentListelement(props) {
     )
   }
 
+  // get the background color of the student, based on the decision
+  function getBackground() {
+    if (decision === -1) {
+      return "white";
+    }
+
+    let colors = ["var(--no_red_20)", "var(--maybe_yellow_20)", "var(--yes_green_20)"];
+    return colors[decision];
+  }
+
+  // get the background color of practical problems
+  function getProblemsColor() {
+    if (practicalProblems === 0) {
+      return "var(--yes_green_65)"
+    }
+    return "var(--no_red_65)"
+  }
+
   // The html representation of a list-element
-  return(
-    <div id="list-element" className="list-element" style={{width: "800px", position: "relative"}}>
+  return (
+    <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}>
+      <Row className="upper-layer">
+        <Col id="name" className="name" md="auto">{student["name"]}</Col>
+        <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
+          No practical problems
+        </Col>
+        <Col/>
+        <Col className="suggestions" md="auto">Suggestions:</Col>
+        <Col className="suggestionsYes" md="auto">{suggestionsYes}</Col>
+        <Col className="suggestionsMaybe" md="auto">{suggestionsMaybe}</Col>
+        <Col className="suggestionsNo" md="auto">{suggestionsNo}</Col>
+      </Row>
 
-      <div id="upper-layer" style={{height: "30px"}}>
-        <div id="name" style={{float: "left"}} className="name">{name}</div>
-        <div id="practical-problems" style={{float: "left"}} className="practical-problems">2 practical problems</div>
-        <div id="suggestions" style={{float: "right"}} className="suggestions">
-          Suggestions:
-          <div style={{float: "right"}} className="suggestionsYes">{suggestionsYes}</div>
-          <div style={{float: "right"}} className="suggestionsMaybe">{suggestionsMaybe}</div>
-          <div style={{float: "right"}} className="suggestionsNo">{suggestionsNo}</div>
-        </div>
-      </div>
-
-      <div id="info-titles" style={{float: "left"}}>
+      <Row id="info" className="info">
+        <Col id="info-titles" className="info-titles" md="auto">
           {getInfoTitles()}
           Decision:
-      </div>
+        </Col>
+        <Col id="info-answers" md="auto" className="info-answers">
+          {getInfoAnswers()}
+          {getDecision()}
+        </Col>
 
-      <div id="info-answers">
-        {getInfoAnswers()}
-        {getDecision()}
-      </div>
-
-      <div id="roles" style={{float: "right"}}>
-        <ul>
-          {getRoles()}
-        </ul>
-      </div>
-
-      <br/><br/>
-
-    </div>
+        <Col id="skills" align="right" className="skills">
+          <ul>
+            {getSkills()}
+          </ul>
+        </Col>
+      </Row>
+    </Container>
   )
 }
