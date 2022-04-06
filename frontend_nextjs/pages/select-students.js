@@ -16,7 +16,7 @@ export default function SelectStudents(props) {
 
     // This function inserts the data in the variables
     useEffect( () => {
-        if (!students) {
+        if (!students.length) {
             getJson(getStudentsPath()).then(res => {
                 setStudents(res);
             })
