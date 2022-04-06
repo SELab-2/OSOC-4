@@ -24,11 +24,9 @@ export default function SelectStudents(props) {
     })
 
     return(
-      <Row>
-          <Col md="auto" className="filters">
-              <StudentsFilters/>
-          </Col>
-          <StudentList students={students} />
+      <Row className="fill_height">
+        <StudentsFilters/>
+        <StudentList students={students} />
       </Row>
     )
     

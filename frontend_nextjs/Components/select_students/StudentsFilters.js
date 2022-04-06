@@ -74,7 +74,7 @@ export default function StudentsFilters(props) {
 
   // The HTML representation of the filters in the 'Select students' tab
   return(
-    <Container>
+    <Col md="auto" className="filters fill_height scroll-overflow">
       <Row className="title-row-filters">
         <Col>
           <h2 className="filters-title">Filters</h2>
@@ -115,6 +115,6 @@ export default function StudentsFilters(props) {
       <StudentsFilter filter_id="no-checkbox" filter_text="No" />
       <StudentsFilter filter_id="undecided-checkbox" filter_text="Undecided" />
 
-    </Container>
+    </Col>
   )
 }

@@ -1,17 +1,13 @@
-.filters {
-    height: 700px;
-    margin: 20px;
-    padding-right: 40px;
-    padding-left: 20px;
-    border-right-width: 1px;
-    border-right-style: solid;
-    border-right-color: lightgray;
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-}
-
 .students_list {
     margin: 20px;
     padding: 0;
+}
+
+.fill_height {
+    height: 100%;
+    max-height: 100%;
+}
+
+.scroll-overflow {
+    overflow-y: scroll;
 }

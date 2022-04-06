@@ -32,3 +32,13 @@
     -webkit-text-fill-color: blue;
     text-underline-color: blue;
 }
+
+.filters {
+    height: 100%;
+    margin: 20px;
+    padding-right: 40px;
+    padding-left: 30px;
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-right-color: lightgray;
+}
