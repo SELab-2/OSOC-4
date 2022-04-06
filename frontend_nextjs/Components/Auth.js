@@ -21,11 +21,9 @@ export default function RouteGuard(props) {
             router.push('/')
         } else {
             return (
-                <Container>
+                <Container className="fullscreen_container">
                     <NavHeader key="Navbar" className="navheader" />
-                    <Row>
-                        {props.children}
-                    </Row>
+                    {props.children}
                 </Container>
             )
         }

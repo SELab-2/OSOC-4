@@ -13,9 +13,9 @@ export default function NavHeader(props) {
 
     return (
       <Row className="navheader">
-        <Col md="auto">
+        <Col md="auto" height="50%">
           <Navbar.Brand href="/" className="logo_header">
-            <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="95px" height="50px" objectFit={'contain'} />
+            <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="100%" height="50%" objectFit={'contain'} />
           </Navbar.Brand>
         </Col>
         <Col />

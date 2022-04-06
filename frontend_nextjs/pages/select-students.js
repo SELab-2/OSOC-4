@@ -24,15 +24,12 @@ export default function SelectStudents(props) {
     })
 
     return(
-      <Container fluid>
-        <Row>
-            <Col md="auto" className="filters">
-                <StudentsFilters/>
-            </Col>
-            <StudentList students={students} />
-        </Row>
-      </Container>
-
+      <Row>
+          <Col md="auto" className="filters">
+              <StudentsFilters/>
+          </Col>
+          <StudentList students={students} />
+      </Row>
     )
     
 }
