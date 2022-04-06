@@ -7,6 +7,7 @@ import StudentsFilters from "../Components/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
 import TempStudentListelement from "../Components/TempStudentElement";
+import {log} from "../utils/logger";
 
 
 export default function SelectStudents(props) {
@@ -16,8 +17,10 @@ export default function SelectStudents(props) {
 
     // This function inserts the data in the variables
     useEffect( () => {
-        if (!students.length) {
-            getJson(getStudentsPath()).then(res => {
+        if (!students.length && "edition" in localStorage) {
+            log("loading select students")
+            getJson(getStudentsPath(localStorage.getItem("edition"))).then(res => {
+                log(res)
                 setStudents(res);
             })
         }
