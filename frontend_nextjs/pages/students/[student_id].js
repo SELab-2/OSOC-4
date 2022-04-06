@@ -4,6 +4,8 @@ import {router} from "next/client";
 import {getJson} from "../../utils/json-requests";
 import {getStudentPath, getStudentsPath} from "../../routes";
 import StudentList from "../../Components/select_students/StudentList";
+import Scrollbar from "bootstrap/js/src/util/scrollbar";
+import StudentDetails from "../../Components/select_students/StudentDetails";
 
 
 export default function Student_id(props) {
@@ -15,23 +17,27 @@ export default function Student_id(props) {
 
   // This function inserts the data in the variables
   useEffect( () => {
-    getJson(getStudentPath(student_id)).then(res => {
-      console.log("resultaat: " + res)
-      setStudent(res);
-    })
+    if (!Object.keys(student).length) {
+      getJson(getStudentPath(student_id)).then(res => {
+        setStudent(res);
+      })
+    }
 
-
-    getJson(getStudentsPath()).then(res => {
-      setStudents(res);
-    })
-
+    if (! students) {
+      getJson(getStudentsPath()).then(res => {
+        setStudents(res);
+      })
+    }
   })
 
   return(
     <Container fluid>
       <Row>
         <Col md="auto">
-          <StudentList students={students}/>
+          <StudentList students={students} />
+        </Col>
+        <Col>
+          <StudentDetails student={student} />
         </Col>
       </Row>
     </Container>

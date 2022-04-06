@@ -22,3 +22,8 @@ ul {
 .col, .row, .col-md-auto {
   padding: 0;
 }
+
+.container {
+  max-width: 100%;
+  padding: 0;
+}

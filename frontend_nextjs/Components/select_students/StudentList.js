@@ -5,11 +5,11 @@ import {useEffect, useState} from "react";
 export default function StudentList(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [students, setStudents] = useState([])
+  const [students, setStudents] = useState(undefined);
 
   // This function inserts the data in the variables
   useEffect( () => {
-    if (students !== []) {
+    if (! students) {
       setStudents(props.students)
     }
   })
