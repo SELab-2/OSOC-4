@@ -1,6 +1,6 @@
 import {Dropdown} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {change_edition, getJson} from "../../utils/json-requests";
+import {getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
 import {useSession} from "next-auth/react";
 
@@ -15,7 +15,6 @@ export default function EditionDropdownButton() {
             getJson("/editions").then(async res => {
                 log("load all editions")
                 log(res)
-                //TODO sort edition list
                 // TODO fix cleaner way to make sure same edition doesn't get loaded multiple times
                 let temp_list = []
                 for(let e of res){
@@ -41,7 +40,6 @@ export default function EditionDropdownButton() {
         log(item)
         log(item.year)
         localStorage.setItem("edition", item.year)
-        change_edition(item.year)
         await setCurrentVersion([item.id, item.name]);
     }
 
