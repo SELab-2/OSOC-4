@@ -3,7 +3,7 @@
 
 export const getSkillsPath = () => '/roles'
 
-export const getStudentsPath = () => '/students/'
+export const getStudentsPath = (edition) => '/editions/' + edition +'/students'
 
 export const getSuggestionsPath = () => '/suggestions/'
 
