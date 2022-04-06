@@ -107,6 +107,7 @@ export default function StudentsFilters(props) {
   }
 
   // The HTML representation of the filters in the 'Select students' tab
+
   return(
     <Container>
       <Row className="title-row-filters">
