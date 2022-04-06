@@ -6,6 +6,7 @@ from sqlmodel import Field, SQLModel, Relationship
 
 from app.config import config
 
+
 class SuggestionOption(int, Enum):
     NO = 0
     MAYBE = 1
@@ -28,6 +29,7 @@ class Suggestion(SQLModel, table=True):
     suggested_by: "User" = Relationship(back_populates="suggestions")
     project: Optional["Project"] = Relationship(back_populates="suggestions")
     skill: Optional["Skill"] = Relationship(back_populates="suggestions")
+
 
 class SuggestionExtended(BaseModel):
     decision: int

@@ -16,6 +16,7 @@ router = APIRouter(prefix="/students")
 
 router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
+
 @router.get("/", response_description="Students retrieved")
 async def get_students(orderby: str = "name+asc", skills: str = "", alumn: bool = None, search: str = "", session: AsyncSession = Depends(get_session)):
     """get_students get all the Student instances from the database
@@ -43,7 +44,6 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     :return: student with id
     :rtype: StudentOutExtended
     """
-
 
     # student info
     info = {"id": f"{config.api_url}students/{student_id}"}
