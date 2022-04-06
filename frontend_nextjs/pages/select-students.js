@@ -24,7 +24,7 @@ export default function SelectStudents(props) {
     })
 
     return(
-      <Row className="fill_height">
+      <Row className="fill_height fill_width">
         <StudentsFilters/>
         <StudentList students={students} />
       </Row>

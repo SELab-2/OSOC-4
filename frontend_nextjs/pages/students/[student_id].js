@@ -31,17 +31,10 @@ export default function Student_id(props) {
   })
 
   return(
-    <Container fluid>
-      <Row>
-        <Col md="auto">
-          <StudentList students={students} />
-        </Col>
-        <Col>
-          <StudentDetails student={student} />
-        </Col>
-      </Row>
-    </Container>
-
+    <Row className="fill_height">
+      <StudentList students={students} />
+      <StudentDetails student={student} />
+    </Row>
   )
 
 }

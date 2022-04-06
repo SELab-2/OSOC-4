@@ -1,4 +1,4 @@
-import {Navbar, Row, Col, Nav, Button} from 'react-bootstrap';
+import {Navbar, Row, Col, Nav, Button, Container} from 'react-bootstrap';
 import { signOut } from 'next-auth/react';
 import Image from 'next/image'
 import osocEmblem from '../public/assets/osoc-emblem.svg';
@@ -12,33 +12,28 @@ export default function NavHeader(props) {
     }
 
     return (
-      <Row className="navheader">
-        <Col md="auto" height="50%">
-          <Navbar.Brand href="/" className="logo_header">
-            <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="100%" height="50%" objectFit={'contain'} />
+      <Navbar collapseOnSelect expand="lg" bg="white">
+          <Navbar.Brand href="/">
+            <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="65px" height="50px" objectFit={'contain'} />
           </Navbar.Brand>
-        </Col>
-        <Col />
-
-        <Col md="auto" className="navbar-item">
-          <Link href="/select-students" className="fill_parent">Select students</Link>
-        </Col>
-
-        <Col md="auto" className="navbar-item">
-          <Link href="/email-students" className="fill_parent">Email students</Link>
-        </Col>
-
-        <Col md="auto" className="navbar-item">
-          <Link href="/projects" className="fill_parent">Projects</Link>
-        </Col>
-
-        <Col md="auto" className="navbar-item">
-          <Link href="/settings" className="fill_parent">Settings</Link>
-        </Col>
-
-        <Col md="auto" className="navbar-item" onClick={logoutHandler}>
-          Logout
-        </Col>
-      </Row>
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse id="responsive-navbar-nav">
+            <Nav className="me-auto">
+              <Link href="/select-students">Select Students</Link>
+            </Nav>
+            <Nav className="me-auto">
+              <Link href="/email-users">Email Users</Link>
+            </Nav>
+            <Nav className="me-auto">
+              <Link href="/projects">Projects</Link>
+            </Nav>
+            <Nav className="me-auto">
+              <Link href="/settings">Settings</Link>
+            </Nav>
+            <Nav>
+              <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+      </Navbar>
     )
 }

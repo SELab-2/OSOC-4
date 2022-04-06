@@ -9,5 +9,10 @@
 }
 
 .scroll-overflow {
-    overflow-y: scroll;
+    overflow-y: auto;
+}
+
+.fill_width {
+    width: 100vw;
+    max-width: 100vw;
 }

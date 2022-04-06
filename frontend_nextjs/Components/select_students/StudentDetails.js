@@ -17,10 +17,15 @@ export default function StudentDetails(props) {
   })
 
   return(
-    <Container>
+    <Col className="fill_height scroll-overflow student_details">
       <Row>
-        {student["name"]}
+        <Col md="auto">
+          <Row>
+            {student["name"]}
+          </Row>
+          <Row>VIDEO EDITOR</Row>
+        </Col>
       </Row>
-    </Container>
+    </Col>
   )
 }
