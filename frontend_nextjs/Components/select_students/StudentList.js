@@ -28,7 +28,7 @@ export default function StudentList(props) {
   }
 
   return(
-    <Col className="fill_height scroll-overflow">
+    <Col className="fill_height scroll-overflow fill_width">
       <ul className="students_list fill_height">
         {getStudents()}
       </ul>

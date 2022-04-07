@@ -104,3 +104,9 @@
     border-style: solid;
     border-radius: 5px;
 }
+
+.remaining-height-backbutton {
+    position: absolute;
+    top: 50px;
+    bottom: 0;
+}
