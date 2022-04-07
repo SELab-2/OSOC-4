@@ -1,8 +1,11 @@
-import {Col, Container, Row} from "react-bootstrap";
+import {Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Row} from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
 import {useEffect, useState} from "react";
 import Scrollbar from "bootstrap/js/src/util/scrollbar";
 import StudentList from "./StudentList";
+import DropdownMenu from "react-bootstrap/DropdownMenu";
+import DropdownItem from "react-bootstrap/DropdownItem";
+import SuggestionsCount from "./SuggestionsCount";
 
 export default function StudentDetails(props) {
 
@@ -17,15 +20,46 @@ export default function StudentDetails(props) {
   })
 
   return(
-    <Col className="fill_height scroll-overflow student_details">
-      <Row>
-        <Col md="auto">
-          <Row>
-            {student["name"]}
+      <Col className="fill_height student-details">
+          <Row className="details-upper-layer">
+            <Col md="auto">
+              <Row className="name_big">
+                {student["name"]}
+              </Row>
+              <Row>
+                <Col md="auto" className="skill">VIDEO EDITOR</Col>
+              </Row>
+            </Col>
+            <Col/>
+            <Col md="auto">
+              <Row>
+                <Col md="auto"><button className="suggest-yes-button suggest-button">Suggest yes</button></Col>
+                <Col md="auto"><button className="suggest-maybe-button suggest-button">Suggest maybe</button></Col>
+                <Col md="auto"><button className="suggest-no-button suggest-button">Suggest no</button></Col>
+              </Row>
+              <Row>
+                <Col className="suggestions-buttons-margins">
+                  <select className="dropdown-decision">
+                    <option value="">Undecided</option>
+                    <option value="">Yes</option>
+                    <option value="">Maybe</option>
+                    <option value="">No</option>
+                  </select>
+                </Col>
+                <Col md="auto"><Button className="suggest-confirm-button">Confirm</Button></Col>
+              </Row>
+            </Col>
           </Row>
-          <Row>VIDEO EDITOR</Row>
-        </Col>
-      </Row>
-    </Col>
+          <Row className="remaining-height-details">
+            <Col className="fill_height scroll-overflow">
+              <Row><h2>Decision</h2></Row>
+              <Row>Undecided</Row>
+              <Row>
+                <Col md="auto"><h2>Suggestions</h2></Col>
+                <SuggestionsCount suggestionsYes={0} suggestionsMaybe={0} suggestionsNo={0} />
+              </Row>
+            </Col>
+          </Row>
+      </Col>
   )
 }

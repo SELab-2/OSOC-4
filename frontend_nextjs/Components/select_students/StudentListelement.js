@@ -6,6 +6,7 @@ import {
 } from "../../routes";
 import {Col, Container, Row} from "react-bootstrap";
 import {router} from "next/client";
+import SuggestionsCount from "./SuggestionsCount";
 
 export default function StudentListelement(props) {
 
@@ -157,9 +158,7 @@ export default function StudentListelement(props) {
         <Col md="auto">
           <Row md="auto">
             <Col className="suggestions" md="auto">Suggestions:</Col>
-            <Col className="suggestionsYes" md="auto">{suggestionsYes}</Col>
-            <Col className="suggestionsMaybe" md="auto">{suggestionsMaybe}</Col>
-            <Col className="suggestionsNo" md="auto">{suggestionsNo}</Col>
+            <SuggestionsCount suggestionsYes={suggestionsYes} suggestionsMaybe={suggestionsMaybe} suggestionsNo={suggestionsNo} />
           </Row>
         </Col>
       </Row>

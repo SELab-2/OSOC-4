@@ -31,7 +31,7 @@ export default function Student_id(props) {
   })
 
   return(
-    <Row className="fill_height">
+    <Row className="remaining_height fill_width">
       <StudentList students={students} />
       <StudentDetails student={student} />
     </Row>

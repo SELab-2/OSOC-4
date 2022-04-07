@@ -1,0 +1,59 @@
+.name_big {
+    font-size: 35px;
+}
+
+.suggest-button {
+    font-size: 14px;
+    width: 125px;
+    -webkit-text-fill-color: black;
+    border-width: 0;
+    margin: 5px 3px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+
+    border-radius: 4px;
+}
+
+.suggest-yes-button {
+    background-color: var(--yes_green_65);
+}
+
+.suggest-maybe-button {
+    background-color: var(--maybe_yellow_65);
+}
+
+.suggest-no-button {
+    background-color: var(--no_red_65);
+}
+
+.suggest-confirm-button {
+    font-size: 14px;
+    width: 125px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.details-upper-layer {
+    margin: 10px 20px;
+    height: 100px;
+}
+
+.dropdown-decision {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    background-color: white;
+    border-style: solid;
+    border-radius: 5px;
+    margin-left: 3px;
+    margin-right: 3px;
+    width: 98%;
+}
+
+.remaining-height-details {
+    position: absolute;
+    top: 100px;
+    bottom: 0;
+    margin: 10px 20px;
+}

@@ -12,9 +12,10 @@ export default function NavHeader(props) {
     }
 
     return (
-      <Navbar collapseOnSelect expand="lg" bg="white">
+      <Row className="navheader">
+        <Navbar collapseOnSelect class="navbar navbar-expand-lg navbar-light bg-light">
           <Navbar.Brand href="/">
-            <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="65px" height="50px" objectFit={'contain'} />
+            <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="90px" height="50px" objectFit={'contain'} />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
@@ -34,6 +35,7 @@ export default function NavHeader(props) {
               <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
             </Nav>
           </Navbar.Collapse>
-      </Navbar>
+        </Navbar>
+      </Row>
     )
 }

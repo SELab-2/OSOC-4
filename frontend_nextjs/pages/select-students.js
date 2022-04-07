@@ -1,11 +1,9 @@
-import StudentListelement from "../Components/select_students/StudentListelement";
 import {useEffect, useState} from "react";
 import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
-import {Container, Row, Col} from "react-bootstrap";
+import {Row} from "react-bootstrap";
 
-import TempStudentListelement from "../Components/select_students/TempStudentElement";
 import StudentList from "../Components/select_students/StudentList";
 
 
@@ -24,7 +22,7 @@ export default function SelectStudents(props) {
     })
 
     return(
-      <Row className="fill_height fill_width">
+      <Row className="remaining_height fill_width">
         <StudentsFilters/>
         <StudentList students={students} />
       </Row>
