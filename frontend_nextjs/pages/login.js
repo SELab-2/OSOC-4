@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { login } from "../utils/json-requests";
 import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
-import logoFull from '../public/assets/0-1-osoc-full-2.png';
+import logoScreen from '../public/assets/osoc-screen.png';
 
 const Login = props => {
     const [email, setEmail] = useState("");
@@ -56,7 +56,7 @@ const Login = props => {
         <div className="body-login">
             <section className="body-left">
                 <div className="image-wrapper">
-                    <Image src={logoFull} alt="osoc-logo" width="100%" height="100%" layout={'responsive'} objectFit={'contain'} />
+                    <Image className="logo" src={logoScreen} alt="osoc-logo"/>
                 </div>
             </section>
 
