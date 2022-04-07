@@ -26,9 +26,7 @@ export default function Student_id(props) {
   return(
     <Row className="remaining_height fill_width">
       <Col md="auto" className="fill_height" style={{width: "35%"}}>
-        <Row md="auto" className="backbutton-margin">
-          <button className="backbutton" onClick={() => router.back()}>Back</button>
-        </Row>
+
         <Row className="remaining-height-backbutton" style={{width: "35%"}}>
           <StudentList students={students} width="min"/>
         </Row>
