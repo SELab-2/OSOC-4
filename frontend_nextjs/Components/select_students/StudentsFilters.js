@@ -81,7 +81,7 @@ export default function StudentsFilters(props) {
         </Col>
         <Col/>
         <Col md="auto" style={{alignSelf: "center"}}>
-          <button onClick={resetFilters}>
+          <button className="reset-filters-button" onClick={resetFilters}>
             Reset filters
           </button>
         </Col>

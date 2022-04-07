@@ -7,6 +7,7 @@ import DropdownMenu from "react-bootstrap/DropdownMenu";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import SuggestionsCount from "./SuggestionsCount";
 
+// This function returns the details of a student
 export default function StudentDetails(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
@@ -19,8 +20,9 @@ export default function StudentDetails(props) {
     }
   })
 
+  // returns the html for student details
   return(
-      <Col className="fill_height student-details">
+      <Col className="fill_height student-details-window">
           <Row className="details-upper-layer">
             <Col md="auto">
               <Row className="name_big">
@@ -38,7 +40,7 @@ export default function StudentDetails(props) {
                 <Col md="auto"><button className="suggest-no-button suggest-button">Suggest no</button></Col>
               </Row>
               <Row>
-                <Col className="suggestions-buttons-margins">
+                <Col>
                   <select className="dropdown-decision">
                     <option value="">Undecided</option>
                     <option value="">Yes</option>
@@ -50,13 +52,17 @@ export default function StudentDetails(props) {
               </Row>
             </Col>
           </Row>
-          <Row className="remaining-height-details">
-            <Col className="fill_height scroll-overflow">
-              <Row><h2>Decision</h2></Row>
-              <Row>Undecided</Row>
+          <Row className="remaining-height-details" md="auto">
+            <Col md="auto" className="fill_height scroll-overflow student-details">
+              <Row md="auto" className="h2-titles"><Col md="auto"><h2>Decision</h2></Col></Row>
+              <Row md="auto"><Col md="auto">Undecided</Col></Row>
+              <Row md="auto" className="student-details-suggestions-line h2-titles">
+                <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
+                <SuggestionsCount suggestionsYes={0} suggestionsMaybe={0} suggestionsNo={0}/>
+              </Row>
               <Row>
-                <Col md="auto"><h2>Suggestions</h2></Col>
-                <SuggestionsCount suggestionsYes={0} suggestionsMaybe={0} suggestionsNo={0} />
+                <Col md="auto" className="suggestions-circle suggestions-circle-red"/>
+                <Col>Michiel Leyman</Col>
               </Row>
             </Col>
           </Row>

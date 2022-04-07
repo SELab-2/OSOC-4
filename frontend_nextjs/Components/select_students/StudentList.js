@@ -27,8 +27,22 @@ export default function StudentList(props) {
     return null;
   }
 
+  function getMd() {
+    if (props.width === "max") {
+      return ""
+    }
+    return "auto"
+  }
+
+  function getWidth() {
+    if (props.width === "max") {
+      return {};
+    }
+    return {width: "35%"};
+  }
+
   return(
-    <Col className="fill_height scroll-overflow">
+    <Col className="fill_height scroll-overflow" md={getMd()} style={getWidth()}>
       <ul className="students_list fill_height">
         {getStudents()}
       </ul>

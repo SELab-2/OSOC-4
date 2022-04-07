@@ -30,9 +30,10 @@ export default function Student_id(props) {
     }
   })
 
+  // the html to display the student page
   return(
     <Row className="remaining_height fill_width">
-      <StudentList students={students} />
+      <StudentList students={students} width="min"/>
       <StudentDetails student={student} />
     </Row>
   )

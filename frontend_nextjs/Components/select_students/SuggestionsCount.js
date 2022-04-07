@@ -1,5 +1,6 @@
-import {Col, Row} from "react-bootstrap";
+import {Col} from "react-bootstrap";
 
+// displays the counts of the suggestions for a student
 export default function SuggestionsCount(props) {
 
   return [

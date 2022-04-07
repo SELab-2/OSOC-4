@@ -142,7 +142,7 @@ export default function StudentListelement(props) {
   function studentDetails() {
     let i = props.student.lastIndexOf('/');
     let id = props.student.substring(i + 1);
-    router.push(getStudentPath(id))
+    router.push(getStudentPath(id));
   }
 
   // The html representation of a list-element

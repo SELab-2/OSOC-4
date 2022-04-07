@@ -21,10 +21,11 @@ export default function SelectStudents(props) {
         }
     })
 
+    // the html that displays the overview of students
     return(
       <Row className="remaining_height fill_width">
         <StudentsFilters/>
-        <StudentList students={students} />
+        <StudentList students={students} width="max" />
       </Row>
     )
     
