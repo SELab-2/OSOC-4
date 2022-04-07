@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
-import {Row} from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 
@@ -25,7 +25,9 @@ export default function SelectStudents(props) {
     return(
       <Row className="remaining_height fill_width">
         <StudentsFilters/>
-        <StudentList students={students} width="max" />
+          <Col className="fill_height scroll-overflow">
+              <StudentList students={students} width="max" />
+          </Col>
       </Row>
     )
     

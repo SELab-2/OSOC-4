@@ -58,7 +58,7 @@ export default function StudentListelement(props) {
         }
 
         // check if there are no skills yet
-        if (skills.length === 0) {
+        if (skills.length === 0) {jaj
           getJson(getSkillsPath()).then(res => {
             let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
             setSkills(skillObjs.map(skill => skill.name));

@@ -26,7 +26,14 @@ export default function Student_id(props) {
   // the html to display the student page
   return(
     <Row className="remaining_height fill_width">
-      <StudentList students={students} width="min"/>
+      <Col md="auto" style={{width: "35%"}}>
+        <Row md="auto" className="backbutton-margin">
+          <button className="backbutton" onClick={() => router.back()}>Back to results</button>
+        </Row>
+        <Row className="fill_height scroll-overflow">
+          <StudentList students={students} width="min"/>
+        </Row>
+      </Col>
       <StudentDetails student_id={student_id} />
     </Row>
   )

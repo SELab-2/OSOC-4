@@ -93,3 +93,14 @@
     padding-top: 15px;
     margin-right: 25px;
 }
+
+.backbutton-margin {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.backbutton {
+    padding: 5px 18px;
+    border-style: solid;
+    border-radius: 5px;
+}
