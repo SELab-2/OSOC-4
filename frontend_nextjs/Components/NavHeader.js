@@ -23,7 +23,7 @@ export default function NavHeader(props) {
               <Link href="/select-students">Select Students</Link>
             </Nav>
             <Nav className="me-auto">
-              <Link href="/email-users">Email Users</Link>
+              <Link href="/email-students">Email Students</Link>
             </Nav>
             <Nav className="me-auto">
               <Link href="/projects">Projects</Link>
