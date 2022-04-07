@@ -1,10 +1,5 @@
-import {Button, ButtonGroup, Col, Container, Dropdown, DropdownButton, Row} from "react-bootstrap";
-import StudentListelement from "./StudentListelement";
+import {Button, Col, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
-import Scrollbar from "bootstrap/js/src/util/scrollbar";
-import StudentList from "./StudentList";
-import DropdownMenu from "react-bootstrap/DropdownMenu";
-import DropdownItem from "react-bootstrap/DropdownItem";
 import SuggestionsCount from "./SuggestionsCount";
 import {getJson} from "../../utils/json-requests";
 import {getStudentPath} from "../../routes";

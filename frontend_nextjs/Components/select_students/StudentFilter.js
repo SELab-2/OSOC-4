@@ -1,7 +1,4 @@
-import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
-import {getSkillsPath, getStudentsPath} from "../../routes";
-import {Col, Container, Row} from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 
 
 export default function StudentsFilter(props) {

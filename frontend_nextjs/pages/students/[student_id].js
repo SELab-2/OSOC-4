@@ -1,10 +1,9 @@
 import {useEffect, useState} from "react";
-import {Container, Row, Col} from "react-bootstrap";
+import {Row, Col} from "react-bootstrap";
 import {router} from "next/client";
 import {getJson} from "../../utils/json-requests";
-import {getStudentPath, getStudentsPath} from "../../routes";
+import {getStudentsPath} from "../../routes";
 import StudentList from "../../Components/select_students/StudentList";
-import Scrollbar from "bootstrap/js/src/util/scrollbar";
 import StudentDetails from "../../Components/select_students/StudentDetails";
 
 
