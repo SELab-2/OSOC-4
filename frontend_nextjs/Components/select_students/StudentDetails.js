@@ -6,17 +6,22 @@ import StudentList from "./StudentList";
 import DropdownMenu from "react-bootstrap/DropdownMenu";
 import DropdownItem from "react-bootstrap/DropdownItem";
 import SuggestionsCount from "./SuggestionsCount";
+import {getJson} from "../../utils/json-requests";
+import {getStudentPath} from "../../routes";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [student, setStudent] = useState({});
+  const [studentId, setStudentId] = useState(undefined);
+
 
   // This function inserts the data in the variables
   useEffect( () => {
-    if (!Object.keys(student).length) {
-      setStudent(props.student)
+    if (studentId !== props.student_id) {
+      setStudentId(props.student_id);
+      getJson(getStudentPath(props.student_id)).then(res => setStudent(res))
     }
   })
 

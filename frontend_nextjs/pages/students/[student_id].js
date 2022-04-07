@@ -12,17 +12,10 @@ export default function Student_id(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const {student_id} = router.query;
-  const [student, setStudent] = useState({});
   const [students, setStudents] = useState(undefined);
 
   // This function inserts the data in the variables
   useEffect( () => {
-    if (!Object.keys(student).length) {
-      getJson(getStudentPath(student_id)).then(res => {
-        setStudent(res);
-      })
-    }
-
     if (! students) {
       getJson(getStudentsPath()).then(res => {
         setStudents(res);
@@ -34,7 +27,7 @@ export default function Student_id(props) {
   return(
     <Row className="remaining_height fill_width">
       <StudentList students={students} width="min"/>
-      <StudentDetails student={student} />
+      <StudentDetails student_id={student_id} />
     </Row>
   )
 

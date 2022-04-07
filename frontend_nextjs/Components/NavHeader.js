@@ -13,7 +13,7 @@ export default function NavHeader(props) {
 
     return (
       <Row className="navheader">
-        <Navbar collapseOnSelect class="navbar navbar-expand-lg navbar-light bg-light">
+        <Navbar collapseOnSelect className="navbar navbar-expand-lg navbar-light">
           <Navbar.Brand href="/">
             <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="90px" height="50px" objectFit={'contain'} />
           </Navbar.Brand>
