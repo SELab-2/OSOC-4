@@ -3,7 +3,6 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState } from 'react';
 import { useRouter } from 'next/router'
-import { login } from "../utils/json-requests";
 import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
@@ -31,9 +30,8 @@ const Login = props => {
     }
 
 
-    async function handleSubmitLogin(event) {
-        log("handle login submit")
-
+    async function handleLogin() {
+        await signIn('credentials', {email: email, password: password});
     }
 
 
@@ -69,7 +67,7 @@ const Login = props => {
                             <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address" />
                             <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
 
-                            <button className="submit" onClick={() => { signIn('credentials', { email: email, password: password }) }}>
+                            <button className="submit" onClick={handleLogin}>
                                 Login
                             </button>
 

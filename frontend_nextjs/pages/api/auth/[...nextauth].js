@@ -2,7 +2,7 @@ import axios from 'axios';
 import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getSession, getCsrfToken } from 'next-auth/react';
-import { login } from '../../../utils/json-requests';
+import {getJson, login} from '../../../utils/json-requests';
 
 async function refreshAccessToken(tokenObject) {
     const csrfToken = await getCsrfToken()
@@ -35,9 +35,6 @@ const providers = [
             try {
                 // Authenticate user with credentials
                 const user = await login({ "email": credentials.email, "password": credentials.password });
-
-                console.log("muttn")
-                console.log(user)
 
                 user.data = user.data.data
 

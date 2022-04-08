@@ -1,12 +1,13 @@
 import StudentListelement from "../Components/StudentListelement";
 
 import {useEffect, useState} from "react";
-import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
 import TempStudentListelement from "../Components/TempStudentElement";
+import {useSession} from "next-auth/react";
+import {urlManager} from "../utils/ApiClient";
 
 
 export default function SelectStudents(props) {
@@ -15,11 +16,14 @@ export default function SelectStudents(props) {
     const [students, setStudents] = useState([]);
 
     // This function inserts the data in the variables
+    const { data: session, status } = useSession()
     useEffect( () => {
-        if (!students.length) {
-            getJson(getStudentsPath()).then(res => {
-                setStudents(res);
-            })
+        if (session) {
+            if (!students.length) {
+                urlManager.getStudents().then(url => getJson(url).then(res => {
+                    setStudents(res);
+                }));
+            }
         }
     })
 
