@@ -11,8 +11,11 @@ class QuestionTag(SQLModel, table=True):
 
     question: "Question" = Relationship(back_populates="question_tags")
 
+
 class QuestionTagCreate(BaseModel):
     tag: str
+
+
 class QuestionTagSimpleOut(BaseModel):
     tag: str
     question: str
@@ -30,4 +33,3 @@ class QuestionTagUpdate(BaseModel):
     def check_question(cls, question):
         assert question, "question cannot be empty."
         return question
-
