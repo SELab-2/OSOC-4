@@ -139,7 +139,7 @@ export default function StudentDetails(props) {
           </Row>
           <Row className="remaining-height-details" md="auto">
             <Col md="auto" className="fill_height scroll-overflow student-details">
-              <Row md="auto" className="h2-titles"><Col><h2>General</h2></Col></Row>
+              <Row md="auto" className="first-h2-titles"><Col><h2>General</h2></Col></Row>
               <Row md="auto" className="decision">
                 <GeneralInfo student={student} decision={getDecision()} />
               </Row>

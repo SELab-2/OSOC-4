@@ -54,7 +54,7 @@
 
 .remaining-height-details {
     position: absolute;
-    top: 100px;
+    top: 130px;
     bottom: 0;
     margin-left: 10px;
 }
@@ -93,6 +93,10 @@
 
 .h2-titles {
     margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.first-h2-titles {
     margin-bottom: 15px;
 }
 
