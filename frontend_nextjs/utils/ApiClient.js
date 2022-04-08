@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getSession, getCsrfToken } from 'next-auth/react';
 import {getJson} from "./json-requests";
+import {log} from "./logger";
 
 class UrlManager {
     baseUrl = process.env.NEXT_API_URL;
@@ -12,18 +13,22 @@ class UrlManager {
     _projects = null;
 
     async getEditions() {
+        log("Getting editions")
         if (this._editions) {return this._editions;}
         await this._setEditions()
         return this._editions;
     }
 
     async getUsers() {
+        log("Getting users")
+
         if (this._users) {return this._users;}
         await this._setUsers();
         return this._users;
     }
 
     async getCurrentEdition() {
+        log("getting current edition")
         if (this._current_edition) {return this._current_edition;}
         await this._setCurrentEdition()
         return this._current_edition;
@@ -43,30 +48,31 @@ class UrlManager {
 
 
     async _setUsers() {
+        log("Setting users")
         let res = await getJson("");
         this._editions = res["editions"];
         this._users = res["users"];
     }
 
     async _setEditions() {
+        log("Setting editions")
         let res = await getJson("");
         this._editions = res["editions"];
         this._users = res["users"];
     }
 
     async _setCurrentEdition(year = null) {
+        log("Setting current editions")
         if (!this._editions) {await this._setEditions();}
-        let editionData;
-        if (!this._year) {
-            let res = await getJson(this._editions);
-            this._current_edition = res[0];
-            editionData = await getJson(this._current_edition);
-            this._year = res['year'];
-        } else {
+        if(year){
             this._year = year;
             this._current_edition = this._editions + "/" + this._year;
-            editionData = await getJson(this._current_edition);
+        }else{
+            let res = await getJson(this._editions);
+            this._current_edition = res[0];
         }
+        let editionData = await getJson(this._current_edition);
+        this._year = editionData['year'];
         this._students = editionData["students"];
         this._projects = editionData["projects"];
     }

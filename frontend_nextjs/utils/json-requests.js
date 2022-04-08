@@ -196,8 +196,20 @@ export async function set_password(invitekey, json) {
     }
 }
 
+export async function get_edition(){
+    if ("edition" in localStorage){
+        log("found locally")
+        return JSON.parse(localStorage.getItem("edition"))
+    }
 
+    log("not found locally")
+    let editions = await getJson("/editions")
 
+    // edition list should be ordered so first element should be latest edition
+    let edition = await getJson(editions[0])
+    if (edition) {
+        localStorage.setItem("edition", JSON.stringify({"year": edition.year, "name": edition.name}))
+        return {"year": edition.year, "name": edition.name}
+    }
 
-
-
+}
