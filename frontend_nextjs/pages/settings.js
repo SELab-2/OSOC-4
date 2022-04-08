@@ -12,6 +12,7 @@ import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
 import {useSession} from "next-auth/react";
 import {log} from "../utils/logger";
+import {urlManager} from "../utils/ApiClient";
 
 
 
@@ -29,13 +30,17 @@ export default function Settings(props) {
     useEffect(() => {
         if((user === undefined || name === "" || email === "") &&  ! loading){
             setLoading(true)
-            getJson("users/me").then(res => {
+            urlManager.getUsers().then(users_url =>{
+                getJson(users_url + "/me").then(res => {
+                    log(res)
                     setUser(res.data);
                     setName(res.data.name);
                     setEmail(res.data.email);
                     setRole(res.data.role);
                 }
-            ).then(() => setLoading(false))
+                ).then(() => setLoading(false))
+            })
+
         }
     }, [session, loading, user, name, email]);
 
@@ -61,7 +66,7 @@ export default function Settings(props) {
                                 <ChangeEmail email={email}/>
                             </SettingCards>
                             <SettingCards title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
-                                <ChangeName userid={session.userid} user={user}/>
+                                <ChangeName user={user}/>
                             </SettingCards>
                         </div>
                     </AccordionBody>

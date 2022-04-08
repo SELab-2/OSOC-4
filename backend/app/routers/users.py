@@ -11,7 +11,7 @@ from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
                                             UserNotFoundException, InvalidEmailOrPasswordException)
 from app.models.passwordreset import PasswordResetInput
 from app.models.user import (User, UserCreate, UserData, UserOut,
-                             UserOutSimple, UserRole, ChangeUser, ChangePassword, UserMe)
+                             UserOutSimple, UserRole, ChangeUser, ChangePassword, UserMe, ChangeUserMe)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
@@ -49,17 +49,13 @@ async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = De
 
 
 @router.patch("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def change_user_me(new_data: ChangeUser, Authorize: AuthJWT = Depends(),
+async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
                          session: AsyncSession = Depends(get_session)):
     current_user_id = Authorize.get_jwt_subject()
 
     user = await read_where(User, User.id == int(current_user_id), session=session)
 
     user.name = new_data.name
-    user.active = new_data.active
-    user.approved = new_data.approved
-    user.disabled = new_data.disabled
-    user.role = new_data.role
 
     user = await update(user, session=session)
 

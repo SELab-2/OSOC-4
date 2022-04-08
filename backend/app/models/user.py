@@ -129,3 +129,7 @@ class UserMe(BaseModel):
     name: str
     email: str
     role: UserRole
+
+
+class ChangeUserMe(BaseModel):
+    name: str

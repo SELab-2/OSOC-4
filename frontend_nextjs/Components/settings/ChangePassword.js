@@ -33,15 +33,17 @@ export default function ChangePassword(props) {
     async function handleSubmitChange(event){
         event.preventDefault()
         if(newPassword === confirmPassword){
-            let body = {"current_password": currentPassword, "new_password": newPassword, "confirm_password":confirmPassword}
+            let body = {
+                "current_password": currentPassword,
+                "new_password": newPassword,
+                "confirm_password":confirmPassword
+            }
+
             let url = session.userid + "/password"
-            log(url)
             let response = await patchEdit(url, body)
             log(response)
             if (response.success) { setChangedSuccess(true); }
-            log(newPassword)
         }
-        log(newPassword)
     }
 
     return(
