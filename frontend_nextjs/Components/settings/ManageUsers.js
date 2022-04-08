@@ -9,24 +9,26 @@ export default function ManageUsers() {
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
     const [toInvite, setToInvite] = useState("");
+    const [loading, setLoading] = useState(false)
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
     };
 
     useEffect(() => {
-        if (!users.length) {
+        if (!users.length && ! loading) {
+            setLoading(true)
             urlManager.getUsers().then(url => getJson(url).then(res => {
                 log("manage users:")
                 log(res)
                 for (let u of res) {
                     getJson(u.id).then(async user => {
                         if (user.data) { await setUsers(prevState => [...prevState, user.data]); }
-                    })
+                    }).then(() => setLoading(false))
                 }
             }));
         }
-    })
+    }, [users.length, loading])
 
     const handleChangeToInvite = (event) => {
         event.preventDefault();
