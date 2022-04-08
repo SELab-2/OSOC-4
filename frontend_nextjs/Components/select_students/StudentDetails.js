@@ -21,7 +21,6 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id) {
       setStudentId(props.student_id);
       getJson(getStudentPath(props.student_id)).then(res => {
-        console.log(res);
         setStudent(res);
         setSuggestions(res["suggestions"]);
       })
