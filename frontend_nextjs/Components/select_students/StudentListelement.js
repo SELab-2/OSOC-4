@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
+import GeneralInfo from "./GeneralInfo"
 
 import {
   getStudentPath,
@@ -41,22 +42,6 @@ export default function StudentListelement(props) {
     let skills = [];
     return skills.map((skill,index) =>
       <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
-    )
-  }
-
-  // get the titles of the basic questions shown in the list element
-  function getInfoTitles() {
-    let questions = ["Studies:", "Type of degree:", "First language:", "Level of English:"];
-    return questions.map((question,index) =>
-      <p key={index}>{question}</p>
-    )
-  }
-
-  // get the answers on the basic questions in HTML format
-  function getInfoAnswers() {
-    let answers = [student["studies"], student["type of degree"], student["first_languages"], student["level of english"]];
-    return answers.map((answer,index) =>
-      <p key={index}>{answer}</p>
     )
   }
 
@@ -111,15 +96,7 @@ export default function StudentListelement(props) {
       </Row>
 
       <Row id="info" className="info">
-        <Col id="info-titles" className="info-titles" md="auto">
-          {getInfoTitles()}
-          Decision:
-        </Col>
-        <Col id="info-answers" md="auto" className="info-answers">
-          {getInfoAnswers()}
-          {getDecision()}
-        </Col>
-
+        <GeneralInfo student={student} decision={getDecision()} />
         <Col id="skills" align="right" className="skills">
           <ul>
             {getSkills()}

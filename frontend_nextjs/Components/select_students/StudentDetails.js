@@ -2,6 +2,7 @@ import {Button, Col, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
+import GeneralInfo from "./GeneralInfo"
 import {getJson} from "../../utils/json-requests";
 import {getStudentPath} from "../../routes";
 
@@ -91,15 +92,16 @@ export default function StudentDetails(props) {
           </Row>
           <Row className="remaining-height-details" md="auto">
             <Col md="auto" className="fill_height scroll-overflow student-details">
-              <Row md="auto" className="h2-titles"><Col><h2>Decision</h2></Col></Row>
-              <Row md="auto" className="decision">{getDecision()}</Row>
+              <Row md="auto" className="h2-titles"><Col><h2>General</h2></Col></Row>
+              <Row md="auto" className="decision">
+                <GeneralInfo student={student} decision={getDecision()} />
+              </Row>
               <Row md="auto" className="student-details-suggestions-line h2-titles">
                 <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
                 <SuggestionsCount suggestionsYes={getSuggestionsCount(2)} suggestionsMaybe={getSuggestionsCount(1)}
                                   suggestionsNo={getSuggestionsCount(0)}/>
               </Row>
               {getSuggestions()}
-              <Row md="auto" className="h2-titles"><Col><h2>General</h2></Col></Row>
             </Col>
           </Row>
       </Col>
