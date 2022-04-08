@@ -67,6 +67,11 @@ export default function StudentDetails(props) {
     return <Row>No suggestions</Row>
   }
 
+  function getEmailButtonDisabled() {
+    let decisions = suggestions.filter(suggestion => suggestion["definitive"]);
+    return decisions.length === 0;
+  }
+
   function MyVerticallyCenteredModal(props) {
     return (
       <Modal
@@ -139,8 +144,7 @@ export default function StudentDetails(props) {
                 <GeneralInfo student={student} decision={getDecision()} />
               </Row>
               <Row md="auto">
-                <Button className="send-email-button">
-                  <Image src={editIcon} alt="" objectFit={'contain'} />
+                <Button className="send-email-button" disabled={getEmailButtonDisabled()}>
                   Send email
                 </Button>
               </Row>

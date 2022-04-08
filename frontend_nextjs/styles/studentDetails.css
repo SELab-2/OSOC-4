@@ -123,3 +123,7 @@
     font-weight: bold;
     font-size: 20px;
 }
+
+.send-email-button {
+    margin-top: 10px;
+}
