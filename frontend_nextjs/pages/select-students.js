@@ -1,11 +1,9 @@
-import StudentListelement from "../Components/StudentListelement";
-
 import {useEffect, useState} from "react";
 import {getJson} from "../utils/json-requests";
-import StudentsFilters from "../Components/StudentsFilters";
-import {Container, Row, Col} from "react-bootstrap";
+import StudentsFilters from "../Components/select_students/StudentsFilters";
+import {Col, Row} from "react-bootstrap";
 
-import TempStudentListelement from "../Components/TempStudentElement";
+import StudentList from "../Components/select_students/StudentList";
 import {useSession} from "next-auth/react";
 import {urlManager} from "../utils/ApiClient";
 
@@ -13,13 +11,13 @@ import {urlManager} from "../utils/ApiClient";
 export default function SelectStudents(props) {
 
     // These constants are initialized empty, the data will be inserted in useEffect
-    const [students, setStudents] = useState([]);
+    const [students, setStudents] = useState(undefined);
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
     useEffect( () => {
         if (session) {
-            if (!students.length) {
+            if (!students) {
                 urlManager.getStudents().then(url => getJson(url).then(res => {
                     setStudents(res);
                 }));
@@ -27,36 +25,14 @@ export default function SelectStudents(props) {
         }
     })
 
-    // function to get a list of students
-    function getStudents() {
-        if (students) {
-            return students.map(student =>
-              // generate a list of students, each student needs 'student' as a prop
-              <li key={student}>
-                  <StudentListelement student={student} />
-              </li>
-            );
-        }
-        return null;
-    }
-     /*
-     <Container fluid>
-        <Row>
-            <Col md="auto" className="filters">
-                <StudentsFilters/>
-            </Col>
-        </Row>
-      </Container>*/
+    // the html that displays the overview of students
     return(
-      <Container fluid>
-        <Row>
-            <Col>
-                <ul className="students_list">
-                    {getStudents()}
-                </ul>
-            </Col>
-        </Row>
-      </Container>
-
+      <Row className="remaining_height fill_width">
+        <StudentsFilters/>
+          <Col className="fill_height scroll-overflow">
+              <StudentList students={students} width="max" />
+          </Col>
+      </Row>
     )
+    
 }

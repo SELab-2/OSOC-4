@@ -78,7 +78,7 @@ export default function Settings(props) {
                     <AccordionBody>
                         <div>
                             <Button variant={"outline-secondary"} onClick={changeTheme}>{darkTheme ? "Turn to light theme" : "Turn to dark theme"}</Button>
-                            {/*<EditionDropdownButton/>*/}
+                            <EditionDropdownButton/>
                         </div>
                     </AccordionBody>
                 </AccordionItem>

@@ -30,6 +30,7 @@ class EditionOutSimple(BaseModel):
 
 class EditionOutExtended(BaseModel):
     uri: str
+    year: int
     name: Optional[str] = ""
     description: Optional[str] = ""
     user_ids: List[str]
