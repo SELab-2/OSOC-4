@@ -5,6 +5,7 @@ import {getJson} from "../../utils/json-requests";
 import {getStudentsPath} from "../../routes";
 import StudentList from "../../Components/select_students/StudentList";
 import StudentDetails from "../../Components/select_students/StudentDetails";
+import {urlManager} from "../../utils/ApiClient";
 
 
 export default function Student_id(props) {
@@ -16,9 +17,9 @@ export default function Student_id(props) {
   // This function inserts the data in the variables
   useEffect( () => {
     if (! students) {
-      getJson(getStudentsPath()).then(res => {
+      urlManager.getStudents().then(url => getJson(url).then(res => {
         setStudents(res);
-      })
+      }))
     }
   })
 

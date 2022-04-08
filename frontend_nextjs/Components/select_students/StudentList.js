@@ -12,7 +12,7 @@ export default function StudentList(props) {
     if (! students) {
       setStudents(props.students)
     }
-  })
+  }, [students, props.students])
 
   // function to get a list of students
   function getStudents() {
