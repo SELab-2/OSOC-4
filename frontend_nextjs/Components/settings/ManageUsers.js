@@ -3,6 +3,7 @@ import { Button, Form, Table } from "react-bootstrap";
 import UserTr from "./UserTr";
 import { getJson, postCreate } from "../../utils/json-requests";
 import { log } from "../../utils/logger";
+import {urlManager} from "../../utils/ApiClient";
 
 export default function ManageUsers() {
     const [search, setSearch] = useState("");
@@ -15,7 +16,7 @@ export default function ManageUsers() {
 
     useEffect(() => {
         if (!users.length) {
-            getJson("/users").then(res => {
+            urlManager.getUsers().then(url => getJson(url).then(res => {
                 log("manage users:")
                 log(res)
                 for (let u of res) {
@@ -23,7 +24,7 @@ export default function ManageUsers() {
                         if (user.data) { await setUsers(prevState => [...prevState, user.data]); }
                     })
                 }
-            });
+            }));
         }
     })
 
