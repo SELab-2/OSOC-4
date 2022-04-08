@@ -2,7 +2,7 @@ import {Button, Col, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import {getJson} from "../../utils/json-requests";
-import {getStudentPath} from "../../routes";
+import {getSelectStudentsPath, getStudentPath, getStudentsPath} from "../../routes";
 import {router} from "next/client";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
@@ -26,6 +26,12 @@ export default function StudentDetails(props) {
   // returns the html for student details
   return(
       <Col className="fill_height student-details-window">
+          <Row>
+            <Col />
+            <Col md="auto">
+                <Image  onClick={() => router.push(getSelectStudentsPath())} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="36px" height="36px" objectFit={'contain'} />
+            </Col>
+          </Row>
           <Row className="details-upper-layer">
             <Col md="auto">
               <Row className="name_big">
@@ -37,14 +43,10 @@ export default function StudentDetails(props) {
             </Col>
             <Col/>
             <Col md="auto">
-
               <Row>
                 <Col md="auto"><button className="suggest-yes-button suggest-button">Suggest yes</button></Col>
                 <Col md="auto"><button className="suggest-maybe-button suggest-button">Suggest maybe</button></Col>
                 <Col md="auto"><button className="suggest-no-button suggest-button">Suggest no</button></Col>
-                <Col>
-                  <Image  onClick={() => router.back()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="50px" height="50px" objectFit={'contain'} />
-                </Col>
               </Row>
               <Row>
                 <Col>
