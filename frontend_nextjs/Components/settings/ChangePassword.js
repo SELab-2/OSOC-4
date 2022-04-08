@@ -60,7 +60,7 @@ export default function ChangePassword(props) {
                 <Form.Label>Repeat new password</Form.Label>
                 <Form.Control type="password" placeholder="Confirm password" value={confirmPassword} onChange={handleChangeConfirmPassword}/>
                 {(newPassword === confirmPassword) ? null : (<Form.Text className="text-muted">
-                    Passwords don't match!
+                    Passwords do not match!
                 </Form.Text>)}
                 {(changedSuccess)? (<Form.Text className="text-muted">Changed password!</Form.Text>) : null}
 

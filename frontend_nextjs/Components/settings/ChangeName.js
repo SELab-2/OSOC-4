@@ -21,8 +21,7 @@ export default function ChangeName(props) {
         event.preventDefault();
 
         let users_url = await urlManager.getUsers();
-        let response = await patchEdit(users_url + "/me", {"name": name});
-        log(response)
+        let response = await patchEdit(users_url + "/me", {"name": changeName});
         if (response.success) {
             setSavedSuccess(true);
             setName(changeName);

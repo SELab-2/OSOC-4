@@ -104,7 +104,6 @@ export async function postCreate(url, json) {
                 data: e.response.data.message
             };
         } else {
-
             await catchError(e);
             return "";
         }
