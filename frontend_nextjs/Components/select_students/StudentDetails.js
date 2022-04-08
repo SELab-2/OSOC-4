@@ -1,11 +1,19 @@
-import {Button, Col, Modal, ModalBody, ModalDialog, ModalFooter, ModalHeader, ModalTitle, Row} from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Image,
+  Modal,
+  ModalHeader,
+  ModalTitle,
+  Row
+} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
 import {getJson} from "../../utils/json-requests";
 import {getStudentPath} from "../../routes";
-import {render} from "react-dom";
+import editIcon from "../../public/assets/edit.svg"
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -129,6 +137,12 @@ export default function StudentDetails(props) {
               <Row md="auto" className="h2-titles"><Col><h2>General</h2></Col></Row>
               <Row md="auto" className="decision">
                 <GeneralInfo student={student} decision={getDecision()} />
+              </Row>
+              <Row md="auto">
+                <Button className="send-email-button">
+                  <Image src={editIcon} alt="" objectFit={'contain'} />
+                  Send email
+                </Button>
               </Row>
               <Row md="auto" className="student-details-suggestions-line h2-titles">
                 <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
