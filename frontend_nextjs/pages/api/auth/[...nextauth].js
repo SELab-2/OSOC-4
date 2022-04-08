@@ -3,7 +3,6 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getSession, getCsrfToken } from 'next-auth/react';
 import {getJson, login} from '../../../utils/json-requests';
-import {setupUrlCacheOnLogin} from "../../../utils/ApiClient";
 
 async function refreshAccessToken(tokenObject) {
     const csrfToken = await getCsrfToken()

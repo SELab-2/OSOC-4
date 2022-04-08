@@ -1,13 +1,13 @@
 import StudentListelement from "../Components/StudentListelement";
 
 import {useEffect, useState} from "react";
-import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
 import TempStudentListelement from "../Components/TempStudentElement";
 import {useSession} from "next-auth/react";
+import {urlManager} from "../utils/ApiClient";
 
 
 export default function SelectStudents(props) {
@@ -20,9 +20,9 @@ export default function SelectStudents(props) {
     useEffect( () => {
         if (session) {
             if (!students.length) {
-                getJson(getStudentsPath()).then(res => {
+                urlManager.getStudents().then(url => getJson(url).then(res => {
                     setStudents(res);
-                })
+                }));
             }
         }
     })

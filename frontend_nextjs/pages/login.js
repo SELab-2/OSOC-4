@@ -3,11 +3,9 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState } from 'react';
 import { useRouter } from 'next/router'
-import { login } from "../utils/json-requests";
 import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
-import {setupUrlCacheOnLogin} from "../utils/ApiClient";
 
 const Login = props => {
     const [email, setEmail] = useState("");
