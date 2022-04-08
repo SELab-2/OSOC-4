@@ -1,5 +1,3 @@
-from fastapi import APIRouter, Depends
-
 from app.crud import update
 from app.database import get_session
 from app.models.answer import Answer
@@ -10,12 +8,12 @@ from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.skill import Skill
 from app.models.student import Student
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.models.suggestion import SuggestionOption, Suggestion
-from app.models.user import UserRole, User
+from app.models.suggestion import Suggestion, SuggestionOption
+from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/dummy")
 
@@ -60,13 +58,13 @@ class StudentsGenerator:
     async def generate(self, edition, session):
         # studies, type of degree, level of english, suggestions, de vragen die horen bij practical problems, skills
         # Questions
-        question_name = Question(question="What is your name", field_id="")
-        question_email = Question(question="What is your email", field_id="")
-        question_phonenumb = Question(question="What is your phone number", field_id="")
-        question_first_lang = Question(question="What is your first language", field_id="")
-        question_level_english = Question(question="What is your level of English", field_id="")
-        question_studies = Question(question="What do/did you study?", field_id="")
-        question_type_degree = Question(question="What kind of diploma are you currently going for?", field_id="")
+        question_name = Question(question="What is your name", field_id="", edition=edition.year)
+        question_email = Question(question="What is your email", field_id="", edition=edition)
+        question_phonenumb = Question(question="What is your phone number", field_id="", edition=edition.year)
+        question_first_lang = Question(question="What is your first language", field_id="", edition=edition.year)
+        question_level_english = Question(question="What is your level of English", field_id="", edition=edition.year)
+        question_studies = Question(question="What do/did you study?", field_id="", edition=edition.year)
+        question_type_degree = Question(question="What kind of diploma are you currently going for?", field_id="", edition=edition.year)
 
         # Mappings: (question, datalist, tag)
         pairs = [(question_name, self.names, "name"),

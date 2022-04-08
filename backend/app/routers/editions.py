@@ -2,27 +2,34 @@ import datetime
 import json
 
 from app.config import config
-from app.crud import read_all_where, read_where, update
+from app.crud import count_where, read_all_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
+from app.exceptions.questiontag_exceptions import (
+    QuestionTagAlreadyExists, QuestionTagCantBeModified,
+    QuestionTagNotFoundException)
 from app.models.answer import Answer
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
+from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
-from app.models.question_tag import QuestionTag
+from app.models.question_tag import (QuestionTag, QuestionTagCreate,
+                                     QuestionTagSimpleOut, QuestionTagUpdate)
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from app.utils.response import response
+from asyncpg import UniqueViolationError
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, selectinload
 from sqlmodel import select
 
 router = APIRouter(prefix="/editions")
@@ -173,7 +180,6 @@ async def get_conflicting_students(year: int):
 
     students = await db.engine.find(Student, {"edition": year})
     students = [student.id for student in students]
-    print(students)
 
     pipeline = [
         # get confirmed suggestions for students in the current edition that say yes
@@ -205,3 +211,109 @@ async def get_conflicting_students(year: int):
         students[-1]["suggestion_ids"] = [str(s_id) for s_id in students[-1]["suggestion_ids"]]
 
     return response(students, "Students with conflicting suggestions retrieved succesfully")
+
+
+# Question Tag Endpoints
+
+@router.get("/{year}/questiontags",  response_description="Tags retrieved")
+async def get_question_tags(year: int, session: AsyncSession = Depends(get_session)):
+    """get_question_tags return list of qusetiontags
+
+    :param year: edition year
+    :type year: int
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: list of QuestionTags
+    :rtype: list of QuestionTags
+    """
+    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year and QuestionTag.question_id==None).options(selectinload(QuestionTag.question)).order_by(QuestionTag.tag))
+    tags = res.all()
+    return [QuestionTagSimpleOut(tag=tag.tag, question=tag.question.question) for (tag,) in tags]
+
+@router.post("/{year}/questiontags",  response_description="Added question tag")
+async def add_question_tag(year:int, tag: QuestionTagCreate, session: AsyncSession = Depends(get_session)):
+    """add_question_tag Create new questiontag
+
+    :param year: edition year
+    :type year: int
+    :param tag: tagname
+    :type tag: QuestionTagCreate
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises QuestionTagAlreadyExists: _description_
+    """
+
+    new_questiontag = QuestionTag(tag=tag.tag, edition=year)
+    try:
+        await update(new_questiontag, session=session)
+    except IntegrityError as e:
+        raise QuestionTagAlreadyExists(tag.tag)
+
+@router.delete("/{year}/questiontag/{tag}")
+async def delete_question_tag(year:int, tag: str, session: AsyncSession = Depends(get_session)):
+    """delete_question_tag delete the questiontag
+
+    :param year: edition year
+    :type year: int
+    :param tag: tagname
+    :type tag: str
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises QuestionTagNotFoundException: _description_
+    """
+
+    stat = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.tag == tag).options(selectinload(QuestionTag.question).options(selectinload(Question.question_answers))))
+    try:
+        (questiontag,) = stat.one()
+    except Exception as e:
+        raise QuestionTagNotFoundException()
+
+    if questiontag.question and len(questiontag.question.question_answers) == 0:
+        # delete the unused question
+        questiontag.question_id = None
+        await update(questiontag, session=session)
+
+        await session.delete(questiontag.question)
+        await session.commit()
+
+@router.patch("/{year}/questiontag/{tag}")
+async def modify_question_tag(year:int, tag: str, tagupdate: QuestionTagUpdate, session: AsyncSession = Depends(get_session)):
+    """modify_question_tag Modify a question tag to link a question
+
+    :param year: editionyear
+    :type year: int
+    :param tag: tagname
+    :type tag: str
+    :param tagupdate: _description_
+    :type tagupdate: QuestionTagUpdate
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises QuestionTagNotFoundException: _description_
+    """
+
+    stat = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.tag == tag).options(selectinload(QuestionTag.question).options(selectinload(Question.question_answers))))
+    try:
+        (questiontag,) = stat.one()
+    except Exception as e:
+        raise QuestionTagNotFoundException()
+
+    if questiontag.question and len(questiontag.question.question_answers) == 0:
+        # Delete the unused question
+        questiontag.question_id = None
+        await update(questiontag, session=session)
+
+        await session.delete(questiontag.question)
+        await session.commit()
+
+    # Search the new question
+    question = await read_where(Question, Question.question == tagupdate.question, Question.edition == year, session=session)
+
+    if question:
+        questiontag.question_id = question.id
+    else:
+        newquestion = Question(question=tagupdate.question, field_id="", edition=year)
+        await update(newquestion, session=session)
+        questiontag.question_id = newquestion.id
+
+    await update(questiontag, session=session)
+
