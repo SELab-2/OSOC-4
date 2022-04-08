@@ -212,7 +212,7 @@ async def get_conflicting_students(year: int):
 
 
 # Question Tag Endpoints
-@router.get("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(UserRole.ADMIN))], response_description="Tags retrieved")
+@router.get("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Tags retrieved")
 async def get_question_tags(year: int, session: AsyncSession = Depends(get_session)):
     """get_question_tags return list of qusetiontags
 
@@ -228,7 +228,7 @@ async def get_question_tags(year: int, session: AsyncSession = Depends(get_sessi
     return [QuestionTagSimpleOut(tag=tag.tag, question=tag.question.question) for (tag,) in tags]
 
 
-@router.get("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(UserRole.ADMIN))], response_description="Tags retrieved")
+@router.get("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Tags retrieved")
 async def get_unused_question_tags(year: int, session: AsyncSession = Depends(get_session)):
     """get_question_tags return list of qusetiontags
 
@@ -244,7 +244,7 @@ async def get_unused_question_tags(year: int, session: AsyncSession = Depends(ge
     return [tag.tag for (tag,) in tags]
 
 
-@router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(UserRole.ADMIN))], response_description="Added question tag")
+@router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Added question tag")
 async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSession = Depends(get_session)):
     """add_question_tag Create new questiontag
 
