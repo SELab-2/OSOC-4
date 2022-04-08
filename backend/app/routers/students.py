@@ -17,26 +17,6 @@ router = APIRouter(prefix="/students")
 router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
-@router.get("/", response_description="Students retrieved")
-async def get_students(orderby: str = "name+asc", skills: str = "", alumn: bool = None, search: str = "", session: AsyncSession = Depends(get_session)):
-    """get_students get all the Student instances from the database
-    :query parameters:
-        :orderby -> str of keys of student + direction to sort by
-    :return: list of students
-    :rtype: dict
-    """
-
-    stat = select(QuestionAnswer.student_id).join(Answer)
-    if search:
-        stat = stat.where(Answer.answer.ilike("%" + search + "%"))
-
-    stat = stat.distinct()
-    res = await session.execute(stat)
-    res = res.all()
-
-    return [config.api_url + "students/" + str(id) for (id,) in res]
-
-
 @router.get("/{student_id}", response_description="Student retrieved")
 async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     """get_student get the Student instances with id from the database
