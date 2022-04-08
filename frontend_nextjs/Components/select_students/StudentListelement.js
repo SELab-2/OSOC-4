@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
+import { useEffect, useState } from "react";
+import { getJson } from "../../utils/json-requests";
 
 import {
   getStudentPath,
 } from "../../routes";
-import {Col, Container, Row} from "react-bootstrap";
-import {router} from "next/client";
+import { Col, Container, Row } from "react-bootstrap";
+import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
 
 export default function StudentListelement(props) {
@@ -16,13 +16,15 @@ export default function StudentListelement(props) {
   const [suggestionsYes, setSuggestionsYes] = useState(0);
   const [suggestionsMaybe, setSuggestionsMaybe] = useState(0);
   const [suggestionsNo, setSuggestionsNo] = useState(0);
-  const [decision,setDecision] = useState(-1);
+  const [decision, setDecision] = useState(-1);
   const [skills, setSkills] = useState([]);
   const [studies, setStudies] = useState(undefined);
   const [degree, setDegree] = useState(undefined);
   const [fistLanguage, setFirstLanguage] = useState(undefined);
   const [levelOfEnglish, setLevelOfEnglish] = useState(undefined);
   const [practicalProblems, setPracticalProblems] = useState(0);
+
+  const router = useRouter()
 
   // This function inserts the data in the variables
   useEffect(() => {
@@ -94,7 +96,7 @@ export default function StudentListelement(props) {
 
           })
         }*/
-    })
+      })
     }
   });
 
@@ -109,8 +111,8 @@ export default function StudentListelement(props) {
 
   // get a list of the skills of the student in HTML format
   function getSkills() {
-    return skills.map((skill,index) =>
-      <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
+    return skills.map((skill, index) =>
+      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
@@ -119,7 +121,7 @@ export default function StudentListelement(props) {
     let questions = ["Studies:", "Type of degree:", "First language:", "Level of English:"];
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
     questions = questions.filter((question, index) => answers[index] !== undefined);
-    return questions.map((question,index) =>
+    return questions.map((question, index) =>
       <p key={index}>{question}</p>
     )
   }
@@ -128,7 +130,7 @@ export default function StudentListelement(props) {
   function getInfoAnswers() {
     let answers = [studies, degree, fistLanguage, levelOfEnglish];
     answers = answers.filter((answer) => answer !== undefined);
-    return answers.map((answer,index) =>
+    return answers.map((answer, index) =>
       <p key={index}>{answer}</p>
     )
   }
@@ -159,14 +161,14 @@ export default function StudentListelement(props) {
 
   // The html representation of a list-element
   return (
-    <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}
-               onClick={() => studentDetails()}>
+    <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
+      onClick={() => studentDetails()}>
       <Row className="upper-layer">
         <Col id="name" className="name" md="auto">{student["name"]}</Col>
-        <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
+        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
           No practical problems
         </Col>
-        <Col/>
+        <Col />
         <Col md="auto">
           <Row md="auto">
             <Col className="suggestions" md="auto">Suggestions:</Col>

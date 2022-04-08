@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import {Col, Row} from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
 
 
@@ -52,11 +52,11 @@ export default function StudentsFilters(props) {
     if (skills) {
       let shownSkills = skills;
 
-      if (! extendedRoleList) {
-        shownSkills = skills.slice(0,5);
+      if (!extendedRoleList) {
+        shownSkills = skills.slice(0, 5);
       }
 
-      return shownSkills.map((skill,index) =>
+      return shownSkills.map((skill, index) =>
         <StudentsFilter filter_id={skill.id} filter_text={skill.name} />
       );
     }
@@ -71,21 +71,21 @@ export default function StudentsFilters(props) {
   }
 
   // The HTML representation of the filters in the 'Select students' tab
-  return(
+  return (
     <Col md="auto" className="filters fill_height scroll-overflow">
       <Row className="title-row-filters">
         <Col>
           <h2 className="filters-title">Filters</h2>
         </Col>
-        <Col/>
-        <Col md="auto" style={{alignSelf: "center"}}>
+        <Col />
+        <Col md="auto" style={{ alignSelf: "center" }}>
           <button className="reset-filters-button" onClick={resetFilters}>
             Reset filters
           </button>
         </Col>
       </Row>
 
-      <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni"/>
+      <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni" />
       <StudentsFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers" />
       <StudentsFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for" />
       <StudentsFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students" />
@@ -96,7 +96,7 @@ export default function StudentsFilters(props) {
       </Row>
       <Row className="skills-search-filters">
         <Col>
-          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"/>
+          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills" />
         </Col>
       </Row>
       {getSkills()}
