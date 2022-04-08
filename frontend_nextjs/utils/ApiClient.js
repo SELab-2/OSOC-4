@@ -70,9 +70,9 @@ class UrlManager {
         }else{
             let res = await getJson(this._editions);
             this._current_edition = res[0];
-            this._year = res['year'];
         }
         let editionData = await getJson(this._current_edition);
+        this._year = editionData['year'];
         this._students = editionData["students"];
         this._projects = editionData["projects"];
     }
