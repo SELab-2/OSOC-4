@@ -76,6 +76,14 @@
     background-color: var(--no_red_65);
 }
 
+.suggestions-circle-yellow {
+    background-color: var(--maybe_yellow_65);
+}
+
+.suggestions-circle-green {
+    background-color: var(--yes_green_65);
+}
+
 .suggestions-circle {
     width: 20px;
     height: 20px;
@@ -109,4 +117,9 @@
     position: absolute;
     top: 50px;
     bottom: 0;
+}
+
+.decision {
+    font-weight: bold;
+    font-size: 20px;
 }

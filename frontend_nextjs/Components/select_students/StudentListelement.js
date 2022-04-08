@@ -18,7 +18,6 @@ export default function StudentListelement(props) {
   useEffect(() => {
     if (!Object.keys(student).length) {
       getJson(props.student).then(res => {
-        console.log(res);
         setStudent(res);
         let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"])
         if (decisions.length !== 0) {
