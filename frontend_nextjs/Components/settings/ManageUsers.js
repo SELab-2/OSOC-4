@@ -8,6 +8,7 @@ import {urlManager} from "../../utils/ApiClient";
 export default function ManageUsers() {
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
+    const [shownUsers, setShownUsers] = useState([])
     const [toInvite, setToInvite] = useState("");
     const [loading, setLoading] = useState(false)
 
@@ -23,7 +24,10 @@ export default function ManageUsers() {
                 log(res)
                 for (let u of res) {
                     getJson(u.id).then(async user => {
-                        if (user.data) { await setUsers(prevState => [...prevState, user.data]); }
+                        if (user.data) {
+                            await setUsers(prevState => [...prevState, user.data]);
+                            await setShownUsers(prevState => [...prevState, user.data]);
+                        }
                     }).then(() => setLoading(false))
                 }
             }));
@@ -55,6 +59,8 @@ export default function ManageUsers() {
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
+        log("LOL")
+        setShownUsers(users.filter(user => user.name.includes(search)))
         //TODO, does changing userlist happend here or at handleSearch?
     }
 
@@ -95,7 +101,7 @@ export default function ManageUsers() {
                     </tr>
                 </thead>
                 <tbody>
-                    {(users.length) ? (users.map((item, index) => (<UserTr key={item.id} user={item} />))) : null}
+                    {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr key={item.id} user={item} />))) : null}
                 </tbody>
             </Table>
         </div>
