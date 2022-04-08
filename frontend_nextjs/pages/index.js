@@ -3,6 +3,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useSession } from "next-auth/react"
 import LoadingPage from "../Components/LoadingPage"
+import {useEffect} from "react";
 
 function Home(props) {
 

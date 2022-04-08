@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from app.config import config
 from pydantic import BaseModel
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class EditionCoach(SQLModel, table=True):
@@ -34,8 +34,12 @@ class EditionOutExtended(BaseModel):
     description: Optional[str] = ""
     user_ids: List[str]
 
+    students: str = ""
+    projects: str = ""
+
     def __init__(self, **data):
         data["uri"] = config.api_url + "editions/" + str(data["year"])
-
-        data["user_ids"] = [config.api_url + "users/" + user for user in data["user_ids"]]
+        data["user_ids"] = [config.api_url + "users/" + str(user) for user in data["user_ids"]]
+        data["students"] = f"{config.api_url}editions/{data['year']}/students"
+        data["projects"] = f"{config.api_url}editions/{data['year']}/projects"
         super().__init__(**data)

@@ -1,8 +1,14 @@
 import StudentListelement from "../Components/StudentListelement";
-import { useEffect, useState } from "react";
-import { getStudentsPath } from "../routes";
-import { getJson } from "../utils/json-requests";
+
+import {useEffect, useState} from "react";
+import {getJson} from "../utils/json-requests";
+import StudentsFilters from "../Components/StudentsFilters";
+import {Container, Row, Col} from "react-bootstrap";
+
 import TempStudentListelement from "../Components/TempStudentElement";
+import {useSession} from "next-auth/react";
+import {urlManager} from "../utils/ApiClient";
+
 
 export default function SelectStudents(props) {
 
@@ -10,19 +16,47 @@ export default function SelectStudents(props) {
     const [students, setStudents] = useState([]);
 
     // This function inserts the data in the variables
-    useEffect(() => {
+    const { data: session, status } = useSession()
+    useEffect( () => {
+        if (session) {
+            if (!students.length) {
+                urlManager.getStudents().then(url => getJson(url).then(res => {
+                    setStudents(res);
+                }));
+            }
+        }
+    })
 
-        getJson(getStudentsPath()).then(res => {
-            setStudents(res);
-            console.log(res)
-        })
+    // function to get a list of students
+    function getStudents() {
+        if (students) {
+            return students.map(student =>
+              // generate a list of students, each student needs 'student' as a prop
+              <li key={student}>
+                  <StudentListelement student={student} />
+              </li>
+            );
+        }
+        return null;
+    }
+     /*
+     <Container fluid>
+        <Row>
+            <Col md="auto" className="filters">
+                <StudentsFilters/>
+            </Col>
+        </Row>
+      </Container>*/
+    return(
+      <Container fluid>
+        <Row>
+            <Col>
+                <ul className="students_list">
+                    {getStudents()}
+                </ul>
+            </Col>
+        </Row>
+      </Container>
 
-    }, [])
-
-    return (
-        <div>
-            <h1>Students</h1>
-            {students.map(student => <TempStudentListelement key={student} id={student} />)}
-        </div>
     )
 }

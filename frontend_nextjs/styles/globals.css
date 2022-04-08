@@ -18,3 +18,7 @@ a {
 ul {
   list-style-type: none;
 }
+
+.col, .row, .col-md-auto {
+  padding: 0;
+}

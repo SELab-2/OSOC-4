@@ -1,0 +1,34 @@
+.title-row-filters {
+    margin-bottom: 10px;
+}
+
+.checkbox-filters {
+    margin-right: 13px;
+}
+
+.filter-row {
+    margin-bottom: 3px;
+}
+
+.filter-title {
+    margin-top: 25px;
+}
+
+.skills-search-filters {
+    margin-bottom: 7px;
+}
+
+.reset-filters-button {
+    align-self: center;
+}
+
+.filters-title {
+    margin-bottom: 0;
+}
+
+.more-or-less-button {
+    background-color: white;
+    border-width: 0;
+    -webkit-text-fill-color: blue;
+    text-underline-color: blue;
+}
