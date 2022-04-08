@@ -1,10 +1,9 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel
-from sqlmodel import Field, SQLModel, Relationship
-
 from app.config import config
+from pydantic import BaseModel
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class SuggestionOption(int, Enum):
@@ -29,6 +28,16 @@ class Suggestion(SQLModel, table=True):
     suggested_by: "User" = Relationship(back_populates="suggestions")
     project: Optional["Project"] = Relationship(back_populates="suggestions")
     skill: Optional["Skill"] = Relationship(back_populates="suggestions")
+
+
+class SuggestionCreate(BaseModel):
+    decision: SuggestionOption
+    definitive: bool
+    reason: str
+
+    student_id: int
+    project_id: int
+    skill_name: str
 
 
 class SuggestionExtended(BaseModel):
