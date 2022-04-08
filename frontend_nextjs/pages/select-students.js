@@ -4,7 +4,6 @@ import StudentsFilters from "../Components/select_students/StudentsFilters";
 import {Col, Row} from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
-import TempStudentListelement from "../Components/TempStudentElement";
 import {useSession} from "next-auth/react";
 import {urlManager} from "../utils/ApiClient";
 
