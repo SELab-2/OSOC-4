@@ -2,7 +2,7 @@ import StudentListelement from "../Components/StudentListelement";
 
 import {useEffect, useState} from "react";
 import {getStudentsPath} from "../routes";
-import {getJson} from "../utils/json-requests";
+import {get_edition, getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
@@ -16,12 +16,19 @@ export default function SelectStudents(props) {
     const [students, setStudents] = useState([]);
 
     // This function inserts the data in the variables
-    useEffect( () => {
-        if (!students.length && "edition" in localStorage) {
+    useEffect(  () => {
+        if (!students.length) {
             log("loading select students")
-            getJson(getStudentsPath(localStorage.getItem("edition"))).then(res => {
-                log(res)
-                setStudents(res);
+            get_edition().then(async edition => {
+                log("edition loaded")
+                log(edition)
+                getJson(getStudentsPath(edition.year)).then(res => {
+                    log("students loaded")
+                    log(res)
+                    if(res){
+                        setStudents(res);
+                    }
+                })
             })
         }
     })

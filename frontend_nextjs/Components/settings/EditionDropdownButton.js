@@ -1,16 +1,21 @@
 import {Dropdown} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
+import {get_edition, getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
-import {useSession} from "next-auth/react";
 
 export default function EditionDropdownButton() {
     const [editionList, setEditionList] = useState([]);
-    const [currentVersion, setCurrentVersion] = useState(["", ""])
-    const { data: session, status } = useSession()
+    const [currentVersion, setCurrentVersion] = useState(undefined)
 
 
     useEffect(() => {
+        if(currentVersion === undefined){
+            get_edition().then(edition => {
+                log(edition.year)
+                setCurrentVersion(edition)
+            })
+        }
+
         if (editionList.length === 0) {
             getJson("/editions").then(async res => {
                 log("load all editions")
@@ -35,18 +40,17 @@ export default function EditionDropdownButton() {
         }
     })
 
-    const ChangeSelectedVersion = async (item) => {
+    const ChangeSelectedVersion = async (edition) => {
         log("change edition dropdown")
-        log(item)
-        log(item.year)
-        localStorage.setItem("edition", item.year)
-        await setCurrentVersion([item.id, item.name]);
+        log(edition)
+        localStorage.setItem("edition", JSON.stringify({"year": edition.year, "name": edition.name}))
+        await setCurrentVersion({"year": edition.year, "name": edition.name});
     }
 
     return (
         <Dropdown>
             <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                Current versions name: {currentVersion[1]}
+                {(currentVersion) ? currentVersion.name : null}
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 {(editionList.length) ? (editionList.map((item, index) => (
