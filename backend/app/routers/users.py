@@ -24,7 +24,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter(prefix="/users")
 
 
-@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved", response_model=List[UserOutSimple])
+@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved",
+            response_model=List[UserOutSimple])
 async def get_users(session: AsyncSession = Depends(get_session)):
     """get_users get all the users from the database
 
@@ -45,6 +46,24 @@ async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = De
     # No need to check whether user exists
 
     return response(UserMe.parse_raw(user.json()), "User retrieved successfully")
+
+
+@router.patch("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def change_user_me(new_data: ChangeUser, Authorize: AuthJWT = Depends(),
+                         session: AsyncSession = Depends(get_session)):
+    current_user_id = Authorize.get_jwt_subject()
+
+    user = await read_where(User, User.id == int(current_user_id), session=session)
+
+    user.name = new_data.name
+    user.active = new_data.active
+    user.approved = new_data.approved
+    user.disabled = new_data.disabled
+    user.role = new_data.role
+
+    user = await update(user, session=session)
+
+    return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
@@ -68,7 +87,8 @@ async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_se
 
 
 @router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends(),
+                          session: AsyncSession = Depends(get_session)):
     """change_password function that changes the user password
 
     :param reset_key: the reset key
@@ -108,7 +128,8 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
 
 
 @router.get("/{id}")
-async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
+async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
+                   session: AsyncSession = Depends(get_session)):
     """get_user this functions returns the user with given id (or None)
 
     :param id: the user id

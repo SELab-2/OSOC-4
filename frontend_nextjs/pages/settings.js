@@ -20,25 +20,24 @@ export default function Settings(props) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState(0);
-
+    const [loading, setLoading] = useState(false)
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
 
     const { data: session, status } = useSession()
 
     useEffect(() => {
-        log(session)
-        if (session) {
-            // TODO change to /users/me
-            getJson(session.userid).then(res => {
+        if((user === undefined || name === "" || email === "") &&  ! loading){
+            setLoading(true)
+            getJson("users/me").then(res => {
                     setUser(res.data);
                     setName(res.data.name);
                     setEmail(res.data.email);
                     setRole(res.data.role);
                 }
-            )
+            ).then(() => setLoading(false))
         }
-    }, [session]);
+    }, [session, loading, user, name, email]);
 
     //TODO make this actually change the theme
     const changeTheme = (event) => {
