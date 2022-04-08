@@ -8,7 +8,7 @@ export default function NavHeader(props) {
 
     async function logoutHandler(event) {
         event.preventDefault();
-        signOut()
+        await signOut()
     }
 
     return (
