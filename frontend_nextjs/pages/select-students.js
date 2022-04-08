@@ -7,6 +7,7 @@ import StudentsFilters from "../Components/StudentsFilters";
 import {Container, Row, Col} from "react-bootstrap";
 
 import TempStudentListelement from "../Components/TempStudentElement";
+import {useSession} from "next-auth/react";
 
 
 export default function SelectStudents(props) {
@@ -15,11 +16,14 @@ export default function SelectStudents(props) {
     const [students, setStudents] = useState([]);
 
     // This function inserts the data in the variables
+    const { data: session, status } = useSession()
     useEffect( () => {
-        if (!students.length) {
-            getJson(getStudentsPath()).then(res => {
-                setStudents(res);
-            })
+        if (session) {
+            if (!students.length) {
+                getJson(getStudentsPath()).then(res => {
+                    setStudents(res);
+                })
+            }
         }
     })
 

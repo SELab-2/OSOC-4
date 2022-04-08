@@ -33,6 +33,10 @@ export default function Settings(props) {
                     setRole(res.data.role);
                 }
             )
+            getJson("").then(res => {
+                console.log("GET root");
+                console.log(res);
+                })
         }
     }, [session]);
 
