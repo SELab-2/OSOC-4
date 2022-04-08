@@ -131,3 +131,13 @@
 .send-email-button {
     margin-top: 10px;
 }
+
+.suggestion-reason {
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.send-email-checkbox {
+    margin-left: 15px;
+    margin-right: 15px;
+}

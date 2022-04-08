@@ -1,7 +1,6 @@
 import {
   Button,
   Col,
-  Image,
   Modal,
   ModalHeader,
   ModalTitle,
@@ -13,7 +12,9 @@ import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
 import {getJson} from "../../utils/json-requests";
 import {getStudentPath} from "../../routes";
-import editIcon from "../../public/assets/edit.svg"
+import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
+import DecisionPopUpWindow from "./DecisionPopUpWindow"
+
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -22,7 +23,11 @@ export default function StudentDetails(props) {
   const [student, setStudent] = useState({});
   const [studentId, setStudentId] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
-  const [modalShow, setModalShow] = useState(false);
+  const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
+  const [decisionPopUpShow, setDecisionPopUpShow] = useState(false);
+  const [decision, setDecision] = useState(-1);
+  const [suggestion, setSuggestion] = useState(0);
+  const [confirmButton, setConfirmButton] = useState(true);
 
   // This function inserts the data in the variables
   useEffect( () => {
@@ -30,84 +35,59 @@ export default function StudentDetails(props) {
       setStudentId(props.student_id);
       getJson(getStudentPath(props.student_id)).then(res => {
         setStudent(res);
-        setSuggestions(res["suggestions"]);
+
+        setSuggestions(res["suggestions"].filter(suggestion => ! suggestion["definitive"]));
+
+        let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"]);
+        if (decisions.length !== 0) {
+          setDecision(decisions[0]["decision"]);
+        } else {
+          setDecision(-1);
+        }
       })
     }
   })
 
   function getDecision() {
-    let decisions = suggestions.filter(suggestion => suggestion["definitive"]);
-    if (decisions.length === 0) {
+    if (decision === -1) {
       return "Undecided"
     }
     let decisionwords = ["No", "Maybe", "Yes"];
-    return decisionwords[decisions[0]["decision"]];
+    return decisionwords[decision];
   }
 
   function getSuggestionsCount(decision) {
-    let temp_suggestions = suggestions.filter(suggestion => ! suggestion["definitive"]);
-    return temp_suggestions.filter(suggestion => suggestion["decision"] === decision).length;
+    return suggestions.filter(suggestion => suggestion["decision"] === decision).length;
   }
 
   function getSuggestions() {
     let result = [];
-    let cases = [[2, "suggestions-circle-green"], [1, "suggestions-circle-yellow"], [0, "suggestions-circle-red"]];
-    for (let variables of cases) {
-      let classNames = "suggestions-circle " + variables[1];
-      for (let i = 0; i < suggestions.length; i ++) {
-        let suggestion = suggestions[i];
-        if (suggestion["decision"] === variables[0] && ! suggestion["definitive"]) {
-          result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}/>)
-        }
-      }
+    let classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
+
+    for (let i = 0; i < suggestions.length; i ++) {
+      let suggestion = suggestions[i];
+      let classNames = "suggestions-circle " + classes[suggestion["decision"]];
+      result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}/>)
     }
+
     if (result.length > 0) {
       return result;
     }
     return <Row>No suggestions</Row>
   }
 
-  function getEmailButtonDisabled() {
-    let decisions = suggestions.filter(suggestion => suggestion["definitive"]);
-    return decisions.length === 0;
-  }
-
-  function MyVerticallyCenteredModal(props) {
-    return (
-      <Modal
-        {...props}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <ModalHeader closeButton>
-          <ModalTitle id="contained-modal-title-vcenter">
-            Modal heading
-          </ModalTitle>
-        </ModalHeader>
-        <Modal.Body>
-          <h4>Centered Modal</h4>
-          <p>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
-            consectetur ac, vestibulum at eros.
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={props.onHide}>Close</Button>
-        </Modal.Footer>
-      </Modal>
-    );
+  function suggest(suggestion) {
+    setSuggestion(suggestion);
+    setSuggestionPopUpShow(true);
   }
 
   // returns the html for student details
   return(
       <Col className="fill_height student-details-window">
 
-          <MyVerticallyCenteredModal
-            show={modalShow}
-            onHide={() => setModalShow(false)}
-          />
+          <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} decision={suggestion} student={student}/>
+          <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={suggestion} student={student} />
+
           <Row className="details-upper-layer">
             <Col md="auto">
               <Row className="name_big">
@@ -120,20 +100,31 @@ export default function StudentDetails(props) {
             <Col/>
             <Col md="auto">
               <Row>
-                <Col md="auto"><button className="suggest-yes-button suggest-button" onClick={() => setModalShow(true)}>Suggest yes</button></Col>
-                <Col md="auto"><button className="suggest-maybe-button suggest-button">Suggest maybe</button></Col>
-                <Col md="auto"><button className="suggest-no-button suggest-button">Suggest no</button></Col>
+                <Col md="auto"><button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>
+                  Suggest yes</button>
+                </Col>
+                <Col md="auto"><button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>
+                  Suggest maybe</button>
+                </Col>
+                <Col md="auto"><button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>
+                  Suggest no</button>
+                </Col>
               </Row>
               <Row>
                 <Col>
-                  <select className="dropdown-decision">
-                    <option value="">Undecided</option>
-                    <option value="">Yes</option>
-                    <option value="">Maybe</option>
-                    <option value="">No</option>
+                  <select className="dropdown-decision" id="dropdown-decision"
+                          onChange={(ev) => setConfirmButton(ev.target.value=== "-1")}>
+                    <option value="-1">Undecided</option>
+                    <option value="2">Yes</option>
+                    <option value="1">Maybe</option>
+                    <option value="0">No</option>
                   </select>
                 </Col>
-                <Col md="auto"><Button className="suggest-confirm-button">Confirm</Button></Col>
+                <Col md="auto">
+                  <Button className="suggest-confirm-button" disabled={confirmButton} onClick={() => setDecisionPopUpShow(true)}>
+                  Confirm
+                  </Button>
+                </Col>
               </Row>
             </Col>
           </Row>
@@ -144,7 +135,7 @@ export default function StudentDetails(props) {
                 <GeneralInfo student={student} decision={getDecision()} />
               </Row>
               <Row md="auto">
-                <Button className="send-email-button" disabled={getEmailButtonDisabled()}>
+                <Button className="send-email-button" disabled={decision === -1}>
                   Send email
                 </Button>
               </Row>
