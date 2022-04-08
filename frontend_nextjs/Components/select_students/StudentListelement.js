@@ -29,6 +29,18 @@ export default function StudentListelement(props) {
     if (!Object.keys(student).length) {
       getJson(props.student).then(res => {
         setStudent(res);
+        if ("first_languages" in res) {
+          setFirstLanguage(res["first language"]);
+        }
+        if ("level of english" in res) {
+          setLevelOfEnglish(res["level of english"]);
+        }
+        if ("studies" in res) {
+          setStudies(res["studies"])
+        }
+        if ("type of degree" in res) {
+          setDegree(res["type of degree"])
+        }
         /*setStudent(props.student)
         setName(props.student.name)
         let localStudent = props.student;
