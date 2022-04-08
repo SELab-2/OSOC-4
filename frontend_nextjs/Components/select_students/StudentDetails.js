@@ -1,10 +1,11 @@
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Col, Modal, ModalBody, ModalDialog, ModalFooter, ModalHeader, ModalTitle, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
 import {getJson} from "../../utils/json-requests";
 import {getStudentPath} from "../../routes";
+import {render} from "react-dom";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -13,6 +14,7 @@ export default function StudentDetails(props) {
   const [student, setStudent] = useState({});
   const [studentId, setStudentId] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
+  const [modalShow, setModalShow] = useState(false);
 
   // This function inserts the data in the variables
   useEffect( () => {
@@ -58,9 +60,42 @@ export default function StudentDetails(props) {
     return <Row>No suggestions</Row>
   }
 
+  function MyVerticallyCenteredModal(props) {
+    return (
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <ModalHeader closeButton>
+          <ModalTitle id="contained-modal-title-vcenter">
+            Modal heading
+          </ModalTitle>
+        </ModalHeader>
+        <Modal.Body>
+          <h4>Centered Modal</h4>
+          <p>
+            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
+            consectetur ac, vestibulum at eros.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={props.onHide}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
   // returns the html for student details
   return(
       <Col className="fill_height student-details-window">
+
+          <MyVerticallyCenteredModal
+            show={modalShow}
+            onHide={() => setModalShow(false)}
+          />
           <Row className="details-upper-layer">
             <Col md="auto">
               <Row className="name_big">
@@ -73,7 +108,7 @@ export default function StudentDetails(props) {
             <Col/>
             <Col md="auto">
               <Row>
-                <Col md="auto"><button className="suggest-yes-button suggest-button">Suggest yes</button></Col>
+                <Col md="auto"><button className="suggest-yes-button suggest-button" onClick={() => setModalShow(true)}>Suggest yes</button></Col>
                 <Col md="auto"><button className="suggest-maybe-button suggest-button">Suggest maybe</button></Col>
                 <Col md="auto"><button className="suggest-no-button suggest-button">Suggest no</button></Col>
               </Row>
