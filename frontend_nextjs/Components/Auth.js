@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import LoadingPage from "../Components/LoadingPage"
 import NavHeader from "../Components/NavHeader"
+import {Container} from "react-bootstrap";
 
 export default function RouteGuard(props) {
     const router = useRouter()
@@ -19,7 +20,12 @@ export default function RouteGuard(props) {
         if (!props.auth) {
             router.push('/')
         } else {
-            return [<NavHeader key="Navbar"/>, ...props.children]
+            return (
+                <Container>
+                    <NavHeader key="Navbar" className="navheader" />
+                    {props.children}
+                </Container>
+            )
         }
     } else if (!props.auth && !isUser) {
         return props.children
