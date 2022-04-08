@@ -11,7 +11,7 @@ import {urlManager} from "../utils/ApiClient";
 export default function SelectStudents(props) {
 
     // These constants are initialized empty, the data will be inserted in useEffect
-    const [students, setStudents] = useState(undefined);
+    const [students, setStudents] = useState([]);
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
