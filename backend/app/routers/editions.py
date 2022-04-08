@@ -212,7 +212,7 @@ async def get_conflicting_students(year: int):
 
 
 # Question Tag Endpoints
-@router.get("/{year}/questiontags", response_description="Tags retrieved")
+@router.get("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(UserRole.ADMIN))], response_description="Tags retrieved")
 async def get_question_tags(year: int, session: AsyncSession = Depends(get_session)):
     """get_question_tags return list of qusetiontags
 
@@ -228,7 +228,7 @@ async def get_question_tags(year: int, session: AsyncSession = Depends(get_sessi
     return [QuestionTagSimpleOut(tag=tag.tag, question=tag.question.question) for (tag,) in tags]
 
 
-@router.get("/{year}/questiontags", response_description="Tags retrieved")
+@router.get("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(UserRole.ADMIN))], response_description="Tags retrieved")
 async def get_unused_question_tags(year: int, session: AsyncSession = Depends(get_session)):
     """get_question_tags return list of qusetiontags
 
@@ -244,7 +244,7 @@ async def get_unused_question_tags(year: int, session: AsyncSession = Depends(ge
     return [tag.tag for (tag,) in tags]
 
 
-@router.post("/{year}/questiontags", response_description="Added question tag")
+@router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(UserRole.ADMIN))], response_description="Added question tag")
 async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSession = Depends(get_session)):
     """add_question_tag Create new questiontag
 
@@ -264,7 +264,7 @@ async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSess
         raise QuestionTagAlreadyExists(tag.tag)
 
 
-@router.delete("/{year}/questiontag/{tag}")
+@router.delete("/{year}/questiontag/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
     """delete_question_tag delete the questiontag
 
@@ -292,7 +292,7 @@ async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depen
         await session.commit()
 
 
-@router.patch("/{year}/questiontag/{tag}")
+@router.patch("/{year}/questiontag/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate, session: AsyncSession = Depends(get_session)):
     """modify_question_tag Modify a question tag to link a question
 
