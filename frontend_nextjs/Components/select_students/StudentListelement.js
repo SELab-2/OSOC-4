@@ -1,14 +1,11 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
-
-import {
-  getStudentPath,
-} from "../../routes";
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
 
+// represents one list element card in the student list
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
@@ -23,6 +20,7 @@ export default function StudentListelement(props) {
     if (!Object.keys(student).length) {
       getJson(props.student).then(res => {
         setStudent(res);
+        // a decision is a suggestion which is definitive
         let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"])
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
@@ -68,12 +66,21 @@ export default function StudentListelement(props) {
     return "var(--no_red_65)"
   }
 
+  // a function to open the details of a student
   function studentDetails() {
     let i = props.student.lastIndexOf('/');
     let id = props.student.substring(i + 1);
-    router.push(getStudentPath(id));
+
+    // the path is not changed, but there is a query added wich contains the id of the student
+    router.push({
+      pathname: router.pathname,
+      query: {
+        studentId: id  // update the query param
+      }
+    }, undefined, { shallow: true})
   }
 
+  // get the suggestion count for a certain decision ("yes", "maybe" or "no")
   function getSuggestions(decision) {
     if (! student["suggestions"]) {
       return 0;

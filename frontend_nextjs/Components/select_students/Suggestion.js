@@ -6,6 +6,7 @@ import {getStudentPath} from "../../routes";
 // displays the counts of the suggestions for a student
 export default function SuggestionsCount(props) {
 
+  // These constants are initialized empty, the data will be inserted in useEffect
   const [suggestedBy, setSuggestedBy] = useState("")
 
   // This function inserts the data in the variables
@@ -15,6 +16,7 @@ export default function SuggestionsCount(props) {
     }
   })
 
+  // returns the html representation of a suggestion
   return (
     <Row key={props.key}>
       <Col md="auto" className={props.classNames}/>

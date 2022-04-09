@@ -1,10 +1,12 @@
-import {Button, Col, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
-import {useState} from "react";
+import {Button, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
 
+// This view shows the pop up window when making a decision about a student.
 export default function SendEmailPopUpWindow(props) {
 
+  // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
+  // returns the string for decision of the student
   function getDecision() {
     if (props.decision === -1) {
       return "undecided" // this can only be shown untill the suggested value is adjusted
@@ -13,14 +15,17 @@ export default function SendEmailPopUpWindow(props) {
     return decisions[props.decision];
   }
 
+  // called when the pop up window is closed
   function onHide() {
     setPopUpShow(false);
   }
 
+  // called on submitting the email
   function submitEmail() {
     setPopUpShow(false);
   }
 
+  // returns the html representation for the email pop up window
   return (
     <Modal
       show={popUpShow}
@@ -31,7 +36,7 @@ export default function SendEmailPopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Send '{getDecision()}' email to {props.student["name"]}
+          Send &apos;{getDecision()}&apos; email to {props.student["name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
