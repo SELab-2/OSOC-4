@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Error from 'next/error'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { check_invitekey, set_password } from '../../utils/json-requests'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
@@ -30,6 +30,9 @@ const Invite = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (password <= 11) {alert("The new password is to short, it should be at least 12 characters long");return;}
+        if (password !== validatePassword) {alert("The two passwords don't match.");return;}
+
         const j = {
             "validate_password": validatePassword,
             "password": password,
@@ -37,13 +40,13 @@ const Invite = () => {
         }
         const resp = await set_password(invitekey, j);
         if (resp) {
-            router.push('/login')
+            await router.push('/login')
         }
     }
 
     useEffect(async () => {
         const resp = await check_invitekey(invitekey);
-
+        console.log("INVITE")
         console.log(resp);
 
         if (resp) {
@@ -69,8 +72,11 @@ const Invite = () => {
             <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={handleChangePassword} value={password} />
+                {(password.length > 11) ? null : (<Form.Text className="text-muted">Password should be at least 12 characters long!</Form.Text>)}
+                <br/>
                 <Form.Label>Confirm Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={handleChangeValidationPassword} value={validatePassword} />
+                {(password === validatePassword) ? null : (<Form.Text className="text-muted">Passwords should be the same!</Form.Text>)}
             </Form.Group>
             <Button variant="primary" type="submit">
                 Submit
