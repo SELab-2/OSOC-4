@@ -7,12 +7,15 @@ import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
 import {forgot} from "../utils/json-requests";
+import LoadingPage from "../Components/LoadingPage";
 
 const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showForgot, setShowForgot] = useState(false)
     const [emailForgot, setEmailForgot] = useState("")
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
     const router = useRouter()
     // let from = useLocation().state?.from?.pathname || "/";
     // const navigate = useNavigate()
@@ -32,7 +35,10 @@ const Login = props => {
 
 
     async function handleLogin() {
-        await signIn('credentials', { email: email, password: password });
+        await setLoading(true);
+        await signIn('credentials', {redirect: false, email: email, password: password });
+        await setMessage("Login failed, please provide the correct email address and password.")
+        await setLoading(false);
     }
 
 
@@ -49,6 +55,10 @@ const Login = props => {
         if (output.success) {
         }
         setShowForgot(false)
+    }
+
+    if (loading) {
+        return (<LoadingPage/>);
     }
 
     return (
@@ -73,6 +83,9 @@ const Login = props => {
                             </button>
 
                         </div>
+
+                        <p>{message}</p>
+                        <br/>
                         <a href="#" onClick={() => { setEmailForgot(email); setShowForgot(true); }} >Forgot your password?</a>
                     </div>
                 ) : (
