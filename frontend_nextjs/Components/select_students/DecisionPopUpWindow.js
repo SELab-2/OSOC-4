@@ -35,15 +35,20 @@ export default function PopUpWindow(props) {
           Decision '{getDecision()}' for {props.student["name"]}
         </ModalTitle>
       </ModalHeader>
-      <Modal.Body>
+      <Modal.Body className="modalbody-margin">
         <Row className="filter-row">
           <Col md="auto" className="send-email-checkbox">
             <input id="send_email" type="checkbox" onChange={val => setTextAreaDisabled(! val.target.checked)}/>
           </Col>
           <Col><label htmlFor="send_email">Send email to {props.student["name"]}</label></Col>
         </Row>
-        <textarea id="decision-email" className="fill_width suggestion-reason"
-                  disabled={textAreaDisabled} value="default email"/>
+        <Row className="disabled-text">
+          Message to {props.student["name"]}:
+        </Row>
+        <Row className="disabled-text">
+          <textarea id="decision-email" className="fill_width suggestion-reason"
+                    disabled={textAreaDisabled} value="default email"/>
+        </Row>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Close</Button>

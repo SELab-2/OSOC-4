@@ -138,6 +138,14 @@
 }
 
 .send-email-checkbox {
+    margin-right: 15px;
+}
+
+.modalbody-margin {
     margin-left: 15px;
     margin-right: 15px;
+}
+
+.disabled-text {
+    -webkit-text-fill-color: gray;
 }
