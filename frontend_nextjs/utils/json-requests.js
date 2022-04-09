@@ -213,3 +213,26 @@ export async function get_edition(){
     }
 
 }
+
+
+export async function check_resetkey(resetkey) {
+    try {
+        await ApiClient.get(`/resetpassword/${resetkey}`)
+        return true;
+    } catch (e) {
+        log(e)
+        return false;
+    }
+}
+
+export async function use_resetkey(resetkey, json) {
+    console.log("use resetkey")
+    console.log(json)
+    try {
+        await ApiClient.post(`/resetpassword/${resetkey}`, json)
+        return true;
+    } catch (e) {
+        log(e)
+        return await catchError(e);
+    }
+}

@@ -173,7 +173,6 @@ async def get_conflicting_students(year: int):
 
     students = await db.engine.find(Student, {"edition": year})
     students = [student.id for student in students]
-    print(students)
 
     pipeline = [
         # get confirmed suggestions for students in the current edition that say yes
