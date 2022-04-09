@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import Error from 'next/error'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import {check_resetkey, set_password, use_resetkey} from '../../utils/json-requests'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
@@ -30,7 +30,10 @@ const Reset = () => {
             "validate_password": validatePassword
         }
         const resp = await use_resetkey(resetkey, data);
-        if (resp) {await router.push('/login');}
+        alert(resp["message"]);
+        if (resp) {
+            await router.push('/login');
+        }
     }
 
     useEffect(() => {
@@ -55,6 +58,7 @@ const Reset = () => {
                 <Form.Control type="password" placeholder="Password" onChange={handleChangePassword} value={password} />
                 <Form.Label>Confirm Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={handleChangeValidationPassword} value={validatePassword} />
+                {(password === validatePassword) ? null : (<Form.Text className="text-muted">Passwords should be the same!</Form.Text>)}
             </Form.Group>
             <Button variant="primary" type="submit">
                 Submit
