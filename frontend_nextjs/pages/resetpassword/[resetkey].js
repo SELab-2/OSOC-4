@@ -25,13 +25,16 @@ const Reset = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (password <= 11) {alert("The new password is to short, it should be at least 12 characters long");return;}
+        if (password !== validatePassword) {alert("The two passwords don't match.");return;}
+
         const data = {
             "password": password,
             "validate_password": validatePassword
         }
         const resp = await use_resetkey(resetkey, data);
-        alert(resp["message"]);
         if (resp) {
+            alert(resp["message"]);
             await router.push('/login');
         }
     }
@@ -56,6 +59,7 @@ const Reset = () => {
             <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={handleChangePassword} value={password} />
+                {(password.length > 11) ? null : (<Form.Text className="text-muted">Password should be at least 12 characters long!</Form.Text>)}
                 <Form.Label>Confirm Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={handleChangeValidationPassword} value={validatePassword} />
                 {(password === validatePassword) ? null : (<Form.Text className="text-muted">Passwords should be the same!</Form.Text>)}

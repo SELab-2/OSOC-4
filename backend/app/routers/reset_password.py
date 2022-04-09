@@ -48,6 +48,6 @@ async def use_resetkey(resetkey: str, reset: UserResetPassword = Body(...), sess
         await update(user, session=session)
         db.redis.delete(resetkey)
 
-        return response(None, "Password reset successful")
+        return response(None, "New password successfully set, you can now login with your new password")
 
     raise InvalidResetKeyException()
