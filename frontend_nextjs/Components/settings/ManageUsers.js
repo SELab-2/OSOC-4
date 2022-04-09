@@ -5,7 +5,7 @@ import { getJson, postCreate } from "../../utils/json-requests";
 import { log } from "../../utils/logger";
 import {urlManager} from "../../utils/ApiClient";
 
-export default function ManageUsers() {
+export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
     const [shownUsers, setShownUsers] = useState([])
@@ -101,7 +101,7 @@ export default function ManageUsers() {
                     </tr>
                 </thead>
                 <tbody>
-                    {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr key={item.id} user={item} />))) : null}
+                    {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr isMe={item.email === props.me.email} key={item.id} user={item} />))) : null}
                 </tbody>
             </Table>
         </div>

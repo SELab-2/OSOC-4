@@ -89,7 +89,7 @@ export default function Settings(props) {
                         </AccordionHeader>
                         <AccordionBody>
                             <div className="admin-settings">
-                                <ManageUsers/>
+                                <ManageUsers me={user}/>
                             </div>
                         </AccordionBody>
                     </AccordionItem>
