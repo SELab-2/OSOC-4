@@ -50,7 +50,7 @@ async def invited_user(invitekey: str, userinvite: UserInvite, session: AsyncSes
     userid = db.redis.get(invitekey)  # check that the inv key exists
 
     if userid:
-        user: User = await read_where(User, User.id == ObjectId(userid), session=session)
+        user: User = await read_where(User, User.id == int(userid), session=session)
 
         if not user:
             raise NotPermittedException()
