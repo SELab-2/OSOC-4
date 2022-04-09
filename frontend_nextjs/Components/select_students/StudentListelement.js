@@ -5,8 +5,8 @@ import GeneralInfo from "./GeneralInfo"
 import {
   getStudentPath,
 } from "../../routes";
-import {Col, Container, Row} from "react-bootstrap";
-import {router} from "next/client";
+import { Col, Container, Row } from "react-bootstrap";
+import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
 
 export default function StudentListelement(props) {
@@ -14,6 +14,9 @@ export default function StudentListelement(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [student, setStudent] = useState({});
   const [decision,setDecision] = useState(-1);
+
+
+  const router = useRouter()
 
   // This function inserts the data in the variables
   useEffect(() => {
@@ -44,6 +47,7 @@ export default function StudentListelement(props) {
       <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
     )
   }
+
 
   // get the background color of the student, based on the decision
   function getBackground() {
@@ -79,14 +83,14 @@ export default function StudentListelement(props) {
 
   // The html representation of a list-element
   return (
-    <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}
-               onClick={() => studentDetails()}>
+    <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
+      onClick={() => studentDetails()}>
       <Row className="upper-layer">
         <Col id="name" className="name" md="auto">{student["name"]}</Col>
-        <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
+        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
           No practical problems
         </Col>
-        <Col/>
+        <Col />
         <Col md="auto">
           <Row md="auto">
             <Col className="suggestions" md="auto">Suggestions:</Col>

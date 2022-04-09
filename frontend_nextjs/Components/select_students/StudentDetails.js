@@ -8,15 +8,16 @@ import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
 import {getJson} from "../../utils/json-requests";
-import {getStudentPath} from "../../routes";
 import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
 import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
 import deleteIcon from '../../public/assets/delete.svg';
 import editIcon from '../../public/assets/edit.svg'
-import Image from 'next/image';
 import DeletePopUpWindow from "./DeletePopUpWindow";
-
+import {getSelectStudentsPath, getStudentPath, getStudentsPath} from "../../routes";
+import {router} from "next/client";
+import closeIcon from "../../public/assets/close.svg";
+import Image from "next/image";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -97,6 +98,12 @@ export default function StudentDetails(props) {
           <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
           <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
 
+          <Row>
+            <Col />
+            <Col md="auto">
+                <Image  onClick={() => router.push(getSelectStudentsPath())} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="36px" height="36px" objectFit={'contain'} />
+            </Col>
+          </Row>
           <Row className="details-upper-layer">
             <Col md="auto">
               <Row>

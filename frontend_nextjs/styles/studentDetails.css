@@ -1,5 +1,5 @@
 .name_big {
-    font-size: 35px;
+    font-size: 40px;
 }
 
 .suggest-button {
@@ -36,7 +36,7 @@
 }
 
 .details-upper-layer {
-    margin: 10px 20px;
+    margin: 0 20px;
     height: 100px;
 }
 
@@ -55,6 +55,7 @@
 .remaining-height-details {
     position: absolute;
     top: 130px;
+
     bottom: 0;
     margin-left: 10px;
 }
@@ -112,7 +113,7 @@
 }
 
 .backbutton {
-    padding: 5px 18px;
+    padding: 0 0 0 0;
     border-style: solid;
     border-radius: 5px;
 }
