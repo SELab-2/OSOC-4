@@ -1,25 +1,20 @@
 import asyncio
 import unittest
 from enum import IntEnum, Enum, auto
-from typing import Set, Dict, Any, Tuple
+from typing import Set, Dict, Any, Tuple, Optional, Type
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
+from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.api import app
-from app.database import db
-from app.models.answer import Answer
+from app.crud import read_where, update, read_all_where
+from app.database import engine
 from app.models.edition import Edition
-from app.models.participation import Participation
-from app.models.project import Project
-from app.models.question import Question
-from app.models.question_answer import QuestionAnswer
 from app.models.skill import Skill
-from app.models.student import Student
-from app.models.suggestion import Suggestion
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
-from asgi_lifespan import LifespanManager
-from httpx import AsyncClient, Response
 
 
 class Request(Enum):
@@ -50,6 +45,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.bad_id = 0
         self.users = {
             "user_admin": User(
                 email="user_admin@test.be",
@@ -109,18 +105,23 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             "documentatie verantwoordelijke": Skill(name="documentatie verantwoordelijke"),
             "customer relations": Skill(name="customer relations"),
             "frontend": Skill(name="frontend"),
+            "2022_edition": Edition(year=2022, name="Summer edition 2022", coaches=[], students=[]),
             **self.users
         }
 
-        self.objects["project_test"] = Project(
-            name="project_test",
-            description="A project aimed at being dummy data",
-            goals=["Testing this application", "Being dummy data"],
-            partner=Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
-            required_skills=[],
-            users=[],
-            edition=2022
-        )
+        # self.objects["project_test"] = Project(
+        #     edition=self.objects["2022_edition"].year,
+        #     name="project_test",
+        #     description="A project aimed at being dummy data",
+        #     goals="i have goals",
+        #     partner_name="Testing inc.",
+        #     partner_description="Testing inc. is focused on being dummy data.",
+        #     coaches=[self.objects["user_approved_coach"].id],
+        #     required_skills=[],
+        #     suggestions=[],
+        #     participations=[],
+        # )
+
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         }
@@ -131,31 +132,54 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.client: AsyncClient = AsyncClient(app=app, base_url="http://test")
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
+        self.session: AsyncSession = AsyncSession(engine)
+
         for key, obj in self.objects.items():
             if isinstance(obj, User):
-                plain_password = obj.password
+                self.saved_objects["passwords"][key] = obj.password  # if having problems, check this out
                 obj.password = get_password_hash(obj.password)
-                self.saved_objects["passwords"][key] = plain_password
 
-            # update the corresponding object list
-            obj_list = self.saved_objects.get(obj.__repr_name__()) or []
-            obj_list.append(key)
-            self.saved_objects[obj.__repr_name__()] = obj_list  # Key is the type of the obj (without extra)
-
-            self.saved_objects[key] = await db.engine.save(obj)
+            await update(obj, session=self.session)
 
     async def asyncTearDown(self) -> None:
-        for model in [Answer, Edition, Participation, Project, Question,
-                      QuestionAnswer, Skill, Student, Suggestion, User]:
-            instances = await db.engine.find(model)
-            for instance in instances:
-                await db.engine.delete(instance)
+        async with engine.connect() as conn:
+            # tables in dependency order (delete last first and/or cascade)
+            tables = await conn.run_sync(
+                lambda sync_conn: inspect(sync_conn).get_sorted_table_and_fkc_names()
+            )
+
+        for table in reversed(tables):
+            # TODO: fix this, doing "TRUNCATE user CASCADE" gives syntax error, thus workaround
+            if table[0] == "user":  # workaround for user table
+                users = await read_all_where(User, session=self.session)
+                for user in users:
+                    await self.session.delete(user)
+            elif table[0] is not None:
+                await self.session.execute(f"TRUNCATE {table[0]} CASCADE")  # successful on edition fails on user
+
+            await self.session.commit()
+
+        # old way of doing things, this should result in the same empty database as the above function
+        # The above way of doing it ensures all tables are emptied instead of only those in this loop which may change
+        # for model in [Answer, Edition, Participation, Project, Question,
+        #               QuestionAnswer, Skill, Student, Suggestion, User]:
+        #     objects = await read_all_where(model, session=self.session)
+        #     for obj in objects:
+        #         await self.session.delete(obj)
+        #
+        #     await self.session.commit()
+
         await self.lf.__aexit__()
         await self.client.aclose()
+        await self.session.close()
 
-    async def get_access_token(self, user: str):
-        email: str = self.saved_objects[user].email
-        password: str = self.saved_objects["passwords"][user]
+    async def get_user_by_name(self, user_name: str) -> Optional[Type[User]]:
+        return await read_where(User, User.name == user_name, session=self.session)
+
+    async def get_access_token(self, user_name: str):
+        user: User = await self.get_user_by_name(user_name)
+        email: str = user.email
+        password: str = self.saved_objects["passwords"][user_name]
         login = await self.client.post("/login", json={"email": email, "password": password},
                                        headers={"Content-Type": "application/json"})
         return login.json()["data"]["accessToken"]

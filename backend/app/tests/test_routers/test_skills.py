@@ -1,4 +1,5 @@
 import json
+import unittest
 from typing import Dict
 
 from httpx import Response
@@ -12,6 +13,7 @@ class TestSkills(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @unittest.skip("Router no longer included")
     async def test_get_skills(self):
         path = "/skills"
         allowed_users = {"user_admin"}

@@ -1,3 +1,5 @@
+import unittest
+
 from app.crud import update, read_where
 from app.database import db
 from app.models.user import User
@@ -9,10 +11,11 @@ class TestUserInvites(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @unittest.skip("Router no longer included")
     async def test_valid_invitekey(self):
         path = "/invite/"
 
-        new_user: User = await update(User.parse_obj({"email": "new.mail@test.test"}))
+        new_user: User = await update(User.parse_obj({"email": "new.mail@test.test"}), session=self.session)
 
         # correct key
         key = generate_new_invite_key()
@@ -35,13 +38,14 @@ class TestUserInvites(TestBase):
         db.redis.setex(bad_key, key[1], str(new_user.id))
         await self.do_request(Request.GET, f"{path}{bad_key}", "", Status.BAD_REQUEST, use_access_token=False)
 
+    @unittest.skip("Router no longer included")
     async def test_invited_user(self):
         path = "/invite/"
 
         username = "The NewGuy"
         email = "The.NewGuy@test.test"
         password = "ValidPass?!123"
-        new_user: User = await update(User.parse_obj({"email": email}))
+        new_user: User = await update(User.parse_obj({"email": email}), session=self.session)
         body = {
             "name": username,
             "password": password,
@@ -72,7 +76,7 @@ class TestUserInvites(TestBase):
                               json_body=body, use_access_token=False)
 
         # Assert that the invites were unsuccessful
-        new_user = await read_where(User, User.id == new_user.id)
+        new_user = await read_where(User, User.id == new_user.id, session=self.session)
         self.check_user(new_user, ["", email.lower(), 0, False, False, True], True)
 
         # Try with activated user
@@ -82,7 +86,7 @@ class TestUserInvites(TestBase):
 
         # Assert that the invite was unsuccessful
         expected_user = self.objects["user_admin"]
-        found_user = await read_where(User, User.id == self.objects["user_admin"].id)
+        found_user = await read_where(User, User.id == self.objects["user_admin"].id, session=self.session)
         self.check_user(expected_user,
                         [found_user.name, found_user.email.lower(), found_user.role,
                          found_user.active, found_user.approved, found_user.disabled],
@@ -99,14 +103,14 @@ class TestUserInvites(TestBase):
         await self.do_request(Request.POST, f"{path}{key[0]}", "", Status.BAD_REQUEST,
                               json_body=bad_body, use_access_token=False)
         # Assert that the invite was unsuccessful
-        new_user = await read_where(User, User.id == new_user.id)
+        new_user = await read_where(User, User.id == new_user.id, session=self.session)
         self.check_user(new_user, ["", email.lower(), 0, False, False, True], True)
 
         # Try successful
         await self.do_request(Request.POST, f"{path}{key[0]}", "", Status.SUCCESS,
                               json_body=body, use_access_token=False)
         # Assert that the invite was successful
-        new_user = await read_where(User, User.id == new_user.id)
+        new_user = await read_where(User, User.id == new_user.id, session=self.session)
         # check role
         self.check_user(new_user, [username, email.lower(), 0, True, False, True], False)
 

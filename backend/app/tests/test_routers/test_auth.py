@@ -20,9 +20,9 @@ class TestAuth(TestBase):
         self.assertTrue("message" in response.json())
 
     async def test_post_login(self):
-        user_admin = self.objects["user_admin"]
+        user_admin = await self.get_user_by_name("user_admin")
         user_admin_pass = self.saved_objects["passwords"][user_admin.name]
-        user_approved = self.objects["user_approved_coach"]
+        user_approved = await self.get_user_by_name("user_approved_coach")
         user_approved_pass = self.saved_objects["passwords"][user_approved.name]
 
         # correct login admin & approved user
