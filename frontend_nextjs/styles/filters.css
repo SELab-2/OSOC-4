@@ -1,0 +1,53 @@
+.title-row-filters {
+    margin-bottom: 10px;
+}
+
+.checkbox-filters {
+    margin-right: 13px;
+}
+
+.filter-row {
+    margin-bottom: 3px;
+}
+
+.filter-title {
+    margin-top: 25px;
+}
+
+.skills-search-filters {
+    margin-bottom: 7px;
+}
+
+.reset-filters-button {
+    align-self: center;
+}
+
+.filters-title {
+    margin-bottom: 0;
+}
+
+.more-or-less-button {
+    background-color: white;
+    border-width: 0;
+    -webkit-text-fill-color: blue;
+    text-underline-color: blue;
+}
+
+.filters {
+    margin-right: 20px;
+    margin-left: 20px;
+    padding-top: 20px;
+    padding-right: 40px;
+    padding-left: 30px;
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-right-color: lightgray;
+}
+
+.reset-filters-button {
+    padding-left: 10px;
+    padding-right: 10px;
+    border-style: solid;
+    border-radius: 8px;
+    border-width: 1px;
+}

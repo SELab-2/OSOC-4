@@ -1,0 +1,23 @@
+.students_list {
+    margin: 0 20px 0 20px;
+    padding: 0;
+}
+
+.fill_height {
+    height: 100%;
+}
+
+.scroll-overflow {
+    overflow-y: auto;
+}
+
+.fill_width {
+    width: 100%;
+}
+
+.remaining_height {
+    position: absolute;
+    top: 75px;
+    bottom: 0;
+    width: 100%;
+}

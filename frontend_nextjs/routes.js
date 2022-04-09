@@ -1,19 +1,11 @@
 
 
 
-export const getRolesPath = () => '/roles'
 
-export const getStudentsPath = () => '/students/'
+export const getSkillsPath = () => '/roles'
 
-export const getSuggestionsPath = () => '/suggestions/'
+export const getStudentsPath = (edition) => '/editions/' + edition +'/students'
 
-export const getStudyQuestionId = () => '623f083b969d6c69127ec697'
+export const getStudentPath = (id) => '/students/' + id
 
-export const getDegreeQuestionId = () => '623f083b969d6c69127ec68f'
-
-export const getFirstLanguageQuestionId = () => '623f083b969d6c69127ec683'
-
-export const getLevelOfEnglishQuestionId = () => '623f083b969d6c69127ec689'
-
-export const getQuestionAnswersPath = () => '/question_answers/'
-
+export const getSelectStudentsPath = () => '/select-students/'

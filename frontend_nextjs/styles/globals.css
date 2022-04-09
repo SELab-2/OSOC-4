@@ -18,3 +18,43 @@ a {
 ul {
   list-style-type: none;
 }
+
+.col, .row, .col-md-auto {
+  padding: 0;
+}
+
+.container {
+  max-height: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

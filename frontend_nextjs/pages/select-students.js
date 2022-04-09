@@ -1,7 +1,12 @@
-import StudentListelement from "../Components/StudentListelement";
 import {useEffect, useState} from "react";
-import {getStudentsPath} from "../routes";
 import {getJson} from "../utils/json-requests";
+import StudentsFilters from "../Components/select_students/StudentsFilters";
+import {Col, Row} from "react-bootstrap";
+
+import StudentList from "../Components/select_students/StudentList";
+import {useSession} from "next-auth/react";
+import {urlManager} from "../utils/ApiClient";
+
 
 export default function SelectStudents(props) {
 
@@ -9,32 +14,25 @@ export default function SelectStudents(props) {
     const [students, setStudents] = useState(undefined);
 
     // This function inserts the data in the variables
+    const { data: session, status } = useSession()
     useEffect( () => {
-        if (!students) {
-            getJson(getStudentsPath()).then(res => {
-                setStudents(res.data);
-            })
+        if (session) {
+            if (!students) {
+                urlManager.getStudents().then(url => getJson(url).then(res => {
+                    setStudents(res);
+                }));
+            }
         }
     })
 
-    // function to get a list of students
-    function getStudents() {
-        if (students) {
-            return students.map(student =>
-              // generate a list of students, each student needs 'student' as a prop
-              <li key={student.id}>
-                  <StudentListelement student={student} />
-              </li>
-            );
-        }
-        return null;
-    }
-
+    // the html that displays the overview of students
     return(
-      <div>
-          <ul className="students-list">
-              {getStudents()}
-          </ul>
-      </div>
+      <Row className="remaining_height fill_width">
+        <StudentsFilters/>
+          <Col className="fill_height scroll-overflow">
+              <StudentList students={students} width="max" />
+          </Col>
+      </Row>
     )
+    
 }

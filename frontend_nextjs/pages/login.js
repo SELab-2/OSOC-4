@@ -3,10 +3,9 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useState } from 'react';
 import { useRouter } from 'next/router'
-import { login } from "../utils/json-requests";
 import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
-import logoFull from '../public/assets/0-1-osoc-full-2.png';
+import logoScreen from '../public/assets/osoc-screen.png';
 
 const Login = props => {
     const [email, setEmail] = useState("");
@@ -31,9 +30,8 @@ const Login = props => {
     }
 
 
-    async function handleSubmitLogin(event) {
-        log("handle login submit")
-
+    async function handleLogin() {
+        await signIn('credentials', {email: email, password: password});
     }
 
 
@@ -56,7 +54,7 @@ const Login = props => {
         <div className="body-login">
             <section className="body-left">
                 <div className="image-wrapper">
-                    <Image src={logoFull} alt="osoc-logo" width="100%" height="100%" layout={'responsive'} objectFit={'contain'} />
+                    <Image className="logo" src={logoScreen} alt="osoc-logo"/>
                 </div>
             </section>
 
@@ -69,7 +67,7 @@ const Login = props => {
                             <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address" />
                             <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
 
-                            <button className="submit" onClick={() => { signIn('credentials', { email: email, password: password }) }}>
+                            <button className="submit" onClick={handleLogin}>
                                 Login
                             </button>
 

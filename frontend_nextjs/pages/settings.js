@@ -24,6 +24,7 @@ export default function Settings(props) {
     const [darkTheme, setDarkTheme] = useState(false);
 
     const { data: session, status } = useSession()
+
     useEffect(() => {
         if (session) {
             getJson(session.userid).then(res => {
@@ -70,7 +71,7 @@ export default function Settings(props) {
                     <AccordionBody>
                         <div>
                             <Button variant={"outline-secondary"} onClick={changeTheme}>{darkTheme ? "Turn to light theme" : "Turn to dark theme"}</Button>
-                            {/*<EditionDropdownButton/>*/}
+                            <EditionDropdownButton/>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
