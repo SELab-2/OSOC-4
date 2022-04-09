@@ -26,7 +26,7 @@ async def valid_invitekey(invitekey: str):
     except InvalidId:
         raise InvalidInviteException()
 
-    userid = await read_where(User, User.id == ObjectId(db.redis.get(invitekey)))
+    userid = await read_where(User, User.id == int(db.redis.get(invitekey)))
     if userid is None:
         raise InvalidInviteException()
     return response(None, "Valid invitekey")
