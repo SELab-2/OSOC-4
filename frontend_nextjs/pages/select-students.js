@@ -29,20 +29,6 @@ export default function SelectStudents(props) {
         }
     })
 
-    function getDetailcollapsed() {
-        if (studentId) {
-            return "visible";
-        }
-        return "collapse";
-    }
-
-    function getFiltersCollapsed() {
-        if (! studentId) {
-            return "visible";
-        }
-        return "collapse";
-    }
-
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">

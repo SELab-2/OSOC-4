@@ -37,7 +37,6 @@
 
 .details-upper-layer {
     margin: 0 20px;
-    height: 100px;
 }
 
 .dropdown-decision {
@@ -53,9 +52,6 @@
 }
 
 .remaining-height-details {
-    position: absolute;
-    top: 160px;
-    bottom: 0;
     margin-left: 10px;
 }
 

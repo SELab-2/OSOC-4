@@ -103,12 +103,6 @@ export default function StudentDetails(props) {
           <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
           <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
 
-          <Row className="fill_width">
-            <Col />
-            <Col md="auto">
-                <Image  onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="36px" height="36px" objectFit={'contain'} />
-            </Col>
-          </Row>
           <Row className="details-upper-layer">
             <Col md="auto">
               <Row>
@@ -137,6 +131,9 @@ export default function StudentDetails(props) {
                 <Col md="auto"><button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>
                   Suggest no</button>
                 </Col>
+                  <Col md="auto" className="close-button">
+                    <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="52px" height="52px" objectFit={'contain'} />
+                  </Col>
               </Row>
               <Row>
                 <Col>
@@ -156,7 +153,7 @@ export default function StudentDetails(props) {
               </Row>
             </Col>
           </Row>
-          <Row className="remaining-height-details" md="auto">
+          <Row className="remaining-height-details" md="auto" style={{}}>
             <Col md="auto" className="fill_height scroll-overflow student-details">
               <Row md="auto" className="first-h2-titles"><Col><h2>General</h2></Col></Row>
               <Row md="auto" className="decision">

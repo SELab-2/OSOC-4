@@ -27,5 +27,9 @@
 }
 
 .students-list-paddingtop {
-    padding-top: 40px;
+    padding-top: 20px;
+}
+
+.close-button {
+    margin-top: 3px;
 }

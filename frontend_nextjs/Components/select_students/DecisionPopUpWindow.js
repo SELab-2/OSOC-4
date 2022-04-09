@@ -1,11 +1,14 @@
 import {Button, Col, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
 import {useState} from "react";
 
+// This view shows the pop up window when making a decision about a student.
 export default function DecisionPopUpWindow(props) {
 
+  // defines wheater or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
   const [textAreaDisabled, setTextAreaDisabled] = useState(true);
 
+  // returns the string for decision of the student
   function getDecision() {
     if (props.decision === -1) {
       return "undecided" // this can only be shown untill the suggested value is adjusted
@@ -14,14 +17,17 @@ export default function DecisionPopUpWindow(props) {
     return decisions[props.decision];
   }
 
+  // called when the pop up window is closed
   function onHide() {
     setPopUpShow(false);
   }
 
+  // called on submitting the decision
   function submitDecision() {
     setPopUpShow(false);
   }
 
+  // returns "disabled-text" if the text area should be disabled
   function getTextClassName() {
     if (textAreaDisabled) {
       return "disabled-text";
@@ -29,6 +35,7 @@ export default function DecisionPopUpWindow(props) {
     return "";
   }
 
+  // returns the html representation for the pop up window
   return (
     <Modal
       show={popUpShow}

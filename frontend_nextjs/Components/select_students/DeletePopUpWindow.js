@@ -1,7 +1,9 @@
-import {Button, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
+import {Button, Modal, ModalHeader, ModalTitle} from "react-bootstrap";
 
+// This view shows the pop up window when making a decision about a student.
 export default function DeletePopUpWindow(props) {
 
+  // defines wheater or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
   function onHide() {
