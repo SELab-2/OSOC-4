@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
+import { useEffect, useState } from "react";
+import { getJson } from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 
 import {
@@ -13,7 +13,7 @@ export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [student, setStudent] = useState({});
-  const [decision,setDecision] = useState(-1);
+  const [decision, setDecision] = useState(-1);
 
 
   const router = useRouter()
@@ -27,7 +27,7 @@ export default function StudentListelement(props) {
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
         }
-    })
+      })
     }
   });
 
@@ -43,8 +43,8 @@ export default function StudentListelement(props) {
   // get a list of the skills of the student in HTML format
   function getSkills() {
     let skills = [];
-    return skills.map((skill,index) =>
-      <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
+    return skills.map((skill, index) =>
+      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
@@ -75,10 +75,10 @@ export default function StudentListelement(props) {
   }
 
   function getSuggestions(decision) {
-    if (! student["suggestions"]) {
+    if (!student["suggestion_counts"]) {
       return 0;
     }
-    return student["suggestions"].filter(suggestion => ! suggestion["definitive"] && suggestion["decision"] === decision).length
+    return student["suggestion_counts"][decision]
   }
 
   // The html representation of a list-element
