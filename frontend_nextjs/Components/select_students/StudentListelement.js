@@ -3,11 +3,13 @@ import {getJson} from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 
 import {
+  getSelectStudentsPath,
   getStudentPath,
 } from "../../routes";
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
+import {urlManager} from "../../utils/ApiClient";
 
 export default function StudentListelement(props) {
 
@@ -71,7 +73,15 @@ export default function StudentListelement(props) {
   function studentDetails() {
     let i = props.student.lastIndexOf('/');
     let id = props.student.substring(i + 1);
-    router.push(getStudentPath(id));
+
+    // history.replaceState(null, "", getSelectStudentsPath() + id)
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        studentId: id  // update the query param
+      }
+    }, undefined, { shallow: true})
   }
 
   function getSuggestions(decision) {

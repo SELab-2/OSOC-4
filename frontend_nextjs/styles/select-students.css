@@ -21,3 +21,11 @@
     bottom: 0;
     width: 100%;
 }
+
+.studentlist-topmargin {
+    margin-top: 20px;
+}
+
+.students-list-paddingtop {
+    padding-top: 40px;
+}

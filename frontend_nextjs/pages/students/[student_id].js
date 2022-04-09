@@ -27,9 +27,7 @@ export default function Student_id(props) {
   return(
     <Row className="remaining_height fill_width">
       <Col md="auto" className="fill_height" style={{width: "35%"}}>
-        <Row className="remaining-height-backbutton" style={{width: "35%"}}>
-          <StudentList students={students} width="min"/>
-        </Row>
+        <StudentList students={students}/>
       </Col>
       <StudentDetails student_id={student_id} />
     </Row>

@@ -6,12 +6,16 @@ import { Col, Row } from "react-bootstrap";
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
+import {router} from "next/client";
+import StudentDetails from "../Components/select_students/StudentDetails";
+import {getSelectStudentsPath} from "../routes";
 
 
 export default function SelectStudents(props) {
 
     // These constants are initialized empty, the data will be inserted in useEffect
     const [students, setStudents] = useState(undefined);
+    const studentId = router.query.studentId;
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
@@ -25,13 +29,31 @@ export default function SelectStudents(props) {
         }
     })
 
+    function getDetailcollapsed() {
+        if (studentId) {
+            return "visible";
+        }
+        return "collapse";
+    }
+
+    function getFiltersCollapsed() {
+        if (! studentId) {
+            return "visible";
+        }
+        return "collapse";
+    }
+
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">
-            <StudentsFilters />
-            <Col className="fill_height scroll-overflow">
-                <StudentList students={students} width="max" />
+            <StudentsFilters visibility={getFiltersCollapsed()}/>
+            <Col className="fill_height students-list-paddingtop">
+                 <div className="fill_height">
+                     <StudentList students={students}/>
+                 </div>
             </Col>
+
+            <StudentDetails student_id={studentId} visibility={getDetailcollapsed()}/>
         </Row>
     )
 

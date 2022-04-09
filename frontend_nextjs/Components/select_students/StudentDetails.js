@@ -34,12 +34,11 @@ export default function StudentDetails(props) {
 
   const [decision, setDecision] = useState(-1);
   const [suggestion, setSuggestion] = useState(0);
-  const [confirmButton, setConfirmButton] = useState(true);
   const [decideField, setDecideField] = useState(-1);
 
   // This function inserts the data in the variables
   useEffect( () => {
-    if (studentId !== props.student_id) {
+    if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       getJson(getStudentPath(props.student_id)).then(res => {
         setStudent(res);
@@ -89,19 +88,25 @@ export default function StudentDetails(props) {
     setSuggestionPopUpShow(true);
   }
 
+  function hideStudentDetails() {
+    router.push({
+      pathname: router.pathname
+    }, undefined, { shallow: true})
+  }
+
   // returns the html for student details
   return(
-      <Col className="fill_height student-details-window">
+      <Col className="fill_height student-details-window" style={{visibility: props.visibility}} >
 
           <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} decision={suggestion} student={student}/>
           <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
           <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
           <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
 
-          <Row>
+          <Row className="fill_width">
             <Col />
             <Col md="auto">
-                <Image  onClick={() => router.push(getSelectStudentsPath())} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="36px" height="36px" objectFit={'contain'} />
+                <Image  onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="36px" height="36px" objectFit={'contain'} />
             </Col>
           </Row>
           <Row className="details-upper-layer">
