@@ -6,18 +6,18 @@ import EditionDropdownButton from "../Components/settings/EditionDropdownButton"
 import ChangeName from "../Components/settings/ChangeName";
 import ChangeEmail from "../Components/settings/ChangeEmail";
 import SettingCards from "../Components/settings/SettingCards";
-import {Accordion, Button} from "react-bootstrap";
+import {Accordion} from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
-import {useSession} from "next-auth/react";
 import {log} from "../utils/logger";
 import {urlManager} from "../utils/ApiClient";
+import ChangeTheme from "../Components/settings/ChangeTheme";
 import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
-
-
+import dark_theme from "/public/assets/dark_theme.png"
+import edition from "/public/assets/edition.png"
 
 export default function Settings(props) {
     const [user, setUser] = useState(undefined);
@@ -78,9 +78,13 @@ export default function Settings(props) {
                         <h3>Website settings</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                        <div>
-                            <Button variant={"outline-secondary"} onClick={changeTheme}>{darkTheme ? "Turn to light theme" : "Turn to dark theme"}</Button>
-                            <EditionDropdownButton/>
+                        <div className="personal-settings">
+                            <SettingCards image={dark_theme} title={"Dark theme"} subtitle={"Customize the layout of the website to reduce the glow and calm your eyes"}>
+                               <ChangeTheme/>
+                            </SettingCards>
+                            <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
+                                <EditionDropdownButton/>
+                            </SettingCards>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
