@@ -18,7 +18,7 @@ export default function UserTr(props) {
         json.disabled = role === 0;
         json.role = role
 
-        let response =await patchEdit(user_url + "/" + props.user.id, json)
+        let response = await patchEdit(user_url + "/" + props.user.id, json)
         if (response.success){setStatusAccount(role)}
     }
 

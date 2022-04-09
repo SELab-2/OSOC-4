@@ -13,6 +13,9 @@ import AccordionHeader from "react-bootstrap/AccordionHeader";
 import {useSession} from "next-auth/react";
 import {log} from "../utils/logger";
 import {urlManager} from "../utils/ApiClient";
+import change_email_image from "/public/assets/change_email.png"
+import change_name_image from "/public/assets/change_name.png"
+import change_password_image from "/public/assets/change_password.png"
 
 
 
@@ -25,14 +28,13 @@ export default function Settings(props) {
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
 
-    const { data: session, status } = useSession()
 
     useEffect(() => {
         if((user === undefined || name === "" || email === "") &&  ! loading){
             setLoading(true)
             urlManager.getUsers().then(users_url =>{
                 getJson(users_url + "/me").then(res => {
-                    log(res)
+                    log(res.data)
                     setUser(res.data);
                     setName(res.data.name);
                     setEmail(res.data.email);
@@ -42,7 +44,7 @@ export default function Settings(props) {
             })
 
         }
-    }, [session, loading, user, name, email]);
+    }, [loading, user, name, email]);
 
     //TODO make this actually change the theme
     const changeTheme = (event) => {
@@ -59,13 +61,13 @@ export default function Settings(props) {
                     </Accordion.Header>
                     <AccordionBody>
                         <div className="personal-settings">
-                            <SettingCards title={"Change password"} subtitle={"Having a strong password is a good idea"}>
+                            <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
                                 <ChangePassword/>
                             </SettingCards>
-                            <SettingCards title={"Change email"} subtitle={"Change to a different email-adress"}>
+                            <SettingCards image={change_email_image} title={"Change email"} subtitle={"Change to a different email-adress"}>
                                 <ChangeEmail email={email}/>
                             </SettingCards>
-                            <SettingCards title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
+                            <SettingCards image={change_name_image} title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
                                 <ChangeName user={user}/>
                             </SettingCards>
                         </div>
@@ -82,7 +84,7 @@ export default function Settings(props) {
                         </div>
                     </AccordionBody>
                 </AccordionItem>
-                {(role === 2)? (
+                {(role === 2) ? (
                     <AccordionItem eventKey={2}>
                         <AccordionHeader>
                             <h3>Admin settings</h3>

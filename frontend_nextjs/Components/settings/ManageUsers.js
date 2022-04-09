@@ -43,25 +43,21 @@ export default function ManageUsers(props) {
         log("handle submit invite");
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
-        emails.forEach(e => {
+        let user_url = await urlManager.getUsers();
+        emails.forEach(email => {
             // post to create
-            postCreate("users/create", { "email": e }).then(resp => {
+            postCreate(user_url + "/create", { "email": email }).then(resp => {
                 log(resp.data.data)
                 if (resp.data.data.id) {
-                    postCreate(resp.data.data.id + "/invite", {}, false);
+                    postCreate(resp.data.data.id + "/invite", {});
                 }
             })
-            // post to invite
         })
-        log("submit invites");
-        log(toInvite);
     }
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
-        log("LOL")
         setShownUsers(users.filter(user => user.name.includes(search)))
-        //TODO, does changing userlist happend here or at handleSearch?
     }
 
     return (
