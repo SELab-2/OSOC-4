@@ -5,6 +5,7 @@ import StudentsFilter from "./StudentFilter";
 
 export default function StudentsFilters(props) {
 
+  // These constants are initialized empty, the data will be inserted in useEffect
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [skills, setSkills] = useState(undefined);
   const [filters, setFilters] = useState({});
@@ -36,18 +37,23 @@ export default function StudentsFilters(props) {
     }*/
   })
 
+  // called when pressed on "reset filters"
   const resetFilters = () => {
 
   }
 
+  // this function makes all the roles visible
   const showMore = () => {
     setExtendedRoleList(true);
   }
 
+  // this function makes only 5 roles visible
   const showLess = () => {
     setExtendedRoleList(false);
   }
 
+  // returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
+  // list depending on extendedRoleList
   function getSkills() {
     if (skills) {
       let shownSkills = skills;
@@ -63,6 +69,7 @@ export default function StudentsFilters(props) {
     return null;
   }
 
+  // returns the html representation for the 'more or less' button, the button to show more or less skills
   function moreOrLessButton() {
     if (extendedRoleList) {
       return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
@@ -72,7 +79,7 @@ export default function StudentsFilters(props) {
 
   // The HTML representation of the filters in the 'Select students' tab
   return (
-    <Col md="auto" className="filters fill_height scroll-overflow">
+    <Col md="auto" className="filters fill_height scroll-overflow" style={{visibility: props.visibility}}>
       <Row className="title-row-filters">
         <Col>
           <h2 className="filters-title">Filters</h2>

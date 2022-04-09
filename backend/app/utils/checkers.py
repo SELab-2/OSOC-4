@@ -22,7 +22,6 @@ class RoleChecker:
         Authorize.jwt_required()
 
         current_user_id = Authorize.get_jwt_subject()
-        print(current_user_id)
         user = await read_where(User, User.id == int(current_user_id), session=session)
 
         if not user.approved:

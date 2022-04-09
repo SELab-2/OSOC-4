@@ -15,8 +15,8 @@ router = APIRouter(prefix="/projects")
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Project data added into the database")
-async def add_user_data(project: ProjectCreate, session: AsyncSession = Depends(get_session)):
-    """add_user_data add a new user
+async def add_project_data(project: ProjectCreate, session: AsyncSession = Depends(get_session)):
+    """add_project_data add a new project
 
     :param project: defaults to Body(...)
     :type project: ProjectCreate, optional

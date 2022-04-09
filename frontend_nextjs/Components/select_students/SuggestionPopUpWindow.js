@@ -1,9 +1,12 @@
 import {Button, Modal, ModalHeader, ModalTitle} from "react-bootstrap";
 
+// This view shows the pop up window when making a suggestion about a student.
 export default function PopUpWindow(props) {
 
+  // defines wheater or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
+  // returns the string for suggestion for the student
   function getSuggestion() {
     if (props.decision === -1) {
       return "undecided" // this can only be shown untill the suggested value is adjusted
@@ -12,14 +15,17 @@ export default function PopUpWindow(props) {
     return decisions[props.decision];
   }
 
+  // called when the pop up window is closed
   function onHide() {
     setPopUpShow(false);
   }
 
+  // called on submitting the suggestion
   function submitSuggestion() {
     setPopUpShow(false);
   }
 
+  // returns the html representation for the pop up window
   return (
     <Modal
       show={popUpShow}
