@@ -1,12 +1,14 @@
 import os
 from datetime import timedelta
 
+from app.config import config
 from app.crud import count_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.passwordreset import EmailInput
 from app.models.tokens import TokenExtended
 from app.models.user import User, UserLogin, UserRole
+from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_reset_password_key
 from app.utils.mailsender import send_password_reset
@@ -61,6 +63,14 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
     return entry and entry == 'true'
 
 
+@router.get('/')
+def root(role: RoleChecker(UserRole.COACH) = Depends()):
+    paths = {"editions": f"{config.api_url}editions"}
+    if role == UserRole.ADMIN:
+        paths["users"] = f"{config.api_url}users"
+    return paths
+
+
 @router.post('/login')
 async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """login endpoint for login
@@ -73,7 +83,6 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
     :return: access and refresh token
     :rtype: dict
     """
-
     # check if any user exist else make one
     user_count = await count_where(User, session=session)
     if not user_count:
@@ -87,8 +96,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
             disabled=False)
         u = await update(new_user, session)
     else:
-        u = await read_where(User, User.email == user.email, session=session)
-
+        u = await read_where(User, User.email == user.email and not User.disabled, session=session)
 
     if u:
         if not verify_password(user.password, u.password):
@@ -101,7 +109,9 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
         # Authorize.set_refresh_cookies(refresh_token)
 
         # return response(UserOutSimple.parse_raw(u.json()), "Login successful")
-        return response(TokenExtended(id=str(u.id), accessToken=access_token, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)), refreshToken=refresh_token), "Login successful")
+        return response(
+            TokenExtended(id=str(u.id), accessToken=access_token, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
+                          refreshToken=refresh_token), "Login successful")
 
     raise InvalidEmailOrPasswordException()
 
@@ -123,7 +133,9 @@ def refresh(Authorize: AuthJWT = Depends()):
     new_access_token = Authorize.create_access_token(subject=current_user_id, expires_time=settings.access_expires)
     # Authorize.set_access_cookies(new_access_token)
     # return {"access_token": new_access_token}
-    return TokenExtended(accessToken=new_access_token, id=current_user_id, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)), refreshToken=Authorize.get_raw_jwt()['jti'])
+    return TokenExtended(accessToken=new_access_token, id=current_user_id,
+                         accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
+                         refreshToken=Authorize.get_raw_jwt()['jti'])
 
 
 @router.delete('/access-revoke')
@@ -178,7 +190,7 @@ def logout(Authorize: AuthJWT = Depends()):
 
 
 @router.post('/forgot')
-async def forgot(emailinput: EmailInput = Body(...)):
+async def forgot(emailinput: EmailInput = Body(...), session: AsyncSession = Depends(get_session)):
     """forgot send an email with a reset password link if the user exists
 
     :param emailinput: email adress input, defaults to Body(...)
@@ -187,11 +199,12 @@ async def forgot(emailinput: EmailInput = Body(...)):
     :rtype: dict
     """
     # check if user exists and not disabled
-    user = await read_where(User, User.email == emailinput.email, User.disabled == False)
+    user = await read_where(User, User.email == emailinput.email and not User.disabled, session=session)
     if user:
         reset_key, reset_expires = generate_new_reset_password_key()
         db.redis.setex(reset_key, reset_expires, str(user.id))
         # send email to user with the reset key
         send_password_reset(user.email, reset_key)
 
-    return {"msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}
+    return {
+        "msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}

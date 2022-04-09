@@ -8,6 +8,8 @@ import "../styles/manageusers.css"
 import "../styles/studentListelement.css"
 import "../styles/select-students.css"
 import "../styles/filters.css"
+import "../styles/navheader.css"
+import "../styles/studentDetails.css"
 
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
@@ -15,11 +17,12 @@ import RefreshTokenHandler from '../Components/refreshTokenHandler';
 import Login from "../pages/login";
 import RouteGuard from "../Components/Auth";
 import Invite from "./invites/[invitekey]";
+import Reset from "./resetpassword/[resetkey]";
 
 function MyApp({ Component, pageProps }) {
   const [interval, setInterval] = useState(0);
 
-  const no_auth = [Login, Invite];
+  const no_auth = [Login, Invite, Reset];
 
 
   return (
