@@ -13,8 +13,8 @@ import DecisionPopUpWindow from "./DecisionPopUpWindow"
 import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
 import deleteIcon from '../../public/assets/delete.svg';
 import DeletePopUpWindow from "./DeletePopUpWindow";
-import { useRouter } from "next/client";
-import { getStudentPath} from "../../routes";
+import { useRouter } from "next/router";
+import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
