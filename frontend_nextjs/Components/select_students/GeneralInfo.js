@@ -20,6 +20,7 @@ export default function SuggestionsCount(props) {
     )
   }
 
+  // return html representation of the suggestion counts for a student
   return [
     <Col key="info-titles" className="info-titles" md="auto">
       {getInfoTitles()}

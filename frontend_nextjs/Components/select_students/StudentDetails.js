@@ -23,28 +23,35 @@ import Image from "next/image";
 export default function StudentDetails(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
+  // These constants contain info about the student
   const [student, setStudent] = useState({});
   const [studentId, setStudentId] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
+  const [decision, setDecision] = useState(-1);
 
+  // These constant define wheater the pop-up windows should be shown or not
   const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
   const [decisionPopUpShow, setDecisionPopUpShow] = useState(false);
   const [emailPopUpShow, setEmailPopUpShow] = useState(false);
   const [deletePopUpShow, setDeletePopUpShow] = useState(false);
 
-  const [decision, setDecision] = useState(-1);
+  // These constants contain the value of the decide field and which suggestion window should be shown
   const [suggestion, setSuggestion] = useState(0);
   const [decideField, setDecideField] = useState(-1);
 
   // This function inserts the data in the variables
   useEffect( () => {
+    // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       getJson(getStudentPath(props.student_id)).then(res => {
         setStudent(res);
 
+        // Fill in the suggestions field, this contains all the suggestions which are not definitive
         setSuggestions(res["suggestions"].filter(suggestion => ! suggestion["definitive"]));
 
+        // Fill in the decisions field, this contains the decision for the student if there is one,
+        // this decision is stored as a suggestion which is definitive
         let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"]);
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
@@ -55,6 +62,7 @@ export default function StudentDetails(props) {
     }
   })
 
+  // return a string representation of the decision
   function getDecision() {
     if (decision === -1) {
       return "Undecided"
@@ -63,10 +71,13 @@ export default function StudentDetails(props) {
     return decisionwords[decision];
   }
 
+  // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {
     return suggestions.filter(suggestion => suggestion["decision"] === decision).length;
   }
 
+  // returns a list of html suggestions, with the correct css classes.
+  // If there are no suggestions: this returns "No suggestions"
   function getSuggestions() {
     let result = [];
     let classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
@@ -83,11 +94,14 @@ export default function StudentDetails(props) {
     return <Row>No suggestions</Row>
   }
 
+  // called when you click on 'suggest yes', 'suggest maybe' or 'suggest no', it will show the correct pop-up window
   function suggest(suggestion) {
     setSuggestion(suggestion);
     setSuggestionPopUpShow(true);
   }
 
+  // this function is called when the student details are closed, it will go back to the student list with filters,
+  // without reloading the page
   function hideStudentDetails() {
     router.push({
       pathname: router.pathname

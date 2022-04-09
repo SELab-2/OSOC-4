@@ -8,9 +8,8 @@ import { useSession } from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
 import {router} from "next/client";
 import StudentDetails from "../Components/select_students/StudentDetails";
-import {getSelectStudentsPath} from "../routes";
 
-
+// The page corresponding with the 'select students' tab
 export default function SelectStudents(props) {
 
     // These constants are initialized empty, the data will be inserted in useEffect
@@ -22,6 +21,7 @@ export default function SelectStudents(props) {
     useEffect(() => {
         if (session) {
             if (!students) {
+                // the urlManager returns the url for the list of students
                 urlManager.getStudents().then(url => getJson(url).then(res => {
                     setStudents(res);
                 }));

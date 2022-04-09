@@ -27,6 +27,7 @@ export default function StudentList(props) {
     return null;
   }
 
+  // returns the html representation for the student list
   return (
     <Col className="fill_height scroll-overflow fill_width">
       <ul className="students_list fill_height">
