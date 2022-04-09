@@ -1,3 +1,6 @@
+from bson.errors import InvalidId
+from fastapi import APIRouter, Depends
+from odmantic import ObjectId
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import read_where, update
@@ -9,7 +12,6 @@ from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
 from app.models.user import User, UserInvite
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
-from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/invite")
 
@@ -18,7 +20,13 @@ router = APIRouter(prefix="/invite")
 async def valid_invitekey(invitekey: str):
     if invitekey[0] != "I":
         raise InvalidInviteException()
-    userid = db.redis.get(invitekey)
+
+    try:  # Check whether the id is valid
+        ObjectId(db.redis.get(invitekey))
+    except InvalidId:
+        raise InvalidInviteException()
+
+    userid = await read_where(User, User.id == int(db.redis.get(invitekey)))
     if userid is None:
         raise InvalidInviteException()
     return response(None, "Valid invitekey")
@@ -42,7 +50,7 @@ async def invited_user(invitekey: str, userinvite: UserInvite, session: AsyncSes
     userid = db.redis.get(invitekey)  # check that the inv key exists
 
     if userid:
-        user = await read_where(User, User.id == int(userid), session=session)
+        user: User = await read_where(User, User.id == int(userid), session=session)
 
         if not user:
             raise NotPermittedException()
