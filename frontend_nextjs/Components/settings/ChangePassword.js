@@ -1,12 +1,16 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import {log} from "../../utils/logger";
+import {patchEdit} from "../../utils/json-requests";
+import {useSession} from "next-auth/react";
 
-export default function ChangePassword() {
+export default function ChangePassword(props) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [changedSuccess, setChangedSuccess] = useState(false);
+
+    const { data: session, status } = useSession()
 
     const handleChangeCurrentPassword = (event) => {
         event.preventDefault()
@@ -28,11 +32,18 @@ export default function ChangePassword() {
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        //todo make this work with backend and implement more checks
         if(newPassword === confirmPassword){
-            setChangedSuccess(true)
+            let body = {
+                "current_password": currentPassword,
+                "new_password": newPassword,
+                "confirm_password":confirmPassword
+            }
+
+            let url = session.userid + "/password"
+            let response = await patchEdit(url, body)
+            log(response)
+            if (response.success) { setChangedSuccess(true); }
         }
-        log(newPassword)
     }
 
     return(
@@ -49,7 +60,7 @@ export default function ChangePassword() {
                 <Form.Label>Repeat new password</Form.Label>
                 <Form.Control type="password" placeholder="Confirm password" value={confirmPassword} onChange={handleChangeConfirmPassword}/>
                 {(newPassword === confirmPassword) ? null : (<Form.Text className="text-muted">
-                    Passwords don't match!
+                    Passwords do not match!
                 </Form.Text>)}
                 {(changedSuccess)? (<Form.Text className="text-muted">Changed password!</Form.Text>) : null}
 

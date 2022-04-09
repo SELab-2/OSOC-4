@@ -6,36 +6,45 @@ import EditionDropdownButton from "../Components/settings/EditionDropdownButton"
 import ChangeName from "../Components/settings/ChangeName";
 import ChangeEmail from "../Components/settings/ChangeEmail";
 import SettingCards from "../Components/settings/SettingCards";
-import {Accordion, Button} from "react-bootstrap";
+import {Accordion} from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
-import {useSession} from "next-auth/react";
-
-
+import {log} from "../utils/logger";
+import {urlManager} from "../utils/ApiClient";
+import ChangeTheme from "../Components/settings/ChangeTheme";
+import change_email_image from "/public/assets/change_email.png"
+import change_name_image from "/public/assets/change_name.png"
+import change_password_image from "/public/assets/change_password.png"
+import dark_theme from "/public/assets/dark_theme.png"
+import edition from "/public/assets/edition.png"
 
 export default function Settings(props) {
     const [user, setUser] = useState(undefined);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState(0);
-
+    const [loading, setLoading] = useState(false)
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
 
-    const { data: session, status } = useSession()
 
     useEffect(() => {
-        if (session) {
-            getJson(session.userid).then(res => {
+        if((user === undefined || name === "" || email === "") &&  ! loading){
+            setLoading(true)
+            urlManager.getUsers().then(users_url =>{
+                getJson(users_url + "/me").then(res => {
+                    log(res.data)
                     setUser(res.data);
                     setName(res.data.name);
                     setEmail(res.data.email);
                     setRole(res.data.role);
                 }
-            )
+                ).then(() => setLoading(false))
+            })
+
         }
-    }, [session]);
+    }, [loading, user, name, email]);
 
     //TODO make this actually change the theme
     const changeTheme = (event) => {
@@ -52,14 +61,14 @@ export default function Settings(props) {
                     </Accordion.Header>
                     <AccordionBody>
                         <div className="personal-settings">
-                            <SettingCards title={"Change password"} subtitle={"Having a strong password is a good idea"}>
+                            <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
                                 <ChangePassword/>
                             </SettingCards>
-                            <SettingCards title={"Change email"} subtitle={"Change to a different email-adress"}>
+                            <SettingCards image={change_email_image} title={"Change email"} subtitle={"Change to a different email-adress"}>
                                 <ChangeEmail email={email}/>
                             </SettingCards>
-                            <SettingCards title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
-                                <ChangeName userid={session.userid} name={name} email={email}/>
+                            <SettingCards image={change_name_image} title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
+                                <ChangeName user={user}/>
                             </SettingCards>
                         </div>
                     </AccordionBody>
@@ -69,20 +78,24 @@ export default function Settings(props) {
                         <h3>Website settings</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                        <div>
-                            <Button variant={"outline-secondary"} onClick={changeTheme}>{darkTheme ? "Turn to light theme" : "Turn to dark theme"}</Button>
-                            <EditionDropdownButton/>
+                        <div className="personal-settings">
+                            <SettingCards image={dark_theme} title={"Dark theme"} subtitle={"Customize the layout of the website to reduce the glow and calm your eyes"}>
+                               <ChangeTheme/>
+                            </SettingCards>
+                            <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
+                                <EditionDropdownButton/>
+                            </SettingCards>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
-                {(role === 2)? (
+                {(role === 2) ? (
                     <AccordionItem eventKey={2}>
                         <AccordionHeader>
                             <h3>Admin settings</h3>
                         </AccordionHeader>
                         <AccordionBody>
                             <div className="admin-settings">
-                                <ManageUsers/>
+                                <ManageUsers me={user}/>
                             </div>
                         </AccordionBody>
                     </AccordionItem>
