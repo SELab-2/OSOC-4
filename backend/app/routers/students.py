@@ -4,7 +4,6 @@ from app.models.answer import Answer
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
-
 from app.models.suggestion import Suggestion, SuggestionExtended
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker

@@ -17,7 +17,8 @@ from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
-                                     QuestionTagSimpleOut, QuestionTagUpdate)
+                                     QuestionTagSimpleOut, QuestionTagUpdate,
+                                     UnusedQuestionTagSimpleOut)
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
@@ -225,10 +226,11 @@ async def get_question_tags(year: int, session: AsyncSession = Depends(get_sessi
     """
     res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).options(selectinload(QuestionTag.question)).order_by(QuestionTag.tag))
     tags = res.all()
-    return [QuestionTagSimpleOut(tag=tag.tag, question=tag.question.question) for (tag,) in tags]
+
+    return [QuestionTagSimpleOut(tag=tag.tag, mandatory=tag.mandatory, showInList=tag.showInList, question=tag.question.question) for (tag,) in tags]
 
 
-@router.get("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Tags retrieved")
+@router.get("/{year}/questiontags/unused", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Tags retrieved")
 async def get_unused_question_tags(year: int, session: AsyncSession = Depends(get_session)):
     """get_question_tags return list of qusetiontags
 
@@ -240,6 +242,22 @@ async def get_unused_question_tags(year: int, session: AsyncSession = Depends(ge
     :rtype: list of QuestionTags
     """
     res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is None).options(selectinload(QuestionTag.question)).order_by(QuestionTag.tag))
+    tags = res.all()
+    return [UnusedQuestionTagSimpleOut.parse_raw(tag.json()) for (tag,) in tags]
+
+
+@router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Tags retrieved")
+async def get_showinlist_question_tags(year: int, session: AsyncSession = Depends(get_session)):
+    """get_showinlist_question_tags return list of qusetiontags that must be shown in the listview
+
+    :param year: edition year
+    :type year: int
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: list of QuestionTags
+    :rtype: list of QuestionTags
+    """
+    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).where(QuestionTag.showInList == True).order_by(QuestionTag.tag))
     tags = res.all()
     return [tag.tag for (tag,) in tags]
 

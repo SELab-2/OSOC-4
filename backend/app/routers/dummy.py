@@ -77,7 +77,7 @@ class StudentsGenerator:
 
         # Store (question, tag) pairs
         for pair in pairs:
-            await update(QuestionTag(question=pair[0], edition=edition.year, tag=pair[2]), session)
+            await update(QuestionTag(question=pair[0], edition=edition.year, tag=pair[2], showInList=True), session)
 
         # Store question, answer) pairs: answer is derived from datalist
         for i in range(self.entries):
