@@ -12,9 +12,8 @@ import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
 import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
 import deleteIcon from '../../public/assets/delete.svg';
-import editIcon from '../../public/assets/edit.svg'
 import DeletePopUpWindow from "./DeletePopUpWindow";
-import {getSelectStudentsPath, getStudentPath, getStudentsPath} from "../../routes";
+import { getStudentPath} from "../../routes";
 import {router} from "next/client";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
@@ -79,8 +78,8 @@ export default function StudentDetails(props) {
   // returns a list of html suggestions, with the correct css classes.
   // If there are no suggestions: this returns "No suggestions"
   function getSuggestions() {
+    const classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
     let result = [];
-    let classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
 
     for (let i = 0; i < suggestions.length; i ++) {
       let suggestion = suggestions[i];

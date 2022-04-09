@@ -3,7 +3,7 @@ import {Button, Modal, ModalHeader, ModalTitle} from "react-bootstrap";
 // This view shows the pop up window when making a decision about a student.
 export default function DeletePopUpWindow(props) {
 
-  // defines wheater or not the pop up window must be shown
+  // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
   // called when the pop up window is closed

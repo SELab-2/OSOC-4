@@ -10,7 +10,7 @@ import {router} from "next/client";
 import StudentDetails from "../Components/select_students/StudentDetails";
 
 // The page corresponding with the 'select students' tab
-export default function SelectStudents(props) {
+export default function SelectStudents() {
 
     // These constants are initialized empty, the data will be inserted in useEffect
     const [students, setStudents] = useState(undefined);

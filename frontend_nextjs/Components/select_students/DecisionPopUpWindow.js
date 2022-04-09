@@ -4,14 +4,14 @@ import {useState} from "react";
 // This view shows the pop up window when making a decision about a student.
 export default function DecisionPopUpWindow(props) {
 
-  // defines wheater or not the pop up window must be shown
+  // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
   const [textAreaDisabled, setTextAreaDisabled] = useState(true);
 
   // returns the string for decision of the student
   function getDecision() {
     if (props.decision === -1) {
-      return "undecided" // this can only be shown untill the suggested value is adjusted
+      return "undecided" // this can only be shown until the suggested value is adjusted
     }
     let decisions = ["no", "maybe", "yes"];
     return decisions[props.decision];
@@ -46,7 +46,7 @@ export default function DecisionPopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Decision '{getDecision()}' for {props.student["name"]}
+          Decision &apos;{getDecision()}&apos; for {props.student["name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">

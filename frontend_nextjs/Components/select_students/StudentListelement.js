@@ -1,15 +1,9 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
-
-import {
-  getSelectStudentsPath,
-  getStudentPath,
-} from "../../routes";
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
-import {urlManager} from "../../utils/ApiClient";
 
 // represents one list element card in the student list
 export default function StudentListelement(props) {
