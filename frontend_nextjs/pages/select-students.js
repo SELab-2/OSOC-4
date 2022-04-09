@@ -46,14 +46,13 @@ export default function SelectStudents(props) {
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">
-            <StudentsFilters visibility={getFiltersCollapsed()}/>
+            {(! studentId) ? <StudentsFilters/> : null}
             <Col className="fill_height students-list-paddingtop">
                  <div className="fill_height">
                      <StudentList students={students}/>
                  </div>
             </Col>
-
-            <StudentDetails student_id={studentId} visibility={getDetailcollapsed()}/>
+            {(studentId) ? <StudentDetails student_id={studentId}/> : null}
         </Row>
     )
 
