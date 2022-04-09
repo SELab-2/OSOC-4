@@ -36,7 +36,7 @@
 }
 
 .details-upper-layer {
-    margin: 0 20px;
+    margin: 0 30px;
 }
 
 .dropdown-decision {
@@ -52,7 +52,8 @@
 }
 
 .remaining-height-details {
-    margin-left: 10px;
+    margin-top: 30px;
+    margin-left: 20px;
 }
 
 .student-details {
