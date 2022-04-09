@@ -1,12 +1,14 @@
 import os
 from datetime import timedelta
 
+from app.config import config
 from app.crud import count_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
 from app.models.passwordreset import EmailInput
 from app.models.tokens import TokenExtended
 from app.models.user import User, UserLogin, UserRole
+from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_reset_password_key
 from app.utils.mailsender import send_password_reset
@@ -59,6 +61,14 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
     jti = decrypted_token['jti']
     entry = db.redis.get(jti)
     return entry and entry == 'true'
+
+
+@router.get('/')
+def root(role: RoleChecker(UserRole.COACH) = Depends()):
+    paths = {"editions": f"{config.api_url}editions"}
+    if role == UserRole.ADMIN:
+        paths["users"] = f"{config.api_url}users"
+    return paths
 
 
 @router.post('/login')

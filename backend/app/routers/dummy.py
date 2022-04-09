@@ -70,7 +70,7 @@ class StudentsGenerator:
         pairs = [(question_name, self.names, "name"),
                  (question_email, self.emails, "email"),
                  (question_phonenumb, self.phonenumbs, "phone number"),
-                 (question_first_lang, self.first_languages, "first_languages"),
+                 (question_first_lang, self.first_languages, "first language"),
                  (question_level_english, self.levels_english, "level of english"),
                  (question_studies, self.studies, "studies"),
                  (question_type_degree, self.degree_types, "type of degree")]
