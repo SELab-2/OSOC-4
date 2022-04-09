@@ -83,9 +83,6 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
     :return: access and refresh token
     :rtype: dict
     """
-
-    print("test")
-
     # check if any user exist else make one
     user_count = await count_where(User, session=session)
     if not user_count:
@@ -101,9 +98,6 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
     else:
         u = await read_where(User, User.email == user.email, session=session)
 
-    print(user)
-    print(u)
-
     if u:
         if not verify_password(user.password, u.password):
             raise InvalidEmailOrPasswordException()
@@ -115,7 +109,9 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
         # Authorize.set_refresh_cookies(refresh_token)
 
         # return response(UserOutSimple.parse_raw(u.json()), "Login successful")
-        return response(TokenExtended(id=str(u.id), accessToken=access_token, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)), refreshToken=refresh_token), "Login successful")
+        return response(
+            TokenExtended(id=str(u.id), accessToken=access_token, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
+                          refreshToken=refresh_token), "Login successful")
 
     raise InvalidEmailOrPasswordException()
 
@@ -137,7 +133,9 @@ def refresh(Authorize: AuthJWT = Depends()):
     new_access_token = Authorize.create_access_token(subject=current_user_id, expires_time=settings.access_expires)
     # Authorize.set_access_cookies(new_access_token)
     # return {"access_token": new_access_token}
-    return TokenExtended(accessToken=new_access_token, id=current_user_id, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)), refreshToken=Authorize.get_raw_jwt()['jti'])
+    return TokenExtended(accessToken=new_access_token, id=current_user_id,
+                         accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
+                         refreshToken=Authorize.get_raw_jwt()['jti'])
 
 
 @router.delete('/access-revoke')
@@ -192,7 +190,7 @@ def logout(Authorize: AuthJWT = Depends()):
 
 
 @router.post('/forgot')
-async def forgot(emailinput: EmailInput = Body(...)):
+async def forgot(emailinput: EmailInput = Body(...), session: AsyncSession = Depends(get_session)):
     """forgot send an email with a reset password link if the user exists
 
     :param emailinput: email adress input, defaults to Body(...)
@@ -201,11 +199,12 @@ async def forgot(emailinput: EmailInput = Body(...)):
     :rtype: dict
     """
     # check if user exists and not disabled
-    user = await read_where(User, User.email == emailinput.email, User.disabled == False)
+    user = await read_where(User, User.email == emailinput.email and not User.disabled, session=session)
     if user:
         reset_key, reset_expires = generate_new_reset_password_key()
         db.redis.setex(reset_key, reset_expires, str(user.id))
         # send email to user with the reset key
         send_password_reset(user.email, reset_key)
 
-    return {"msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}
+    return {
+        "msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}

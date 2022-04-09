@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
+import {forgot} from "../utils/json-requests";
 
 const Login = props => {
     const [email, setEmail] = useState("");
