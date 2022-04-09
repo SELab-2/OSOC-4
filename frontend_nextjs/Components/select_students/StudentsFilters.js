@@ -1,10 +1,11 @@
-import {useEffect, useState} from "react";
-import {Col, Row} from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
 
 
 export default function StudentsFilters(props) {
 
+  // These constants are initialized empty, the data will be inserted in useEffect
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [skills, setSkills] = useState(undefined);
   const [filters, setFilters] = useState({});
@@ -36,33 +37,39 @@ export default function StudentsFilters(props) {
     }*/
   })
 
+  // called when pressed on "reset filters"
   const resetFilters = () => {
 
   }
 
+  // this function makes all the roles visible
   const showMore = () => {
     setExtendedRoleList(true);
   }
 
+  // this function makes only 5 roles visible
   const showLess = () => {
     setExtendedRoleList(false);
   }
 
+  // returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
+  // list depending on extendedRoleList
   function getSkills() {
     if (skills) {
       let shownSkills = skills;
 
-      if (! extendedRoleList) {
-        shownSkills = skills.slice(0,5);
+      if (!extendedRoleList) {
+        shownSkills = skills.slice(0, 5);
       }
 
-      return shownSkills.map((skill,index) =>
+      return shownSkills.map((skill, index) =>
         <StudentsFilter filter_id={skill.id} filter_text={skill.name} />
       );
     }
     return null;
   }
 
+  // returns the html representation for the 'more or less' button, the button to show more or less skills
   function moreOrLessButton() {
     if (extendedRoleList) {
       return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
@@ -71,21 +78,21 @@ export default function StudentsFilters(props) {
   }
 
   // The HTML representation of the filters in the 'Select students' tab
-  return(
-    <Col md="auto" className="filters fill_height scroll-overflow">
+  return (
+    <Col md="auto" className="filters fill_height scroll-overflow" style={{visibility: props.visibility}}>
       <Row className="title-row-filters">
         <Col>
           <h2 className="filters-title">Filters</h2>
         </Col>
-        <Col/>
-        <Col md="auto" style={{alignSelf: "center"}}>
+        <Col />
+        <Col md="auto" style={{ alignSelf: "center" }}>
           <button className="reset-filters-button" onClick={resetFilters}>
             Reset filters
           </button>
         </Col>
       </Row>
 
-      <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni"/>
+      <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni" />
       <StudentsFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers" />
       <StudentsFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for" />
       <StudentsFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students" />
@@ -96,7 +103,7 @@ export default function StudentsFilters(props) {
       </Row>
       <Row className="skills-search-filters">
         <Col>
-          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"/>
+          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills" />
         </Col>
       </Row>
       {getSkills()}

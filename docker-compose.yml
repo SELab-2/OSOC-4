@@ -29,7 +29,7 @@ services:
       INVITE_EXPIRE: 4320 # in minutes
       PASSWORDRESET_EXPIRE: 30 # in minutes
       # Frontend URL
-      FRONTEND_URL: https://localhost:3000
+      FRONTEND_URL: http://localhost:3000
     
     depends_on:
       - postgres
