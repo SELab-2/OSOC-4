@@ -36,7 +36,6 @@ class StudentOutSimple(BaseModel):
     id: str
 
     def __init__(self, **data):
-        print(data)
         data["id"] = config.api_url + "students/" + str(data["id"])
         super().__init__(**data)
 

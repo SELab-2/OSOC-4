@@ -1,18 +1,17 @@
 import { useRouter } from 'next/router'
 import Error from 'next/error'
 import React, { useEffect } from 'react'
-import { check_invitekey, set_password } from '../../utils/json-requests'
+import {check_resetkey, set_password, use_resetkey} from '../../utils/json-requests'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
 import { Form, Button } from 'react-bootstrap';
 
-const Invite = () => {
+const Reset = () => {
     const router = useRouter()
-    const { invitekey } = router.query
+    const { resetkey } = router.query
     const [validKey, setValidkey] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     const [validatePassword, setValidatePassword] = useState("");
 
@@ -24,51 +23,39 @@ const Invite = () => {
         setValidatePassword(event.target.value);
     }
 
-    const handleChangeName = (event) => {
-        setName(event.target.value);
-    }
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (password <= 11) {alert("The new password is to short, it should be at least 12 characters long");return;}
         if (password !== validatePassword) {alert("The two passwords don't match.");return;}
 
-        const j = {
-            "validate_password": validatePassword,
+        const data = {
             "password": password,
-            "name": name,
+            "validate_password": validatePassword
         }
-        const resp = await set_password(invitekey, j);
+        const resp = await use_resetkey(resetkey, data);
         if (resp) {
-            await router.push('/login')
+            alert(resp["message"]);
+            await router.push('/login');
         }
     }
 
-    useEffect(async () => {
-        const resp = await check_invitekey(invitekey);
-        console.log("INVITE")
-        console.log(resp);
-
-        if (resp) {
-            setValidkey(true);
-        }
-        setLoading(false);
-    }, [invitekey])
+    useEffect(() => {
+        check_resetkey(resetkey).then(resp => {
+            console.log(resp);
+            if (resp) {setValidkey(true);}
+            setLoading(false);
+        });
+    }, [resetkey])
 
     if (loading) {
         return <LoadingPage />
     }
     else if (!validKey) {
-        return <h1>Not a valid invite</h1>
+        return <h1>Not a valid password reset key</h1>
     }
 
     return (
         <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formBasicName">
-                <Form.Label>Your Name</Form.Label>
-                <Form.Control type="name" placeholder="Enter your name" onChange={handleChangeName} value={name} />
-            </Form.Group>
-
             <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control type="password" placeholder="Password" onChange={handleChangePassword} value={password} />
@@ -82,8 +69,7 @@ const Invite = () => {
                 Submit
             </Button>
         </Form>
-
     )
 }
 
-export default Invite;
+export default Reset;
