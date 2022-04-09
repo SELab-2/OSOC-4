@@ -37,7 +37,7 @@ const providers = [
                 // Authenticate user with credentials
                 const user = await login({ "email": credentials.email, "password": credentials.password });
 
-                log(user)
+                if (!user.success) {return null;}
 
                 user.data = user.data.data
 
