@@ -1,6 +1,6 @@
 import {Col, Row} from "react-bootstrap";
 
-
+// Represents one line of a filter, with checkbox and label
 export default function StudentsFilter(props) {
 
   function changeFilter(checked) {

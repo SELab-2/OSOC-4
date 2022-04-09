@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import LoadingPage from "../Components/LoadingPage"
 import NavHeader from "../Components/NavHeader"
-import {Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 export default function RouteGuard(props) {
     const router = useRouter()

@@ -99,6 +99,17 @@ class UserInvite(BaseModel):
         return v
 
 
+class UserResetPassword(BaseModel):
+    password: str
+    validate_password: str
+
+    @validator('password')
+    def password_format_check(cls, v):
+        if not valid_password(v):
+            raise InvalidPasswordException()
+        return v
+
+
 class ChangeUser(BaseModel):
     name: str = ""
     role: UserRole = 0

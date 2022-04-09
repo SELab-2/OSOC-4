@@ -1,99 +1,30 @@
 import {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
-
-import {
-  getStudentPath,
-} from "../../routes";
-import {Col, Container, Row} from "react-bootstrap";
-import {router} from "next/client";
+import GeneralInfo from "./GeneralInfo"
+import { Col, Container, Row } from "react-bootstrap";
+import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
 
+// represents one list element card in the student list
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [student, setStudent] = useState({});
-  const [suggestions, setSuggestions] = useState([]);
-  const [suggestionsYes, setSuggestionsYes] = useState(0);
-  const [suggestionsMaybe, setSuggestionsMaybe] = useState(0);
-  const [suggestionsNo, setSuggestionsNo] = useState(0);
   const [decision,setDecision] = useState(-1);
-  const [skills, setSkills] = useState([]);
-  const [studies, setStudies] = useState(undefined);
-  const [degree, setDegree] = useState(undefined);
-  const [fistLanguage, setFirstLanguage] = useState(undefined);
-  const [levelOfEnglish, setLevelOfEnglish] = useState(undefined);
-  const [practicalProblems, setPracticalProblems] = useState(0);
+
+
+  const router = useRouter()
 
   // This function inserts the data in the variables
   useEffect(() => {
     if (!Object.keys(student).length) {
       getJson(props.student).then(res => {
         setStudent(res);
-        if ("first_languages" in res) {
-          setFirstLanguage(res["first language"]);
+        // a decision is a suggestion which is definitive
+        let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"])
+        if (decisions.length !== 0) {
+          setDecision(decisions[0]["decision"]);
         }
-        if ("level of english" in res) {
-          setLevelOfEnglish(res["level of english"]);
-        }
-        if ("studies" in res) {
-          setStudies(res["studies"])
-        }
-        if ("type of degree" in res) {
-          setDegree(res["type of degree"])
-        }
-        /*setStudent(props.student)
-        setName(props.student.name)
-        let localStudent = props.student;
-
-        // check if there are no suggestions yet
-        if (suggestions.length === 0) {
-          getJson(getSuggestionsPath()).then(res => {
-            let possibleSuggestions = res.data;
-            // only get the suggestions of the current student
-            let localSuggestions = possibleSuggestions.filter(suggestion => suggestion.student === localStudent.id);
-            setSuggestions(localSuggestions);
-
-            // filter the suggestions on yes, maybe or no
-            setSuggestionsYes(localSuggestions.filter(
-              suggestion => suggestion.decision === 2 && (! suggestion.definitive)).length);
-            setSuggestionsMaybe(localSuggestions.filter(
-              suggestion => suggestion.decision === 1 && (! suggestion.definitive)).length);
-            setSuggestionsNo(localSuggestions.filter(
-              suggestion => suggestion.decision === 0 && (! suggestion.definitive)).length);
-
-            // get the decision from the suggestions if there is one
-            let newDecision = localSuggestions.filter(suggestion => suggestion.definitive);
-            if (newDecision.length) {
-              setDecision(newDecision[0].decision);
-            }
-          })
-        }
-
-        // check if there are no skills yet
-        if (skills.length === 0) {jaj
-          getJson(getSkillsPath()).then(res => {
-            let skillObjs = res.data.filter(skill => localStudent.skills.includes(skill.id));
-            setSkills(skillObjs.map(skill => skill.name));
-          })
-        }
-
-
-        if (studies === undefined) {
-          getJson(getQuestionAnswersPath()).then(res => {
-            let questionAnswers = res.data.filter(questionAnswer => localStudent.question_answers.includes(questionAnswer.id));
-
-            setStudies(questionAnswers.find((questionAnswer => questionAnswer.question === getStudyQuestionId())));
-
-            setDegree(questionAnswers.find((questionAnswer => questionAnswer.question === getDegreeQuestionId())));
-
-            setFirstLanguage(questionAnswers.find((questionAnswer =>
-              questionAnswer.question === getFirstLanguageQuestionId())));
-
-            setLevelOfEnglish(questionAnswers.find((questionAnswer =>
-              questionAnswer.question === getLevelOfEnglishQuestionId())));
-
-          })
-        }*/
     })
     }
   });
@@ -109,29 +40,12 @@ export default function StudentListelement(props) {
 
   // get a list of the skills of the student in HTML format
   function getSkills() {
+    let skills = [];
     return skills.map((skill,index) =>
       <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
-  // get the titles of the basic questions shown in the list element
-  function getInfoTitles() {
-    let questions = ["Studies:", "Type of degree:", "First language:", "Level of English:"];
-    let answers = [studies, degree, fistLanguage, levelOfEnglish];
-    questions = questions.filter((question, index) => answers[index] !== undefined);
-    return questions.map((question,index) =>
-      <p key={index}>{question}</p>
-    )
-  }
-
-  // get the answers on the basic questions in HTML format
-  function getInfoAnswers() {
-    let answers = [studies, degree, fistLanguage, levelOfEnglish];
-    answers = answers.filter((answer) => answer !== undefined);
-    return answers.map((answer,index) =>
-      <p key={index}>{answer}</p>
-    )
-  }
 
   // get the background color of the student, based on the decision
   function getBackground() {
@@ -145,46 +59,55 @@ export default function StudentListelement(props) {
 
   // get the background color of practical problems
   function getProblemsColor() {
+    let practicalProblems = 0;
     if (practicalProblems === 0) {
       return "var(--yes_green_65)"
     }
     return "var(--no_red_65)"
   }
 
+  // a function to open the details of a student
   function studentDetails() {
     let i = props.student.lastIndexOf('/');
     let id = props.student.substring(i + 1);
-    router.push(getStudentPath(id));
+
+    // the path is not changed, but there is a query added wich contains the id of the student
+    router.push({
+      pathname: router.pathname,
+      query: {
+        studentId: id  // update the query param
+      }
+    }, undefined, { shallow: true})
+  }
+
+  // get the suggestion count for a certain decision ("yes", "maybe" or "no")
+  function getSuggestions(decision) {
+    if (! student["suggestions"]) {
+      return 0;
+    }
+    return student["suggestions"].filter(suggestion => ! suggestion["definitive"] && suggestion["decision"] === decision).length
   }
 
   // The html representation of a list-element
   return (
-    <Container fluid id="list-element" className="list-element" style={{backgroundColor: getBackground()}}
-               onClick={() => studentDetails()}>
+    <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
+      onClick={() => studentDetails()}>
       <Row className="upper-layer">
         <Col id="name" className="name" md="auto">{student["name"]}</Col>
-        <Col id="practical-problems" style={{backgroundColor: getProblemsColor()}} className="practical-problems" md="auto">
+        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
           No practical problems
         </Col>
-        <Col/>
+        <Col />
         <Col md="auto">
           <Row md="auto">
             <Col className="suggestions" md="auto">Suggestions:</Col>
-            <SuggestionsCount suggestionsYes={suggestionsYes} suggestionsMaybe={suggestionsMaybe} suggestionsNo={suggestionsNo} />
+            <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
         </Col>
       </Row>
 
       <Row id="info" className="info">
-        <Col id="info-titles" className="info-titles" md="auto">
-          {getInfoTitles()}
-          Decision:
-        </Col>
-        <Col id="info-answers" md="auto" className="info-answers">
-          {getInfoAnswers()}
-          {getDecision()}
-        </Col>
-
+        <GeneralInfo student={student} decision={getDecision()} />
         <Col id="skills" align="right" className="skills">
           <ul>
             {getSkills()}

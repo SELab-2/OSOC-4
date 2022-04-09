@@ -1,7 +1,6 @@
 import axios from "axios";
-import { log } from "./logger";
-import Cookies from 'js-cookie';
-import { ApiClient, AuthApiClient } from './ApiClient'
+import {log} from "./logger";
+import {ApiClient, AuthApiClient} from './ApiClient'
 
 const nobase = axios.create({
     withCredentials: true,
@@ -214,4 +213,25 @@ export async function get_edition(){
         return {"year": edition.year, "name": edition.name}
     }
 
+}
+
+
+export async function check_resetkey(resetkey) {
+    try {
+        await ApiClient.get(`/resetpassword/${resetkey}`)
+        return true;
+    } catch (e) {
+        log(e)
+        return false;
+    }
+}
+
+export async function use_resetkey(resetkey, json) {
+    try {
+        let resp = await ApiClient.post(`/resetpassword/${resetkey}`, json)
+        return resp["data"];
+    } catch (e) {
+        log(e)
+        return await catchError(e);
+    }
 }

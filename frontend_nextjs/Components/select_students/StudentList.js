@@ -1,6 +1,6 @@
-import {Col} from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 export default function StudentList(props) {
 
@@ -8,15 +8,14 @@ export default function StudentList(props) {
   const [students, setStudents] = useState(undefined);
 
   // This function inserts the data in the variables
-  useEffect( () => {
-    if (! students) {
+  useEffect(() => {
+    if (!students) {
       setStudents(props.students)
     }
   }, [students, props.students])
 
   // function to get a list of students
   function getStudents() {
-    console.log(students);
     if (students) {
       return students.map(student =>
         // generate a list of students, each student needs 'student' as a prop
@@ -28,7 +27,8 @@ export default function StudentList(props) {
     return null;
   }
 
-  return(
+  // returns the html representation for the student list
+  return (
     <Col className="fill_height scroll-overflow fill_width">
       <ul className="students_list fill_height">
         {getStudents()}

@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
+import {forgot} from "../utils/json-requests";
 
 const Login = props => {
     const [email, setEmail] = useState("");
@@ -31,7 +32,7 @@ const Login = props => {
 
 
     async function handleLogin() {
-        await signIn('credentials', {email: email, password: password});
+        await signIn('credentials', { email: email, password: password });
     }
 
 
@@ -54,7 +55,7 @@ const Login = props => {
         <div className="body-login">
             <section className="body-left">
                 <div className="image-wrapper">
-                    <Image className="logo" src={logoScreen} alt="osoc-logo"/>
+                    <Image className="logo" src={logoScreen} alt="osoc-logo" />
                 </div>
             </section>
 
