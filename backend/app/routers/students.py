@@ -33,6 +33,14 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     # student suggestions
     r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
     student_info = r.all()
-    info["suggestions"] = [SuggestionExtended.parse_raw(s.json()) for (s,) in student_info]
+
+    suggestions = []
+    suggestion_count = {0: 0, 1: 0, 2: 0}
+    for (s,) in student_info:
+        suggestion_count[s.decision] += 1
+        suggestions.append(SuggestionExtended.parse_raw(s.json()))
+
+    info["suggestion_counts"] = suggestion_count
+    info["suggestions"] = suggestions
 
     return info
