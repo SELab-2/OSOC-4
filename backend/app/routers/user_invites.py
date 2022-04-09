@@ -10,7 +10,6 @@ from app.models.user import User, UserInvite
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
 from fastapi import APIRouter, Depends
-from odmantic import ObjectId
 
 router = APIRouter(prefix="/invite")
 
