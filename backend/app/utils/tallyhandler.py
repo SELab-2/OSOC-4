@@ -5,42 +5,48 @@ from app.models.question_answer import QuestionAnswer
 from app.models.student import Student
 
 
-async def process_tally(data):
+async def get_save_answer(answer, session):
+    # check if answer exists else save it
+    a = await read_where(Answer, Answer.answer == answer, session=session)
+    if not a:
+        a = Answer(answer=answer)
+        await update(a, session=session)
+    return a
+
+
+async def process_tally(data, edition, session):
     """Processes a Tally - submitted Tally and returns a dict with fields that can be used to validate the data .
 
     Args:
         data ([type]): [description]
     """
-    # [to implement] get edition by form id
-    # form_id = res["data"]["formId"]
 
-    studentform: Student = Student(
-        name="", email="", phonenumber="", nickname="", questions=[])
+    student = Student(edition_year=edition)
+    await update(student, session=session)
 
     for field in data["data"]["fields"]:
-        if "email" in field["label"].lower() and field["type"] == "INPUT_EMAIL":
-            studentform.email = field["value"]
-        else:
-            # check if question already in database
-            q: Question = Question(question=field["label"],
-                                   field_id=field["key"], type=field["type"])
-            question = await read_where(Question, Question.id == q.id)
 
-            if not question:
-                question = await update(q)
+        if "Which role are you applying for that is not in the list above?" == field["label"]:
+            field["label"] = "Which role are you applying for?"
 
-            if question.type == "MULTIPLE_CHOICE":
-                options = field["options"]
-                for option in options:
-                    a: Answer = Answer(questionid=question.id,
-                                       field_id=option["id"], text=option["text"])
+        # Check if the question already exists else save it
+        q = await read_where(Question, Question.question == field["label"], Question.field_id == field["key"], Question.edition == edition, session=session)
+        if not q:
+            q = Question(question=field["label"], edition=edition)
+            await update(q, session=session)
 
-                    answer = await read_where(Answer, Answer.id == a.id)
-                    if not a:
-                        answer = await update(a)
+        if field["type"] in ["MULTIPLE_CHOICE", "CHECKBOXES"]:
+            q_values = field["value"] if isinstance(field["value"], list) else [field["value"]]
+            if "options" in field:
+                for option in field["options"]:
+                    if option["id"] in q_values and option["text"] != "Other":
+                        a = await get_save_answer(option["text"], session)
 
-                    if option["id"] == field["value"]:
-                        studentform.question_answers.append(QuestionAnswer(
-                            question=question.id, answer=answer.id))
+                        # save the question answer binding
+                        await update(QuestionAnswer(student=student, question=q, answer=a), session=session)
 
-            await update(studentform)
+        elif field["type"] in ["TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_PHONE_NUMBER", "INPUT_EMAIL", "INPUT_LINK", "FILE_UPLOAD"]:
+            if field["value"] is not None:
+                a = await get_save_answer(str(field["value"]), session)
+                await update(QuestionAnswer(student=student, question=q, answer=a), session=session)
+
