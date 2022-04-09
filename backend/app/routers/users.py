@@ -4,13 +4,12 @@ from app.crud import read_all_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
-from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
-                                            PasswordsDoNotMatchException,
+from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
                                             UserNotFoundException, InvalidEmailOrPasswordException)
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import (User, UserCreate, UserData, UserOut,
+from app.models.user import (User, UserCreate, UserOut,
                              UserOutSimple, UserRole, ChangeUser, ChangePassword, UserMe, ChangeUserMe)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
