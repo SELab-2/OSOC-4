@@ -1,9 +1,6 @@
 import {
   Button,
   Col,
-  Modal,
-  ModalHeader,
-  ModalTitle,
   Row
 } from "react-bootstrap";
 import {useEffect, useState} from "react";
@@ -14,6 +11,11 @@ import {getJson} from "../../utils/json-requests";
 import {getStudentPath} from "../../routes";
 import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
+import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
+import deleteIcon from '../../public/assets/delete.svg';
+import editIcon from '../../public/assets/edit.svg'
+import Image from 'next/image';
+import DeletePopUpWindow from "./DeletePopUpWindow";
 
 
 // This function returns the details of a student
@@ -23,11 +25,16 @@ export default function StudentDetails(props) {
   const [student, setStudent] = useState({});
   const [studentId, setStudentId] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
+
   const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
   const [decisionPopUpShow, setDecisionPopUpShow] = useState(false);
+  const [emailPopUpShow, setEmailPopUpShow] = useState(false);
+  const [deletePopUpShow, setDeletePopUpShow] = useState(false);
+
   const [decision, setDecision] = useState(-1);
   const [suggestion, setSuggestion] = useState(0);
   const [confirmButton, setConfirmButton] = useState(true);
+  const [decideField, setDecideField] = useState(-1);
 
   // This function inserts the data in the variables
   useEffect( () => {
@@ -86,12 +93,21 @@ export default function StudentDetails(props) {
       <Col className="fill_height student-details-window">
 
           <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} decision={suggestion} student={student}/>
-          <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={suggestion} student={student} />
+          <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
+          <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
+          <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
 
           <Row className="details-upper-layer">
             <Col md="auto">
-              <Row className="name_big">
-                {student["name"]}
+              <Row>
+                <Col md="auto" className="name_big">
+                  {student["name"]}
+                </Col>
+                <Col>
+                  <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
+                    <Image src={deleteIcon} className="delete-icon"/>
+                  </button>
+                </Col>
               </Row>
               <Row>
                 <Col md="auto" className="skill">VIDEO EDITOR</Col>
@@ -113,7 +129,7 @@ export default function StudentDetails(props) {
               <Row>
                 <Col>
                   <select className="dropdown-decision" id="dropdown-decision"
-                          onChange={(ev) => setConfirmButton(ev.target.value=== "-1")}>
+                          onChange={(ev) => setDecideField(ev.target.value)}>
                     <option value="-1">Undecided</option>
                     <option value="2">Yes</option>
                     <option value="1">Maybe</option>
@@ -121,7 +137,7 @@ export default function StudentDetails(props) {
                   </select>
                 </Col>
                 <Col md="auto">
-                  <Button className="suggest-confirm-button" disabled={confirmButton} onClick={() => setDecisionPopUpShow(true)}>
+                  <Button className="suggest-confirm-button" disabled={decideField === -1} onClick={() => setDecisionPopUpShow(true)}>
                   Confirm
                   </Button>
                 </Col>
@@ -135,7 +151,7 @@ export default function StudentDetails(props) {
                 <GeneralInfo student={student} decision={getDecision()} />
               </Row>
               <Row md="auto">
-                <Button className="send-email-button" disabled={decision === -1}>
+                <Button className="send-email-button" disabled={decision === -1} onClick={() => setEmailPopUpShow(true)}>
                   Send email
                 </Button>
               </Row>
