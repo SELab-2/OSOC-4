@@ -112,7 +112,7 @@ class UserResetPassword(BaseModel):
 
 class ChangeUser(BaseModel):
     name: str = ""
-    role: UserRole = 0
+    role: int
     active: bool = False
     approved: bool = False
     disabled: bool = True
