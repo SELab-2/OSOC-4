@@ -4,9 +4,10 @@ import {log} from "../utils/logger";
 import ProjectCard from "../Components/ProjectCard";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {useRouter} from "next/router";
+import {urlManager} from "../utils/ApiClient";
 
 export default function Projects(props) {
-    const [projects, setProjects] = useState([])
+    const [allProjects, setAllProjects] = useState([])
     const [loaded, setLoaded] = useState(false)
     const [search, handleSearch] = useState("")
     const [peopleNeeded, setPeopleNeeded] = useState(false)
@@ -15,27 +16,30 @@ export default function Projects(props) {
     const router = useRouter()
 
     useEffect(() => {
-        if (!projects.length) {
-            getJson("/projects").then(res => {
+        if (! allProjects.length && ! loaded) {
+            urlManager.getProjects().then(async projects_url => {
+                let projects = await getJson(projects_url)
                 log("load project")
-                log(res)
-                for (let p of res.data) {
-                    getJson(p.id).then(async project => {
-                        if (project.data) {
-                            await setProjects(prevState => [...prevState, project.data]);
+                log(projects)
+                for (let p of projects) {
+                    log(p)
+                    getJson(p).then(async project => {
+                        log(project)
+                        if (project) {
+                            await setAllProjects(prevState => [...prevState, project]);
                             // TODO clean this up (currently only works if updated here
-                            await setVisibleProjects(prevState => [...prevState, project.data]);
+                            await setVisibleProjects(prevState => [...prevState, project]);
                         }
                     })
                 }
                 setLoaded(true)
-            });
+            })
         }
     })
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
-        setVisibleProjects(projects.filter((project) => project.name.includes(search)))
+        setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
         log("SUBMIT")
     }
 
@@ -76,7 +80,7 @@ export default function Projects(props) {
             </Row>
             <div>
                 {
-                    loaded ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
+                    visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
                 }
             </div>
         </div>

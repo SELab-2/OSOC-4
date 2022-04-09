@@ -46,6 +46,11 @@ class UrlManager {
         return this._projects;
     }
 
+    async getCurrentYear(){
+        if(! this._year) {await this._setCurrentEdition();}
+        return this._year;
+    }
+
 
     async _setUsers() {
         log("Setting users")

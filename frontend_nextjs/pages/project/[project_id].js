@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
 import {Button, Col, Modal, Row} from "react-bootstrap";
+import {urlManager} from "../../utils/ApiClient";
 
 const Project = () => {
     const router = useRouter()
@@ -14,12 +15,12 @@ const Project = () => {
 
     useEffect(() => {
         if (! loaded) {
-            getJson("/projects" + "/" + project_id).then(res => {
-                log("load project")
-                log(res)
-                setProject(res.data)
-                setLoaded(true)
-            });
+                getJson("projects/" + project_id).then(res => {
+                    log("load project")
+                    log(res)
+                    setProject(res)
+                    setLoaded(true)
+                });
         }
     })
 
@@ -59,14 +60,14 @@ const Project = () => {
                             </Modal>
                         </Col>
                     </Row>
-                    <h2>Project by: {project.partner.name}</h2>
-                    <p>{project.partner.about}</p>
+                    <h2>Project by: {project.partner_name}</h2>
+                    <p>{project.partner_description}</p>
                     <br/>
                     <h2>About the project</h2>
                     <p>{project.description}</p>
 
                     <h2>Goals</h2>
-                    {project.goals.map((goal, index) => (<p key={index}>- {goal}</p>))}
+                    {project.goals.split("\n").map((goal, index) => (<p key={index}>- {goal}</p>))}
                     {/*TODO nog iets met user?*/}
                 </div>) : null}
         </div>

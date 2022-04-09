@@ -2,15 +2,16 @@ import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {log} from "../utils/logger";
 import {useRouter} from "next/router";
-import {getJson} from "../utils/json-requests";
+import {getJson, postCreate} from "../utils/json-requests";
 import SelectSearch, {fuzzySearch} from "react-select-search";
+import {urlManager} from "../utils/ApiClient";
 
 
 export default function NewProjects() {
     const [projectName, setProjectName] = useState()
     const [partnerName, setPartnerName] = useState()
-    const [partnerBio, setPartnerBio] = useState()
-    const [projectBio, setProjectBio] = useState()
+    const [partnerDescription, setPartnerDescription] = useState()
+    const [projectDescription, setProjectDescription] = useState()
     const [briefing, setBriefing] = useState()
 
     const [tools, setTools] = useState()
@@ -27,17 +28,17 @@ export default function NewProjects() {
 
     useEffect(() => {
         if (skills.length === 0) {
-            getJson("/skills").then(async res => {
-                log("load skills")
-                log(res)
-                if(res.data){
-                    // scuffed way to get unique skills (should be fixed in backend soon)
-                    let uniq = [...new Set(res.data.map(skill => skill.name))];
-                    let array = [];
-                    uniq.map(skill => array.push({"value":skill, "name":skill}));
-                    setSkills(array);
-                }
-            })
+            // getJson("/skills").then(async res => {
+            //     log("load skills")
+            //     log(res)
+            //     if(res.data){
+            //         // scuffed way to get unique skills (should be fixed in backend soon)
+            //         let uniq = [...new Set(res.data.map(skill => skill.name))];
+            //         let array = [];
+            //         uniq.map(skill => array.push({"value":skill, "name":skill}));
+            //         setSkills(array);
+            //     }
+            // })
         }
     })
 
@@ -73,7 +74,17 @@ export default function NewProjects() {
     async function handleSubmitChange(event){
         event.preventDefault()
         log("Creating new project")
-        // TODO make this work with backend
+        let edition = await urlManager.getCurrentYear();
+        // TODO check forms
+        let body = {
+            "name":projectName,
+            "description":projectDescription,
+            "partner_name":partnerName,
+            "partner_description": partnerDescription,
+            "goals": "",
+            "edition": edition
+        }
+        await postCreate("projects/create", body)
     }
 
 
@@ -108,10 +119,10 @@ export default function NewProjects() {
                 <Form.Control type="text" value={partnerName} placeholder={"Partner name"} onChange={e => setPartnerName(e.target.value)} />
 
                 <Form.Label>About partner:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={partnerBio} placeholder={"Short bio about the partner, website, ..."} onChange={e => setPartnerBio(e.target.value)} />
+                <Form.Control as="textarea" rows={3} value={partnerDescription} placeholder={"Short bio about the partner, website, ..."} onChange={e => setPartnerDescription(e.target.value)} />
 
                 <Form.Label>About project:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={projectBio} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectBio(e.target.value)} />
+                <Form.Control as="textarea" rows={3} value={projectDescription} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectDescription(e.target.value)} />
 
                 <Form.Label>Briefing:</Form.Label>
                 <Form.Control as="textarea" rows={3} value={briefing} placeholder={"Link to the project page"} onChange={e => setBriefing(e.target.value)} />
