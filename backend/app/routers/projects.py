@@ -56,7 +56,7 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
     projectUsers = await session.execute(select(User.id).join(ProjectCoach).where(ProjectCoach.project_id == int(id)))
     projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers.all()]
     projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
-    projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]   
+    projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]
     return projectOutExtended
 
 
