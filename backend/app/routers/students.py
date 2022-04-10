@@ -1,6 +1,7 @@
 from app.config import config
 from app.database import get_session
 from app.models.answer import Answer
+from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
@@ -53,6 +54,27 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     # student suggestions
     r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
     student_info = r.all()
+    # student questionAnswers
+    info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
     info["suggestions"] = [SuggestionExtended.parse_raw(s.json()) for (s,) in student_info]
+
+    return info
+
+
+@router.get("/{student_id}/question-answers", response_description="Student retrieved")
+async def get_student_questionanswers(student_id, session: AsyncSession = Depends(get_session)):
+    """get_student get the Student instances with id from the database
+
+    :return: student with id
+    :rtype: StudentOutExtended
+    """
+    # student questionAnswers
+    r = await session.execute(select(Question.question, Answer.answer, QuestionTag.tag).select_from(QuestionAnswer)
+                              .join(Question, QuestionAnswer.question)
+                              .join(Answer, QuestionAnswer.answer)
+                              .outerjoin(QuestionTag, Question.question_tags)
+                              .where(QuestionAnswer.student_id == int(student_id)))
+    info = r.all()
+    info = [{"question": x[0], "answer":x[1]} for x in info if x[2] is None]
 
     return info

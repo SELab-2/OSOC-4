@@ -17,22 +17,24 @@ export default function ManageUsers(props) {
     };
 
     useEffect(() => {
-        if (!users.length && ! loading) {
-            setLoading(true)
-            urlManager.getUsers().then(url => getJson(url).then(res => {
-                log("manage users:")
-                log(res)
-                for (let u of res) {
-                    getJson(u.id).then(async user => {
-                        if (user.data) {
-                            await setUsers(prevState => [...prevState, user.data]);
-                            await setShownUsers(prevState => [...prevState, user.data]);
-                        }
-                    }).then(() => setLoading(false))
-                }
-            }));
+        if (Boolean(props.initialize)) {
+            if (!users.length && !loading) {
+                setLoading(true)
+                urlManager.getUsers().then(url => getJson(url).then(res => {
+                    log("manage users:")
+                    log(res)
+                    for (let u of res) {
+                        getJson(u.id).then(async user => {
+                            if (user.data) {
+                                await setUsers(prevState => [...prevState, user.data]);
+                                await setShownUsers(prevState => [...prevState, user.data]);
+                            }
+                        }).then(() => setLoading(false))
+                    }
+                }));
+            }
         }
-    }, [users.length, loading])
+    }, [users.length, loading, props.initialize])
 
     const handleChangeToInvite = (event) => {
         event.preventDefault();

@@ -11,12 +11,11 @@ import StudentDetails from "../Components/select_students/StudentDetails";
 
 // The page corresponding with the 'select students' tab
 export default function SelectStudents() {
+    const router = useRouter();
 
     // These constants are initialized empty, the data will be inserted in useEffect
     const [students, setStudents] = useState(undefined);
     const studentId = router.query.studentId;
-
-    const router = useRouter();
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()

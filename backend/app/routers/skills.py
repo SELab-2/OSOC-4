@@ -6,7 +6,6 @@ from app.database import get_session
 from app.models.skill import Skill
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
-from app.utils.response import list_modeltype_response
 
 router = APIRouter(prefix="/skills")
 
@@ -19,4 +18,4 @@ async def get_skills(session: AsyncSession = Depends(get_session)):
     :rtype: dict
     """
     results = await read_all_where(Skill, session=session)
-    return list_modeltype_response(results, Skill)
+    return [r.name for r in results]
