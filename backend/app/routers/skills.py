@@ -19,4 +19,5 @@ async def get_skills(session: AsyncSession = Depends(get_session)):
     :rtype: dict
     """
     results = await read_all_where(Skill, session=session)
-    return list_modeltype_response(results, Skill)
+    return [r.name for r in results]    
+    
