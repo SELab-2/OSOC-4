@@ -25,6 +25,7 @@ export default function Settings(props) {
     const [email, setEmail] = useState("");
     const [role, setRole] = useState(0);
     const [loading, setLoading] = useState(false)
+    const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
 
@@ -50,6 +51,10 @@ export default function Settings(props) {
     const changeTheme = (event) => {
         event.preventDefault()
         setDarkTheme(! darkTheme)
+    }
+
+    function clickAdminSettings() {
+        setInitializeUsers(true);
     }
 
     return(
@@ -89,13 +94,13 @@ export default function Settings(props) {
                     </AccordionBody>
                 </AccordionItem>
                 {(role === 2) ? (
-                    <AccordionItem eventKey={2}>
+                    <AccordionItem eventKey={2} onClick={clickAdminSettings}>
                         <AccordionHeader>
                             <h3>Admin settings</h3>
                         </AccordionHeader>
                         <AccordionBody>
                             <div className="admin-settings">
-                                <ManageUsers me={user}/>
+                                <ManageUsers me={user} initialize={initializeUsers}/>
                             </div>
                         </AccordionBody>
                     </AccordionItem>
