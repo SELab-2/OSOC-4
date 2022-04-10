@@ -6,11 +6,12 @@ import { Col, Row } from "react-bootstrap";
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
-import {router} from "next/client";
+import {useRouter} from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 
 // The page corresponding with the 'select students' tab
 export default function SelectStudents() {
+    const router = useRouter();
 
     // These constants are initialized empty, the data will be inserted in useEffect
     const [students, setStudents] = useState(undefined);
