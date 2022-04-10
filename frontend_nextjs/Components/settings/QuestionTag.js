@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { getJson } from "../../utils/json-requests";
+import { getJson, sendDelete, patchEdit } from "../../utils/json-requests";
 import { Form, Button } from 'react-bootstrap';
+import deleteIcon from '../../public/assets/delete.svg';
+import Image from "next/image";
 
 export default function QuestionTag(props) {
     const [previousTag, setPreviousTag] = useState({});
@@ -34,9 +36,26 @@ export default function QuestionTag(props) {
         }));
     }
 
+    const deleteTag = (event) => {
+        event.preventDefault()
+        sendDelete(props.url).then(result => {
+            props.deleteTag(props.url)
+        })
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        patchEdit(props.url, questionTag).then(res => {
+            if (previousTag["tag"] !== questionTag["tag"]) {
+                props.renameTag(props.url, props.url.replace(previousTag["tag"], questionTag["tag"]))
+            }
+            setPreviousTag(questionTag);
+        })
+    }
+
     return (
         <div>
-            <Form>
+            <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     {questionTag["mandatory"] ? (
                         <Form.Control name="tag" type="text" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} disabled />
@@ -52,6 +71,12 @@ export default function QuestionTag(props) {
                         label={"show in studentlist"}
                         onChange={handleCheckboxChange}
                     />
+                    {!questionTag["mandatory"] &&
+                        <button onClick={deleteTag}>
+                            <Image src={deleteIcon} className="delete-icon" />
+                        </button>
+                    }
+
                 </Form.Group>
                 {JSON.stringify(questionTag) !== JSON.stringify(previousTag) &&
                     <Button variant="primary" type="submit">

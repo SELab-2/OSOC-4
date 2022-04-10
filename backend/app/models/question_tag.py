@@ -44,8 +44,4 @@ class QuestionTagUpdate(BaseModel):
     tag: str
     question: str
     showInList: bool
-
-    @validator("question", pre=True, always=True)
-    def check_question(cls, question):
-        assert question, "question cannot be empty."
-        return question
+    mandatory: bool

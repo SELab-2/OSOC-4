@@ -26,17 +26,36 @@ export default function QuestionTags() {
     }
 
     async function submitNewTag(event) {
+        event.preventDefault()
         const questiontag_url = await urlManager.getQuestionTags()
         postCreate(questiontag_url, { "tag": newTag }).then(resp => {
-            setQuestionTags([...questionTags, resp])
+            setQuestionTags([...questionTags, resp["data"]])
+            setNewTag("");
         })
+
+    }
+
+    const deleteTag = (url) => {
+        const newArr = questionTags.filter(item => item !== url);
+        setQuestionTags(newArr);
+    }
+
+    const renameTag = (url, newurl) => {
+
+        var index = questionTags.indexOf(url);
+
+        if (index !== -1) {
+            questionTags[index] = newurl;
+        }
+
+        setQuestionTags([...questionTags]);
     }
 
     return (
         <div>
             {
                 questionTags.map(url =>
-                    <QuestionTag key={url} url={url} />
+                    <QuestionTag key={url} url={url} deleteTag={deleteTag} renameTag={renameTag} />
                 )
             }
             <Form onSubmit={submitNewTag}>

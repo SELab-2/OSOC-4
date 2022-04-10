@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
+import { useEffect, useState } from "react";
+import { getJson } from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
@@ -10,7 +10,7 @@ export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [student, setStudent] = useState({});
-  const [decision,setDecision] = useState(-1);
+  const [decision, setDecision] = useState(-1);
 
 
   const router = useRouter()
@@ -25,7 +25,7 @@ export default function StudentListelement(props) {
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
         }
-    })
+      })
     }
   });
 
@@ -41,8 +41,8 @@ export default function StudentListelement(props) {
   // get a list of the skills of the student in HTML format
   function getSkills() {
     let skills = [];
-    return skills.map((skill,index) =>
-      <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
+    return skills.map((skill, index) =>
+      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
@@ -77,15 +77,15 @@ export default function StudentListelement(props) {
       query: {
         studentId: id  // update the query param
       }
-    }, undefined, { shallow: true})
+    }, undefined, { shallow: true })
   }
 
   // get the suggestion count for a certain decision ("yes", "maybe" or "no")
   function getSuggestions(decision) {
-    if (! student["suggestions"]) {
+    if (!student["suggestions"]) {
       return 0;
     }
-    return student["suggestions"].filter(suggestion => ! suggestion["definitive"] && suggestion["decision"] === decision).length
+    return student["suggestions"].filter(suggestion => !suggestion["definitive"] && suggestion["decision"] === decision).length
   }
 
   // The html representation of a list-element

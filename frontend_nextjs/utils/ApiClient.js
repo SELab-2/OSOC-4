@@ -120,7 +120,6 @@ function AxiosClient(auth_headers = true) {
                 request.headers["X-CSRF-TOKEN"] = csrfToken
             }
         }
-        console.log(request)
         return request;
     });
 

@@ -1,6 +1,6 @@
 import axios from "axios";
-import {log} from "./logger";
-import {ApiClient, AuthApiClient} from './ApiClient'
+import { log } from "./logger";
+import { ApiClient, AuthApiClient } from './ApiClient'
 
 const nobase = axios.create({
     withCredentials: true,
@@ -70,7 +70,7 @@ export async function getJson(url) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|any>}
  */
-export async function sendDelete(url, getters, commit) {
+export async function sendDelete(url) {
     log("json-requests: sendDelete: " + url)
     try {
         const req = await AuthApiClient.delete(url);
@@ -197,8 +197,8 @@ export async function set_password(invitekey, json) {
     }
 }
 
-export async function get_edition(){
-    if ("edition" in localStorage){
+export async function get_edition() {
+    if ("edition" in localStorage) {
         log("found locally")
         return JSON.parse(localStorage.getItem("edition"))
     }
@@ -209,8 +209,8 @@ export async function get_edition(){
     // edition list should be ordered so first element should be latest edition
     let edition = await getJson(editions[0])
     if (edition) {
-        localStorage.setItem("edition", JSON.stringify({"year": edition.year, "name": edition.name}))
-        return {"year": edition.year, "name": edition.name}
+        localStorage.setItem("edition", JSON.stringify({ "year": edition.year, "name": edition.name }))
+        return { "year": edition.year, "name": edition.name }
     }
 
 }
