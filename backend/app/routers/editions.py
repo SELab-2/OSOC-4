@@ -224,11 +224,21 @@ async def get_question_tags(year: int, session: AsyncSession = Depends(get_sessi
     :return: list of QuestionTags
     :rtype: list of QuestionTags
     """
-    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).options(selectinload(QuestionTag.question)).order_by(QuestionTag.tag))
+    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).order_by(QuestionTag.tag))
     tags = res.all()
 
-    return [QuestionTagSimpleOut(tag=tag.tag, mandatory=tag.mandatory, showInList=tag.showInList, question=tag.question.question) for (tag,) in tags]
+    return [f"{config.api_url}editions/{str(year)}/questiontags/{tag.tag}" for (tag,) in tags]
 
+
+@router.get("/{year}/questiontags/{tag}")
+async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
+    try:
+        res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.tag == tag).options(selectinload(QuestionTag.question)))
+        (qtag,) = res.one()
+    except Exception:
+        raise QuestionTagNotFoundException()
+
+    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, showInList=qtag.showInList, question=qtag.question.question)
 
 @router.get("/{year}/questiontags/unused", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Tags retrieved")
 async def get_unused_question_tags(year: int, session: AsyncSession = Depends(get_session)):
@@ -281,6 +291,8 @@ async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSess
     except IntegrityError:
         raise QuestionTagAlreadyExists(tag.tag)
 
+    return f"{config.api_url}editions/{str(year)}/questiontags/{tag.tag}"
+
 
 @router.delete("/{year}/questiontag/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
@@ -331,6 +343,9 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     except Exception:
         raise QuestionTagNotFoundException()
 
+    questiontag.tag = tagupdate.tag
+    questiontag.showInList = tagupdate.showInList
+
     if questiontag.question and len(questiontag.question.question_answers) == 0:
         # Delete the unused question
         questiontag.question_id = None
@@ -350,3 +365,4 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
         questiontag.question_id = newquestion.id
 
     await update(questiontag, session=session)
+    return f"{config.api_url}editions/{str(year)}/questiontag/{questiontag.tag}"
