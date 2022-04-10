@@ -254,6 +254,7 @@ class StudentGenerator:
 
 def generate_suggestions(student, student_skills, project, coaches, unconfirmed=3, confirmed_suggestion=None, admin=None):
     suggestions = [Suggestion(
+        mail_sent=False,
         decision=choice(list(SuggestionOption)),
         reason="reason x",
         student=student,
@@ -264,6 +265,7 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
 
     if confirmed_suggestion is not None and admin is not None:
         suggestions.append(Suggestion(
+            mail_sent=True,
             decision=confirmed_suggestion,
             reason="reason x",
             student=student,
