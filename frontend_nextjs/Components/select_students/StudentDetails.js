@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
+import {urlManager} from "../../utils/ApiClient";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -28,6 +29,7 @@ export default function StudentDetails(props) {
   const [studentId, setStudentId] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
   const [decision, setDecision] = useState(-1);
+  const [questionAnswers, setQuestionAnswers] = useState([])
 
   // These constant define wheater the pop-up windows should be shown or not
   const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
@@ -44,7 +46,7 @@ export default function StudentDetails(props) {
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
-      getJson(getStudentPath(props.student_id)).then(res => {
+      getJson(urlManager.baseUrl + "/students/" + props.student_id).then(res => {  //todo use urlManager
         setStudent(res);
 
         // Fill in the suggestions field, this contains all the suggestions which are not definitive
@@ -58,9 +60,15 @@ export default function StudentDetails(props) {
         } else {
           setDecision(-1);
         }
+
+        // Fill in the questionAnswers
+        getJson(res["question-answers"]).then(res => {
+          setQuestionAnswers(res);
+          console.log(res);
+        })
       })
     }
-  })
+  }, [studentId, props.student_id])
 
   // return a string representation of the decision
   function getDecision() {
@@ -121,7 +129,7 @@ export default function StudentDetails(props) {
         <Col md="auto">
           <Row>
             <Col md="auto" className="name_big">
-              {student["name"]}
+              {student["first name"]} {student["last name"]}
             </Col>
             <Col>
               <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
