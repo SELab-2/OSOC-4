@@ -4,16 +4,15 @@ from app.crud import read_all_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
-from app.exceptions.user_exceptions import (EmailAlreadyUsedException,
-                                            PasswordsDoNotMatchException,
+from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
-                                            UserNotFoundException)
+                                            UserNotFoundException, InvalidEmailOrPasswordException)
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import (User, UserCreate, UserData, UserOut,
-                             UserOutSimple, UserRole)
+from app.models.user import (User, UserCreate, UserOut,
+                             UserOutSimple, UserRole, ChangeUser, ChangePassword, UserMe, ChangeUserMe)
 from app.utils.checkers import RoleChecker
-from app.utils.cryptography import get_password_hash
+from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import response
@@ -24,7 +23,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter(prefix="/users")
 
 
-@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved", response_model=List[UserOutSimple])
+@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved",
+            response_model=List[UserOutSimple])
 async def get_users(session: AsyncSession = Depends(get_session)):
     """get_users get all the users from the database
 
@@ -44,7 +44,21 @@ async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = De
     # User will always be found since otherwise they can't be authorized
     # No need to check whether user exists
 
-    return response(UserOutSimple.parse_raw(user.json()), "User retrieved successfully")
+    return response(UserMe.parse_raw(user.json()), "User retrieved successfully")
+
+
+@router.patch("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
+                         session: AsyncSession = Depends(get_session)):
+    current_user_id = Authorize.get_jwt_subject()
+
+    user = await read_where(User, User.id == int(current_user_id), session=session)
+
+    user.name = new_data.name
+
+    user = await update(user, session=session)
+
+    return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
@@ -68,7 +82,8 @@ async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_se
 
 
 @router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends(),
+                          session: AsyncSession = Depends(get_session)):
     """change_password function that changes the user password
 
     :param reset_key: the reset key
@@ -108,7 +123,8 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
 
 
 @router.get("/{id}")
-async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
+async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
+                   session: AsyncSession = Depends(get_session)):
     """get_user this functions returns the user with given id (or None)
 
     :param id: the user id
@@ -127,38 +143,61 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(), sessi
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
 
 
-@router.post("/{id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_user(id: str, new_data: UserData, session: AsyncSession = Depends(get_session)):
+@router.patch("/{user_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession = Depends(get_session)):
     """update_user this updates a user
 
-    :param id: the user id
-    :type id: str
-    :param new_data: email and name, defaults to Body(...)
-    :type new_data: UserData, optional
-    :raises EmailAlreadyUsedException: email already in use
+    :param user_id: the user id
+    :type user_id: str
+    :param new_data: name, active, approved, disabled and role
+    :type new_data: ChangeUser
     :raises NotPermittedException: Unauthorized
     :return: response
     :rtype: success or error
     """
 
-    user = await read_where(User, User.id == int(id), session=session)
-
-    user_w_email = await read_where(User, User.email == new_data.email, session=session)
+    user = await read_where(User, User.id == int(user_id), session=session)
 
     if user is None:
         raise UserNotFoundException()
-    if user_w_email is not None and user_w_email.id != user.id:
-        # The email is already in use
-        raise EmailAlreadyUsedException()
-    else:
-        # No other user with the new email address was found
-        user.email = new_data.email
 
     user.name = new_data.name
+    user.active = new_data.active
+    user.approved = new_data.approved
+    user.disabled = new_data.disabled
+    user.role = new_data.role
 
     user = await update(user, session=session)
 
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
+
+
+@router.patch("/{user_id}/password", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def update_password(user_id: str, passwords: ChangePassword, session: AsyncSession = Depends(get_session)):
+    """"update_password this changes the password of given user if previous password is given
+        :param user_id: the user id
+    :type user_id: str
+    :param passwords: current_password, new_password and confirm_password
+    :type passwords: ChangePassword
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    if passwords.new_password != passwords.confirm_password:
+        raise PasswordsDoNotMatchException()
+
+    user = await read_where(User, User.id == int(user_id), session=session)
+
+    if user is None:
+        raise UserNotFoundException()
+
+    if not verify_password(passwords.current_password, user.password):
+        raise InvalidEmailOrPasswordException()
+
+    user.password = get_password_hash(passwords.new_password)
+    await update(user, session=session)
+    return response(None, "Updated password successfully")
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])

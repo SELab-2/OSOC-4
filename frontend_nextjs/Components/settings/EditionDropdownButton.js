@@ -56,16 +56,22 @@ export default function EditionDropdownButton() {
     }
 
     return (
-        <Dropdown>
-            <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                {(currentVersion) ? currentVersion.name : null}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-                {(editionList.length) ? (editionList.map((item, index) => (
-                    //TODO show selected version in menu and make onClick clean or use other method
-                    <Dropdown.Item  onClick={() => ChangeSelectedVersion(item)} key={index} value={item.uri}>{item.name}</Dropdown.Item>
-                ))) : null}
-            </Dropdown.Menu>
-        </Dropdown>
+        <div>
+            <p className="details-text">Changing this will affect the whole site. <br/>
+                On every page where it has effect it will use the edition you select here. This only list the editions that you have access to.
+            </p>
+            <Dropdown>
+                <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
+                    {(currentVersion) ? currentVersion.name : null}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    {(editionList.length) ? (editionList.map((item, index) => (
+                        //TODO show selected version in menu and make onClick clean or use other method
+                        <Dropdown.Item  onClick={() => ChangeSelectedVersion(item)} key={index} value={item.uri}>{item.name}</Dropdown.Item>
+                    ))) : null}
+                </Dropdown.Menu>
+            </Dropdown>
+        </div>
+
     )
 }
