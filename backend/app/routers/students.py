@@ -63,7 +63,7 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
 
 
 @router.get("/{student_id}/question-answers", response_description="Student retrieved")
-async def get_student(student_id, session: AsyncSession = Depends(get_session)):
+async def get_student_questionanswers(student_id, session: AsyncSession = Depends(get_session)):
     """get_student get the Student instances with id from the database
 
     :return: student with id
