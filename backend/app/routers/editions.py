@@ -18,8 +18,7 @@ from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
-                                     QuestionTagSimpleOut, QuestionTagUpdate,
-                                     UnusedQuestionTagSimpleOut)
+                                     QuestionTagSimpleOut, QuestionTagUpdate)
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
