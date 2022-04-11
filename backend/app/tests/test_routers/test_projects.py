@@ -45,7 +45,7 @@ class TestProjects(TestBase):
         project = await db.engine.find_one(Project, Project.name == body["name"])
         self.assertIsNotNone(project, f"'{body['name']}' was not found in the database.")
 
-    @unittest.skip("Fault in test data")
+    @unittest.skip("Fault in test data, test_base can't create project with approved_coach")
     async def test_get_projects_id(self):
         project = await read_where(Project, Project.name == "project_test", session=self.session)
         path = "/projects/" + str(project.id)

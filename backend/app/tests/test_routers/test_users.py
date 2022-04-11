@@ -244,7 +244,7 @@ class TestUsers(TestBase):
         await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_approved_coach",
                               json_body={}, expected_status=Status.FORBIDDEN)
 
-    @unittest.skip("No approval")
+    @unittest.skip("Data is not changed after being updated in corresponding router.")
     async def test_post_approve_user(self):
         activated_user: User = await self.get_user_by_name("user_activated_coach")
         path: str = f"/users/{str(activated_user.id)}/approve"

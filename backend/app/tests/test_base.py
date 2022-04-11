@@ -12,6 +12,7 @@ from app.api import app
 from app.crud import read_where, update, read_all_where
 from app.database import engine
 from app.models.edition import Edition
+from app.models.project import Project
 from app.models.skill import Skill
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
