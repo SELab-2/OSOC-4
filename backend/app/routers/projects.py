@@ -1,11 +1,13 @@
+from app.config import config
 from app.crud import read_where, update
 from app.database import get_session
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
                                 ProjectOutExtended, ProjectOutSimple)
-from app.models.user import UserRole
+from app.models.user import UserRole, User
 from app.utils.checkers import RoleChecker
 from app.utils.response import response
+from app.models.project import ProjectRequiredSkill, RequiredSkillOut
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -50,7 +52,12 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
     if not project:
         raise ProjectNotFoundException()
 
-    return ProjectOutExtended.parse_raw(project.json())
+    projectOutExtended = ProjectOutExtended.parse_raw(project.json())
+    projectUsers = await session.execute(select(User.id).join(ProjectCoach).where(ProjectCoach.project_id == int(id)))
+    projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers.all()]
+    projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
+    projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]
+    return projectOutExtended
 
 
 @router.patch("/{id}", response_description="Project with id updated", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])

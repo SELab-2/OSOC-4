@@ -45,7 +45,7 @@ class PartnerOut(BaseModel):
 
 
 class RequiredSkillOut(BaseModel):
-    skill: str
+    skill_name: str
     number: int
 
 
@@ -74,7 +74,7 @@ class ProjectOutExtended(BaseModel):
     goals: str
     partner_name: str
     partner_description: str
-    # required_skills: List[RequiredSkills]
+    required_skills: List[RequiredSkillOut] = []
     users: List[str] = []
     edition: str
 
