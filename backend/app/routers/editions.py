@@ -360,30 +360,29 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     questiontag.showInList = tagupdate.showInList
 
     if questiontag.question and questiontag.question.question != tagupdate.question:
-        print(questiontag.question.question_answers)
+
         if len(questiontag.question.question_answers) == 0:
             # Delete the unused question
             unused_question = questiontag.question
-            print("deleting ...")
             questiontag.question_id = None
             await update(questiontag, session=session)
 
             await session.delete(unused_question)
             await session.commit()
+        else:
+            questiontag.question_id = None
+            await update(questiontag, session=session)
 
-        if tagupdate.question:
-            # Search the new question
-            print(tagupdate.question)
-            question = await read_where(Question, Question.question == tagupdate.question, Question.edition == year, session=session)
+    if questiontag.question_id is None and tagupdate.question:
+        # Search the new question
+        question = await read_where(Question, Question.question == tagupdate.question, Question.edition == year, session=session)
 
-            print(question)
-
-            if question:
-                questiontag.question_id = question.id
-            else:
-                newquestion = Question(question=tagupdate.question, field_id="", edition=year)
-                await update(newquestion, session=session)
-                questiontag.question_id = newquestion.id
+        if question:
+            questiontag.question_id = question.id
+        else:
+            newquestion = Question(question=tagupdate.question, field_id="", edition=year)
+            await update(newquestion, session=session)
+            questiontag.question_id = newquestion.id
 
     await update(questiontag, session=session)
     return f"{config.api_url}editions/{str(year)}/questiontag/{questiontag.tag}"
