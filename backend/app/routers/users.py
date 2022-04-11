@@ -107,12 +107,12 @@ async def change_password(reset_key: str, passwords: PasswordResetInput = Body(.
     elif passwords.password != passwords.validate_password:
         raise PasswordsDoNotMatchException()
 
-    user = await read_where(User, User.id == userid, session=session)
+    user = await read_where(User, User.id == int(userid), session=session)
 
     Authorize.jwt_required()
     current_user_id = Authorize.get_jwt_subject()
 
-    if not user or user.disabled or current_user_id != userid:
+    if not user or user.disabled or int(current_user_id) != int(userid):
         raise NotPermittedException()
 
     user.password = get_password_hash(passwords.password)
