@@ -12,10 +12,7 @@ export default function SuggestionsCount(props) {
 
   // get the answers on the basic questions in HTML format
   function getInfoAnswers() {
-    console.log(props.tags)
-    console.log(props.student)
     let answers = props.tags.map(tag => props.student[tag.tag])
-    console.log(answers)
     return answers.map((answer, index) =>
       <p key={`${index}_${answer}`}>{answer}</p>
     )

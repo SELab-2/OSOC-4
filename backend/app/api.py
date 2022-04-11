@@ -9,7 +9,7 @@ from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app.config import config
-from app.database import init_db
+from app.database import init_db, disconnect_db
 from app.exceptions.base_exception import BaseException
 from app.routers import (auth, ddd, dummy, editions, projects, reset_password,
                          skills, students, tally, user_invites, users)
@@ -34,9 +34,9 @@ async def startup():
     await init_db()
 
 
-# @app.on_event("shutdown")
-# async def shutdown():
-#     disconnect_db()
+@app.on_event("shutdown")
+async def shutdown():
+    await disconnect_db()
 
 
 app.include_router(dummy.router)
