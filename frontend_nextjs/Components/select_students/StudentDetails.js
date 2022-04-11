@@ -116,6 +116,15 @@ export default function StudentDetails(props) {
     }, undefined, { shallow: true })
   }
 
+  function getQuestionAnswers() {
+    return questionAnswers.map((questionAnswer,i) =>
+      [
+        <Row key={"question"+ i} className="student-details-question">{questionAnswer["question"]}</Row>,
+        <Row key={"answer" + i} className="student-details-answer">{questionAnswer["answer"]}</Row>
+      ]
+    )
+  }
+
   // returns the html for student details
   return (
     <Col className="fill_height student-details-window" style={{ visibility: props.visibility }} >
@@ -154,7 +163,7 @@ export default function StudentDetails(props) {
               Suggest no</button>
             </Col>
             <Col md="auto" className="close-button">
-              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="52px" height="52px" objectFit={'contain'} />
+              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="44px" height="44px" objectFit={'contain'} />
             </Col>
           </Row>
           <Row>
@@ -191,6 +200,10 @@ export default function StudentDetails(props) {
               suggestionsNo={getSuggestionsCount(0)} />
           </Row>
           {getSuggestions()}
+          <Row md="auto" className="h2-titles">
+            <Col md="auto"><h2>Questions</h2></Col>
+          </Row>
+          {getQuestionAnswers()}
         </Col>
       </Row>
     </Col>

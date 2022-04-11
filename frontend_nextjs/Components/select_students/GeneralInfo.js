@@ -14,7 +14,7 @@ export default function SuggestionsCount(props) {
   // get the answers on the basic questions in HTML format
   function getInfoAnswers() {
     let answers = [props.student["studies"], props.student["type of degree"],
-      props.student["first_languages"], props.student["level of english"]];
+      props.student["first language"], props.student["level of english"]];
     return answers.map((answer,index) =>
       <p key={index}>{answer}</p>
     )
