@@ -14,7 +14,7 @@ class SuggestionOption(int, Enum):
 
 
 class Suggestion(SQLModel, table=True):
-    # mail_sent: bool
+    mail_sent: bool = Field(default=False)
     id: Optional[int] = Field(default=None, primary_key=True)
     decision: SuggestionOption
     definitive: bool
@@ -32,6 +32,7 @@ class Suggestion(SQLModel, table=True):
 
 
 class SuggestionExtended(BaseModel):
+    mail_sent: bool
     decision: int
     definitive: bool
     reason: str

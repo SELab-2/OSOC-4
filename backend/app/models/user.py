@@ -108,3 +108,39 @@ class UserResetPassword(BaseModel):
         if not valid_password(v):
             raise InvalidPasswordException()
         return v
+
+
+class ChangeUser(BaseModel):
+    name: str = ""
+    role: int
+    active: bool = False
+    approved: bool = False
+    disabled: bool = True
+
+    @validator('name')
+    def name_not_empty(cls, v):
+        if v == "":
+            raise EmptyNameException()
+        return v
+
+
+class ChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+
+    @validator('new_password')
+    def password_format_check(cls, v):
+        if not valid_password(v):
+            raise InvalidPasswordException()
+        return v
+
+
+class UserMe(BaseModel):
+    name: str
+    email: str
+    role: UserRole
+
+
+class ChangeUserMe(BaseModel):
+    name: str

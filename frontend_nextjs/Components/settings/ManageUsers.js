@@ -5,28 +5,36 @@ import { getJson, postCreate } from "../../utils/json-requests";
 import { log } from "../../utils/logger";
 import {urlManager} from "../../utils/ApiClient";
 
-export default function ManageUsers() {
+export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
+    const [shownUsers, setShownUsers] = useState([])
     const [toInvite, setToInvite] = useState("");
+    const [loading, setLoading] = useState(false)
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
     };
 
     useEffect(() => {
-        if (!users.length) {
-            urlManager.getUsers().then(url => getJson(url).then(res => {
-                log("manage users:")
-                log(res)
-                for (let u of res) {
-                    getJson(u.id).then(async user => {
-                        if (user.data) { await setUsers(prevState => [...prevState, user.data]); }
-                    })
-                }
-            }));
+        if (Boolean(props.initialize)) {
+            if (!users.length && !loading) {
+                setLoading(true)
+                urlManager.getUsers().then(url => getJson(url).then(res => {
+                    log("manage users:")
+                    log(res)
+                    for (let u of res) {
+                        getJson(u.id).then(async user => {
+                            if (user.data) {
+                                await setUsers(prevState => [...prevState, user.data]);
+                                await setShownUsers(prevState => [...prevState, user.data]);
+                            }
+                        }).then(() => setLoading(false))
+                    }
+                }));
+            }
         }
-    })
+    }, [users.length, loading, props.initialize])
 
     const handleChangeToInvite = (event) => {
         event.preventDefault();
@@ -37,23 +45,21 @@ export default function ManageUsers() {
         log("handle submit invite");
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
-        emails.forEach(e => {
+        let user_url = await urlManager.getUsers();
+        emails.forEach(email => {
             // post to create
-            postCreate("users/create", { "email": e }).then(resp => {
+            postCreate(user_url + "/create", { "email": email }).then(resp => {
                 log(resp.data.data)
                 if (resp.data.data.id) {
-                    postCreate(resp.data.data.id + "/invite", {}, false);
+                    postCreate(resp.data.data.id + "/invite", {});
                 }
             })
-            // post to invite
         })
-        log("submit invites");
-        log(toInvite);
     }
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
-        //TODO, does changing userlist happend here or at handleSearch?
+        setShownUsers(users.filter(user => user.name.includes(search)))
     }
 
     return (
@@ -93,7 +99,7 @@ export default function ManageUsers() {
                     </tr>
                 </thead>
                 <tbody>
-                    {(users.length) ? (users.map((item, index) => (<UserTr key={item.id} user={item} />))) : null}
+                    {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr isMe={item.email === props.me.email} key={item.id} user={item} />))) : null}
                 </tbody>
             </Table>
         </div>

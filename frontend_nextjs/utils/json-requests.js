@@ -103,7 +103,6 @@ export async function postCreate(url, json) {
                 data: e.response.data.message
             };
         } else {
-
             await catchError(e);
             return "";
         }
@@ -117,12 +116,14 @@ export async function postCreate(url, json) {
  * @param json the data
  * @returns {Promise<string|{data, success: boolean}>}
  */
-export async function patchEdit(url, json, getters, commit) {
+export async function patchEdit(url, json) {
     log("json-requests: patchEdit: " + url)
     try {
+        const resp = await AuthApiClient.patch(url, json);
+
         return {
             success: true,
-            data: (await AuthApiClient.patch(url, json)).data.url
+            data: resp.data
         };
     } catch (e) {
         if (e.response.status === 400 && e.response.data.message) {
@@ -131,6 +132,7 @@ export async function patchEdit(url, json, getters, commit) {
                 data: e.response.data.message
             };
         } else {
+
             await catchError(e);
             return "";
         }
