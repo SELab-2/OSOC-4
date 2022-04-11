@@ -319,6 +319,9 @@ async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depen
     except Exception:
         raise QuestionTagNotFoundException()
 
+    if questiontag.mandatory:
+        raise QuestionTagCantBeModified()
+
     if questiontag.question and len(questiontag.question.question_answers) == 0:
         # delete the unused question
         questiontag.question_id = None
