@@ -2,6 +2,7 @@ import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
 import { useEffect, useState } from "react";
 import { getJson } from "../../utils/json-requests";
+import { urlManager } from "../../utils/ApiClient";
 
 export default function StudentList(props) {
 
@@ -11,10 +12,16 @@ export default function StudentList(props) {
 
 
   // This function inserts the data in the variables
-  useEffect(() => {
+  useEffect(async () => {
     urlManager.getQuestionTags().then(questiontags_url => {
       getJson(questiontags_url).then(res => {
-        setQuestionTags(res.filter(tag => tag.showInList));
+        console.log(res)
+
+        Promise.all(res.map(url => getJson(url).then(r => {
+          return r
+        }))).then(values => {
+          setShowInListTags(values.filter(tag => tag.showInList == true));
+        })
       }
       )
     })

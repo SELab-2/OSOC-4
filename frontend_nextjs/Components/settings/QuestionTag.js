@@ -47,7 +47,7 @@ export default function QuestionTag(props) {
         event.preventDefault();
         patchEdit(props.url, questionTag).then(res => {
             if (previousTag["tag"] !== questionTag["tag"]) {
-                props.renameTag(props.url, props.url.replace(previousTag["tag"], questionTag["tag"]))
+                props.renameTag(props.url, res)
             }
             setPreviousTag(questionTag);
         })
@@ -64,6 +64,7 @@ export default function QuestionTag(props) {
                     )
                     }
                     <Form.Control name="question" type="text" placeholder="Question" value={questionTag["question"]} onChange={handleChange} />
+
                     <Form.Check
                         name="showInList"
                         type="checkbox"
@@ -71,6 +72,7 @@ export default function QuestionTag(props) {
                         label={"show in studentlist"}
                         onChange={handleCheckboxChange}
                     />
+
                     {!questionTag["mandatory"] &&
                         <button onClick={deleteTag}>
                             <Image src={deleteIcon} className="delete-icon" />

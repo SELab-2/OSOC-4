@@ -10,7 +10,8 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                SuggestionRetrieveException,
                                                YearAlreadyOverException)
 from app.exceptions.questiontag_exceptions import (
-    QuestionTagAlreadyExists, QuestionTagNotFoundException)
+    QuestionTagAlreadyExists, QuestionTagCantBeModified,
+    QuestionTagNotFoundException)
 from app.models.answer import Answer
 from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
@@ -351,27 +352,38 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     except Exception:
         raise QuestionTagNotFoundException()
 
-    questiontag.tag = tagupdate.tag
+    if not questiontag.mandatory:
+        questiontag.tag = tagupdate.tag
+    else:
+        raise QuestionTagCantBeModified()
+
     questiontag.showInList = tagupdate.showInList
 
-    if questiontag.question and len(questiontag.question.question_answers) == 0:
-        # Delete the unused question
-        questiontag.question_id = None
-        await update(questiontag, session=session)
+    if questiontag.question and questiontag.question.question != tagupdate.question:
+        print(questiontag.question.question_answers)
+        if len(questiontag.question.question_answers) == 0:
+            # Delete the unused question
+            unused_question = questiontag.question
+            print("deleting ...")
+            questiontag.question_id = None
+            await update(questiontag, session=session)
 
-        await session.delete(questiontag.question)
-        await session.commit()
+            await session.delete(unused_question)
+            await session.commit()
 
-    if tagupdate.question:
-        # Search the new question
-        question = await read_where(Question, Question.question == tagupdate.question, Question.edition == year, session=session)
+        if tagupdate.question:
+            # Search the new question
+            print(tagupdate.question)
+            question = await read_where(Question, Question.question == tagupdate.question, Question.edition == year, session=session)
 
-        if question:
-            questiontag.question_id = question.id
-        else:
-            newquestion = Question(question=tagupdate.question, field_id="", edition=year)
-            await update(newquestion, session=session)
-            questiontag.question_id = newquestion.id
+            print(question)
+
+            if question:
+                questiontag.question_id = question.id
+            else:
+                newquestion = Question(question=tagupdate.question, field_id="", edition=year)
+                await update(newquestion, session=session)
+                questiontag.question_id = newquestion.id
 
     await update(questiontag, session=session)
     return f"{config.api_url}editions/{str(year)}/questiontag/{questiontag.tag}"

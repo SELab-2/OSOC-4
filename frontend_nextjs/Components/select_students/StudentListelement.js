@@ -107,7 +107,7 @@ export default function StudentListelement(props) {
       </Row>
 
       <Row id="info" className="info">
-        <GeneralInfo student={student} decision={getDecision()} />
+        <GeneralInfo student={student} tags={props.tags} decision={getDecision()} />
         <Col id="skills" align="right" className="skills">
           <ul>
             {getSkills()}

@@ -47,8 +47,8 @@ def generate_user(role=UserRole.COACH, active=True, approved=True, disabled=Fals
 class QuestionAnswerGenerator:
     question_first_name = Question(question="What is your first name?", field_id="")
     question_last_name = Question(question="What is your last name?", field_id="")
-    question_email = Question(question="Phone number", field_id="")
-    question_phone_number = Question(question="Your email address", field_id="")
+    question_email = Question(question="Your email address", field_id="")
+    question_phone_number = Question(question="Phone number", field_id="")
 
     questions_yes_no = \
         [Question(question=q, field_id="") for q in
