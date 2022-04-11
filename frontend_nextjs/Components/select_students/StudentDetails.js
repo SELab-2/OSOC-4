@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
-import {urlManager} from "../../utils/ApiClient";
+import { urlManager } from "../../utils/ApiClient";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -30,6 +30,7 @@ export default function StudentDetails(props) {
   const [suggestions, setSuggestions] = useState([]);
   const [decision, setDecision] = useState(-1);
   const [questionAnswers, setQuestionAnswers] = useState([])
+  const [tags, setTags] = useState([])
 
   // These constant define wheater the pop-up windows should be shown or not
   const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
@@ -43,6 +44,19 @@ export default function StudentDetails(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
+
+    urlManager.getQuestionTags().then(questiontags_url => {
+      getJson(questiontags_url).then(res => {
+
+        Promise.all(res.map(url => getJson(url).then(r => {
+          return r
+        }))).then(values => {
+          setTags(values);
+        })
+      }
+      )
+    })
+
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
@@ -117,9 +131,9 @@ export default function StudentDetails(props) {
   }
 
   function getQuestionAnswers() {
-    return questionAnswers.map((questionAnswer,i) =>
+    return questionAnswers.map((questionAnswer, i) =>
       [
-        <Row key={"question"+ i} className="student-details-question">{questionAnswer["question"]}</Row>,
+        <Row key={"question" + i} className="student-details-question">{questionAnswer["question"]}</Row>,
         <Row key={"answer" + i} className="student-details-answer">{questionAnswer["answer"]}</Row>
       ]
     )
@@ -187,7 +201,7 @@ export default function StudentDetails(props) {
       <Row className="remaining-height-details" md="auto" style={{}}>
         <Col md="auto" className="fill_height scroll-overflow student-details">
           <Row md="auto" className="decision">
-            <GeneralInfo student={student} decision={getDecision()} />
+            <GeneralInfo tags={tags} student={student} decision={getDecision()} />
           </Row>
           <Row md="auto">
             <Button className="send-email-button" disabled={decision === -1} onClick={() => setEmailPopUpShow(true)}>
