@@ -8,6 +8,6 @@ router = APIRouter(prefix="/tally")
 
 
 @router.post("/add", response_description="Form submitted")
-async def add_new_form(data: dict, session: AsyncSession = Depends(get_session)):
-    await process_tally(data, 2022, session)
+async def add_new_form(year: int, data: dict, session: AsyncSession = Depends(get_session)):
+    await process_tally(data, year, session)
     return response(None, "Form added successfully.")

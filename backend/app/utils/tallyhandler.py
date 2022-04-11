@@ -49,4 +49,3 @@ async def process_tally(data, edition, session):
             if field["value"] is not None:
                 a = await get_save_answer(str(field["value"]), session)
                 await update(QuestionAnswer(student=student, question=q, answer=a), session=session)
-
