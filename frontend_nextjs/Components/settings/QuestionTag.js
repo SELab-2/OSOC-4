@@ -47,7 +47,7 @@ export default function QuestionTag(props) {
         event.preventDefault();
         patchEdit(props.url, questionTag).then(res => {
             if (previousTag["tag"] !== questionTag["tag"]) {
-                props.renameTag(props.url, res)
+                props.renameTag(props.url, res["data"])
             }
             setPreviousTag(questionTag);
         })

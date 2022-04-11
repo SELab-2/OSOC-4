@@ -372,4 +372,5 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
             questiontag.question_id = newquestion.id
 
     await update(questiontag, session=session)
-    return f"{config.api_url}editions/{str(year)}/questiontag/{questiontag.tag}"
+    print(questiontag)
+    return f"{config.api_url}editions/{str(year)}/questiontags/{questiontag.tag}"
