@@ -71,7 +71,6 @@ class TestUsers(TestBase):
         user = await read_where(User, User.email == body["email"], session=self.session)
         self.assertIsNotNone(user, f"'{body['email']}' was not found in the database.")
 
-    @unittest.skip("Password doesn't change after successful request. ")
     async def test_post_forgot(self):
         path: str = "/users/forgot/"
         allowed_users: Set[str] = {"user_admin", "user_approved_coach"}
@@ -244,7 +243,6 @@ class TestUsers(TestBase):
         await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_approved_coach",
                               json_body={}, expected_status=Status.FORBIDDEN)
 
-    @unittest.skip("Data is not changed after being updated in corresponding router.")
     async def test_post_approve_user(self):
         activated_user: User = await self.get_user_by_name("user_activated_coach")
         path: str = f"/users/{str(activated_user.id)}/approve"

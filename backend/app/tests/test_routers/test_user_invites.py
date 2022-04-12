@@ -1,5 +1,3 @@
-import unittest
-
 from app.crud import update, read_where
 from app.database import db
 from app.models.user import User
@@ -37,7 +35,6 @@ class TestUserInvites(TestBase):
         db.redis.setex(bad_key, key[1], new_user.id)
         await self.do_request(Request.GET, f"{path}{bad_key}", "", Status.BAD_REQUEST, use_access_token=False)
 
-    @unittest.skip("Data is not changed after being updated in corresponding router.")
     async def test_invited_user(self):
         path = "/invite/"
 

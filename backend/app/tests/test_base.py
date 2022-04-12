@@ -12,7 +12,6 @@ from app.api import app
 from app.crud import read_where, update, read_all_where
 from app.database import engine
 from app.models.edition import Edition
-from app.models.project import Project
 from app.models.skill import Skill
 from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
@@ -225,6 +224,10 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         status code was {response.status_code},
                         expected {expected_status}
                         """)
+
+        if request_type != Request.GET:
+            await self.session.invalidate()
+
         return response
 
     async def _auth_test_request(self, request_type: Request, path: str, body: Dict):
