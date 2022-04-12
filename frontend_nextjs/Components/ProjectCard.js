@@ -18,14 +18,19 @@ export default function ProjectCard(props) {
     return(
         <div  className="align-content-center">
             <Card onClick={handleProjectClick}  className="card">
-                <Card.Title> {props.partner_name}</Card.Title>
+                <Card.Title> {props.project.partner_name}</Card.Title>
                 {/*todo make this clickable with link to partner?*/}
                 <Card.Subtitle>{props.project.partner_description}</Card.Subtitle>
                 <Card.Body>
                     <Row>
                         <Col className={"border-right"}>
                             <h5>Needed</h5>
-                            {/*{ (props.project.required_skills.length) ? (props.project.required_skills.map(item => (<div>{item.number}</div>))) : null}*/}
+                            { (props.project.required_skills.length) ? (props.project.required_skills.map(item => (
+                                <div key={item.skill_name}>
+                                    <p>skill:{item.skill_name}</p>
+                                    <p>amount:{item.number}</p>
+                                </div>
+                            ))) : null}
                         </Col>
                         <Col>
                             <h5>The team</h5>

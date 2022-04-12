@@ -70,7 +70,7 @@ export async function getJson(url) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|any>}
  */
-export async function sendDelete(url, getters, commit) {
+export async function sendDelete(url) {
     log("json-requests: sendDelete: " + url)
     try {
         const req = await AuthApiClient.delete(url);
