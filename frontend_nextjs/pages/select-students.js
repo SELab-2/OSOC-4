@@ -17,16 +17,19 @@ export default function SelectStudents() {
     // These constants are initialized empty, the data will be inserted in useEffect
     const [students, setStudents] = useState(undefined);
     const studentId = router.query.studentId;
+    const [searchChanged, setSearchChanged] = useState(false);
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
     useEffect(() => {
         if (session) {
-            if (!students) {
+            if ((!students) || searchChanged) {
+                setSearchChanged(false);
                 // the urlManager returns the url for the list of students
-                urlManager.getStudents().then(url => getJson(url).then(res => {
-                    setStudents(res);
-                }));
+                urlManager.getStudents(router.query.sortby, router.query.search).then(url => getJson(url).then(res => {
+                        setStudents(res);
+                    })
+                );
             }
         }
     })
@@ -38,7 +41,7 @@ export default function SelectStudents() {
                 <Row className="fill_height">
                     {(! studentId) ? <StudentsFilters/> : null}
                     <Col className="fill_height students-list-paddingtop">
-                        <SearchSortBar />
+                        <SearchSortBar setSearchChanged={setSearchChanged}/>
                          <Row className="fill_height">
                              <StudentList students={students}/>
                          </Row>

@@ -34,9 +34,8 @@ class UrlManager {
         return this._current_edition;
     }
 
-    async getStudents() {
-        if (this._students) {return this._students;}
-        await this._setStudents();
+    async getStudents(orderby=null, search=null) {
+        await this._setStudents(orderby, search);
         return this._students;
     }
 
@@ -77,8 +76,19 @@ class UrlManager {
         this._projects = editionData["projects"];
     }
 
-    async _setStudents() {
+    async _setStudents(orderby=null, search=null) {
         await this._setCurrentEdition();
+        let filtersUrl = "";
+        if (orderby) {
+            filtersUrl += "&orderby=" + orderby;
+        }
+        if (search) {
+            filtersUrl += "&search=" + search;
+        }
+        if (filtersUrl) {
+            filtersUrl = "?" + filtersUrl.slice(1);
+        }
+        this._students += filtersUrl;
     }
 
     async _setProjects() {
@@ -113,13 +123,13 @@ function AxiosClient(auth_headers = true) {
     });
 
     instance.interceptors.response.use(
-        (response) => {
-            return response;
-        },
-        (error) => {
-            console.log(`error`, error);
-            throw error;
-        },
+      (response) => {
+          return response;
+      },
+      (error) => {
+          console.log(`error`, error);
+          throw error;
+      },
     );
 
     return instance;
