@@ -215,7 +215,6 @@ class TestUsers(TestBase):
                                      edited_by_{user_title} was found in the database,
                                      the user was wrongly modified.""")
 
-    @unittest.skip("problem with getting email and/or password of user_unactivated_coach")
     async def test_post_invite_user(self):
         unactivated_user = await self.get_user_by_name("user_unactivated_coach")
 
@@ -223,7 +222,7 @@ class TestUsers(TestBase):
         allowed_users = {"user_admin"}
         body = {}
 
-        unactivated_user.email = "Stef.VandenHaute@UGent.be"  # TODO: set in env
+        unactivated_user.email = "Stef.VandenHaute+SEL2TEST@UGent.be".lower()  # TODO: set in env
         await update(unactivated_user, session=self.session)
 
         active_user = await self.get_user_by_name("user_activated_coach")

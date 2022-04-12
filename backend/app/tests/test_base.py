@@ -180,8 +180,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         user: User = await self.get_user_by_name(user_name)
         email: str = user.email
         password: str = self.saved_objects["passwords"][user_name]
-        login = await self.client.post("/login", json={"email": email, "password": password},
-                                       headers={"Content-Type": "application/json"})
+        login = await self.client.post("/login", json={"email": email, "password": password})
         return login.json()["data"]["accessToken"]
 
     async def do_request(self, request_type: Request, path: str, user: str,

@@ -27,4 +27,4 @@ class TestSkills(TestBase):
 
             self.assertEqual(expected_skills, skills,
                              f"The request from {user_title} did not match the expected skills.")
-            self.assertEqual(len(expected_skills), len(skills), f"Not all skills were unique.")
+            self.assertEqual(len(expected_skills), len(skills), "Not all skills were unique.")
