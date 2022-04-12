@@ -64,10 +64,9 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
 
 
 @router.get('/')
-def root(role: RoleChecker(UserRole.COACH) = Depends()):
+def root():
     paths = {"editions": f"{config.api_url}editions"}
-    if role == UserRole.ADMIN:
-        paths["users"] = f"{config.api_url}users"
+    paths["users"] = f"{config.api_url}users"
     return paths
 
 

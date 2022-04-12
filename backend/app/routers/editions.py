@@ -104,7 +104,7 @@ async def update_edition(year: int, edition: Edition = Body(...), session: Async
     return EditionOutSimple.parse_raw(result.json()).uri
 
 
-@router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
+@router.get("/{year}/students", response_description="Students retrieved")
 async def get_edition_students(year: int, orderby: str = "", search: str = "", session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
