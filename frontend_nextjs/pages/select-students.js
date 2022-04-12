@@ -27,7 +27,13 @@ export default function SelectStudents() {
                 setSearchChanged(false);
                 // the urlManager returns the url for the list of students
                 urlManager.getStudents(router.query.sortby, router.query.search).then(url => getJson(url).then(res => {
-                        setStudents(res);
+                        let result = res.map(res => [res, {}]);
+                        for (let i = 0; i < result.length; i ++) {
+                            getJson(res[i]).then(student => {
+                              result[i] = [res[i], student]
+                            });
+                        }
+                        setStudents(result);
                     })
                 );
             }
@@ -39,7 +45,7 @@ export default function SelectStudents() {
         <Row className="remaining_height fill_width">
             <Col className="searchbar-height fill_height">
                 <Row className="fill_height">
-                    {(! studentId) ? <StudentsFilters/> : null}
+                    {(! studentId) ? <StudentsFilters students={students} setStudents={setStudents}/> : null}
                     <Col className="fill_height students-list-paddingtop">
                         <SearchSortBar setSearchChanged={setSearchChanged}/>
                          <Row className="fill_height">

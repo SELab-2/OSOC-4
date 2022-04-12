@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
 import {useRouter} from "next/router";
+import {getJson} from "../../utils/json-requests";
 
 
 export default function StudentsFilters(props) {
@@ -11,12 +12,37 @@ export default function StudentsFilters(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [allSkills, setAllSkills] = useState([]);
+  const [filtersChanged, setFiltersChanged] = useState(true);
 
   // These constants represent the filters
   const filters = (router.query.filters)? router.query.filters.split(","): [];
   const chosenSkills = (router.query.skills)? router.query.skills.split(","): [];
   const decision = (router.query.decision)? router.query.decision.split(","): [];
 
+  useEffect(() => {
+    if (props.students && filtersChanged) {
+      setFiltersChanged(false);
+      filterStudents();
+    }
+  })
+
+  // get the decision for the student (yes, maybe, no or undecided)
+  function getDecision(studentDecision) {
+    if (studentDecision === -1) {
+      return "Undecided";
+    }
+    let possibleDecisions = ["No", "Maybe", "Yes"];
+    return possibleDecisions[studentDecision];
+  }
+
+  function filterStudents() {
+    /*if (decision.length !== 0) {
+      console.log(props.students);
+      props.setStudents(props.students.filter(student => {
+
+      }))
+    }*/
+  }
 
   // called when pressed on "reset filters"
   function resetFilters() {
