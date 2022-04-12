@@ -1,5 +1,5 @@
 import {Col, Form, Row} from "react-bootstrap";
-import React from "react";
+import React, {useState} from "react";
 import {useRouter} from "next/router";
 
 // displays the counts of the suggestions for a student
@@ -7,7 +7,7 @@ export default function SearchSortBar(props) {
 
   const router = useRouter();
 
-  const search = (router.query.search)? router.query.search: "";
+  const [search, setSearch] = useState((router.query.search)? router.query.search: "");
   const sortby = (router.query.sortby)? router.query.sortby: "name_asc";
 
   function sort(value) {
@@ -20,9 +20,10 @@ export default function SearchSortBar(props) {
     props.setSearchChanged(true);
   }
 
-  function doSearch(value) {
+  function doSearch(ev) {
+    ev.preventDefault();
     let newQuery = router.query;
-    newQuery["search"] = value;
+    newQuery["search"] = search;
     router.push({
       pathname: router.pathname,
       query: newQuery
@@ -34,10 +35,10 @@ export default function SearchSortBar(props) {
   return (
       <Row className="searchbar-row">
         <Col>
-          <Form onSubmit={(ev) => ev.preventDefault()}>
+          <Form onSubmit={ev => doSearch(ev)}>
             <Form.Group controlId="searchStudents">
               <Form.Control type="text" value={search} placeholder={"Search students"}
-                            onChange={ev => doSearch(ev.target.value)} />
+                            onChange={(ev) => setSearch(ev.target.value)}/>
             </Form.Group>
           </Form>
         </Col>
@@ -49,8 +50,6 @@ export default function SearchSortBar(props) {
                   onChange={(ev) => sort(ev.target.value)}>
             <option value={"firstname+asc,lastname+asc"}>Name A-Z</option>
             <option value={"firstname+dc,lastname+dc"}>Name Z-A</option>
-            <option value="1">Maybe</option>
-            <option value="0">No</option>
           </select>
         </Col>
     </Row>
