@@ -1,9 +1,9 @@
 import {
   Button,
-  Col,
+  Col, Dropdown,
   Row
 } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"

@@ -17,9 +17,10 @@
 
 .remaining_height {
     position: absolute;
-    top: 75px;
+    top: 120px;
     bottom: 0;
     width: 100%;
+
 }
 
 .studentlist-topmargin {
@@ -28,8 +29,43 @@
 
 .students-list-paddingtop {
     padding-top: 20px;
+    margin-left: 20px;
 }
 
 .close-button {
     margin-top: 3px;
+}
+
+.searchbar-row {
+    margin-left: 18px;
+    margin-right: 9px;
+}
+
+.remaining-height-searchbar {
+    position: absolute;
+    top: 60px;
+    bottom: 0;
+}
+
+.searchbar-height {
+    margin-top: -45px;
+}
+
+.sortby-label {
+    align-self: center;
+    margin-left: 20px;
+    font-size: 14px;
+}
+
+.dropdown-sortby {
+    border-width: 0;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 7px;
+    background-color: var(--background-gray);
+    border-radius: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 13px;
+
 }

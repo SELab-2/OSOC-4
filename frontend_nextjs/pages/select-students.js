@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getJson } from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
-import { Col, Row } from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
+import SearchSortBar from "../Components/select_students/SearchSortBar";
 
 // The page corresponding with the 'select students' tab
 export default function SelectStudents() {
@@ -33,13 +34,18 @@ export default function SelectStudents() {
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">
-            {(! studentId) ? <StudentsFilters/> : null}
-            <Col className="fill_height students-list-paddingtop">
-                 <div className="fill_height">
-                     <StudentList students={students}/>
-                 </div>
+            <Col className="searchbar-height fill_height">
+                <Row className="fill_height">
+                    {(! studentId) ? <StudentsFilters/> : null}
+                    <Col className="fill_height students-list-paddingtop">
+                        <SearchSortBar />
+                         <Row className="fill_height">
+                             <StudentList students={students}/>
+                         </Row>
+                    </Col>
+                    {(studentId) ? <StudentDetails student_id={studentId}/> : null}
+                </Row>
             </Col>
-            {(studentId) ? <StudentDetails student_id={studentId}/> : null}
         </Row>
     )
 
