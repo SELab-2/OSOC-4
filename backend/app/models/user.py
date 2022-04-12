@@ -32,6 +32,9 @@ class User(SQLModel, table=True):
     projects: List[Project] = Relationship(back_populates="coaches", link_model=ProjectCoach)
     suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
+    class Config:
+        validate_assignment = True
+
     @validator('email')
     def email_lowercase(cls, v):
         return v.lower()
