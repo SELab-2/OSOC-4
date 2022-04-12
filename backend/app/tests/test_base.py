@@ -21,13 +21,20 @@ class Request(Enum):
     DELETE = auto()
     GET = auto()
     POST = auto()
+    PATCH = auto()
     PUT = auto()
 
     async def do_request(self, client: AsyncClient, path: str, headers: Dict[str, str], body: Any = None) -> Response:
-        if self.name == "POST":
-            return await client.post(path, json=body, headers=headers)
+        if self.name == "DELETE":
+            raise NotImplementedError
         elif self.name == "GET":
             return await client.get(path, headers=headers)
+        elif self.name == "POST":
+            return await client.post(path, json=body, headers=headers)
+        elif self.name == "PATCH":
+            return await client.patch(path, json=body, headers=headers)
+        elif self.name == "PUT":
+            return await client.put(path, json=body, headers=headers)
         else:
             raise NotImplementedError
 

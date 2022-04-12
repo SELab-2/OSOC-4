@@ -121,12 +121,12 @@ class TestUsers(TestBase):
             forgotten_user = await self.get_user_by_name(user_title)
             db.redis.setex(key[0], key[1], int(forgotten_user.id))
 
+            body = {"password": new_pass, "validate_password": new_pass}
+
             if user_title in allowed_users:
-                allowed_users_path_and_body[user_title] = path + key[0], {"password": new_pass,
-                                                                          "validate_password": new_pass}
+                allowed_users_path_and_body[user_title] = path + key[0], body
             else:
-                blocked_users_path_and_body[user_title] = path + key[0], {"password": new_pass,
-                                                                          "validate_password": new_pass}
+                blocked_users_path_and_body[user_title] = path + key[0], body
         # change to new passwords where allowed
         await self.auth_access_request_test_per_user(Request.POST,
                                                      allowed_users_path_and_body,
@@ -163,8 +163,7 @@ class TestUsers(TestBase):
                                  Expected: {expected_user}
                                  Was: {gotten_user}""")
 
-    @unittest.skip("Emails can't be updated?")
-    async def test_post_update_user(self):
+    async def test_patch_update_user(self):
         path: str = "/users/"
         allowed_users: Set[str] = {"user_admin"}
         allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
@@ -182,8 +181,8 @@ class TestUsers(TestBase):
                 disabled=False)
             await update(editable_user, session=self.session)
             body = {
-                "email": f"edited_by_{user_title}@test.test",
                 "name": f"edited_by_{user_title}",
+                "role": int(UserRole.NO_ROLE),
                 "active": True,
                 "approved": True,
                 "disabled": False
@@ -194,21 +193,19 @@ class TestUsers(TestBase):
                 blocked_users_path_and_body[user_title] = path + str(editable_user.id), body
 
         # Test authorization & access-control with successful edits
-        await self.auth_access_request_test_per_user(Request.POST,
+        await self.auth_access_request_test_per_user(Request.PATCH,
                                                      allowed_users_path_and_body,
                                                      blocked_users_path_and_body)
 
         # Test failed requests
         bad_path = f"/users/{self.bad_id}"
-        admin = await self.get_user_by_name("user_admin")
-        bad_body: Dict[str, str] = {
-            "email": admin.email, "name": "Rocky", "active": True, "approved": True, "disabled": False
-        }
-        await self.do_request(Request.POST, allowed_users_path_and_body.get("user_admin")[0], "user_admin",
+        bad_body: Dict[str, str] = {"name": ""}
+        await self.do_request(Request.PATCH, allowed_users_path_and_body.get("user_admin")[0], "user_admin",
                               json_body=bad_body, expected_status=Status.BAD_REQUEST)
-        await self.do_request(Request.POST, bad_path, "user_admin",
+        await self.do_request(Request.PATCH, bad_path, "user_admin",
                               json_body={"email": "bad_edited_by_user_admin@test.test",
                                          "name": "bad_edited_by_user_admin",
+                                         "role": int(UserRole.NO_ROLE),
                                          "active": True, "approved": True, "disabled": False},
                               expected_status=Status.NOT_FOUND)
 

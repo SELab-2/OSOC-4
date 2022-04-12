@@ -146,4 +146,10 @@ class UserMe(BaseModel):
 
 
 class ChangeUserMe(BaseModel):
-    name: str
+    name: str = ""
+
+    @validator('name')
+    def name_not_empty(cls, v):
+        if v == "":
+            raise EmptyNameException()
+        return v
