@@ -20,7 +20,7 @@ export default function StudentList(props) {
       return students.map(student =>
         // generate a list of students, each student needs 'student' as a prop
         <li key={student}>
-          <StudentListelement student={student}/>
+          <StudentListelement student={student.id}/>
         </li>
       );
     }

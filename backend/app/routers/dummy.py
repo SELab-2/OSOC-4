@@ -33,6 +33,7 @@ class StudentsGenerator:
     students = []  # this will be filled in once generate() is called
 
     names = []
+    lnames = []
     emails = []
     phonenumbs = []
     first_languages = []
@@ -41,12 +42,13 @@ class StudentsGenerator:
     degree_types = []
 
     def __init__(self):
-        self.add_entry("Quinten Vervynck", "vervycnk.quinten@gmail.com", "00320000000001", "Dutch", 4, "Computer Science", "Bachelor")
-        self.add_entry("Jeremy Anderson", "jeremy.anderson@hotmail.com", "00320000000002", "English (British)", 4, "Computer Science", "Master")
+        self.add_entry("Quinten", "Vervynck", "vervycnk.quinten@gmail.com", "00320000000001", "Dutch", 4, "Computer Science", "Bachelor")
+        self.add_entry("Jeremy", "Anderson", "jeremy.anderson@hotmail.com", "00320000000002", "English (British)", 4, "Computer Science", "Master")
 
-    def add_entry(self, name, email, pn, fl, le, study, dregree_type):
+    def add_entry(self, name, lname, email, pn, fl, le, study, dregree_type):
         self.entries += 1
         self.names.append(name)
+        self.lnames.append(lname)
         self.emails.append(email)
         self.phonenumbs.append(pn)
         self.first_languages.append(fl)
@@ -60,7 +62,8 @@ class StudentsGenerator:
     async def generate(self, edition, session):
         # studies, type of degree, level of english, suggestions, de vragen die horen bij practical problems, skills
         # Questions
-        question_name = Question(question="What is your name", field_id="")
+        question_name = Question(question="What is your first name", field_id="")
+        question_lname = Question(question="What is your last name", field_id="")
         question_email = Question(question="What is your email", field_id="")
         question_phonenumb = Question(question="What is your phone number", field_id="")
         question_first_lang = Question(question="What is your first language", field_id="")
@@ -69,7 +72,8 @@ class StudentsGenerator:
         question_type_degree = Question(question="What kind of diploma are you currently going for?", field_id="")
 
         # Mappings: (question, datalist, tag)
-        pairs = [(question_name, self.names, "name"),
+        pairs = [(question_name, self.names, "first name"),
+                 (question_lname, self.names, "last name"),
                  (question_email, self.emails, "email"),
                  (question_phonenumb, self.phonenumbs, "phone number"),
                  (question_first_lang, self.first_languages, "first language"),
