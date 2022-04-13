@@ -162,7 +162,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         # old way of doing things, this should result in the same empty database as the above function
         # The above way of doing it ensures all tables are emptied instead of only those in this loop which may change
         # for model in [Answer, Edition, Participation, Project, Question,
-        #               QuestionAnswer, Skill, Student, Suggestion, User]:
+        #               QuestionAnswer, Student, User, Skill, Suggestion]:
         #     objects = await read_all_where(model, session=self.session)
         #     for obj in objects:
         #         await self.session.delete(obj)
