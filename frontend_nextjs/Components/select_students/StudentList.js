@@ -1,19 +1,23 @@
 import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
+import LoadingPage from "../LoadingPage";
 
 export default function StudentList(props) {
 
   // function to get a list of students
   function getStudents() {
-    if (props.students) {
+    if (props.students && props.students.length > 0) {
       return props.students.map(student =>
         // generate a list of students, each student needs 'student' as a prop
-        <li key={student[0]}>
+        <li key={student.id}>
           <StudentListelement student={student}/>
         </li>
       );
     }
-    return [<p/>, <p>No students found</p>]
+    if (props.students) {
+      return [<p/>, <p>No students found</p>]
+    }
+    return <LoadingPage />
   }
 
   // returns the html representation for the student list
