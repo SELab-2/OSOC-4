@@ -110,8 +110,11 @@ export default function StudentDetails(props) {
   // this function is called when the student details are closed, it will go back to the student list with filters,
   // without reloading the page
   function hideStudentDetails() {
+    let newQuery = router.query;
+    delete newQuery["studentId"];
     router.push({
-      pathname: router.pathname
+      pathname: router.pathname,
+      query: newQuery
     }, undefined, { shallow: true })
   }
 

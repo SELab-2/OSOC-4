@@ -66,12 +66,13 @@ export default function StudentListelement(props) {
     let i = props.student.id.lastIndexOf('/');
     let id = props.student.id.substring(i + 1);
 
+    let newQuery = router.query;
+    newQuery["studentId"] = id;
+
     // the path is not changed, but there is a query added wich contains the id of the student
     router.push({
       pathname: router.pathname,
-      query: {
-        studentId: id  // update the query param
-      }
+      query: newQuery
     }, undefined, { shallow: true})
   }
 

@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
 import {useRouter} from "next/router";
-import {getJson} from "../../utils/json-requests";
 
 
 export default function StudentsFilters(props) {
@@ -12,11 +11,10 @@ export default function StudentsFilters(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [allSkills, setAllSkills] = useState([]);
-  const setFiltersChanged = props.setFiltersChanged;
 
-  const filters = props.filters;
-  const chosenSkills = props.chosenSkills;
-  const decision = props.decision;
+  const filters = props.filters[0];
+  const chosenSkills = props.filters[1];
+  const decision = props.filters[2];
 
   // called when pressed on "reset filters"
   function resetFilters() {
@@ -54,7 +52,6 @@ export default function StudentsFilters(props) {
       }
     }
     newQuery[filter] = newItems.join(",");
-    setFiltersChanged(true);
     router.push({
       pathname: router.pathname,
       query: newQuery

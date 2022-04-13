@@ -17,7 +17,6 @@ export default function SearchSortBar(props) {
       pathname: router.pathname,
       query: newQuery
     }, undefined, { shallow: true});
-    props.setSearchChanged(true);
   }
 
   function doSearch(ev) {
@@ -28,7 +27,6 @@ export default function SearchSortBar(props) {
       pathname: router.pathname,
       query: newQuery
     }, undefined, {shallow: true});
-    props.setSearchChanged(true);
   }
 
   // return html representation of the suggestion counts for a student

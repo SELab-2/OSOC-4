@@ -18,48 +18,71 @@ export default function SelectStudents() {
     const [students, setStudents] = useState(undefined);
     const [visibleStudent, setVisibleStudents] = useState(undefined);
     const studentId = router.query.studentId
-    const [searchChanged, setSearchChanged] = useState(true);
-    const [filtersChanged, setFiltersChanged] = useState(true);
+
+    // These variables are used to notice if search or filters have changed
+    let [search, setSearch] = useState("");
+    const [localFilters, setLocalFilters] = useState([0,0,0]);
 
     // These constants represent the filters
-    const filters = (router.query.filters)? router.query.filters.split(","): [];
-    const chosenSkills = (router.query.skills)? router.query.skills.split(","): [];
-    const decision = (router.query.decision)? router.query.decision.split(","): [];
+    const filters = [(router.query.filters)? router.query.filters.split(","): [],
+        (router.query.skills)? router.query.skills.split(","): [],
+        (router.query.decision)? router.query.decision.split(","): []]
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
     useEffect(() => {
         if (session) {
-            if ((!students) || searchChanged) {
-                setSearchChanged(false);
+            if ((!students) || (router.query.search !== search)) {
+                setSearch(router.query.search);
                 // the urlManager returns the url for the list of students
                 urlManager.getStudents(router.query.sortby, router.query.search).then(url => getJson(url).then(res => {
                     Promise.all(res.map(studentUrl =>
                       getJson(studentUrl).then(res => res)
                     )).then(students => {
                       setStudents(students);
+                      setLocalFilters([0,0,0]);
                     })
                 })
                 );
             }
-            if (students && filtersChanged) {
-                setFiltersChanged(false);
-                filterStudents();
+            if (students &&
+              (localFilters.some((filter, index) => filter !== filters[index].length))) {
+                let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
+                let filteredStudents = students
+                let newLocalFilters = localFilters;
+                for (let i = 0; i < localFilters.length; i ++) {
+                    if (filters[i].length !== localFilters[i]) {
+                        newLocalFilters[i] = filters[i].length;
+                        filteredStudents = filterFunctions[i](filteredStudents);
+                    }
+                }
+                setLocalFilters(newLocalFilters);
+                setVisibleStudents(filteredStudents);
+            }
+            if (filters.every(filter => filter.length === 0)) {
+                setVisibleStudents(students);
             }
         }
     })
 
-    function filterStudents() {
-        let filteredStudents = students
-        let decisionNumbers = decision.map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
-        if (decision.length !== 0) {
+    function filterStudentsFilters(filteredStudents) {
+        return filteredStudents;
+    }
+
+    function filterStudentsSkills(filteredStudents) {
+        return filteredStudents;
+    }
+
+    function filterStudentsDecision(filteredStudents) {
+        let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
+        if (filters[2].length !== 0) {
             filteredStudents = filteredStudents.filter(student => {
                 let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
                 let decisionNumber = (decisions.length === 0)? -1: decisions[0]["decision"];
                 return decisionNumbers.includes(decisionNumber);
             })
         }
-        setVisibleStudents(filteredStudents);
+        return filteredStudents;
     }
 
     // the html that displays the overview of students
@@ -67,11 +90,10 @@ export default function SelectStudents() {
         <Row className="remaining_height fill_width">
             <Col className="fill_height">
                 <Row className="fill_height">
-                    {(! studentId) ? <StudentsFilters students={students} setVisibleStudents={setVisibleStudents}
-                                  setFiltersChanged={setFiltersChanged}
-                                  filters={filters} decision={decision} chosenSkills={chosenSkills}/> : null}
+                    {(! studentId) ? <StudentsFilters students={students}
+                                  filters={filters}/> : null}
                     <Col className="fill_height students-list-paddingtop">
-                        <SearchSortBar setSearchChanged={setSearchChanged}/>
+                        <SearchSortBar />
                          <Row className="student-list-positioning">
                              <StudentList students={visibleStudent}/>
                          </Row>
