@@ -10,12 +10,12 @@ export default function StudentList(props) {
       return props.students.map(student =>
         // generate a list of students, each student needs 'student' as a prop
         <li key={student.id}>
-          <StudentListelement student={student}/>
+          <StudentListelement student={student} />
         </li>
       );
     }
     if (props.students) {
-      return [<p/>, <p>No students found</p>]
+      return [<p />, <p>No students found</p>]
     }
     return <LoadingPage />
   }

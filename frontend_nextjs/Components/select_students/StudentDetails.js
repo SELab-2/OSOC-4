@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
-import {urlManager} from "../../utils/ApiClient";
+import { urlManager } from "../../utils/ApiClient";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -43,6 +43,7 @@ export default function StudentDetails(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
+
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
@@ -119,9 +120,9 @@ export default function StudentDetails(props) {
   }
 
   function getQuestionAnswers() {
-    return questionAnswers.map((questionAnswer,i) =>
+    return questionAnswers.map((questionAnswer, i) =>
       [
-        <Row key={"question"+ i} className="student-details-question">{questionAnswer["question"]}</Row>,
+        <Row key={"question" + i} className="student-details-question">{questionAnswer["question"]}</Row>,
         <Row key={"answer" + i} className="student-details-answer">{questionAnswer["answer"]}</Row>
       ]
     )
@@ -131,83 +132,83 @@ export default function StudentDetails(props) {
   return (
     <Col className="fill_height student-details-window" style={{ visibility: props.visibility }} >
 
-        <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} decision={suggestion} student={student} />
-        <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
-        <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
-        <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
+      <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} decision={suggestion} student={student} />
+      <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
+      <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
+      <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
 
-        <Row className="details-upper-layer">
-          <Col md="auto">
-            <Row>
-              <Col md="auto" className="name_big">
-                {student["first name"]} {student["last name"]}
-              </Col>
-              <Col>
-                <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                  <Image src={deleteIcon} className="delete-icon" />
-                </button>
-              </Col>
-            </Row>
-            <Row>
-              <Col md="auto" className="skill">VIDEO EDITOR</Col>
-            </Row>
-          </Col>
-          <Col />
-          <Col md="auto">
-            <Row>
-              <Col md="auto"><button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>
-                Suggest yes</button>
-              </Col>
-              <Col md="auto"><button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>
-                Suggest maybe</button>
-              </Col>
-              <Col md="auto"><button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>
-                Suggest no</button>
-              </Col>
-              <Col md="auto" className="close-button">
-                <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="44px" height="44px" objectFit={'contain'} />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <select className="dropdown-decision" id="dropdown-decision"
-                  onChange={(ev) => setDecideField(ev.target.value)}>
-                  <option value="-1">Undecided</option>
-                  <option value="2">Yes</option>
-                  <option value="1">Maybe</option>
-                  <option value="0">No</option>
-                </select>
-              </Col>
-              <Col md="auto">
-                <Button className="suggest-confirm-button" disabled={decideField === -1} onClick={() => setDecisionPopUpShow(true)}>
-                  Confirm
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-        <Row className="remaining-height-details" md="auto" style={{}}>
-          <Col md="auto" className="fill_height scroll-overflow student-details">
-            <Row md="auto" className="decision">
-              <GeneralInfo student={student} decision={getDecision()} />
-            </Row>
-            <Row md="auto">
-              <Button className="send-email-button" disabled={decision === -1} onClick={() => setEmailPopUpShow(true)}>
-                Send email
+      <Row className="details-upper-layer">
+        <Col md="auto">
+          <Row>
+            <Col md="auto" className="name_big">
+              {student["first name"]} {student["last name"]}
+            </Col>
+            <Col>
+              <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
+                <Image src={deleteIcon} className="delete-icon" />
+              </button>
+            </Col>
+          </Row>
+          <Row>
+            <Col md="auto" className="skill">VIDEO EDITOR</Col>
+          </Row>
+        </Col>
+        <Col />
+        <Col md="auto">
+          <Row>
+            <Col md="auto"><button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>
+              Suggest yes</button>
+            </Col>
+            <Col md="auto"><button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>
+              Suggest maybe</button>
+            </Col>
+            <Col md="auto"><button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>
+              Suggest no</button>
+            </Col>
+            <Col md="auto" className="close-button">
+              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="44px" height="44px" objectFit={'contain'} />
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <select className="dropdown-decision" id="dropdown-decision"
+                onChange={(ev) => setDecideField(ev.target.value)}>
+                <option value="-1">Undecided</option>
+                <option value="2">Yes</option>
+                <option value="1">Maybe</option>
+                <option value="0">No</option>
+              </select>
+            </Col>
+            <Col md="auto">
+              <Button className="suggest-confirm-button" disabled={decideField === -1} onClick={() => setDecisionPopUpShow(true)}>
+                Confirm
               </Button>
-            </Row>
-            <Row md="auto" className="student-details-suggestions-line h2-titles">
-              <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
-              <SuggestionsCount suggestionsYes={getSuggestionsCount(2)} suggestionsMaybe={getSuggestionsCount(1)}
-                suggestionsNo={getSuggestionsCount(0)} />
-            </Row>
-            {getSuggestions()}
-            <Row md="auto" className="h2-titles">
-              <Col md="auto"><h2>Questions</h2></Col>
-            </Row>
-            {getQuestionAnswers()}
-          </Col>
-        </Row>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+      <Row className="remaining-height-details" md="auto" style={{}}>
+        <Col md="auto" className="fill_height scroll-overflow student-details">
+          <Row md="auto" className="decision">
+            <GeneralInfo listelement={false} student={student} decision={getDecision()} />
+          </Row>
+          <Row md="auto">
+            <Button className="send-email-button" disabled={decision === -1} onClick={() => setEmailPopUpShow(true)}>
+              Send email
+            </Button>
+          </Row>
+          <Row md="auto" className="student-details-suggestions-line h2-titles">
+            <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
+            <SuggestionsCount suggestionsYes={getSuggestionsCount(2)} suggestionsMaybe={getSuggestionsCount(1)}
+              suggestionsNo={getSuggestionsCount(0)} />
+          </Row>
+          {getSuggestions()}
+          <Row md="auto" className="h2-titles">
+            <Col md="auto"><h2>Questions</h2></Col>
+          </Row>
+          {getQuestionAnswers()}
+        </Col>
+      </Row>
 
     </Col>
   )
