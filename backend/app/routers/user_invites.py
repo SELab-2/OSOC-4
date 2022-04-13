@@ -1,6 +1,4 @@
-from bson.errors import InvalidId
 from fastapi import APIRouter, Depends
-from odmantic import ObjectId
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import read_where, update
@@ -17,17 +15,24 @@ router = APIRouter(prefix="/invite")
 
 
 @router.get("/{invitekey}")
-async def valid_invitekey(invitekey: str):
+async def valid_invitekey(invitekey: str, session: AsyncSession = Depends(get_session)):
     if invitekey[0] != "I":
         raise InvalidInviteException()
 
-    try:  # Check whether the id is valid
-        ObjectId(db.redis.get(invitekey))
-    except InvalidId:
+    uid = db.redis.get(invitekey)
+
+    # Check whether the uid is valid
+    try:
+        uid = int(uid)
+    except ValueError:
         raise InvalidInviteException()
 
-    userid = await read_where(User, User.id == int(db.redis.get(invitekey)))
-    if userid is None:
+    if uid <= 0:
+        raise InvalidInviteException()
+
+    user = await read_where(User, User.id == uid, session=session)
+
+    if user is None:
         raise InvalidInviteException()
     return response(None, "Valid invitekey")
 
