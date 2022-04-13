@@ -110,13 +110,13 @@ class QuestionAnswerGenerator:
         # multiple choice questions with max 2 answers
         self.qa_multiple_choice2 = [
             ["What do/did you study?",
-            "backend developer", "business management", "communication sciences",
-            "computer sciences", "design", "frontend development", "marketing",
-            "photography", "videography", "other"],
+             "backend developer", "business management", "communication sciences",
+             "computer sciences", "design", "frontend development", "marketing",
+             "photography", "videography", "other"],
             ["Which role are you applying for?",
-            "Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
-            "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
-            "Photographer", "Other"]]
+             "Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
+             "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
+             "Photographer", "Other"]]
 
         self.questions_multiple_choice2 = []
         self.answers_multiple_choice2 = []
