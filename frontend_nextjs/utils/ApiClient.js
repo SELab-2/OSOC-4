@@ -12,6 +12,7 @@ class UrlManager {
     _students = null;
     _projects = null;
     _questiontags = null;
+    _skills = null;
 
     async getEditions() {
         log("Getting editions")
@@ -44,6 +45,16 @@ class UrlManager {
         if (this._projects) { return this._projects; }
         await this._setProjects();
         return this._projects;
+    }
+
+    async getSkills(){
+        if (! this._skills) { await this._setSkills() }
+        return this._skills;
+    }
+
+    async getCurrentYear(){
+        if(! this._year) {await this._setCurrentEdition();}
+        return this._year;
     }
 
     async getQuestionTags() {
@@ -105,6 +116,11 @@ class UrlManager {
 
     async _setQuestionTags() {
         await this._setCurrentEdition();
+    }
+
+    //TODO make this not hardcoded
+    async _setSkills(){
+        this._skills = "/skills"
     }
 }
 
