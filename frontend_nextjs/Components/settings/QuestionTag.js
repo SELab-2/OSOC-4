@@ -65,18 +65,19 @@ export default function QuestionTag(props) {
                     }
                     <Form.Control name="question" type="text" placeholder="Question" value={questionTag["question"]} onChange={handleChange} />
 
-                    <Form.Check
-                        name="showInList"
-                        type="checkbox"
-                        checked={questionTag["showInList"]}
-                        label={"show in studentlist"}
-                        onChange={handleCheckboxChange}
-                    />
-
                     {!questionTag["mandatory"] &&
-                        <button onClick={deleteTag}>
-                            <Image src={deleteIcon} className="delete-icon" />
-                        </button>
+                        <div>
+                            <Form.Check
+                                name="showInList"
+                                type="checkbox"
+                                checked={questionTag["showInList"]}
+                                label={"show in studentlist"}
+                                onChange={handleCheckboxChange}
+                            />
+                            <button onClick={deleteTag}>
+                                <Image src={deleteIcon} className="delete-icon" />
+                            </button>
+                        </div>
                     }
 
                 </Form.Group>
