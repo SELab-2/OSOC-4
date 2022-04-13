@@ -1,6 +1,6 @@
 from random import choice, randrange, sample
 
-from app.crud import T, update
+from app.crud import update
 from app.database import get_session
 from app.models.answer import Answer
 from app.models.edition import Edition
@@ -59,45 +59,45 @@ class QuestionAnswerGenerator:
 
         self.questions_yes_no = \
             [Question(question=q, field_id="", edition=edition.year) for q in
-            ["Will you live in Belgium in July 2022?",
-            "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
-            "Would you like to be called by a different name than your birth name?",
-            "Would you like to add your pronouns?",
-            "Have you participated in osoc before?",
-            "Would you like to be a student coach this year?"]]
+                ["Will you live in Belgium in July 2022?",
+                 "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
+                 "Would you like to be called by a different name than your birth name?",
+                 "Would you like to add your pronouns?",
+                 "Have you participated in osoc before?",
+                 "Would you like to be a student coach this year?"]]
 
         self.answers_yes_no = [[Answer(answer=yn) for yn in ["yes", "no"]]
-                        for question in self.questions_yes_no]
+                               for question in self.questions_yes_no]
 
         self.questions_text = \
             [Question(question=q, field_id="", edition=edition.year) for q in
-            ["Are there any responsibilities you might have which could hinder you during the day?",
-            "Tell us a fun fact about yourself.",
-            "How many years does your degree take?",
-            "Which year of your degree are you in?",
-            "What is the name of your college or university?",
-            "Which skill would you list as your best one?"]]
+                ["Are there any responsibilities you might have which could hinder you during the day?",
+                 "Tell us a fun fact about yourself.",
+                 "How many years does your degree take?",
+                 "Which year of your degree are you in?",
+                 "What is the name of your college or university?",
+                 "Which skill would you list as your best one?"]]
 
         self.answers_text = [[Answer(answer=f"text{t}")
-                        for t in range(1, 4)] for question in self.questions_text]
+                              for t in range(1, 4)] for question in self.questions_text]
 
         self.qa_multiple_choice = [
             ["Are you able to work 128 hours with a student employment agreement, or as a volunteer?",
-            "Yes, I can work with a student employee agreement in Belgium",
-            "Yes, I can work as a volunteer in Belgium",
-            "No, but I would like to join this experience for free",
-            "No, I won't be able to work as a student, as a volunteer or for free."],
+             "Yes, I can work with a student employee agreement in Belgium",
+             "Yes, I can work as a volunteer in Belgium",
+             "No, but I would like to join this experience for free",
+             "No, I won't be able to work as a student, as a volunteer or for free."],
             ["What is your gender?", "female", "male", "transgender", "rather not say"],
             ["What language are you most fluent in?", "dutch", "english", "french", "german", "other"],
             ["How would you rate your English",
-            "1 I can understand form, but it is hard for me to reply.",
-            "2 I can have simple conversations.",
-            "3 I can express myself, understand people and get a point across.",
-            "4 I can have extensive and complicated conversations.",
-            "5 I am fluent."],
+             "1 I can understand form, but it is hard for me to reply.",
+             "2 I can have simple conversations.",
+             "3 I can express myself, understand people and get a point across.",
+             "4 I can have extensive and complicated conversations.",
+             "5 I am fluent."],
             ["What kind of diploma are you currently going for?",
-            "a professional bachelor", "an academic bachelor", "an associate degree",
-            "a master's degree", "doctoral degree", "no diploma, I am self taught", "other"]]
+             "a professional bachelor", "an academic bachelor", "an associate degree",
+             "a master's degree", "doctoral degree", "no diploma, I am self taught", "other"]]
 
         self.questions_multiple_choice = []
         self.answers_multiple_choice = []
