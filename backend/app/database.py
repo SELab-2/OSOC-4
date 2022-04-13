@@ -37,8 +37,9 @@ async def init_db():
                 connection = True
                 break
         except Exception as e:
-            print("trying to connect ...")
+            print("Something went wrong while trying to connect.")
             print(e)
+            print("Retrying to connect ...")
             time.sleep(1)
     if not connection:
         exit(1)
@@ -59,11 +60,6 @@ class Database:
 db = Database()
 
 
-# def connect_db():
-#     db.client = AsyncIOMotorClient(MONGO_DETAILS)
-#     db.engine = AIOEngine(motor_client=db.client, database="selab")
-
-
-# def disconnect_db():
-#     db.client.close()
-#     db.redis.close()
+async def disconnect_db():
+    await engine.dispose()
+    db.redis.close()

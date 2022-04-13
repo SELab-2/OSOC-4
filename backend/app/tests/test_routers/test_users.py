@@ -3,7 +3,6 @@ import unittest
 from typing import Dict, Set, Tuple
 
 from httpx import Response
-from odmantic import ObjectId
 
 from app.crud import read_where, read_all_where, update
 from app.database import db
@@ -47,8 +46,8 @@ class TestUsers(TestBase):
         # Test result
         for user_title, response in responses.items():
             user = await self.get_user_by_name(user_title)  # collected from test_base
-            ep_user = json.loads(response.content)["data"]["id"].split("/")[-1]  # collected from endpoint
-            self.assertEqual(str(user.id), ep_user)
+            ep_user = json.loads(response.content)["data"]  # collected from endpoint
+            self.assertSequenceEqual({"name": user.name, "email": user.email, "role": user.role}, ep_user)
 
     async def test_post_add_user_data(self):
         # This test needs to be reworked when multiple users are allowed,
@@ -82,7 +81,7 @@ class TestUsers(TestBase):
 
         key = generate_new_reset_password_key()
         forgotten_user = await self.get_user_by_name("user_approved_coach")
-        db.redis.setex(key[0], key[1], str(forgotten_user.id))
+        db.redis.setex(key[0], key[1], int(forgotten_user.id))
 
         # Test using a wrong validate password
         await self.do_request(Request.POST, path + key[0], "user_admin",
@@ -99,7 +98,7 @@ class TestUsers(TestBase):
 
         # Request using key from other user
         key = generate_new_reset_password_key()
-        db.redis.setex(key[0], key[1], str(forgotten_user.id))
+        db.redis.setex(key[0], key[1], int(forgotten_user.id))
 
         await self.do_request(Request.POST, f"/users/forgot/{key[0]}", "user_admin",
                               json_body={"password": new_pass, "validate_password": new_pass},
@@ -109,10 +108,10 @@ class TestUsers(TestBase):
         # Check passwords aren't changed #
         ##################################
         for user_title in allowed_users:
-            lcl_user: User = await self.get_user_by_name(user_title)
-            db_user: User = await read_where(User, User.id == ObjectId(lcl_user.id), session=self.session)
+            user: User = await self.get_user_by_name(user_title)
 
-            self.assertEqual(lcl_user.password, db_user.password, "The password was changed after bad requests")
+            self.assertTrue(verify_password(f"Test123!{user_title}", user.password),
+                            "The password was changed after bad requests")
 
         #######################################
         # Test authorization & access-control #
@@ -120,14 +119,15 @@ class TestUsers(TestBase):
         for user_title in self.users.keys():
             key = generate_new_reset_password_key()
             forgotten_user = await self.get_user_by_name(user_title)
-            db.redis.setex(key[0], key[1], str(forgotten_user.id))
+            db.redis.setex(key[0], key[1], int(forgotten_user.id))
+
+            body = {"password": new_pass, "validate_password": new_pass}
 
             if user_title in allowed_users:
-                allowed_users_path_and_body[user_title] = path + key[0], {"password": new_pass,
-                                                                          "validate_password": new_pass}
+                allowed_users_path_and_body[user_title] = path + key[0], body
             else:
-                blocked_users_path_and_body[user_title] = path + key[0], {"password": new_pass,
-                                                                          "validate_password": new_pass}
+                blocked_users_path_and_body[user_title] = path + key[0], body
+        # change to new passwords where allowed
         await self.auth_access_request_test_per_user(Request.POST,
                                                      allowed_users_path_and_body,
                                                      blocked_users_path_and_body)
@@ -135,17 +135,13 @@ class TestUsers(TestBase):
         # Check current passwords #
         ###########################
         for user_title in allowed_users:  # Check password was changed
-            lcl_user: User = await self.get_user_by_name(user_title)
-            db_user: User = await read_where(User, User.id == ObjectId(lcl_user.id), session=self.session)
-
-            self.assertTrue(verify_password(new_pass, db_user.password),
+            user: User = await self.get_user_by_name(user_title)
+            self.assertTrue(verify_password(new_pass, user.password),
                             "The password wasn't changed after successful requests")
 
         for user_title in set(self.users.keys()).difference(allowed_users):  # Check password wasn't changed
-            lcl_user: User = await self.get_user_by_name(user_title)
-            db_user: User = await read_where(User, User.id == ObjectId(lcl_user.id), session=self.session)
-
-            self.assertEqual(lcl_user.password, db_user.password, "The password was changed after bad requests")
+            user: User = await self.get_user_by_name(user_title)
+            self.assertFalse(verify_password(new_pass, user.password), "The password was changed after bad requests")
 
     async def test_get_users_id(self):
         expected_user = await self.get_user_by_name("user_admin")
@@ -167,8 +163,7 @@ class TestUsers(TestBase):
                                  Expected: {expected_user}
                                  Was: {gotten_user}""")
 
-    @unittest.skip("Expected behaviour of path?")
-    async def test_post_update_user(self):
+    async def test_patch_update_user(self):
         path: str = "/users/"
         allowed_users: Set[str] = {"user_admin"}
         allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
@@ -185,26 +180,34 @@ class TestUsers(TestBase):
                 approved=False,
                 disabled=False)
             await update(editable_user, session=self.session)
-            body = {"email": f"edited_by_{user_title}@test.test",
-                    "name": f"edited_by_{user_title}"}
+            body = {
+                "name": f"edited_by_{user_title}",
+                "role": int(UserRole.NO_ROLE),
+                "active": True,
+                "approved": True,
+                "disabled": False
+            }
             if user_title in allowed_users:
                 allowed_users_path_and_body[user_title] = path + str(editable_user.id), body
             else:
                 blocked_users_path_and_body[user_title] = path + str(editable_user.id), body
 
         # Test authorization & access-control with successful edits
-        await self.auth_access_request_test_per_user(Request.POST,
+        await self.auth_access_request_test_per_user(Request.PATCH,
                                                      allowed_users_path_and_body,
                                                      blocked_users_path_and_body)
 
         # Test failed requests
         bad_path = f"/users/{self.bad_id}"
-        bad_body: Dict[str, str] = {"email": self.objects["user_admin"].email, "name": "Rocky"}
-        await self.do_request(Request.POST, allowed_users_path_and_body.get("user_admin")[0], "user_admin",
+        bad_body: Dict[str, str] = {"name": ""}
+        await self.do_request(Request.PATCH, allowed_users_path_and_body.get("user_admin")[0], "user_admin",
                               json_body=bad_body, expected_status=Status.BAD_REQUEST)
-        await self.do_request(Request.POST, bad_path, "user_admin",
+        await self.do_request(Request.PATCH, bad_path, "user_admin",
                               json_body={"email": "bad_edited_by_user_admin@test.test",
-                                         "name": "bad_edited_by_user_admin"}, expected_status=Status.NOT_FOUND)
+                                         "name": "bad_edited_by_user_admin",
+                                         "role": int(UserRole.NO_ROLE),
+                                         "active": True, "approved": True, "disabled": False},
+                              expected_status=Status.NOT_FOUND)
 
         # assert edits
         for user_title in self.users.keys():
@@ -219,7 +222,7 @@ class TestUsers(TestBase):
                                      edited_by_{user_title} was found in the database,
                                      the user was wrongly modified.""")
 
-    @unittest.skip("problem with getting email and/or password of user_unactivated_coach")
+    @unittest.skip("Prevent email spam.")
     async def test_post_invite_user(self):
         unactivated_user = await self.get_user_by_name("user_unactivated_coach")
 
@@ -227,7 +230,7 @@ class TestUsers(TestBase):
         allowed_users = {"user_admin"}
         body = {}
 
-        unactivated_user.email = "Stef.VandenHaute@UGent.be"  # TODO: set in env
+        unactivated_user.email = "Stef.VandenHaute+SEL2TEST@UGent.be"  # TODO: set in env
         await update(unactivated_user, session=self.session)
 
         active_user = await self.get_user_by_name("user_activated_coach")
@@ -247,7 +250,6 @@ class TestUsers(TestBase):
         await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_approved_coach",
                               json_body={}, expected_status=Status.FORBIDDEN)
 
-    @unittest.skip("No approval")
     async def test_post_approve_user(self):
         activated_user: User = await self.get_user_by_name("user_activated_coach")
         path: str = f"/users/{str(activated_user.id)}/approve"

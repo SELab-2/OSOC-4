@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getSession, getCsrfToken } from 'next-auth/react';
-import {getJson} from "./json-requests";
-import {log} from "./logger";
+import { getJson } from "./json-requests";
+import { log } from "./logger";
 
 class UrlManager {
     baseUrl = process.env.NEXT_API_URL;
@@ -11,10 +11,12 @@ class UrlManager {
     _current_edition = null;
     _students = null;
     _projects = null;
+    _questiontags = null;
+    _skills = null;
 
     async getEditions() {
         log("Getting editions")
-        if (this._editions) {return this._editions;}
+        if (this._editions) { return this._editions; }
         await this._setEditions()
         return this._editions;
     }
@@ -22,33 +24,44 @@ class UrlManager {
     async getUsers() {
         log("Getting users")
 
-        if (this._users) {return this._users;}
+        if (this._users) { return this._users; }
         await this._setUsers();
         return this._users;
     }
 
     async getCurrentEdition() {
         log("getting current edition")
-        if (this._current_edition) {return this._current_edition;}
+        if (this._current_edition) { return this._current_edition; }
         await this._setCurrentEdition()
         return this._current_edition;
     }
 
     async getStudents() {
-        if (this._students) {return this._students;}
+        if (this._students) { return this._students; }
         await this._setStudents();
         return this._students;
     }
 
     async getProjects() {
-        if (this._projects) {return this._projects;}
+        if (this._projects) { return this._projects; }
         await this._setProjects();
         return this._projects;
+    }
+
+    async getSkills(){
+        if (! this._skills) { await this._setSkills() }
+        return this._skills;
     }
 
     async getCurrentYear(){
         if(! this._year) {await this._setCurrentEdition();}
         return this._year;
+    }
+
+    async getQuestionTags() {
+        if (this._questiontags) { return this._questiontags; }
+        await this._setQuestionTags();
+        return this._questiontags;
     }
 
 
@@ -68,11 +81,11 @@ class UrlManager {
 
     async _setCurrentEdition(year = null) {
         log("Setting current editions")
-        if (!this._editions) {await this._setEditions();}
-        if(year){
+        if (!this._editions) { await this._setEditions(); }
+        if (year) {
             this._year = year;
             this._current_edition = this._editions + "/" + this._year;
-        }else{
+        } else {
             let res = await getJson(this._editions);
             this._current_edition = res[0];
         }
@@ -80,6 +93,7 @@ class UrlManager {
         this._year = editionData['year'];
         this._students = editionData["students"];
         this._projects = editionData["projects"];
+        this._questiontags = editionData["questiontags"];
     }
 
     async _setStudents() {
@@ -88,6 +102,15 @@ class UrlManager {
 
     async _setProjects() {
         await this._setCurrentEdition();
+    }
+
+    async _setQuestionTags() {
+        await this._setCurrentEdition();
+    }
+
+    //TODO make this not hardcoded
+    async _setSkills(){
+        this._skills = "/skills"
     }
 }
 
@@ -113,7 +136,6 @@ function AxiosClient(auth_headers = true) {
                 request.headers["X-CSRF-TOKEN"] = csrfToken
             }
         }
-        console.log(request)
         return request;
     });
 

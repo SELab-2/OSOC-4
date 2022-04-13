@@ -8,14 +8,14 @@ import {urlManager} from "../utils/ApiClient";
 
 
 export default function NewProjects() {
-    const [projectName, setProjectName] = useState()
-    const [partnerName, setPartnerName] = useState()
-    const [partnerDescription, setPartnerDescription] = useState()
-    const [projectDescription, setProjectDescription] = useState()
-    const [briefing, setBriefing] = useState()
+    const [projectName, setProjectName] = useState("")
+    const [partnerName, setPartnerName] = useState("")
+    const [partnerDescription, setPartnerDescription] = useState("")
+    const [projectDescription, setProjectDescription] = useState("")
+    const [briefing, setBriefing] = useState("")
 
-    const [tools, setTools] = useState()
-    const [codeLanguages, setCodeLanguages] = useState()
+    const [tools, setTools] = useState("")
+    const [codeLanguages, setCodeLanguages] = useState("")
 
     const [students, setStudents] = useState([{"skill":"", "amount":1}])
 
@@ -28,17 +28,21 @@ export default function NewProjects() {
 
     useEffect(() => {
         if (skills.length === 0) {
-            // getJson("/skills").then(async res => {
-            //     log("load skills")
-            //     log(res)
-            //     if(res.data){
-            //         // scuffed way to get unique skills (should be fixed in backend soon)
-            //         let uniq = [...new Set(res.data.map(skill => skill.name))];
-            //         let array = [];
-            //         uniq.map(skill => array.push({"value":skill, "name":skill}));
-            //         setSkills(array);
-            //     }
-            // })
+            urlManager.getSkills().then(skills_url => {
+                getJson(skills_url).then(async res => {
+                    log("load skills")
+                    log(res)
+                    if(res){
+                        // scuffed way to get unique skills (should be fixed in backend soon)
+                        let uniq = [...new Set(res.map(skill => skill))];
+                        log(uniq)
+                        let array = [];
+                        uniq.map(skill => array.push({"value":skill, "name":skill}));
+                        setSkills(array);
+                    }
+                })
+            })
+
         }
     })
 
@@ -84,6 +88,7 @@ export default function NewProjects() {
             "goals": "",
             "edition": edition
         }
+        // TODO add skills to project
         await postCreate("projects/create", body)
     }
 

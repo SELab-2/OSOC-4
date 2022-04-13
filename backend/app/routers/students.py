@@ -5,7 +5,6 @@ from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
-
 from app.models.suggestion import Suggestion, SuggestionExtended
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
@@ -49,16 +48,22 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     # student info
     info = {"id": f"{config.api_url}students/{student_id}"}
     # student info from tags
-    r = await session.execute(select(QuestionTag.tag, Answer.answer).select_from(Student).where(Student.id == int(student_id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
+    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer).select_from(Student).where(Student.id == int(student_id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
     student_info = r.all()
-    info.update({k: v for (k, v) in student_info})
+
+    mandatory = {k: v for (k, mandatory, _, v) in student_info if mandatory}
+    listTags = {k: v for (k, mandatory, showInList, v) in student_info if showInList and not mandatory}
+    detailTags = {k: v for (k, mandatory, showInList, v) in student_info if not showInList and not mandatory}
+
+    info["mandatory"] = mandatory
+    info["listtags"] = listTags
+    info["detailtags"] = detailTags
     # student suggestions
     r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
     student_info = r.all()
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
     info["suggestions"] = [SuggestionExtended.parse_raw(s.json()) for (s,) in student_info]
-
     return info
 
 

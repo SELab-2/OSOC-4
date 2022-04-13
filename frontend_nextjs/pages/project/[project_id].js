@@ -24,6 +24,11 @@ const Project = () => {
         }
     })
 
+    //TODO make this delete project
+    async function deleteProject(){
+
+    }
+
     return (
         <div>
             { loaded ? (
@@ -36,6 +41,7 @@ const Project = () => {
                             <h1>{project.name}</h1>
                         </Col>
                         <Col>
+                            {/*TODO make this go to actually edit page*/}
                             <Button>Edit</Button>
                         </Col>
                         <Col>
@@ -48,6 +54,7 @@ const Project = () => {
                                 <Modal.Footer>
                                     <Button variant="secondary" onClick={() => {
                                         setShowDelete(false)
+                                        deleteProject()
                                         log("DELETE PROJECT")
                                         router.push("/projects")
                                     }}>

@@ -6,7 +6,7 @@ import { Col, Row } from "react-bootstrap";
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 
 // The page corresponding with the 'select students' tab
@@ -33,13 +33,13 @@ export default function SelectStudents() {
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">
-            {(! studentId) ? <StudentsFilters/> : null}
+            {(!studentId) ? <StudentsFilters /> : null}
             <Col className="fill_height students-list-paddingtop">
-                 <div className="fill_height">
-                     <StudentList students={students}/>
-                 </div>
+                <div className="fill_height">
+                    <StudentList students={students} />
+                </div>
             </Col>
-            {(studentId) ? <StudentDetails student_id={studentId}/> : null}
+            {(studentId) ? <StudentDetails student_id={studentId} /> : null}
         </Row>
     )
 

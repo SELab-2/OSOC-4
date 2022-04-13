@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
+import { useEffect, useState } from "react";
+import { getJson } from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
@@ -10,7 +10,7 @@ export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [student, setStudent] = useState({});
-  const [decision,setDecision] = useState(-1);
+  const [decision, setDecision] = useState(-1);
 
 
   const router = useRouter()
@@ -25,7 +25,7 @@ export default function StudentListelement(props) {
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
         }
-    })
+      })
     }
   });
 
@@ -41,8 +41,8 @@ export default function StudentListelement(props) {
   // get a list of the skills of the student in HTML format
   function getSkills() {
     let skills = [];
-    return skills.map((skill,index) =>
-      <li className="skill" style={{display: "inline-block"}} key={index}>{skill.toUpperCase()}</li>
+    return skills.map((skill, index) =>
+      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill.toUpperCase()}</li>
     )
   }
 
@@ -77,43 +77,51 @@ export default function StudentListelement(props) {
       query: {
         studentId: id  // update the query param
       }
-    }, undefined, { shallow: true})
+    }, undefined, { shallow: true })
   }
 
   // get the suggestion count for a certain decision ("yes", "maybe" or "no")
   function getSuggestions(decision) {
-    if (! student["suggestions"]) {
+    if (!student["suggestions"]) {
       return 0;
     }
-    return student["suggestions"].filter(suggestion => ! suggestion["definitive"] && suggestion["decision"] === decision).length
+    return student["suggestions"].filter(suggestion => !suggestion["definitive"] && suggestion["decision"] === decision).length
   }
 
   // The html representation of a list-element
   return (
-    <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
-      onClick={() => studentDetails()}>
-      <Row className="upper-layer">
-        <Col id="name" className="name" md="auto">{student["first name"]} {student["last name"]}</Col>
-        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
-          No practical problems
-        </Col>
-        <Col />
-        <Col md="auto">
-          <Row md="auto">
-            <Col className="suggestions" md="auto">Suggestions:</Col>
-            <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
-          </Row>
-        </Col>
-      </Row>
+    <div>
+      {Object.keys(student).length &&
+        <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
+          onClick={() => studentDetails()}>
+          <Row className="upper-layer">
 
-      <Row id="info" className="info">
-        <GeneralInfo student={student} decision={getDecision()} />
-        <Col id="skills" align="right" className="skills">
-          <ul>
-            {getSkills()}
-          </ul>
-        </Col>
-      </Row>
-    </Container>
+            <Col id="name" className="name" md="auto">{student["mandatory"]["first name"]} {student["mandatory"]["last name"]}</Col>
+
+            <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
+              No practical problems
+            </Col>
+            <Col />
+            <Col md="auto">
+              <Row md="auto">
+                <Col className="suggestions" md="auto">Suggestions:</Col>
+                <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
+              </Row>
+            </Col>
+          </Row>
+
+          <Row id="info" className="info">
+            <GeneralInfo student={student} listelement={true} decision={getDecision()} />
+            <Col id="skills" align="right" className="skills">
+              <ul>
+                {getSkills()}
+              </ul>
+            </Col>
+          </Row>
+        </Container>
+      }
+    </div>
+
+
   )
 }
