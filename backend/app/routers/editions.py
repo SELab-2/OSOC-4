@@ -1,6 +1,5 @@
 import datetime
 import json
-from operator import attrgetter
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
@@ -149,7 +148,6 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
         students = [str(student["id"]) for student in sorted_students]
     return [config.api_url + "students/" + str(id) for id in students]
-
 
 
 @router.get("/{year}/projects", response_description="Projects retrieved")
