@@ -1,5 +1,6 @@
 import datetime
 import json
+from operator import attrgetter
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
@@ -131,16 +132,24 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     students = [r for (r,) in res]
 
     if orderby:
-        sorting = {}
-        for key, val in get_sorting(orderby).items():
-            res = await session.execute(select(ua.id, QuestionTag.tag, Answer.answer).join(QuestionAnswer, ua.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == key).join(Answer))
+        sorting = get_sorting(orderby).items()
+        studentobjects = {}
+        for key, val in sorting:
+            res = await session.execute(select(ua.id, QuestionTag.tag, Answer.answer).join(QuestionAnswer, ua.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == key).join(Answer).order_by(ua.id))
             res = res.all()
-            sorting[tuple([r for (_, _, r) in res])] = val
 
-        for k, val in reversed(sorting.items()):
-            students = [x for _, x in sorted(zip(list(k), students), reverse=val)]
+            for (id, _, r) in res:
+                if id not in studentobjects:
+                    studentobjects[id] = {"id": id}
+                studentobjects[id][key] = r
 
+        sorted_students = studentobjects.values()
+        for k, val in reversed(sorting):
+            sorted_students = sorted(sorted_students, key=lambda d: d[k], reverse=val)
+
+        students = [str(student["id"]) for student in sorted_students]
     return [config.api_url + "students/" + str(id) for id in students]
+
 
 
 @router.get("/{year}/projects", response_description="Projects retrieved")

@@ -34,8 +34,11 @@ export default function SelectStudents() {
         if (session) {
             if ((!students) || (router.query.search !== search)) {
                 setSearch(router.query.search);
+
+                console.log(router.query.search)
+
                 // the urlManager returns the url for the list of students
-                urlManager.getStudents(router.query.sortby, router.query.search).then(url => getJson(url).then(res => {
+                urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
                     Promise.all(res.map(studentUrl =>
                         getJson(studentUrl).then(res => res)
                     )).then(students => {

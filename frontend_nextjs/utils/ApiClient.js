@@ -35,8 +35,8 @@ class UrlManager {
         return this._current_edition;
     }
 
-    async getStudents(orderby = null, search = null) {
-        await this._setStudents(orderby, search);
+    async getStudents() {
+        await this._setStudents();
         return this._students;
     }
 
@@ -84,19 +84,8 @@ class UrlManager {
         this._questiontags = editionData["questiontags"];
     }
 
-    async _setStudents(orderby = null, search = null) {
+    async _setStudents() {
         await this._setCurrentEdition();
-        let filtersUrl = "";
-        if (orderby) {
-            filtersUrl += "&orderby=" + orderby;
-        }
-        if (search) {
-            filtersUrl += "&search=" + search;
-        }
-        if (filtersUrl) {
-            filtersUrl = "?" + filtersUrl.slice(1);
-        }
-        this._students += filtersUrl;
     }
 
     async _setProjects() {
