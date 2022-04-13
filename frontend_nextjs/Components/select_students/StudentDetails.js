@@ -30,7 +30,6 @@ export default function StudentDetails(props) {
   const [suggestions, setSuggestions] = useState([]);
   const [decision, setDecision] = useState(-1);
   const [questionAnswers, setQuestionAnswers] = useState([])
-  const [tags, setTags] = useState([])
 
   // These constant define wheater the pop-up windows should be shown or not
   const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
@@ -44,18 +43,6 @@ export default function StudentDetails(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
-
-    urlManager.getQuestionTags().then(questiontags_url => {
-      getJson(questiontags_url).then(res => {
-
-        Promise.all(res.map(url => getJson(url).then(r => {
-          return r
-        }))).then(values => {
-          setTags(values);
-        })
-      }
-      )
-    })
 
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
