@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
@@ -10,7 +9,6 @@ export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [decision,setDecision] = useState(-2);
-
 
   const router = useRouter()
 
@@ -66,8 +64,8 @@ export default function StudentListelement(props) {
 
   // a function to open the details of a student
   function studentDetails() {
-    let i = props.studentId.lastIndexOf('/');
-    let id = props.studentId.substring(i + 1);
+    let i = props.student.id.lastIndexOf('/');
+    let id = props.student.id.substring(i + 1);
 
     // the path is not changed, but there is a query added wich contains the id of the student
     router.push({
@@ -97,7 +95,7 @@ export default function StudentListelement(props) {
         </Col>
         <Col />
         <Col md="auto">
-          <Row md="auto">
+          <Row md="auto" className="nomargin">
             <Col className="suggestions" md="auto">Suggestions:</Col>
             <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
@@ -106,7 +104,7 @@ export default function StudentListelement(props) {
 
       <Row id="info" className="info">
         <GeneralInfo student={props.student} decision={getDecision()} />
-        <Col id="skills" align="right" className="skills">
+        <Col id="skills" align="right" className="skills" md="auto">
           <ul>
             {getSkills()}
           </ul>

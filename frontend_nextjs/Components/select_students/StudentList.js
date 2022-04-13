@@ -1,16 +1,15 @@
 import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
-import { useEffect, useState } from "react";
 
 export default function StudentList(props) {
 
   // function to get a list of students
   function getStudents() {
-    if (props.students && props.students.length !== 0) {
+    if (props.students) {
       return props.students.map(student =>
         // generate a list of students, each student needs 'student' as a prop
         <li key={student[0]}>
-          <StudentListelement studentId={student[0]} student={student[1]}/>
+          <StudentListelement student={student}/>
         </li>
       );
     }

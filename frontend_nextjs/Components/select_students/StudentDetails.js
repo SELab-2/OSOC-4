@@ -64,7 +64,6 @@ export default function StudentDetails(props) {
         // Fill in the questionAnswers
         getJson(res["question-answers"]).then(res => {
           setQuestionAnswers(res);
-          console.log(res);
         })
       })
     }
