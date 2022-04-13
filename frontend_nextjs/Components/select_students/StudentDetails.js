@@ -1,9 +1,9 @@
 import {
   Button,
-  Col,
+  Col, Dropdown,
   Row
 } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
@@ -65,7 +65,6 @@ export default function StudentDetails(props) {
         // Fill in the questionAnswers
         getJson(res["question-answers"]).then(res => {
           setQuestionAnswers(res);
-          console.log(res);
         })
       })
     }
@@ -112,8 +111,11 @@ export default function StudentDetails(props) {
   // this function is called when the student details are closed, it will go back to the student list with filters,
   // without reloading the page
   function hideStudentDetails() {
+    let newQuery = router.query;
+    delete newQuery["studentId"];
     router.push({
-      pathname: router.pathname
+      pathname: router.pathname,
+      query: newQuery
     }, undefined, { shallow: true })
   }
 
@@ -139,7 +141,7 @@ export default function StudentDetails(props) {
         <Col md="auto">
           <Row>
             <Col md="auto" className="name_big">
-              {student["first name"]} {student["last name"]}
+              {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
             </Col>
             <Col>
               <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
@@ -207,6 +209,7 @@ export default function StudentDetails(props) {
           {getQuestionAnswers()}
         </Col>
       </Row>
+
     </Col>
   )
 }

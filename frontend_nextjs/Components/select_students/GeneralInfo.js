@@ -1,58 +1,50 @@
-import { Col } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 
 // displays the counts of the suggestions for a student
 export default function SuggestionsCount(props) {
 
-  // get the titles of the basic questions shown in the list element
-  function getInfoTitles() {
+  // get the info of the basic questions shown in the list element
+  function getInfo() {
+    if (props.student["suggestions"]) {
+      let decisions = props.student["suggestions"].filter(sugg => sugg["definitive"]);
+      let decision = (decisions.length === 0) ? "Undecided" : ["No", "Maybe", "Yes"][decisions[0]["decision"]];
 
-    let tags = []
+      let rows = [];
 
-    if (Object.keys(props.student).length) {
-
-      Object.entries(props.student["listtags"]).map(([k, _]) => {
-        tags.push(<p key={k}>{k}</p>)
+      Object.entries(props.student["listtags"]).map(([k, v]) => {
+        rows.push(
+          <Row key={k} className="question-answer-row">
+            <Col md="auto" className="info-titles">{k}</Col>
+            <Col md="auto" className="info-answers">{v}</Col>
+          </Row>
+        )
       })
-
       if (!props.listelement) {
-        Object.entries(props.student["detailtags"]).map(([k, _]) => {
-          tags.push(<p key={k}>{k}</p>)
+        Object.entries(props.student["detailtags"]).map(([k, v]) => {
+          rows.push(
+            <Row key={k} className="question-answer-row">
+              <Col md="auto" className="info-titles">{k}</Col>
+              <Col md="auto" className="info-answers">{v}</Col>
+            </Row>
+          )
         })
       }
 
+      rows.push(
+        <Row key={"Decision"} className="question-answer-row">
+          <Col md="auto" className="info-titles">{"Decision"}</Col>
+          <Col md="auto" className="info-answers">{decision}</Col>
+        </Row>
+      )
+
+      return rows;
     }
-
-    return tags;
-  }
-
-  // get the answers on the basic questions in HTML format
-  function getInfoAnswers() {
-    let answers = []
-
-    if (Object.keys(props.student).length) {
-
-      Object.entries(props.student["listtags"]).map(([_, v]) => {
-        answers.push(<p key={`${v}`}>{v}</p>)
-      })
-
-      if (!props.listelement) {
-        Object.entries(props.student["detailtags"]).map(([_, v]) => {
-          answers.push(<p key={`${v}`}>{v}</p>)
-        })
-      }
-    }
-
-    return answers;
   }
 
   // return html representation of the suggestion counts for a student
-  return [
-    <Col key="info-titles" className="info-titles" md="auto">
-      {getInfoTitles()}
-      Decision:
-    </Col>,
-    <Col key="info-answers" md="auto" className="info-answers">
-      {getInfoAnswers()}
-      {props.decision}
-    </Col>]
+  return (
+    <Col md="auto">
+      {getInfo()}
+    </Col>
+  );
 }

@@ -1,34 +1,23 @@
 import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
-import { useEffect, useState } from "react";
-import { getJson } from "../../utils/json-requests";
-import { urlManager } from "../../utils/ApiClient";
+import LoadingPage from "../LoadingPage";
 
 export default function StudentList(props) {
 
-  // These constants are initialized empty, the data will be inserted in useEffect
-  const [students, setStudents] = useState(undefined);
-  const [showInListTags, setShowInListTags] = useState([])
-
-
-  // This function inserts the data in the variables
-  useEffect(async () => {
-    if (!students) {
-      setStudents(props.students)
-    }
-  }, [students, props.students])
-
   // function to get a list of students
   function getStudents() {
-    if (students) {
-      return students.map(student =>
+    if (props.students && props.students.length > 0) {
+      return props.students.map(student =>
         // generate a list of students, each student needs 'student' as a prop
-        <li key={student}>
+        <li key={student.id}>
           <StudentListelement student={student} />
         </li>
       );
     }
-    return null;
+    if (props.students) {
+      return [<p />, <p>No students found</p>]
+    }
+    return <LoadingPage />
   }
 
   // returns the html representation for the student list
