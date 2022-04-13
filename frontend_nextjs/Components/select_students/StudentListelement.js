@@ -9,19 +9,19 @@ export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [decision,setDecision] = useState(-2);
+  let prevDecision = -2;
 
   const router = useRouter()
 
   // This function inserts the data in the variables
   useEffect(() => {
-    if (props.student["suggestions"] && decision === -2) {
+    if (props.student["suggestions"] && (decision === -2 || prevDecision !== decision)) {
         // a decision is a suggestion which is definitive
         let decisions = props.student["suggestions"].filter(suggestion => suggestion["definitive"])
-        if (decisions.length !== 0) {
-          setDecision(decisions[0]["decision"]);
-        } else {
-          setDecision(-1);
-        }
+          if (decisions) {
+            (decisions.length === 0)? setDecision(-1): setDecision(decisions[0]["decision"]);
+            (decisions.length === 0)? prevDecision = -1: prevDecision = decisions[0]["decision"];
+          }
     }
   });
 
@@ -48,7 +48,6 @@ export default function StudentListelement(props) {
     if (decision === -1) {
       return "white";
     }
-
     let colors = ["var(--no_red_20)", "var(--maybe_yellow_20)", "var(--yes_green_20)"];
     return colors[decision];
   }

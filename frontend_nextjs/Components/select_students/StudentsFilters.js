@@ -27,27 +27,19 @@ export default function StudentsFilters(props) {
   })
 
   // get the decision for the student (yes, maybe, no or undecided)
-  function getDecision(studentDecision) {
-    if (studentDecision === -1) {
-      return "Undecided";
-    }
-    let possibleDecisions = ["No", "Maybe", "Yes"];
-    return possibleDecisions[studentDecision];
-  }
+
 
   function filterStudents() {
+    let filteredStudents = props.students
+    let decisionNumbers = decision.map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
     if (decision.length !== 0) {
-      props.setStudents(props.students.filter(student => {
+      filteredStudents = filteredStudents.filter(student => {
         let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
-        let decisionNumber;
-        if (decisions.length === 0) {
-          decisionNumber = -1;
-        } else {
-          decisionNumber = decisions[0]["decision"];
-        }
-        return decision.includes(getDecision(decisionNumber));
-      }))
+        let decisionNumber = (decisions.length === 0)? -1: decisions[0]["decision"];
+        return decisionNumbers.includes(decisionNumber);
+      })
     }
+    props.setVisibleStudents(filteredStudents);
   }
 
   // called when pressed on "reset filters"
@@ -104,7 +96,9 @@ export default function StudentsFilters(props) {
       }
 
       return shownSkills.map((skill, index) =>
-        <StudentsFilter filter_id={skill.id} filter_text={skill.name} onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)}/>
+        <StudentsFilter filter_id={skill.id} filter_text={skill.name}
+                        value={chosenSkills.includes(skill.name)}
+                        onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)}/>
       );
     }
     return null;
@@ -165,13 +159,13 @@ export default function StudentsFilters(props) {
         <Col><h3>Decision</h3></Col>
       </Row>
 
-      <StudentsFilter filter_id="yes-checkbox" filter_text="Yes"
+      <StudentsFilter filter_id="yes-checkbox" filter_text="Yes" value={decision.includes("yes")}
                       onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)}/>
-      <StudentsFilter filter_id="maybe-checkbox" filter_text="Maybe"
+      <StudentsFilter filter_id="maybe-checkbox" filter_text="Maybe" value={decision.includes("maybe")}
                       onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
-      <StudentsFilter filter_id="no-checkbox" filter_text="No"
+      <StudentsFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
                       onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
-      <StudentsFilter filter_id="undecided-checkbox" filter_text="Undecided"
+      <StudentsFilter filter_id="undecided-checkbox" filter_text="Undecided" value={decision.includes("undecided")}
                       onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
 
     </Col>

@@ -16,6 +16,7 @@ export default function SelectStudents() {
 
     // These constants are initialized empty, the data will be inserted in useEffect
     const [students, setStudents] = useState(undefined);
+    const [visibleStudent, setVisibleStudents] = useState(undefined);
     const studentId = router.query.studentId;
     const [searchChanged, setSearchChanged] = useState(false);
 
@@ -43,11 +44,11 @@ export default function SelectStudents() {
         <Row className="remaining_height fill_width">
             <Col className="fill_height">
                 <Row className="fill_height">
-                    {(! studentId) ? <StudentsFilters students={students} setStudents={setStudents}/> : null}
+                    {(! studentId) ? <StudentsFilters students={students} setVisibleStudents={setVisibleStudents}/> : null}
                     <Col className="fill_height students-list-paddingtop">
                         <SearchSortBar setSearchChanged={setSearchChanged}/>
                          <Row className="student-list-positioning">
-                             <StudentList students={students}/>
+                             <StudentList students={visibleStudent}/>
                          </Row>
                     </Col>
                     {(studentId) ? <StudentDetails student_id={studentId}/> : null}
