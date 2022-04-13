@@ -21,6 +21,7 @@ export default function SelectStudents() {
 
     // These variables are used to notice if search or filters have changed
     let [search, setSearch] = useState("");
+    let [sortby, setSortby] = useState("");
     const [localFilters, setLocalFilters] = useState([0, 0, 0]);
 
     // These constants represent the filters
@@ -32,10 +33,11 @@ export default function SelectStudents() {
     const { data: session, status } = useSession()
     useEffect(() => {
         if (session) {
-            if ((!students) || (router.query.search !== search)) {
+            if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
                 setSearch(router.query.search);
+                setSortby(router.query.sortby);
 
-                console.log(router.query.search)
+                setStudents(undefined);
 
                 // the urlManager returns the url for the list of students
                 urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
@@ -67,6 +69,10 @@ export default function SelectStudents() {
             }
         }
     })
+
+    async function retrieveStudents() {
+
+    }
 
     function filterStudentsFilters(filteredStudents) {
         return filteredStudents;
