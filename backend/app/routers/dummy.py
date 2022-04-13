@@ -1,5 +1,3 @@
-from fastapi import APIRouter, Depends
-
 from app.crud import update
 from app.database import get_session
 from app.models.answer import Answer
@@ -10,12 +8,12 @@ from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.skill import Skill
 from app.models.student import Student
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.models.suggestion import SuggestionOption, Suggestion
-from app.models.user import UserRole, User
+from app.models.suggestion import Suggestion, SuggestionOption
+from app.models.user import User, UserRole
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/dummy")
 
@@ -32,7 +30,8 @@ class StudentsGenerator:
 
     students = []  # this will be filled in once generate() is called
 
-    names = []
+    firstnames = []
+    lastnames = []
     emails = []
     phonenumbs = []
     first_languages = []
@@ -41,12 +40,13 @@ class StudentsGenerator:
     degree_types = []
 
     def __init__(self):
-        self.add_entry("Quinten Vervynck", "vervycnk.quinten@gmail.com", "00320000000001", "Dutch", 4, "Computer Science", "Bachelor")
-        self.add_entry("Jeremy Anderson", "jeremy.anderson@hotmail.com", "00320000000002", "English (British)", 4, "Computer Science", "Master")
+        self.add_entry("Quinten", "Vervynck", "vervycnk.quinten@gmail.com", "00320000000001", "Dutch", 4, "Computer Science", "Bachelor")
+        self.add_entry("Jeremy", "Anderson", "jeremy.anderson@hotmail.com", "00320000000002", "English (British)", 4, "Computer Science", "Master")
 
-    def add_entry(self, name, email, pn, fl, le, study, dregree_type):
+    def add_entry(self, firstname, lastname, email, pn, fl, le, study, dregree_type):
         self.entries += 1
-        self.names.append(name)
+        self.firstnames.append(firstname)
+        self.lastnames.append(lastname)
         self.emails.append(email)
         self.phonenumbs.append(pn)
         self.first_languages.append(fl)
@@ -60,16 +60,18 @@ class StudentsGenerator:
     async def generate(self, edition, session):
         # studies, type of degree, level of english, suggestions, de vragen die horen bij practical problems, skills
         # Questions
-        question_name = Question(question="What is your name", field_id="")
-        question_email = Question(question="What is your email", field_id="")
-        question_phonenumb = Question(question="What is your phone number", field_id="")
-        question_first_lang = Question(question="What is your first language", field_id="")
-        question_level_english = Question(question="What is your level of English", field_id="")
-        question_studies = Question(question="What do/did you study?", field_id="")
-        question_type_degree = Question(question="What kind of diploma are you currently going for?", field_id="")
+        question_firstname = Question(question="What is your first name", field_id="", edition=edition.year)
+        question_lastname = Question(question="What is your last name", field_id="", edition=edition.year)
+        question_email = Question(question="What is your email", field_id="", edition=edition.year)
+        question_phonenumb = Question(question="What is your phone number", field_id="", edition=edition.year)
+        question_first_lang = Question(question="What is your first language", field_id="", edition=edition.year)
+        question_level_english = Question(question="What is your level of English", field_id="", edition=edition.year)
+        question_studies = Question(question="What do/did you study?", field_id="", edition=edition.year)
+        question_type_degree = Question(question="What kind of diploma are you currently going for?", field_id="", edition=edition.year)
 
         # Mappings: (question, datalist, tag)
-        pairs = [(question_name, self.names, "name"),
+        pairs = [(question_firstname, self.firstnames, "firstname"),
+                 (question_lastname, self.lastnames, "lastname"),
                  (question_email, self.emails, "email"),
                  (question_phonenumb, self.phonenumbs, "phone number"),
                  (question_first_lang, self.first_languages, "first language"),
@@ -79,7 +81,7 @@ class StudentsGenerator:
 
         # Store (question, tag) pairs
         for pair in pairs:
-            await update(QuestionTag(question=pair[0], edition=edition.year, tag=pair[2]), session)
+            await update(QuestionTag(question=pair[0], edition=edition.year, tag=pair[2], showInList=True), session)
 
         # Store question, answer) pairs: answer is derived from datalist
         for i in range(self.entries):

@@ -1,23 +1,24 @@
-import React, {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
+import React, { useEffect, useState } from "react";
+import { getJson } from "../utils/json-requests";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
 import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
 import ChangeName from "../Components/settings/ChangeName";
 import ChangeEmail from "../Components/settings/ChangeEmail";
 import SettingCards from "../Components/settings/SettingCards";
-import {Accordion} from "react-bootstrap";
+import { Accordion } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
-import {log} from "../utils/logger";
-import {urlManager} from "../utils/ApiClient";
+import { log } from "../utils/logger";
+import { urlManager } from "../utils/ApiClient";
 import ChangeTheme from "../Components/settings/ChangeTheme";
 import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import edition from "/public/assets/edition.png"
+import QuestionTags from "../Components/settings/QuestionTags";
 
 export default function Settings(props) {
     const [user, setUser] = useState(undefined);
@@ -31,9 +32,9 @@ export default function Settings(props) {
 
 
     useEffect(() => {
-        if((user === undefined || name === "" || email === "") &&  ! loading){
+        if ((user === undefined || name === "" || email === "") && !loading) {
             setLoading(true)
-            urlManager.getUsers().then(users_url =>{
+            urlManager.getUsers().then(users_url => {
                 getJson(users_url + "/me").then(res => {
                     log(res.data)
                     setUser(res.data);
@@ -50,14 +51,14 @@ export default function Settings(props) {
     //TODO make this actually change the theme
     const changeTheme = (event) => {
         event.preventDefault()
-        setDarkTheme(! darkTheme)
+        setDarkTheme(!darkTheme)
     }
 
     function clickAdminSettings() {
         setInitializeUsers(true);
     }
 
-    return(
+    return (
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
                 <AccordionItem eventKey="0">
@@ -67,28 +68,38 @@ export default function Settings(props) {
                     <AccordionBody>
                         <div className="personal-settings">
                             <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
-                                <ChangePassword/>
+                                <ChangePassword />
                             </SettingCards>
                             <SettingCards image={change_email_image} title={"Change email"} subtitle={"Change to a different email-adress"}>
-                                <ChangeEmail email={email}/>
+                                <ChangeEmail email={email} />
                             </SettingCards>
                             <SettingCards image={change_name_image} title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
-                                <ChangeName user={user}/>
+                                <ChangeName user={user} />
                             </SettingCards>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
+                        <h3>Question Tags</h3>
+                    </AccordionHeader>
+                    <AccordionBody>
+                        <div className="personal-settings">
+                            <QuestionTags />
+                        </div>
+                    </AccordionBody>
+                </AccordionItem>
+                <AccordionItem eventKey="2">
+                    <AccordionHeader>
                         <h3>Website settings</h3>
                     </AccordionHeader>
                     <AccordionBody>
                         <div className="personal-settings">
                             <SettingCards image={dark_theme} title={"Dark theme"} subtitle={"Customize the layout of the website to reduce the glow and calm your eyes"}>
-                               <ChangeTheme/>
+                                <ChangeTheme />
                             </SettingCards>
                             <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
-                                <EditionDropdownButton/>
+                                <EditionDropdownButton />
                             </SettingCards>
                         </div>
                     </AccordionBody>
@@ -100,7 +111,7 @@ export default function Settings(props) {
                         </AccordionHeader>
                         <AccordionBody>
                             <div className="admin-settings">
-                                <ManageUsers me={user} initialize={initializeUsers}/>
+                                <ManageUsers me={user} initialize={initializeUsers} />
                             </div>
                         </AccordionBody>
                     </AccordionItem>

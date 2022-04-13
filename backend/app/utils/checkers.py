@@ -52,9 +52,10 @@ class EditionChecker:
         (edition,) = res.one()
 
         if user.role not in self.always_allowed:
-            if not edition:
-                raise EditionNotFound()
             if user not in edition.coaches:
                 raise NotPermittedException()
+
+        if not edition:
+            raise EditionNotFound()
 
         return edition

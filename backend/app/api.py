@@ -11,7 +11,8 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from app.config import config
 from app.database import init_db, disconnect_db
 from app.exceptions.base_exception import BaseException
-from app.routers import auth, editions, projects, students, users, reset_password, user_invites, dummy, ddd, skills
+from app.routers import (auth, ddd, dummy, editions, projects, reset_password,
+                         skills, students, tally, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -50,7 +51,8 @@ app.include_router(projects.router)
 app.include_router(skills.router)
 app.include_router(students.router)
 # app.include_router(suggestions.router)
-# app.include_router(tally.router)
+app.include_router(tally.router)
+# app.include_router(user_invites.router)
 app.include_router(user_invites.router)
 app.include_router(reset_password.router)
 app.include_router(users.router)
