@@ -90,30 +90,38 @@ export default function StudentListelement(props) {
 
   // The html representation of a list-element
   return (
-    <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
-      onClick={() => studentDetails()}>
-      <Row className="upper-layer">
-        <Col id="name" className="name" md="auto">{student["first name"]} {student["last name"]}</Col>
-        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
-          No practical problems
-        </Col>
-        <Col />
-        <Col md="auto">
-          <Row md="auto">
-            <Col className="suggestions" md="auto">Suggestions:</Col>
-            <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
-          </Row>
-        </Col>
-      </Row>
+    <div>
+      {Object.keys(student).length &&
+        <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
+          onClick={() => studentDetails()}>
+          <Row className="upper-layer">
 
-      <Row id="info" className="info">
-        <GeneralInfo student={student} tags={props.tags} decision={getDecision()} />
-        <Col id="skills" align="right" className="skills">
-          <ul>
-            {getSkills()}
-          </ul>
-        </Col>
-      </Row>
-    </Container>
+            <Col id="name" className="name" md="auto">{student["mandatory"]["first name"]} {student["mandatory"]["last name"]}</Col>
+
+            <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
+              No practical problems
+            </Col>
+            <Col />
+            <Col md="auto">
+              <Row md="auto">
+                <Col className="suggestions" md="auto">Suggestions:</Col>
+                <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
+              </Row>
+            </Col>
+          </Row>
+
+          <Row id="info" className="info">
+            <GeneralInfo student={student} listelement={true} decision={getDecision()} />
+            <Col id="skills" align="right" className="skills">
+              <ul>
+                {getSkills()}
+              </ul>
+            </Col>
+          </Row>
+        </Container>
+      }
+    </div>
+
+
   )
 }

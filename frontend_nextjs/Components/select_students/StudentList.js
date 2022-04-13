@@ -13,18 +13,6 @@ export default function StudentList(props) {
 
   // This function inserts the data in the variables
   useEffect(async () => {
-    urlManager.getQuestionTags().then(questiontags_url => {
-      getJson(questiontags_url).then(res => {
-        console.log(res)
-
-        Promise.all(res.map(url => getJson(url).then(r => {
-          return r
-        }))).then(values => {
-          setShowInListTags(values.filter(tag => tag.showInList == true));
-        })
-      }
-      )
-    })
     if (!students) {
       setStudents(props.students)
     }
@@ -36,7 +24,7 @@ export default function StudentList(props) {
       return students.map(student =>
         // generate a list of students, each student needs 'student' as a prop
         <li key={student}>
-          <StudentListelement tags={showInListTags} student={student} />
+          <StudentListelement student={student} />
         </li>
       );
     }

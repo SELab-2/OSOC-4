@@ -201,7 +201,7 @@ export default function StudentDetails(props) {
       <Row className="remaining-height-details" md="auto" style={{}}>
         <Col md="auto" className="fill_height scroll-overflow student-details">
           <Row md="auto" className="decision">
-            <GeneralInfo tags={tags} student={student} decision={getDecision()} />
+            <GeneralInfo listelement={false} student={student} decision={getDecision()} />
           </Row>
           <Row md="auto">
             <Button className="send-email-button" disabled={decision === -1} onClick={() => setEmailPopUpShow(true)}>
