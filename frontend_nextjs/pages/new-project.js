@@ -34,10 +34,8 @@ export default function NewProjects() {
                     log(res)
                     if(res){
                         // scuffed way to get unique skills (should be fixed in backend soon)
-                        let uniq = [...new Set(res.map(skill => skill))];
-                        log(uniq)
                         let array = [];
-                        uniq.map(skill => array.push({"value":skill, "name":skill}));
+                        res.map(skill => array.push({"value":skill, "name":skill}));
                         setSkills(array);
                     }
                 })
