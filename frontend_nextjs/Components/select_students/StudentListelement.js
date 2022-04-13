@@ -89,7 +89,7 @@ export default function StudentListelement(props) {
     <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
       onClick={() => studentDetails()}>
       <Row className="upper-layer">
-        <Col id="name" className="name" md="auto">{props.student["first name"]} {props.student["last name"]}</Col>
+        <Col id="name" className="name" md="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
         <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
           No practical problems
         </Col>

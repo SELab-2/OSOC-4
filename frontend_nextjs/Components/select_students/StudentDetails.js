@@ -141,7 +141,7 @@ export default function StudentDetails(props) {
         <Col md="auto">
           <Row>
             <Col md="auto" className="name_big">
-              {student["first name"]} {student["last name"]}
+              {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
             </Col>
             <Col>
               <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
