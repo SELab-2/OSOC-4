@@ -12,35 +12,11 @@ export default function StudentsFilters(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [allSkills, setAllSkills] = useState([]);
-  const [filtersChanged, setFiltersChanged] = useState(true);
+  const setFiltersChanged = props.setFiltersChanged;
 
-  // These constants represent the filters
-  const filters = (router.query.filters)? router.query.filters.split(","): [];
-  const chosenSkills = (router.query.skills)? router.query.skills.split(","): [];
-  const decision = (router.query.decision)? router.query.decision.split(","): [];
-
-  useEffect(() => {
-    if (props.students && filtersChanged) {
-      setFiltersChanged(false);
-      filterStudents();
-    }
-  })
-
-  // get the decision for the student (yes, maybe, no or undecided)
-
-
-  function filterStudents() {
-    let filteredStudents = props.students
-    let decisionNumbers = decision.map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
-    if (decision.length !== 0) {
-      filteredStudents = filteredStudents.filter(student => {
-        let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
-        let decisionNumber = (decisions.length === 0)? -1: decisions[0]["decision"];
-        return decisionNumbers.includes(decisionNumber);
-      })
-    }
-    props.setVisibleStudents(filteredStudents);
-  }
+  const filters = props.filters;
+  const chosenSkills = props.chosenSkills;
+  const decision = props.decision;
 
   // called when pressed on "reset filters"
   function resetFilters() {
