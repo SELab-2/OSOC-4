@@ -75,3 +75,17 @@
     left: 0;
     right: 0;
 }
+
+.search-button {
+    align-self: center;
+    background-color: rgba(0,0,0,0);
+    border-width: 0;
+    margin: 7px;
+}
+
+.reset-search-button {
+    align-self: center;
+    background-color: rgba(0,0,0,0);
+    border-width: 0;
+    padding: 9px;
+}
