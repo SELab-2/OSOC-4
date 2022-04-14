@@ -1,18 +1,19 @@
 import json
 
 from app.crud import read_where, update
-from app.database import get_session
+from app.database import get_session, websocketManager
 from app.exceptions.suggestion_exception import SuggestionNotFound
 from app.models.suggestion import (Suggestion, SuggestionCreate,
                                    SuggestionExtended)
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
+from fastapi.routing import APIRouter
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/suggestions")
-
 
 @router.post("/create", response_description="Suggestion created")
 async def create_suggestion(suggestion: SuggestionCreate, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
@@ -27,6 +28,9 @@ async def create_suggestion(suggestion: SuggestionCreate, role: RoleChecker(User
     for key, value in new_suggestion_data.items():
         setattr(old_suggestion, key, value)
     await update(old_suggestion, session)
+
+    await websocketManager.broadcast({"id": old_suggestion.id, "suggestion": jsonable_encoder(SuggestionExtended.parse_raw(old_suggestion.json()))})
+
 
 @router.get("/{id}", response_description="Suggestion with id retrieved")
 async def get_suggestion_with_id(id: int, session: AsyncSession = Depends(get_session)):

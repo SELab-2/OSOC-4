@@ -5,10 +5,11 @@ import { Col, Form, Row } from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
-import { urlManager } from "../utils/ApiClient";
+import { websocketManager, urlManager } from "../utils/ApiClient";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
+import { WebSocketManager } from "../utils/ApiClient"
 
 // The page corresponding with the 'select students' tab
 export default function SelectStudents() {
@@ -28,8 +29,23 @@ export default function SelectStudents() {
     (router.query.skills) ? router.query.skills.split(",") : [],
     (router.query.decision) ? router.query.decision.split(",") : []]
 
+    const [ws, setWs] = useState(undefined);
+
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
+
+    useEffect(() => {
+        if (ws) {
+            ws.onmessage = (event) => updateFromWebsocket(event);
+        } else {
+            const new_ws = new WebSocket("ws://localhost:8000/ws")
+            new_ws.onmessage = (event) => updateFromWebsocket(event);
+            setWs(new_ws);
+
+        }
+
+    }, [students])
+
     useEffect(() => {
         if (session) {
             if ((!students) || (router.query.search !== search)) {
@@ -64,6 +80,19 @@ export default function SelectStudents() {
             }
         }
     })
+
+    const updateFromWebsocket = (event) => {
+        let data = JSON.parse(event.data)
+        console.log(students)
+        students.find((o, i) => {
+            if (o["id"] === data["suggestion"]["student_id"]) {
+                let new_students = [...students]
+                new_students[i]["suggestions"][data["id"]] = data["suggestion"];
+                setStudents(new_students);
+                return true; // stop searching
+            }
+        });
+    }
 
     function filterStudentsFilters(filteredStudents) {
         return filteredStudents;

@@ -51,11 +51,11 @@ export default function StudentDetails(props) {
         setStudent(res);
 
         // Fill in the suggestions field, this contains all the suggestions which are not definitive
-        setSuggestions(res["suggestions"].filter(suggestion => !suggestion["definitive"]));
+        setSuggestions(res["suggestions"]);
 
         // Fill in the decisions field, this contains the decision for the student if there is one,
         // this decision is stored as a suggestion which is definitive
-        let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"]);
+        let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
         } else {
@@ -81,7 +81,7 @@ export default function StudentDetails(props) {
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {
-    return suggestions.filter(suggestion => suggestion["decision"] === decision).length;
+    return Object.values(suggestions).filter(suggestion => suggestion["decision"] === decision).length;
   }
 
   // returns a list of html suggestions, with the correct css classes.
@@ -90,8 +90,8 @@ export default function StudentDetails(props) {
     let result = [];
     const classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
 
-    for (let i = 0; i < suggestions.length; i++) {
-      let suggestion = suggestions[i];
+    for (let i = 0; i < Object.values(suggestions).length; i++) {
+      let suggestion = Object.values(suggestions)[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
       result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames} />)
     }

@@ -1,7 +1,7 @@
 import inspect
 import re
 
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
@@ -9,11 +9,11 @@ from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app.config import config
-from app.database import disconnect_db, init_db
+from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
 from app.routers import (auth, ddd, dummy, editions, projects, reset_password,
                          skills, students, suggestions, tally, user_invites,
-                         users)
+                         users, websocket)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -67,6 +67,17 @@ async def my_exception_handler(request: Request, exception: BaseException):
 @app.exception_handler(AuthJWTException)
 async def auth_exception_handler(request: Request, exception: AuthJWTException):
     return JSONResponse(status_code=exception.status_code, content={"message": exception.message})
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocketManager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+    except WebSocketDisconnect as e:
+        websocketManager.disconnect(websocket)
+        print(e)
 
 
 def custom_openapi():

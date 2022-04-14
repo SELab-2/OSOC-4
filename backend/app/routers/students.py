@@ -49,16 +49,12 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session), 
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
 
-    suggestions = []
-    suggestion_count = {0: 0, 1: 0, 2: 0}
+    suggestions = {}
     info["own_suggestion"] = None
     for (s,) in student_info:
-        suggestion_count[s.decision] += 1
-        suggestions.append(SuggestionExtended.parse_raw(s.json()))
+        suggestions[s.id] = SuggestionExtended.parse_raw(s.json())
         if s.suggested_by_id == Authorize.get_jwt_subject():
             info["own_suggestion"] = MySuggestionOut.parse_raw(s.json())
-
-    info["suggestion_counts"] = suggestion_count
     info["suggestions"] = suggestions
 
 

@@ -18,7 +18,7 @@ export default function StudentListelement(props) {
   useEffect(() => {
     if (props.student["suggestions"] && (decision === -2 || prevDecision !== decision)) {
       // a decision is a suggestion which is definitive
-      let decisions = props.student["suggestions"].filter(suggestion => suggestion["definitive"])
+      let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"])
       if (decisions) {
         (decisions.length === 0) ? setDecision(-1) : setDecision(decisions[0]["decision"]);
         (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
@@ -79,11 +79,10 @@ export default function StudentListelement(props) {
 
   // get the suggestion count for a certain decision ("yes", "maybe" or "no")
   function getSuggestions(decision) {
-    if (props.student["suggestion_counts"]) {
-      return props.student["suggestion_counts"][decision]
+    if (!props.student["suggestions"]) {
+      return 0;
     }
-    return 0;
-
+    return Object.values(props.student["suggestions"]).filter(suggestion => !suggestion["definitive"] && suggestion["decision"] === decision).length
   }
 
   // The html representation of a list-element
