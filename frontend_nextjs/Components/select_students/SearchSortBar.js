@@ -10,8 +10,8 @@ export default function SearchSortBar(props) {
 
   const router = useRouter();
 
-  const [search, setSearch] = useState((router.query.search)? router.query.search: "");
-  const sortby = (router.query.sortby)? router.query.sortby: "name_asc";
+  const [search, setSearch] = useState((router.query.search) ? router.query.search : "");
+  const sortby = (router.query.sortby) ? router.query.sortby : "name_asc";
 
   function sort(value) {
     let newQuery = router.query;
@@ -19,7 +19,7 @@ export default function SearchSortBar(props) {
     router.push({
       pathname: router.pathname,
       query: newQuery
-    }, undefined, { shallow: true});
+    }, undefined, { shallow: true });
   }
 
   function doSearch() {
@@ -28,7 +28,7 @@ export default function SearchSortBar(props) {
     router.push({
       pathname: router.pathname,
       query: newQuery
-    }, undefined, {shallow: true});
+    }, undefined, { shallow: true });
   }
 
   // return html representation of the suggestion counts for a student
@@ -63,7 +63,7 @@ export default function SearchSortBar(props) {
           <select className="dropdown-sortby" id="dropdown-decision" value={sortby}
                   onChange={(ev) => sort(ev.target.value)}>
             <option value={"firstname+asc,lastname+asc"}>Name A-Z</option>
-            <option value={"firstname+dc,lastname+dc"}>Name Z-A</option>
+            <option value={"firstname+dc,lastname+desc"}>Name Z-A</option>
           </select>
         </Col>
     </Row>
