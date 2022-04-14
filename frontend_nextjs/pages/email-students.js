@@ -9,10 +9,14 @@ import SearchSortBar from "../Components/select_students/SearchSortBar";
 import EmailStudentsFilters from "../Components/email-students/EmailStudentsFilters";
 import EmailStudentsTable from "../Components/email-students/EmailStudentsTable";
 import {filterStudents} from "./select-students";
+import SendEmailsPopUpWindow from "../Components/email-students/SendEmailsPopUpWindow";
 
 // The page corresponding with the 'select students' tab
 export default function EmailStudents() {
   const router = useRouter();
+
+  // These constant define wheater the pop-up windows should be shown or not
+  const [sendEmailsPopUpShow, setSendEmailsPopUpShow] = useState(false);
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [students, setStudents] = useState(undefined);
@@ -80,6 +84,9 @@ export default function EmailStudents() {
   // the html that displays the overview of students
   return (
     <Row className="remaining_height fill_width">
+
+      <SendEmailsPopUpWindow popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow} students={receivers} />
+
       <Col className="fill_height">
         <Row className="fill_height">
           <EmailStudentsFilters students={students} filters={filters} />
@@ -96,7 +103,8 @@ export default function EmailStudents() {
             <Row className="send-emails-positioning">
               <Col/>
               <Col md="auto">
-                <Button className="send-emails-button" disabled={! receivers || ! receivers.length}>Send emails</Button>
+                <Button className="send-emails-button" disabled={! receivers || ! receivers.length}
+                        onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button>
               </Col>
             </Row>
           </Col>

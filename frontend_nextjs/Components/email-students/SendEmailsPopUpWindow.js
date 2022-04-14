@@ -1,7 +1,11 @@
-import {Button, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
+import {Button, Col, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
+import StudentsFilter from "../select_students/StudentFilter";
+import {useState} from "react";
 
 // This view shows the pop up window when making a decision about a student.
 export default function SendEmailsPopUpWindow(props) {
+
+  const [defaultEmail, setDefaultEmail] = useState(true);
 
   // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
@@ -27,19 +31,33 @@ export default function SendEmailsPopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Send &apos;{getDecisionString()}&apos; email to {props.student["name"]}
+          Send mails to...
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
-        <Row>
-          Message to {props.student["name"]}:
+        <Row className="send-email-names">
+          {(props.students)? props.students.map(student => student.mandatory["first name"] + " " +
+            student.mandatory["last name"]).join(", ") : null}
         </Row>
         <Row>
-          <textarea id="decision-email" className={"fill_width suggestion-reason "} defaultValue="default email"/>
+          <h5 className="content-title">Content</h5>
+        </Row>
+        <StudentsFilter filter_id="default-email" filter_text="Use default emails" value={defaultEmail}
+                        onChange={ev => setDefaultEmail(true)}/>
+        <StudentsFilter filter_id="own-email" filter_text="Type your email here:" value={! defaultEmail}
+                        onChange={ev => setDefaultEmail(false)}/>
+        <Row>
+          <Col/>
+          <Col md="auto" className={"email-help-text " + ((defaultEmail)? "disabled-text": null)}>
+            (Use @Name, @Firstname, @Lastname, @Decision to address the receiver)
+          </Col>
+        </Row>
+        <Row>
+          <textarea id="student-emails" className="fill_width send-emails" disabled={defaultEmail}/>
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Close</Button>
+        <Button variant="secondary" onClick={onHide}>Cancel</Button>
         <Button variant="primary" onClick={submitEmail}>Submit</Button>
       </Modal.Footer>
     </Modal>

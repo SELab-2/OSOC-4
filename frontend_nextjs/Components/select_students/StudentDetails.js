@@ -32,7 +32,7 @@ export default function StudentDetails(props) {
   const [decision, setDecision] = useState(-1);
   const [questionAnswers, setQuestionAnswers] = useState([])
 
-  // These constant define wheater the pop-up windows should be shown or not
+  // These constants define wheater the pop-up windows should be shown or not
   const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
   const [decisionPopUpShow, setDecisionPopUpShow] = useState(false);
   const [emailPopUpShow, setEmailPopUpShow] = useState(false);

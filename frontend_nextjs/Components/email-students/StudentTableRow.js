@@ -22,7 +22,7 @@ export default function StudentTableRow(props) {
     if (! decisionSuggestion) {
       return "Undecided"
     }
-    return ["no", "maybe", "yes"][decisionSuggestion["decision"]]
+    return ["No", "Maybe", "Yes"][decisionSuggestion["decision"]]
   }
 
   function getEmailSent() {

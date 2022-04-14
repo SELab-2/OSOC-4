@@ -31,6 +31,21 @@
     margin-right: 20px;
 }
 
-.change-emails-button {
+.content-title {
+    padding-left: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
+.send-emails {
+    height: 120px;
+}
+
+.email-help-text {
+    font-size: 13px;
+    margin-top: -10px;
+}
+
+.send-email-names {
+    font-size: 18px;
 }
