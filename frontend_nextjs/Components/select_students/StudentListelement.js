@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getJson } from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
@@ -8,20 +9,22 @@ import SuggestionsCount from "./SuggestionsCount";
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [decision, setDecision] = useState(-2);
-  let prevDecision = -2;
+  const [student, setStudent] = useState({});
+  const [decision, setDecision] = useState(-1);
+
 
   const router = useRouter()
 
   // This function inserts the data in the variables
   useEffect(() => {
-    if (props.student["suggestions"] && (decision === -2 || prevDecision !== decision)) {
-      // a decision is a suggestion which is definitive
-      let decisions = props.student["suggestions"].filter(suggestion => suggestion["definitive"])
-      if (decisions) {
-        (decisions.length === 0) ? setDecision(-1) : setDecision(decisions[0]["decision"]);
-        (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
-      }
+    if (!Object.keys(student).length) {
+      getJson(props.student).then(res => {
+        setStudent(res);
+        let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"])
+        if (decisions.length !== 0) {
+          setDecision(decisions[0]["decision"]);
+        }
+      })
     }
   });
 
@@ -78,10 +81,10 @@ export default function StudentListelement(props) {
 
   // get the suggestion count for a certain decision ("yes", "maybe" or "no")
   function getSuggestions(decision) {
-    if (!props.student["suggestions"]) {
+    if (!student["suggestion_counts"]) {
       return 0;
     }
-    return props.student["suggestions"].filter(suggestion => !suggestion["definitive"] && suggestion["decision"] === decision).length
+    return student["suggestion_counts"][decision]
   }
 
   // The html representation of a list-element
