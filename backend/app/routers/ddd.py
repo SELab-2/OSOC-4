@@ -1,9 +1,7 @@
 from random import choice, randrange, sample
 
-from sqlalchemy import inspect
-
-from app.crud import update, read_all_where, clear_data
-from app.database import get_session, engine
+from app.crud import update, clear_data
+from app.database import get_session
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
