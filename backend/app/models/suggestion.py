@@ -13,14 +13,15 @@ class SuggestionOption(int, Enum):
 
 
 class Suggestion(SQLModel, table=True):
-    mail_sent: bool = Field(default=False)
+    # mail_sent: bool = Field(default=False)
     id: Optional[int] = Field(default=None, primary_key=True)
     decision: SuggestionOption
-    definitive: bool
+    definitive: bool = False
     reason: str
 
     student_id: int = Field(foreign_key="student.id")
     suggested_by_id: int = Field(foreign_key="user.id")
+
     project_id: Optional[int] = Field(default=None, foreign_key="project.id")
     skill_name: Optional[str] = Field(default=None, foreign_key="skill.name")
 
@@ -36,12 +37,18 @@ class SuggestionCreate(BaseModel):
     reason: str
 
     student_id: int
-    project_id: int
-    skill_name: str
+    project_id: Optional[int]
+    suggested_by_id: Optional[int]
+    # skill_name: str
 
+class MySuggestionOut(BaseModel):
+    decision: int
+    definitive: bool
+    reason: str
+
+    project_id: Optional[int]
 
 class SuggestionExtended(BaseModel):
-    mail_sent: bool
     decision: int
     definitive: bool
     reason: str
@@ -49,7 +56,7 @@ class SuggestionExtended(BaseModel):
     student_id: str
     suggested_by_id: str
     project_id: str
-    skill_name: str
+    # skill_name: str
 
     def __init__(self, **data):
         data["student_id"] = f"{config.api_url}students/{str(data['student_id'])}"

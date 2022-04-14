@@ -5,10 +5,12 @@ from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
-from app.models.suggestion import Suggestion, SuggestionExtended
+from app.models.suggestion import (MySuggestionOut, Suggestion,
+                                   SuggestionExtended)
 from app.models.user import UserRole
-from app.utils.checkers import RoleChecker
+from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Depends
+from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
@@ -18,7 +20,7 @@ router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
 @router.get("/{student_id}", response_description="Student retrieved")
-async def get_student(student_id, session: AsyncSession = Depends(get_session)):
+async def get_student(student_id, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
     """get_student get the Student instances with id from the database
 
     :return: student with id
@@ -27,6 +29,9 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
 
     # student info
     info = {"id": f"{config.api_url}students/{student_id}"}
+
+    info["id_int"] = student_id
+
     # student info from tags
     r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer).select_from(Student).where(Student.id == int(student_id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
     student_info = r.all()
@@ -44,14 +49,18 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
 
-    suggestions = [] 
+    suggestions = []
     suggestion_count = {0: 0, 1: 0, 2: 0}
+    info["own_suggestion"] = None
     for (s,) in student_info:
         suggestion_count[s.decision] += 1
         suggestions.append(SuggestionExtended.parse_raw(s.json()))
+        if s.suggested_by_id == Authorize.get_jwt_subject():
+            info["own_suggestion"] = MySuggestionOut.parse_raw(s.json())
 
     info["suggestion_counts"] = suggestion_count
     info["suggestions"] = suggestions
+
 
     return info
 

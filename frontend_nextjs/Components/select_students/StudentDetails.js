@@ -128,11 +128,18 @@ export default function StudentDetails(props) {
     )
   }
 
+  function updateSuggestion(suggestion) {
+    setStudent(prevState => ({
+      ...prevState,
+      ["own_suggestion"]: suggestion
+    }));
+  }
+
   // returns the html for student details
   return (
     <Col className="fill_height student-details-window" style={{ visibility: props.visibility }} >
 
-      <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} decision={suggestion} student={student} />
+      <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
       <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
       <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
       <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
@@ -156,13 +163,13 @@ export default function StudentDetails(props) {
         <Col />
         <Col md="auto">
           <Row>
-            <Col md="auto"><button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>
+            <Col md="auto"><button className={`suggest-yes-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 2 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(2)}>
               Suggest yes</button>
             </Col>
-            <Col md="auto"><button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>
+            <Col md="auto"><button className={`suggest-maybe-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 1 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(1)}>
               Suggest maybe</button>
             </Col>
-            <Col md="auto"><button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>
+            <Col md="auto"><button className={`suggest-no-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 0 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(0)}>
               Suggest no</button>
             </Col>
             <Col md="auto" className="close-button">
@@ -186,7 +193,7 @@ export default function StudentDetails(props) {
             </Col>
           </Row>
         </Col>
-      </Row>
+      </Row >
       <Row className="remaining-height-details" md="auto" style={{}}>
         <Col md="auto" className="fill_height scroll-overflow student-details">
           <Row md="auto" className="decision">
@@ -210,6 +217,6 @@ export default function StudentDetails(props) {
         </Col>
       </Row>
 
-    </Col>
+    </Col >
   )
 }
