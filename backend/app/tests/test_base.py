@@ -8,12 +8,11 @@ from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import app
-from app.crud import read_where, update
+from app.crud import read_where, update, clear_data
 from app.database import engine
 from app.models.edition import Edition
 from app.models.skill import Skill
 from app.models.user import User, UserRole
-from app.routers.ddd import clear_database
 from app.utils.cryptography import get_password_hash
 
 
@@ -149,7 +148,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             await update(obj, session=self.session)
 
     async def asyncTearDown(self) -> None:
-        await clear_database(self.session)
+        await clear_data(self.session)
 
         await self.lf.__aexit__()
         await self.client.aclose()
