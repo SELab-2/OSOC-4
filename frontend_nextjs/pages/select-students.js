@@ -48,22 +48,26 @@ export default function SelectStudents() {
             if (students &&
                 (localFilters.some((filter, index) => filter !== filters[index].length))) {
                 let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
-                let filteredStudents = students
-                let newLocalFilters = localFilters;
-                for (let i = 0; i < localFilters.length; i++) {
-                    if (filters[i].length !== localFilters[i]) {
-                        newLocalFilters[i] = filters[i].length;
-                        filteredStudents = filterFunctions[i](filteredStudents);
-                    }
-                }
-                setLocalFilters(newLocalFilters);
-                setVisibleStudents(filteredStudents);
+                filterStudents(filterFunctions);
             }
             if (filters.every(filter => filter.length === 0)) {
                 setVisibleStudents(students);
             }
         }
     })
+
+    function filterStudents(filterFunctions) {
+        let filteredStudents = students
+        let newLocalFilters = localFilters;
+        for (let i = 0; i < localFilters.length; i++) {
+            if (filters[i].length !== localFilters[i]) {
+                newLocalFilters[i] = filters[i].length;
+                filteredStudents = filterFunctions[i](filteredStudents);
+            }
+        }
+        setLocalFilters(newLocalFilters);
+        setVisibleStudents(filteredStudents);
+    }
 
     function filterStudentsFilters(filteredStudents) {
         return filteredStudents;

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { getJson } from "../utils/json-requests";
-import StudentsFilters from "../Components/select_students/StudentsFilters";
 import { Col, Row } from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
 import { useRouter } from "next/router";
-import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
+import EmailStudentsFilters from "../Components/email-students/EmailStudentsFilters";
+import EmailStudentsTable from "../Components/email-students/EmailStudentsTable";
 
 // The page corresponding with the 'select students' tab
 export default function EmailStudents() {
@@ -16,7 +16,7 @@ export default function EmailStudents() {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [students, setStudents] = useState(undefined);
-  const [visibleStudent, setVisibleStudents] = useState(undefined);
+  const [visibleStudents, setVisibleStudents] = useState(undefined);
 
   // These variables are used to notice if search or filters have changed
   const [search, setSearch] = useState("");
@@ -38,24 +38,15 @@ export default function EmailStudents() {
               getJson(studentUrl).then(res => res)
             )).then(students => {
               setStudents(students);
-              setLocalFilters([0, 0, 0]);
+              setLocalFilters([0, 0]);
             })
           })
         );
       }
       if (students &&
-        (localFilters.some((filter, index) => filter !== filters[index].length))) {
+        (localFilters.some((filter, index) => filter !== filters[index].length ))) {
         let filterFunctions = [filterStudentsFilters, filterStudentsDecision];
-        let filteredStudents = students;
-        let newLocalFilters = localFilters;
-        for (let i = 0; i < localFilters.length; i++) {
-          if (filters[i].length !== localFilters[i]) {
-            newLocalFilters[i] = filters[i].length;
-            filteredStudents = filterFunctions[i](filteredStudents);
-          }
-        }
-        setLocalFilters(newLocalFilters);
-        setVisibleStudents(filteredStudents);
+        filterStudents(filterFunctions);
       }
       if (filters.every(filter => filter.length === 0)) {
         setVisibleStudents(students);
@@ -63,13 +54,26 @@ export default function EmailStudents() {
     }
   })
 
+  function filterStudents(filterFunctions) {
+    let filteredStudents = students;
+    let newLocalFilters = localFilters;
+    for (let i = 0; i < localFilters.length; i++) {
+      if (filters[i].length !== localFilters[i]) {
+        newLocalFilters[i] = filters[i].length;
+        filteredStudents = filterFunctions[i](filteredStudents);
+      }
+    }
+    setLocalFilters(newLocalFilters);
+    setVisibleStudents(filteredStudents);
+  }
+
   function filterStudentsFilters(filteredStudents) {
     return filteredStudents;
   }
 
   function filterStudentsDecision(filteredStudents) {
-    let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
-    if (filters[2].length !== 0) {
+    let decisionNumbers = filters[1].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
+    if (filters[1].length !== 0) {
       filteredStudents = filteredStudents.filter(student => {
         let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
         let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
@@ -84,11 +88,11 @@ export default function EmailStudents() {
     <Row className="remaining_height fill_width">
       <Col className="fill_height">
         <Row className="fill_height">
-          <StudentsFilters students={students} filters={filters} />
+          <EmailStudentsFilters students={students} filters={filters} />
           <Col className="fill_height students-list-paddingtop">
             <SearchSortBar />
             <Row className="student-list-positioning">
-              <StudentList students={visibleStudent} />
+              <EmailStudentsTable students={visibleStudents} />
             </Row>
           </Col>
         </Row>

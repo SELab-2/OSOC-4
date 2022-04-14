@@ -43,7 +43,6 @@ export default function StudentDetails(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
-
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);

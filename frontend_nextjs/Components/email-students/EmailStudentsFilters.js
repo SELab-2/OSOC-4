@@ -1,4 +1,3 @@
-import {useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "../select_students/StudentFilter";
 import {useRouter} from "next/router";
@@ -42,33 +41,6 @@ export default function EmailStudentsFilters(props) {
     }, undefined, {shallow: true})
   }
 
-  // returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
-  // list depending on extendedRoleList
-  function getSkills() {
-    if (allSkills) {
-      let shownSkills = allSkills;
-
-      if (!extendedRoleList) {
-        shownSkills = allSkills.slice(0, 5);
-      }
-
-      return shownSkills.map((skill, index) =>
-        <StudentsFilter filter_id={skill.id} filter_text={skill.name}
-                        value={chosenSkills.includes(skill.name)}
-                        onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)}/>
-      );
-    }
-    return null;
-  }
-
-  // returns the html representation for the 'more or less' button, the button to show more or less skills
-  function moreOrLessButton() {
-    if (extendedRoleList) {
-      return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
-    }
-    return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
-  }
-
   // The HTML representation of the filters in the 'Select students' tab
   return (
     <Col md="auto" className="filters fill_height scroll-overflow" style={{visibility: props.visibility}}>
@@ -84,33 +56,9 @@ export default function EmailStudentsFilters(props) {
         </Col>
       </Row>
 
-      <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni" value={filters.includes("alumn")}
-                      onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)}/>
-      <StudentsFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers"
-                      value={filters.includes("student-coach")}
-                      onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)}/>
-      <StudentsFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for"
-                      value={filters.includes("not-suggested")}
-                      onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)}/>
-      <StudentsFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
-                      value={filters.includes("unmatched")}
-                      onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)}/>
-      <StudentsFilter filter_id="practical-problems-checkbox" filter_text="Only students without practical problems"
-                      value={filters.includes("practical-problems")}
-                      onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)}/>
-
-      <Row className="filter-title">
-        <Col><h3>Skills</h3></Col>
-      </Row>
-      <Row className="skills-search-filters">
-        <Col>
-          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills" />
-        </Col>
-      </Row>
-      {getSkills()}
-      <Row>
-        <Col>{moreOrLessButton()}</Col>
-      </Row>
+      <StudentsFilter filter_id="correct-email" filter_text="Only students without correct email"
+                      value={filters.includes("no-correct-email")}
+                      onChange={(ev) => addFilter("filters", filters, "no-correct-email", ev.target.checked)}/>
 
       <Row className="filter-title">
         <Col><h3>Decision</h3></Col>
