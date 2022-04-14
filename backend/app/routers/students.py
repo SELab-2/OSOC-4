@@ -43,7 +43,16 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     student_info = r.all()
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
-    info["suggestions"] = [SuggestionExtended.parse_raw(s.json()) for (s,) in student_info]
+
+    suggestions = [] 
+    suggestion_count = {0: 0, 1: 0, 2: 0}
+    for (s,) in student_info:
+        suggestion_count[s.decision] += 1
+        suggestions.append(SuggestionExtended.parse_raw(s.json()))
+
+    info["suggestion_counts"] = suggestion_count
+    info["suggestions"] = suggestions
+
     return info
 
 
