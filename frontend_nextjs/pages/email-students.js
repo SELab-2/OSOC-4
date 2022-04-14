@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getJson } from "../utils/json-requests";
-import { Col, Row } from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 
-import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
 import { useRouter } from "next/router";
@@ -17,10 +16,11 @@ export default function EmailStudents() {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [students, setStudents] = useState(undefined);
   const [visibleStudents, setVisibleStudents] = useState(undefined);
+  const [receivers, setReceivers] = useState(undefined);
 
   // These variables are used to notice if search or filters have changed
   const [search, setSearch] = useState("");
-  const [localFilters, setLocalFilters] = useState([0, 0]);
+  const [localFilters, setLocalFilters] = useState([-1, -1]);
 
   // These constants represent the filters
   const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
@@ -38,7 +38,7 @@ export default function EmailStudents() {
               getJson(studentUrl).then(res => res)
             )).then(students => {
               setStudents(students);
-              setLocalFilters([0, 0]);
+              setLocalFilters([-1, -1]);
             })
           })
         );
@@ -47,9 +47,6 @@ export default function EmailStudents() {
         (localFilters.some((filter, index) => filter !== filters[index].length ))) {
         let filterFunctions = [filterStudentsFilters, filterStudentsDecision];
         filterStudents(filterFunctions);
-      }
-      if (filters.every(filter => filter.length === 0)) {
-        setVisibleStudents(students);
       }
     }
   })
@@ -73,14 +70,24 @@ export default function EmailStudents() {
 
   function filterStudentsDecision(filteredStudents) {
     let decisionNumbers = filters[1].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
-    if (filters[1].length !== 0) {
-      filteredStudents = filteredStudents.filter(student => {
-        let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
-        let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
-        return decisionNumbers.includes(decisionNumber);
-      })
-    }
+
+    filteredStudents = filteredStudents.filter(student => {
+      let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
+      return decisions.length !== 0 && (decisionNumbers.length === 0 || decisionNumbers.includes(decisions[0]));
+    })
+
     return filteredStudents;
+  }
+
+  function addToReceivers(checked, student) {
+    if (checked && receivers) {
+      setReceivers(receivers.concat([student]));
+    } else if (checked) {
+      setReceivers([student]);
+    } else if (receivers) {
+      setReceivers(receivers.filter(receiver => receiver.id !== student.id));
+    }
+    console.log(receivers);
   }
 
   // the html that displays the overview of students
@@ -91,8 +98,14 @@ export default function EmailStudents() {
           <EmailStudentsFilters students={students} filters={filters} />
           <Col className="fill_height students-list-paddingtop">
             <SearchSortBar />
-            <Row className="student-list-positioning">
-              <EmailStudentsTable students={visibleStudents} />
+            <Row className="email-list-positioning">
+              <EmailStudentsTable addToReceivers={addToReceivers} students={visibleStudents} />
+            </Row>
+            <Row className="send-emails-positioning">
+              <Col/>
+              <Col md="auto">
+                <Button className="send-emails-button" disabled={! receivers || ! receivers.length}>Send emails</Button>
+              </Col>
             </Row>
           </Col>
         </Row>

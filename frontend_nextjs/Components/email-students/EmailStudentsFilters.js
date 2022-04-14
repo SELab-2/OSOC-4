@@ -70,8 +70,6 @@ export default function EmailStudentsFilters(props) {
                       onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
       <StudentsFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
                       onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
-      <StudentsFilter filter_id="undecided-checkbox" filter_text="Undecided" value={decision.includes("undecided")}
-                      onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
 
     </Col>
   )

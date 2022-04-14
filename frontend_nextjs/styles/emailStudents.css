@@ -1,0 +1,25 @@
+.email-list-positioning {
+    margin-top: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+    height: 75vh;
+}
+
+.email-students-cell {
+    font-size: 18px;
+}
+
+.table-head {
+    font-size: 18px;
+}
+
+.send-emails-button {
+    font-size: 20px;
+    padding: 8px 15px;
+}
+
+.send-emails-positioning {
+    margin-top: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+}

@@ -10,6 +10,7 @@ import "../styles/select-students.css"
 import "../styles/filters.css"
 import "../styles/navheader.css"
 import "../styles/studentDetails.css"
+import "../styles/emailStudents.css"
 
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';

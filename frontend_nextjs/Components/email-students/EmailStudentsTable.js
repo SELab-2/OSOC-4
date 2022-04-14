@@ -5,27 +5,12 @@ import StudentTableRow from "./StudentTableRow";
 
 export default function EmailStudentsTable(props) {
 
-  let receivers = [];
-
-  function addToReceivers(checked, student) {
-    console.log(student);
-    if (checked) {
-      receivers = receivers.concat([student]);
-    } else {
-      let index = receivers.indexOf(student);
-      if (index > -1) {
-        receivers.splice(index, 1);
-      }
-    }
-    console.log(receivers);
-  }
-
   // returns the html representation for the student list
   return (
     <Col className="fill_height scroll-overflow fill_width">
       <Table>
         <thead>
-        <tr>
+        <tr className="table-head">
           <th>
             <p />
           </th>
@@ -43,10 +28,10 @@ export default function EmailStudentsTable(props) {
           </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody className="email-students-cell">
         {(props.students && props.students.length) ?
           (props.students.map(student => (<StudentTableRow key={student.id} student={student}
-                                                           addToReceivers={addToReceivers} />))) : null}
+                                                           addToReceivers={props.addToReceivers} />))) : null}
         </tbody>
       </Table>
     </Col>

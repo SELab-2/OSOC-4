@@ -27,9 +27,9 @@ export default function StudentTableRow(props) {
 
   function getEmailSent() {
     if (decisionSuggestion && decisionSuggestion["mail_sent"]) {
-      return <Image src={correctIcon} height="34px"/>;
+      return <Image src={correctIcon} height="30px"/>;
     }
-    return <Image src={wrongIcon} height="34px"/>;
+    return <Image src={wrongIcon} height="30px"/>;
   }
 
   return (
