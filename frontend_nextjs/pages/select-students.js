@@ -4,18 +4,20 @@ import StudentsFilters from "../Components/select_students/StudentsFilters";
 import { Col, Form, Row } from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
-import { useSession } from "next-auth/react";
+import {getCsrfToken, getSession, useSession} from "next-auth/react";
 import { urlManager } from "../utils/ApiClient";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
+import axios from "axios";
 
 // The page corresponding with the 'select students' tab
-export default function SelectStudents() {
+export default function SelectStudents({ students }) {
     const router = useRouter();
+    console.log("server students:");
+    console.log(students);
 
     // These constants are initialized empty, the data will be inserted in useEffect
-    const [students, setStudents] = useState(undefined);
     const [visibleStudent, setVisibleStudents] = useState(undefined);
     const studentId = router.query.studentId
 
@@ -31,25 +33,27 @@ export default function SelectStudents() {
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
+
+
     useEffect(() => {
-        if (session) {
-            if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
-                setSearch(router.query.search);
-                setSortby(router.query.sortby);
-
-                setStudents(undefined);
-
-                // the urlManager returns the url for the list of students
-                urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
-                    Promise.all(res.map(studentUrl =>
-                        getJson(studentUrl).then(res => res)
-                    )).then(students => {
-                        setStudents(students);
-                        setLocalFilters([0, 0, 0]);
-                    })
+        function filterStudentsFilters(filteredStudents) {
+            return filteredStudents;
+        }
+        function filterStudentsSkills(filteredStudents) {
+            return filteredStudents;
+        }
+        function filterStudentsDecision(filteredStudents) {
+            let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
+            if (filters[2].length !== 0) {
+                filteredStudents = filteredStudents.filter(student => {
+                    let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
+                    let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
+                    return decisionNumbers.includes(decisionNumber);
                 })
-                );
             }
+            return filteredStudents;
+        }
+        if (session) {
             if (students &&
                 (localFilters.some((filter, index) => filter !== filters[index].length))) {
                 let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
@@ -68,31 +72,8 @@ export default function SelectStudents() {
                 setVisibleStudents(students);
             }
         }
-    })
+    }, [session, students, localFilters, filters])
 
-    async function retrieveStudents() {
-
-    }
-
-    function filterStudentsFilters(filteredStudents) {
-        return filteredStudents;
-    }
-
-    function filterStudentsSkills(filteredStudents) {
-        return filteredStudents;
-    }
-
-    function filterStudentsDecision(filteredStudents) {
-        let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
-        if (filters[2].length !== 0) {
-            filteredStudents = filteredStudents.filter(student => {
-                let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
-                let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
-                return decisionNumbers.includes(decisionNumber);
-            })
-        }
-        return filteredStudents;
-    }
 
     // the html that displays the overview of students
     return (
@@ -113,4 +94,25 @@ export default function SelectStudents() {
         </Row>
     )
 
+}
+
+export async function getServerSideProps(context) {
+    const session = await getSession(context);
+    const csrfToken = await getCsrfToken(context);
+    console.log("server side props")
+    console.log(session)
+    let students;
+    let config = {"headers": {
+            "Authorization": `Bearer ${session.accessToken}`,
+            "X-CSRF-TOKEN": csrfToken}}
+    students = await urlManager.getStudents(context, "2019").then(url => axios.get(url, config));
+    students = students.data
+    students = await Promise.all(students.map(s => axios.get(s, config).then(r => r.data)))
+    console.log("got students")
+
+    return {
+        props: {
+            students: students,
+        },
+    }
 }

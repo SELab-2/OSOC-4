@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getSession, getCsrfToken } from 'next-auth/react';
-import { getJson } from "./json-requests";
-import { log } from "./logger";
+import {log} from "./logger";
+
 
 class UrlManager {
     baseUrl = process.env.NEXT_API_URL;
@@ -14,102 +14,86 @@ class UrlManager {
     _questiontags = null;
     _skills = null;
 
-    async getEditions() {
-        log("Getting editions")
-        if (this._editions) { return this._editions; }
-        await this._setEditions()
+    _ready = false;
+
+    invalidate() {
+        this._ready = false;
+    }
+
+    async getEditions(year = null, context = null) {
+        if (!this._ready) {await this._setup(year, context); }
         return this._editions;
     }
 
-    async getUsers() {
-        log("Getting users")
-
-        if (this._users) { return this._users; }
-        await this._setUsers();
+    async getUsers(year = null, context = null) {
+        if (!this._ready) { await this._setup(year, context); }
         return this._users;
     }
 
-    async getCurrentEdition() {
-        log("getting current edition")
-        if (this._current_edition) { return this._current_edition; }
-        await this._setCurrentEdition()
+    async getCurrentEdition(year = null, context = null) {
+        if (!this._ready) { await this._setup(year, context); }
         return this._current_edition;
     }
 
-    async getStudents() {
-        await this._setStudents();
+    async getStudents(year = null, context = null) {
+        if (!this._ready) { await this._setup(year, context); }
         return this._students;
     }
 
-    async getProjects() {
-        if (this._projects) { return this._projects; }
-        await this._setProjects();
+    async getProjects(year = null, context = null) {
+        if (!this._ready) { await this._setup(year, context); }
         return this._projects;
     }
 
-    async getSkills(){
-        if (! this._skills) { await this._setSkills() }
+    async getSkills(year = null, context = null){
+        if (!this._ready) { await this._setup(year, context); }
         return this._skills;
     }
 
-    async getCurrentYear(){
-        if(! this._year) {await this._setCurrentEdition();}
+    async getCurrentYear(year = null, context = null){
+        if (!this._ready) { await this._setup(year, context); }
         return this._year;
     }
 
-    async getQuestionTags() {
-        if (this._questiontags) { return this._questiontags; }
-        await this._setQuestionTags();
+    async getQuestionTags(year = null, context = null) {
+        if (!this._ready) { await this._setup(year, context); }
         return this._questiontags;
     }
 
 
-    async _setUsers() {
-        log("Setting users")
-        let res = await getJson("");
-        this._editions = res["editions"];
-        this._users = res["users"];
-    }
-
-    async _setEditions() {
-        log("Setting editions")
-        let res = await getJson("");
-        this._editions = res["editions"];
-        this._users = res["users"];
-    }
-
-    async _setCurrentEdition(year = null) {
-        log("Setting current editions")
-        if (!this._editions) { await this._setEditions(); }
-        if (year) {
-            this._year = year;
-            this._current_edition = this._editions + "/" + this._year;
+    async _setup(year = null, context = null) {
+        log("UrlManager:setup");
+        this._skills = this.baseUrl + "/skills"; //TODO make this not hardcoded
+        let session, csrfToken;
+        if (context) {
+            session = await getSession(context);
+            csrfToken = await getCsrfToken(context);
         } else {
-            let res = await getJson(this._editions);
-            this._current_edition = res[0];
+            session = await getSession();
+            csrfToken = await getCsrfToken();
         }
-        let editionData = await getJson(this._current_edition);
-        this._year = editionData['year'];
-        this._students = editionData["students"];
-        this._projects = editionData["projects"];
-        this._questiontags = editionData["questiontags"];
-    }
+        if (!session) {throw Error("UrlManager:_setup: session is undefined");}
 
-    async _setStudents() {
-        await this._setCurrentEdition();
-    }
-
-    async _setProjects() {
-        await this._setCurrentEdition();
-    }
-
-    async _setQuestionTags() {
-        await this._setCurrentEdition();
-    }
-
-    //TODO make this not hardcoded
-    async _setSkills(){
-        this._skills = "/skills"
+        // set up all urls
+        let config = {"headers": {
+                "Authorization": `Bearer ${session.accessToken}`,
+                "X-CSRF-TOKEN": csrfToken}}
+        let res = await axios.get("", config);
+        this._editions = res["editions"];
+        this._users = res["users"];
+        if (year) {
+            this._current_edition = this._editions + "/" + year;
+        } else {
+            let res = await axios.get(this._editions, config);
+            this._current_edition = (res.length)? res[0] : null;
+        }
+        if (this._current_edition) {
+            let editionData = await axios.get(this._current_edition, config);
+            this._year = editionData['year'];
+            this._students = editionData["students"];
+            this._projects = editionData["projects"];
+            this._questiontags = editionData["questiontags"];
+        }
     }
 }
 
