@@ -18,7 +18,7 @@ export default function StudentTableRow(props) {
     }
   });
 
-  function getDecision() {
+  function getDecisionString() {
     if (! decisionSuggestion) {
       return "Undecided"
     }
@@ -44,7 +44,7 @@ export default function StudentTableRow(props) {
         Email address
       </td>
       <td>
-        {getDecision()}
+        {getDecisionString()}
       </td>
       <td>
         {getEmailSent()}
