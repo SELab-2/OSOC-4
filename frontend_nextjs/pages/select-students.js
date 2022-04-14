@@ -20,7 +20,7 @@ export default function SelectStudents() {
     const studentId = router.query.studentId
 
     // These variables are used to notice if search or filters have changed
-    let [search, setSearch] = useState("");
+    const [search, setSearch] = useState("");
     const [localFilters, setLocalFilters] = useState([0, 0, 0]);
 
     // These constants represent the filters
