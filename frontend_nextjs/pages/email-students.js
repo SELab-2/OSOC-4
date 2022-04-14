@@ -97,7 +97,12 @@ export default function EmailStudents() {
         <Row className="fill_height">
           <EmailStudentsFilters students={students} filters={filters} />
           <Col className="fill_height students-list-paddingtop">
-            <SearchSortBar />
+            <Row className="nomargin">
+              <Col><SearchSortBar /></Col>
+              <Col md="auto" className="change-emails-positioning">
+                <Button className="change-emails-button btn-secondary">Change default emails</Button>
+              </Col>
+            </Row>
             <Row className="email-list-positioning">
               <EmailStudentsTable addToReceivers={addToReceivers} students={visibleStudents} />
             </Row>
