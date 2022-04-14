@@ -1,7 +1,9 @@
 from random import choice, randrange, sample
 
-from app.crud import update
-from app.database import get_session
+from sqlalchemy import inspect
+
+from app.crud import update, read_all_where
+from app.database import get_session, engine
 from app.models.answer import Answer
 from app.models.edition import Edition
 from app.models.participation import Participation
@@ -280,8 +282,9 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
     return suggestions
 
 
-@router.get("/", response_description="Data inserted")
+@router.post("/", response_description="Data cleared and reinserted")
 async def add_dummy_data(session: AsyncSession = Depends(get_session)):
+    await clear_database(session)
     user_admin = User(
         email="user_admin@test.be",
         name="admin",
@@ -404,3 +407,35 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     await session.commit()
 
     return response(None, "Dummy data inserted")
+
+
+@router.delete("/", response_description="Data cleared")
+async def clear_database(session: AsyncSession = Depends(get_session)):
+    # Get all tables
+    async with engine.connect() as conn:
+        # tables in dependency order (delete last first and/or cascade)
+        tables = await conn.run_sync(
+            lambda sync_conn: inspect(sync_conn).get_sorted_table_and_fkc_names()
+        )
+
+    # Delete tables in reversed order
+    for table in reversed(tables):
+        # TODO: fix this, doing "TRUNCATE user CASCADE" gives syntax error, thus workaround
+        if table[0] == "user":  # workaround for user table
+            users = await read_all_where(User, session=session)
+            for user in users:
+                await session.delete(user)
+        elif table[0] is not None:  # One of the tables is None
+            await session.execute(f"TRUNCATE {table[0]} CASCADE")
+
+        await session.commit()  # apply changes to table (has to happen per table)
+
+        # old way of clearing the database, this should result in the same empty database as the above.
+        # The above way of doing it ensures all tables are emptied instead of only those in this loop which may change.
+        # for model in [Answer, Edition, Participation, Project, Question,
+        #               QuestionAnswer, Student, User, Skill, Suggestion]:
+        #     objects = await read_all_where(model, session=self.session)
+        #     for obj in objects:
+        #         await self.session.delete(obj)
+        #
+        #     await self.session.commit()
