@@ -63,6 +63,9 @@ class UrlManager {
         return this._questiontags;
     }
 
+    async getChangeDefaultEmailsUrl() {
+        return "/default-emails";
+    }
 
     async _setUsers() {
         log("Setting users")

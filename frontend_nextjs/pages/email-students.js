@@ -11,7 +11,7 @@ import EmailStudentsTable from "../Components/email-students/EmailStudentsTable"
 import {filterStudents} from "./select-students";
 import SendEmailsPopUpWindow from "../Components/email-students/SendEmailsPopUpWindow";
 
-// The page corresponding with the 'select students' tab
+// The page corresponding with the 'email students' tab
 export default function EmailStudents() {
   const router = useRouter();
 
@@ -81,7 +81,7 @@ export default function EmailStudents() {
     }
   }
 
-  // the html that displays the overview of students
+  // the html that displays the 'email students' tab
   return (
     <Row className="remaining_height fill_width">
 
@@ -94,7 +94,10 @@ export default function EmailStudents() {
             <Row className="nomargin">
               <Col><SearchSortBar /></Col>
               <Col md="auto" className="change-emails-positioning">
-                <Button className="change-emails-button">Change default emails</Button>
+                <Button className="change-emails-button"
+                        onClick={() => urlManager.getChangeDefaultEmailsUrl().then(res => router.push(res))}>
+                  Change default emails
+                </Button>
               </Col>
             </Row>
             <Row className="email-list-positioning">

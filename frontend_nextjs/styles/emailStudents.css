@@ -49,3 +49,32 @@
 .send-email-names {
     font-size: 18px;
 }
+
+.back-button {
+    background-color: rgba(0,0,0,0);
+    border-width: 0;
+    margin-left: 15px;
+    margin-top: 10px;
+}
+
+.emails-leftmargin {
+    margin-left: 150px;
+}
+
+.nopadding {
+    padding: 0
+}
+
+.title-bottom-margin {
+    margin-bottom: 20px;
+}
+
+.email-title {
+    font-weight: bold;
+    font-size: 20px;
+    width: 300px;
+}
+
+.textbox-margin {
+    margin-right: 200px;
+}
