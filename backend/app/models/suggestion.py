@@ -33,7 +33,7 @@ class Suggestion(SQLModel, table=True):
 
 class SuggestionCreate(BaseModel):
     decision: SuggestionOption
-    definitive: bool
+    definitive: bool = False
     reason: str
 
     student_id: int
@@ -43,7 +43,7 @@ class SuggestionCreate(BaseModel):
 
 class MySuggestionOut(BaseModel):
     decision: int
-    definitive: bool
+    definitive: Optional[bool]
     reason: str
 
     project_id: Optional[int]

@@ -13,14 +13,13 @@ export default function PopUpWindow(props) {
   useEffect(() => {
     if (props.popUpShow && props.student["own_suggestion"]) {
       setSuggestion(props.student["own_suggestion"])
-      setSuggestion(prevState => ({
-        ...prevState,
-        ["decision"]: props.decision
-      }));
-
-
-
+    } else {
+      setSuggestion({ "reason": "" })
     }
+    setSuggestion(prevState => ({
+      ...prevState,
+      ["decision"]: props.decision
+    }));
 
   }, [props.popUpShow])
 
