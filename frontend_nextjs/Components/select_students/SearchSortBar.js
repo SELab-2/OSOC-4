@@ -1,6 +1,9 @@
-import { Col, Form, Row } from "react-bootstrap";
-import React, { useState } from "react";
-import { useRouter } from "next/router";
+import {Button, Col, Form, Row} from "react-bootstrap";
+import React, {useState} from "react";
+import {useRouter} from "next/router";
+import Image from "next/image";
+import resetSearchIcon from "../../public/assets/reset-search.svg";
+import searchIcon from "../../public/assets/search.svg";
 
 // displays the counts of the suggestions for a student
 export default function SearchSortBar(props) {
@@ -19,8 +22,7 @@ export default function SearchSortBar(props) {
     }, undefined, { shallow: true });
   }
 
-  function doSearch(ev) {
-    ev.preventDefault();
+  function doSearch() {
     let newQuery = router.query;
     newQuery["search"] = search;
     router.push({
@@ -31,25 +33,39 @@ export default function SearchSortBar(props) {
 
   // return html representation of the suggestion counts for a student
   return (
-    <Row className="searchbar-row">
-      <Col>
-        <Form onSubmit={ev => doSearch(ev)}>
-          <Form.Group controlId="searchStudents">
-            <Form.Control type="text" value={search} placeholder={"Search students"}
-              onChange={(ev) => setSearch(ev.target.value)} />
-          </Form.Group>
-        </Form>
-      </Col>
-      <Col md="auto" className="sortby-label">
-        Sort by:
-      </Col>
-      <Col md="auto" className="align-self-center">
-        <select className="dropdown-sortby" id="dropdown-decision" value={sortby}
-          onChange={(ev) => sort(ev.target.value)}>
-          <option value={"first name+asc,last name+asc"}>Name A-Z</option>
-          <option value={"first name+desc,last name+desc"}>Name Z-A</option>
-        </select>
-      </Col>
+      <Row className="searchbar-row">
+        <Col>
+          <Form onSubmit={ev => {
+            ev.preventDefault();
+            doSearch();
+          }}>
+            <Form.Group controlId="searchStudents">
+              <Form.Control type="text" value={search} placeholder={"Search students"}
+                            onChange={(ev) => setSearch(ev.target.value)}>
+              </Form.Control>
+            </Form.Group>
+          </Form>
+        </Col>
+        <Col md="auto" >
+          <button className="reset-search-button" onClick={() => setSearch("")}>
+            <Image src={resetSearchIcon} />
+          </button>
+        </Col>
+        <Col md="auto">
+          <button className="search-button" onClick={() => setSearch(() => doSearch())}>
+            <Image src={searchIcon} />
+          </button>
+        </Col>
+        <Col md="auto" className="sortby-label">
+          Sort by:
+        </Col>
+        <Col md="auto" className="align-self-center">
+          <select className="dropdown-sortby" id="dropdown-decision" value={sortby}
+                  onChange={(ev) => sort(ev.target.value)}>
+            <option value={"firstname+asc,lastname+asc"}>Name A-Z</option>
+            <option value={"firstname+dc,lastname+desc"}>Name Z-A</option>
+          </select>
+        </Col>
     </Row>
   )
 }

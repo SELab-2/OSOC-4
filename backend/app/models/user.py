@@ -32,6 +32,9 @@ class User(SQLModel, table=True):
     projects: List[Project] = Relationship(back_populates="coaches", link_model=ProjectCoach)
     suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
+    class Config:
+        validate_assignment = True
+
     @validator('email')
     def email_lowercase(cls, v):
         return v.lower()
@@ -143,4 +146,10 @@ class UserMe(BaseModel):
 
 
 class ChangeUserMe(BaseModel):
-    name: str
+    name: str = ""
+
+    @validator('name')
+    def name_not_empty(cls, v):
+        if v == "":
+            raise EmptyNameException()
+        return v

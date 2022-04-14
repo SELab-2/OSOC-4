@@ -21,13 +21,20 @@ class Request(Enum):
     DELETE = auto()
     GET = auto()
     POST = auto()
+    PATCH = auto()
     PUT = auto()
 
     async def do_request(self, client: AsyncClient, path: str, headers: Dict[str, str], body: Any = None) -> Response:
-        if self.name == "POST":
-            return await client.post(path, json=body, headers=headers)
+        if self.name == "DELETE":
+            raise NotImplementedError
         elif self.name == "GET":
             return await client.get(path, headers=headers)
+        elif self.name == "POST":
+            return await client.post(path, json=body, headers=headers)
+        elif self.name == "PATCH":
+            return await client.patch(path, json=body, headers=headers)
+        elif self.name == "PUT":
+            return await client.put(path, json=body, headers=headers)
         else:
             raise NotImplementedError
 
@@ -180,8 +187,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         user: User = await self.get_user_by_name(user_name)
         email: str = user.email
         password: str = self.saved_objects["passwords"][user_name]
-        login = await self.client.post("/login", json={"email": email, "password": password},
-                                       headers={"Content-Type": "application/json"})
+        login = await self.client.post("/login", json={"email": email, "password": password})
         return login.json()["data"]["accessToken"]
 
     async def do_request(self, request_type: Request, path: str, user: str,
@@ -224,6 +230,10 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         status code was {response.status_code},
                         expected {expected_status}
                         """)
+
+        if request_type != Request.GET:
+            await self.session.invalidate()
+
         return response
 
     async def _auth_test_request(self, request_type: Request, path: str, body: Dict):
