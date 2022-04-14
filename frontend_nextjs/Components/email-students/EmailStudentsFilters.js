@@ -15,7 +15,7 @@ export default function EmailStudentsFilters(props) {
   function resetFilters() {
     let newQuery = router.query;
     delete newQuery["filters"];
-    delete newQuery["skills"];
+    delete newQuery["decision"];
     router.push({
       pathname: router.pathname,
       query: newQuery
