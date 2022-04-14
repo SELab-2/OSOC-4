@@ -1,6 +1,7 @@
 import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "../select_students/StudentFilter";
 import {useRouter} from "next/router";
+import {addFilterGlobal} from "../select_students/StudentsFilters";
 
 
 export default function EmailStudentsFilters(props) {
@@ -23,18 +24,7 @@ export default function EmailStudentsFilters(props) {
   
   // this function adds or removes a skill from the filters
   function addFilter(filter, startItems, itemName, value) {
-    let newQuery = router.query;
-    let newItems = startItems;
-    if (value) {
-      newItems = startItems.concat([itemName]);
-    } else {
-      let index = startItems.indexOf(itemName);
-      if (index > -1) {
-        startItems.splice(index, 1);
-        newItems = startItems;
-      }
-    }
-    newQuery[filter] = newItems.join(",");
+    let newQuery = addFilterGlobal(router.query, filter, startItems, itemName, value);
     router.push({
       pathname: router.pathname,
       query: newQuery

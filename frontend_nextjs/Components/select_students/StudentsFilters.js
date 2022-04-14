@@ -3,6 +3,22 @@ import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
 import {useRouter} from "next/router";
 
+// this function adds or removes a skill from the filters, this function is also used in EmailStudentsFilters
+export function addFilterGlobal(query, filter, startItems, itemName, value) {
+  let newQuery = query;
+  let newItems = startItems;
+  if (value) {
+    newItems = startItems.concat([itemName]);
+  } else {
+    let index = startItems.indexOf(itemName);
+    if (index > -1) {
+      startItems.splice(index, 1);
+      newItems = startItems;
+    }
+  }
+  newQuery[filter] = newItems.join(",");
+  return newQuery
+}
 
 export default function StudentsFilters(props) {
 
@@ -38,26 +54,6 @@ export default function StudentsFilters(props) {
     setExtendedRoleList(false);
   }
 
-  // this function adds or removes a skill from the filters
-  function addFilter(filter, startItems, itemName, value) {
-    let newQuery = router.query;
-    let newItems = startItems;
-    if (value) {
-      newItems = startItems.concat([itemName]);
-    } else {
-      let index = startItems.indexOf(itemName);
-      if (index > -1) {
-        startItems.splice(index, 1);
-        newItems = startItems;
-      }
-    }
-    newQuery[filter] = newItems.join(",");
-    router.push({
-      pathname: router.pathname,
-      query: newQuery
-    }, undefined, {shallow: true})
-  }
-
   // returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
   // list depending on extendedRoleList
   function getSkills() {
@@ -83,6 +79,15 @@ export default function StudentsFilters(props) {
       return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
     }
     return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
+  }
+
+  // this function adds or removes a skill from the filters
+  function addFilter(filter, startItems, itemName, value) {
+    let newQuery = addFilterGlobal(router.query, filter, startItems, itemName, value)
+    router.push({
+      pathname: router.pathname,
+      query: newQuery
+    }, undefined, {shallow: true})
   }
 
   // The HTML representation of the filters in the 'Select students' tab

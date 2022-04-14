@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 import EmailStudentsFilters from "../Components/email-students/EmailStudentsFilters";
 import EmailStudentsTable from "../Components/email-students/EmailStudentsTable";
+import {filterStudents} from "./select-students";
 
 // The page corresponding with the 'select students' tab
 export default function EmailStudents() {
@@ -46,23 +47,10 @@ export default function EmailStudents() {
       if (students &&
         (localFilters.some((filter, index) => filter !== filters[index].length ))) {
         let filterFunctions = [filterStudentsFilters, filterStudentsDecision];
-        filterStudents(filterFunctions);
+        filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents);
       }
     }
   })
-
-  function filterStudents(filterFunctions) {
-    let filteredStudents = students;
-    let newLocalFilters = localFilters;
-    for (let i = 0; i < localFilters.length; i++) {
-      if (filters[i].length !== localFilters[i]) {
-        newLocalFilters[i] = filters[i].length;
-        filteredStudents = filterFunctions[i](filteredStudents);
-      }
-    }
-    setLocalFilters(newLocalFilters);
-    setVisibleStudents(filteredStudents);
-  }
 
   function filterStudentsFilters(filteredStudents) {
     return filteredStudents;
@@ -73,7 +61,7 @@ export default function EmailStudents() {
 
     filteredStudents = filteredStudents.filter(student => {
       let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
-      return decisions.length !== 0 && (decisionNumbers.length === 0 || decisionNumbers.includes(decisions[0]));
+      return decisions.length !== 0 && (decisionNumbers.length === 0 || decisionNumbers.includes(decisions[0]["decision"]));
     })
 
     return filteredStudents;
@@ -87,7 +75,6 @@ export default function EmailStudents() {
     } else if (receivers) {
       setReceivers(receivers.filter(receiver => receiver.id !== student.id));
     }
-    console.log(receivers);
   }
 
   // the html that displays the overview of students
@@ -100,7 +87,7 @@ export default function EmailStudents() {
             <Row className="nomargin">
               <Col><SearchSortBar /></Col>
               <Col md="auto" className="change-emails-positioning">
-                <Button className="change-emails-button btn-secondary">Change default emails</Button>
+                <Button className="change-emails-button">Change default emails</Button>
               </Col>
             </Row>
             <Row className="email-list-positioning">

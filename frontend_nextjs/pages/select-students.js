@@ -10,6 +10,20 @@ import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 
+// This function filters the list of students, it is also used in email-students
+export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
+    let filteredStudents = students
+    let newLocalFilters = localFilters;
+    for (let i = 0; i < localFilters.length; i++) {
+        if (filters[i].length !== localFilters[i]) {
+            newLocalFilters[i] = filters[i].length;
+            filteredStudents = filterFunctions[i](filteredStudents);
+        }
+    }
+    setLocalFilters(newLocalFilters);
+    setVisibleStudents(filteredStudents);
+}
+
 // The page corresponding with the 'select students' tab
 export default function SelectStudents() {
     const router = useRouter();
@@ -48,26 +62,13 @@ export default function SelectStudents() {
             if (students &&
                 (localFilters.some((filter, index) => filter !== filters[index].length))) {
                 let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
-                filterStudents(filterFunctions);
+                filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents);
             }
             if (filters.every(filter => filter.length === 0)) {
                 setVisibleStudents(students);
             }
         }
     })
-
-    function filterStudents(filterFunctions) {
-        let filteredStudents = students
-        let newLocalFilters = localFilters;
-        for (let i = 0; i < localFilters.length; i++) {
-            if (filters[i].length !== localFilters[i]) {
-                newLocalFilters[i] = filters[i].length;
-                filteredStudents = filterFunctions[i](filteredStudents);
-            }
-        }
-        setLocalFilters(newLocalFilters);
-        setVisibleStudents(filteredStudents);
-    }
 
     function filterStudentsFilters(filteredStudents) {
         return filteredStudents;
