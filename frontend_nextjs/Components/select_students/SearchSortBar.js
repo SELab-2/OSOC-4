@@ -35,7 +35,10 @@ export default function SearchSortBar(props) {
   return (
       <Row className="searchbar-row">
         <Col>
-          <Form onSubmit={ev => doSearch(ev)}>
+          <Form onSubmit={ev => {
+            ev.preventDefault();
+            doSearch();
+          }}>
             <Form.Group controlId="searchStudents">
               <Form.Control type="text" value={search} placeholder={"Search students"}
                             onChange={(ev) => setSearch(ev.target.value)}>
