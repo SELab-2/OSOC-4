@@ -1,19 +1,19 @@
 import asyncio
 import unittest
 from enum import IntEnum, Enum, auto
-from typing import Set, Dict, Any, Tuple, Optional, Type
+from typing import Set, Dict, Any, Tuple, Optional, Type, List
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import app
-from app.crud import read_where, update, clear_data
+from app.crud import read_where, update, clear_data, read_all_where
 from app.database import engine
 from app.models.edition import Edition
 from app.models.skill import Skill
 from app.models.user import User, UserRole
-from app.utils.cryptography import get_password_hash
+from app.tests.utils_for_tests.UserGenerator import UserGenerator
 
 
 class Request(Enum):
@@ -52,57 +52,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         super().__init__(*args, **kwargs)
 
         self.bad_id = 0
-        self.users = {
-            "user_admin": User(
-                email="user_admin@test.be",
-                name="user_admin",
-                password="Test123!user_admin",
-                role=UserRole.ADMIN,
-                active=True,
-                approved=True,
-                disabled=False),
-            "user_unactivated_coach": User(
-                email="user_unactivated_coach@test.be",
-                name="user_unactivated_coach",
-                password="Test123!user_unactivated_coach",
-                role=UserRole.COACH,
-                active=False,
-                approved=False,
-                disabled=False),
-            "user_activated_coach": User(
-                email="user_activated_coach@test.be",
-                name="user_activated_coach",
-                password="Test123!user_activated_coach",
-                role=UserRole.COACH,
-                active=True,
-                approved=False,
-                disabled=False),
-            "user_approved_coach": User(
-                email="user_approved_coach@test.be",
-                name="user_approved_coach",
-                password="Test123!user_approved_coach",
-                role=UserRole.COACH,
-                active=True,
-                approved=True,
-                disabled=False),
-            "user_disabled_coach": User(
-                email="user_disabled_coach@test.be",
-                name="user_disabled_coach",
-                password="Test123!user_disabled_coach",
-                role=UserRole.COACH,
-                active=True,
-                approved=True,
-                disabled=True),
-            "user_no_role": User(
-                email="user_no_role@test.be",
-                name="user_no_role",
-                password="Test123!user_no_role",
-                role=UserRole.NO_ROLE,
-                active=False,
-                approved=False,
-                disabled=False)
-        }
-
         self.objects = {
             "projectleider": Skill(name="projectleider"),
             "Systeembeheerder": Skill(name="Systeembeheerder"),
@@ -112,26 +61,11 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             "customer relations": Skill(name="customer relations"),
             "frontend": Skill(name="frontend"),
             "2022_edition": Edition(year=2022, name="Summer edition 2022", coaches=[], students=[]),
-            **self.users
         }
-
-        # self.objects["project_test"] = Project(
-        #     edition=self.objects["2022_edition"].year,
-        #     name="project_test",
-        #     description="A project aimed at being dummy data",
-        #     goals="i have goals",
-        #     partner_name="Testing inc.",
-        #     partner_description="Testing inc. is focused on being dummy data.",
-        #     coaches=[self.objects["user_approved_coach"].id],
-        #     required_skills=[],
-        #     suggestions=[],
-        #     participations=[],
-        # )
 
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         }
-        self.created = []
 
     async def asyncSetUp(self) -> None:
         asyncio.get_running_loop().set_debug(False)  # silent mode
@@ -140,12 +74,21 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         await self.lf.__aenter__()
         self.session: AsyncSession = AsyncSession(engine)
 
-        for key, obj in self.objects.items():
-            if isinstance(obj, User):
-                self.saved_objects["passwords"][key] = obj.password  # if having problems, check this out
-                obj.password = get_password_hash(obj.password)
+        user_generator = UserGenerator(self.session)
+        self.users = {user.name: user for user in user_generator.data}
+        self.saved_objects["passwords"] = user_generator.passwords
+        await user_generator.add_to_session()
 
+        for key, obj in self.objects.items():
             await update(obj, session=self.session)
+
+    async def get_users_by(self, roles: List[UserRole], active=True, approved=True, disabled=False) -> Set[str]:
+        users = await read_all_where(User, session=self.session)
+        return {user.name for user in users
+                if user.role in roles and
+                user.active == active and
+                user.approved == approved and
+                user.disabled == disabled}
 
     async def asyncTearDown(self) -> None:
         await clear_data(self.session)

@@ -5,6 +5,7 @@ from httpx import Response
 
 from app.crud import read_all_where
 from app.models.skill import Skill
+from app.models.user import UserRole
 from app.tests.test_base import TestBase, Request
 
 
@@ -14,7 +15,7 @@ class TestSkills(TestBase):
 
     async def test_get_skills(self):
         path = "/skills"
-        allowed_users = {"user_admin"}
+        allowed_users = await self.get_users_by([UserRole.ADMIN])
 
         # Test authorization & access-control
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
