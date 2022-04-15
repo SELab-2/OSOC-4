@@ -82,7 +82,7 @@ export default function StudentListelement(props) {
     if (!props.student["suggestions"]) {
       return 0;
     }
-    return Object.values(props.student["suggestions"]).filter(suggestion => !suggestion["definitive"] && suggestion["decision"] === decision).length
+    return Object.values(props.student["suggestions"]).filter(suggestion => suggestion["decision"] === decision).length
   }
 
   // The html representation of a list-element

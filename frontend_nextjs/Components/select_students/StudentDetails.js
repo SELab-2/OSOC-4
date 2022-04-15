@@ -69,9 +69,7 @@ export default function StudentDetails(props) {
           })
         })
       } else {
-        console.log("using cached student")
         setStudent(props.student);
-        console.log(props.student)
         setSuggestions(props.student["suggestions"]);
         let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
         if (decisions.length !== 0) {
