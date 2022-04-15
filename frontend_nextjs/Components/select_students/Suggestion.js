@@ -15,13 +15,13 @@ export default function Suggestion(props) {
   const [suggestedBy, setSuggestedBy] = useState("")
 
   /**
-   * This functin inserts the data in the variables.
+   * This function is called when suggestionBy is empty, this is when the component is made.
    */
   useEffect( () => {
     if (suggestedBy === "") {
       getJson(props.suggestion["suggested_by_id"]).then(res => setSuggestedBy(res.data["name"]));
     }
-  })
+  }, [suggestedBy]);
 
   /**
    * returns the html representation of a suggestion

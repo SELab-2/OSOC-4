@@ -47,7 +47,7 @@ export default function StudentDetails(props) {
   const [decideField, setDecideField] = useState(-1);
 
   /**
-   * This function inserts the data in the variables
+   * This function is called when studentId or props.student_id is changed
    */
   useEffect(() => {
 

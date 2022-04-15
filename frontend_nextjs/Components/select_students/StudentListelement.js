@@ -18,7 +18,7 @@ export default function StudentListelement(props) {
   const router = useRouter()
 
   /**
-   * This function inserts the data in the variables
+   * This function is called when decision is changed
    */
   useEffect(() => {
     if (props.student["suggestions"] && (decision === -2 || prevDecision !== decision)) {
@@ -29,7 +29,7 @@ export default function StudentListelement(props) {
         (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
       }
     }
-  });
+  }, [decision, prevDecision, props.student]);
 
   // get the decision for the student (yes, maybe, no or undecided)
   /**

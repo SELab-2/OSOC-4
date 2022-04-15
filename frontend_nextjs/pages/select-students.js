@@ -34,7 +34,7 @@ export default function SelectStudents() {
     (router.query.decision) ? router.query.decision.split(",") : []]
 
     /**
-     * This function inserts the data in the variables
+     * This function is called when students, router.query.sortby, router.query.search or filters is changed
      */
     const { data: session, status } = useSession()
     useEffect(() => {
@@ -79,7 +79,7 @@ export default function SelectStudents() {
                 setVisibleStudents(students);
             }
         }
-    })
+    }, [students, router.query.search, router.query.sortby, filters])
 
     async function retrieveStudents() {
 
