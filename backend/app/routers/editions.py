@@ -1,5 +1,4 @@
 import datetime
-import json
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
