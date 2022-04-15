@@ -15,10 +15,8 @@ export function filterStudents(filterFunctions, students, localFilters, filters,
     let filteredStudents = students
     let newLocalFilters = localFilters;
     for (let i = 0; i < localFilters.length; i++) {
-        if (filters[i].length !== localFilters[i]) {
-            newLocalFilters[i] = filters[i].length;
-            filteredStudents = filterFunctions[i](filteredStudents);
-        }
+        newLocalFilters[i] = filters[i].length;
+        filteredStudents = filterFunctions[i](filteredStudents);
     }
     setLocalFilters(newLocalFilters);
     setVisibleStudents(filteredStudents);

@@ -38,7 +38,7 @@
 }
 
 .send-emails {
-    height: 120px;
+    height: 180px;
 }
 
 .email-help-text {
@@ -53,12 +53,16 @@
 .back-button {
     background-color: rgba(0,0,0,0);
     border-width: 0;
-    margin-left: 15px;
+    margin-left: 40px;
     margin-top: 10px;
 }
 
-.emails-leftmargin {
-    margin-left: 150px;
+.emails-margin {
+    margin: 20px 150px 30px;
+}
+
+.emails-title-margin {
+    margin: 0 150px 50px;
 }
 
 .nopadding {
@@ -75,6 +79,15 @@
     width: 300px;
 }
 
-.textbox-margin {
-    margin-right: 200px;
+.change-emails-savebutton {
+    margin-right: 160px;
+}
+
+.cancel-button {
+    margin-right: 20px;
+    width: 100px;
+}
+
+.save-button {
+    width: 100px;
 }

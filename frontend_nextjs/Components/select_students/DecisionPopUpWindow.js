@@ -1,5 +1,6 @@
 import {Button, Col, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
 import {useState} from "react";
+import {getDecisionString} from "./StudentListelement";
 
 // This view shows the pop up window when making a decision about a student.
 export default function DecisionPopUpWindow(props) {
@@ -37,7 +38,8 @@ export default function DecisionPopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Decision &apos;{getDecisionString(props.decision)}&apos; for {props.student["name"]}
+          Decision &apos;{getDecisionString(props.decision)}&apos; for {props.student.mandatory["first name"] + " " +
+          props.student.mandatory["last name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
