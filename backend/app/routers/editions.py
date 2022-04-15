@@ -13,7 +13,7 @@ from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
     QuestionTagNotFoundException)
 from app.models.answer import Answer
-from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
+from app.models.edition import Edition, EditionCoach, EditionOutExtended, EditionOutSimple
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
@@ -108,6 +108,17 @@ async def update_edition(year: int, edition: Edition = Body(...), session: Async
         setattr(result, key, value)
     await update(result, session)
     return EditionOutSimple.parse_raw(result.json()).uri
+
+
+@router.get("/{year}/users", response_description="Users retrieved")
+async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
+    """get_users get all the User instances from the database in edition with given year
+
+    :return: list of users
+    :rtype: dict
+    """
+    results = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
+    return [f"{config.api_url}users/{str(res.coach_id)}" for res in results]
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
