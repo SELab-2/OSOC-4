@@ -119,6 +119,18 @@ export default function SelectStudents() {
         return filteredStudents;
     }
 
+    function getStudentById() {
+        if (students) {
+            let foundStudent = students.find((o, i) => {
+                if (o["id_int"] === studentId) {
+                    return o;
+                }
+            });
+            return foundStudent;
+        }
+        return undefined;
+    }
+
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">
@@ -132,7 +144,7 @@ export default function SelectStudents() {
                             <StudentList students={visibleStudent} />
                         </Row>
                     </Col>
-                    {(studentId) ? <StudentDetails student_id={studentId} /> : null}
+                    {(studentId) ? <StudentDetails student={getStudentById()} student_id={studentId} /> : null}
                 </Row>
             </Col>
         </Row>

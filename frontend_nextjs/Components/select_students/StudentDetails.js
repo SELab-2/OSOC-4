@@ -43,19 +43,37 @@ export default function StudentDetails(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
-
+    console.log(props)
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
-      getJson(urlManager.baseUrl + "/students/" + props.student_id).then(res => {  //todo use urlManager
-        setStudent(res);
+      if (!props.student) {
+        getJson(urlManager.baseUrl + "/students/" + props.student_id).then(res => {  //todo use urlManager
+          setStudent(res);
 
-        // Fill in the suggestions field, this contains all the suggestions which are not definitive
-        setSuggestions(res["suggestions"]);
+          // Fill in the suggestions field, this contains all the suggestions which are not definitive
+          setSuggestions(res["suggestions"]);
 
-        // Fill in the decisions field, this contains the decision for the student if there is one,
-        // this decision is stored as a suggestion which is definitive
-        let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
+          // Fill in the decisions field, this contains the decision for the student if there is one,
+          // this decision is stored as a suggestion which is definitive
+          let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
+          if (decisions.length !== 0) {
+            setDecision(decisions[0]["decision"]);
+          } else {
+            setDecision(-1);
+          }
+
+          // Fill in the questionAnswers
+          getJson(res["question-answers"]).then(res => {
+            setQuestionAnswers(res);
+          })
+        })
+      } else {
+        console.log("using cached student")
+        setStudent(props.student);
+        console.log(props.student)
+        setSuggestions(props.student["suggestions"]);
+        let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
         } else {
@@ -63,10 +81,11 @@ export default function StudentDetails(props) {
         }
 
         // Fill in the questionAnswers
-        getJson(res["question-answers"]).then(res => {
+        getJson(props.student["question-answers"]).then(res => {
           setQuestionAnswers(res);
         })
-      })
+      }
+
     }
   }, [studentId, props.student_id])
 
