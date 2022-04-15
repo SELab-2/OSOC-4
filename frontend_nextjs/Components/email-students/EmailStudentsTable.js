@@ -2,7 +2,13 @@ import {Col, Table} from "react-bootstrap";
 import React, {useState} from "react";
 import StudentTableRow from "./StudentTableRow";
 
-
+/***
+ * This element return the table of students in the 'email students page'. The table does not show students with
+ * decision 'Undecided'.
+ * @param props the props contain the list of students who will be displayed and 'addToReceivers',
+ * a function to add or delete a student to the receivers of the emails
+ * @returns {JSX.Element} an element that renders the table of students in the 'email students page'
+ */
 export default function EmailStudentsTable(props) {
 
   // returns the html representation for the student list

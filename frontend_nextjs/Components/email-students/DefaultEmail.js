@@ -1,13 +1,15 @@
 import {Col, Row} from "react-bootstrap";
 
-import { useRouter } from "next/router";
 import React from "react";
 
 
-// The page corresponding is used to change the default emails
+/***
+ * This element makes a TextField with a title on the left, to change a default email
+ * @param props the props contain email and setEmail, which represent the value of the textfield
+ * @returns {JSX.Element} An element that represents a title (for example 'Yes' email) with a textField
+ */
 export default function DefaultEmail(props) {
 
-  // the html that displays the overview of students
   return (
     <Row className="emails-margin">
       <Col className="nomargin email-title" md="auto">

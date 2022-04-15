@@ -92,7 +92,7 @@ export default function StudentsFilters(props) {
 
   // The HTML representation of the filters in the 'Select students' tab
   return (
-    <Col md="auto" className="filters fill_height scroll-overflow" style={{visibility: props.visibility}}>
+    <Col md="auto" className="filters fill_height scroll-overflow">
       <Row className="title-row-filters">
         <Col>
           <h2 className="filters-title">Filters</h2>

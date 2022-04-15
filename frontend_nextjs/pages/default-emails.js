@@ -8,7 +8,10 @@ import DefaultEmail from "../Components/email-students/DefaultEmail";
 import {getEmailStudentsPath} from "../routes";
 
 
-// The page corresponding is used to change the default emails
+/**
+ * The page which is used to change the default emails.
+ * @returns {JSX.Element} An element that renders the 'change default emails' page.
+ */
 export default function DefaultEmails() {
   const router = useRouter();
 
@@ -16,15 +19,25 @@ export default function DefaultEmails() {
   const [maybeEmail, setMaybeEmail] = useState("default maybe email");
   const [noEmail, setNoEmail] = useState("default no email");
 
+  /**
+   * This function is called when the save button is clicked, it saves the emails in the database and goes back to the
+   * 'email students' page
+   */
   function saveDefaultEmails() {
     router.push(getEmailStudentsPath());
   }
 
+  /**
+   * This function is called when the cancel button is clicked, it goes back to the 'email students' page without
+   * saving the emails.
+   */
   function cancel() {
     router.push(getEmailStudentsPath());
   }
 
-  // the html that displays the overview of students
+  /**
+   * The html that renders the 'change default emails' page
+   */
   return (
     <Row className="fill_width">
       <Col>
