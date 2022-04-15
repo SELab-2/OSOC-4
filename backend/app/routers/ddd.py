@@ -135,7 +135,7 @@ class QuestionAnswerGenerator:
              QuestionTag(question=self.question_last_name,
                          edition=self.edition.year, mandatory=True, tag="last name"),
              QuestionTag(question=self.question_email,
-                         edition=self.edition.year, tag="email"),
+                         edition=self.edition.year, mandatory=True, tag="email"),
              QuestionTag(question=self.question_phone_number,
                          edition=self.edition.year, tag="phone number"),
              QuestionTag(question=self.questions_multiple_choice[2],
