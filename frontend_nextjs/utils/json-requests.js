@@ -54,10 +54,10 @@ export async function catchError(e) {
  * @param url the URL to send the request to
  * @returns {Promise<undefined|*>}
  */
-export async function getJson(url) {
+export async function getJson(url, params = {}) {
     log("json-requests: getJson: " + url)
     try {
-        let response = await AuthApiClient.get(url);
+        let response = await AuthApiClient.get(url, { params: params });
         return response.data;
     } catch (e) {
         return await catchError(e);
