@@ -1,5 +1,5 @@
 import {Card, Col, Row} from "react-bootstrap";
-import {log} from "../utils/logger";
+import {log} from "../../utils/logger";
 import {useRouter} from "next/router";
 
 export default function ProjectCard(props) {

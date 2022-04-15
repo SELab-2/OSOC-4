@@ -63,6 +63,11 @@ class UrlManager {
         return this._questiontags;
     }
 
+    async getConflicts(){
+        if (! this._conflicts) { await this._setConflicts();}
+        return this._conflicts;
+    }
+
 
     async _setUsers() {
         log("Setting users")
@@ -110,6 +115,11 @@ class UrlManager {
     //TODO make this not hardcoded
     async _setSkills(){
         this._skills = "/skills"
+    }
+
+    async _setConflicts(){
+        if(! this._editions) {await this._setCurrentEdition();}
+        this._conflicts = this._current_edition + "/resolving_conflicts"
     }
 }
 
