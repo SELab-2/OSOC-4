@@ -294,7 +294,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         email="user_coach@test.be",
         name="coach",
         password=get_password_hash("Test123!user_coach"),
-        role=UserRole.ADMIN,
+        role=UserRole.COACH,
         active=True, approved=True, disabled=False)
 
     users = [generate_user(active=False, approved=False, disabled=False),
