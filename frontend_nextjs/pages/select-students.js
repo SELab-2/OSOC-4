@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getJson } from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
-import { Col, Form, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
@@ -10,7 +10,10 @@ import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 
-// The page corresponding with the 'select students' tab
+/**
+ * The page corresponding with the 'select students' tab.
+ * @returns {JSX.Element} A component corresponding with the 'select students' tab.
+ */
 export default function SelectStudents() {
     const router = useRouter();
 
@@ -19,7 +22,8 @@ export default function SelectStudents() {
     const [visibleStudent, setVisibleStudents] = useState(undefined);
     const studentId = router.query.studentId
 
-    // These variables are used to notice if search or filters have changed
+    // These variables are used to notice if search or filters have changed, they will have the values of search,
+    // sortby and filters that we filtered for most recently.
     let [search, setSearch] = useState("");
     let [sortby, setSortby] = useState("");
     const [localFilters, setLocalFilters] = useState([0, 0, 0]);
@@ -29,15 +33,19 @@ export default function SelectStudents() {
     (router.query.skills) ? router.query.skills.split(",") : [],
     (router.query.decision) ? router.query.decision.split(",") : []]
 
-    // This function inserts the data in the variables
+    /**
+     * This function inserts the data in the variables
+     */
     const { data: session, status } = useSession()
     useEffect(() => {
         if (session) {
+
+            // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
+            // variables and update the students list. If the list is updated, we change the local filters. This will
+            // provoke the second part of useEffect to filter the students again.
             if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
                 setSearch(router.query.search);
                 setSortby(router.query.sortby);
-
-                setStudents(undefined);
 
                 // the urlManager returns the url for the list of students
                 urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
@@ -50,6 +58,9 @@ export default function SelectStudents() {
                 })
                 );
             }
+
+            // Check if the real filters have changed from the local filters. If so, update the local filters and
+            // filter the students.
             if (students &&
                 (localFilters.some((filter, index) => filter !== filters[index].length))) {
                 let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
@@ -74,14 +85,29 @@ export default function SelectStudents() {
 
     }
 
+    /**
+     * This function filters the students for the general filters (the filters in filters[0]).
+     * @param filteredStudents The list of students that need to be filtered.
+     * @returns {*} The list of students that are allowed by the general filters.
+     */
     function filterStudentsFilters(filteredStudents) {
         return filteredStudents;
     }
 
+    /**
+     * This function filters the students for the skills filters (the filters in filters[1]).
+     * @param filteredStudents The list of students that need to be filtered.
+     * @returns {*} The list of students that are allowed by the skills filters.
+     */
     function filterStudentsSkills(filteredStudents) {
         return filteredStudents;
     }
 
+    /**
+     * This function filters the students for the decision filters (the filters in filters[2]).
+     * @param filteredStudents The list of students that need to be filtered.
+     * @returns {*} The list of students that are allowed by the decision filters.
+     */
     function filterStudentsDecision(filteredStudents) {
         let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
         if (filters[2].length !== 0) {
@@ -94,7 +120,9 @@ export default function SelectStudents() {
         return filteredStudents;
     }
 
-    // the html that displays the overview of students
+    /**
+     * The html that displays the overview of students
+     */
     return (
         <Row className="remaining_height fill_width">
             <Col className="fill_height">

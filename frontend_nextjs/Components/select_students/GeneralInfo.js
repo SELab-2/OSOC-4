@@ -1,9 +1,20 @@
 import { Col, Row } from "react-bootstrap";
 
-// displays the counts of the suggestions for a student
-export default function SuggestionsCount(props) {
+/**
+ * This element return the basic questions and answers about a student, which questions and answers are shown depends
+ * on where they are displayed (listelement or details) and on which questions/answers the user wants to see in the
+ * listelements, this can be changed in the settings.
+ * @param props props has the fields student and listelement. 'student' is the student who we display the general
+ * info for. 'listelement' is true if we display the general info in the list of students and false if we display it in
+ * the student details.
+ * @returns {JSX.Element} An element that renders the correct questions and answers
+ */
+export default function GeneralInfo(props) {
 
-  // get the info of the basic questions shown in the list element
+  /**
+   * get the correct questions and answers.
+   * @returns {*[]} a list of the questions and answers we want to see.
+   */
   function getInfo() {
     if (props.student["suggestions"]) {
       let decisions = props.student["suggestions"].filter(sugg => sugg["definitive"]);
@@ -11,6 +22,8 @@ export default function SuggestionsCount(props) {
 
       let rows = [];
 
+      // props.students["listtags"] contains the (question,answer) pair that the user wants to show in the list of
+      // students.
       Object.entries(props.student["listtags"]).map(([k, v]) => {
         rows.push(
           <Row key={k} className="question-answer-row">
@@ -19,6 +32,9 @@ export default function SuggestionsCount(props) {
           </Row>
         )
       })
+
+      // If we don't show the general info in the list of students, we add the (question, answer) pairs that we don't
+      // want to see in the list of students, they are in props.students["detailtags"].
       if (!props.listelement) {
         Object.entries(props.student["detailtags"]).map(([k, v]) => {
           rows.push(
@@ -30,6 +46,7 @@ export default function SuggestionsCount(props) {
         })
       }
 
+      // add the decision of the student to the general info
       rows.push(
         <Row key={"Decision"} className="question-answer-row">
           <Col md="auto" className="info-titles">{"Decision"}</Col>
@@ -41,7 +58,9 @@ export default function SuggestionsCount(props) {
     }
   }
 
-  // return html representation of the suggestion counts for a student
+  /**
+   * return html representation of the suggestion counts for a student
+   */
   return (
     <Col md="auto">
       {getInfo()}
