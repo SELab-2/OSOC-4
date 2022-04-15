@@ -174,55 +174,28 @@ async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = De
     return [ProjectOutSimple.parse_raw(r.json()).id for r in results]
 
 
-@router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Students retrieved")
-async def get_conflicting_students(year: int):
+@router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
+async def get_conflicting_students(year: int, session: AsyncSession = Depends(get_session)):
     """get_conflicting_students gets all students with conflicts in their confirmed suggestions
     within an edition
 
     :param year: year of the edition
     :type year: int
-    :return: list of students with conflicting suggestions
-             each entry is a dictionary with keys "student_id" and "suggestion_ids"
-    :rtype: dict
+    :return: list of student_ids with conflicting suggestions
+    :rtype: list
     """
 
-    collection = db.engine.get_collection(Suggestion)
-    if not collection:
-        raise SuggestionRetrieveException()
+    student_ids = await session.execute(
+        f"""
+        SELECT student.id
+        FROM student, suggestion
+        WHERE student.id = suggestion.student_id AND suggestion.definitive = 't' AND suggestion.decision = {SuggestionOption.YES}
+        GROUP BY student.id
+        HAVING COUNT (*) > 1;
+        """
+    )
 
-    students = await db.engine.find(Student, {"edition": year})
-    students = [student.id for student in students]
-
-    pipeline = [
-        # get confirmed suggestions for students in the current edition that say yes
-        {"$match": {
-            "definitive": True,
-            "student": {"$in": students},
-            "decision": SuggestionOption.YES}},
-        # group by student_form, create set of suggestions and get count of suggestions
-        {"$group": {
-            "_id": "$student",
-            "suggestion_ids": {"$addToSet": "$_id"},
-            "count": {"$sum": 1}}},
-        # only match if count of suggestions > 0, since this means there is a conflict
-        {"$match": {
-            "_id": {"$ne": None},
-            "count": {"$gt": 1}}},
-        # change field names
-        {"$project": {
-            "student_id": "$_id",
-            "suggestion_ids": 1,
-            "_id": 0}}
-    ]
-
-    documents = await collection.aggregate(pipeline).to_list(length=None)
-    students = []
-    for doc in documents:
-        students.append(doc)
-        students[-1]["student_id"] = str(students[-1]["student_id"])
-        students[-1]["suggestion_ids"] = [str(s_id) for s_id in students[-1]["suggestion_ids"]]
-
-    return response(students, "Students with conflicting suggestions retrieved succesfully")
+    return [f"{config.api_url}/students/{id}" for (id,) in student_ids]
 
 
 # Question Tag Endpoints
