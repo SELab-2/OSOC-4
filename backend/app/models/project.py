@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from app.config import config
-from app.models.participation import Participation
+from app.models.participation import Participation, ParticipationOutProject
 from app.models.suggestion import Suggestion
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
@@ -76,10 +76,10 @@ class ProjectOutExtended(BaseModel):
     partner_description: str
     required_skills: List[RequiredSkillOut] = []
     users: List[str] = []
+    participations: List[ParticipationOutProject] = []
     edition: str
 
     def __init__(self, **data):
         data["id"] = config.api_url + "projects/" + str(data["id"])
-        # data["users"] = [config.api_url + "users/" + str(user) for user in data["users"]]
         data["edition"] = config.api_url + "editions/" + str(data["edition"])
         super().__init__(**data)
