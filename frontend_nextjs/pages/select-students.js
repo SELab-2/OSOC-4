@@ -49,8 +49,6 @@ export default function SelectStudents() {
                 setSearch(router.query.search);
                 setSortby(router.query.sortby);
 
-                setStudents(undefined);
-
                 // the urlManager returns the url for the list of students
                 urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
                     Promise.all(res.map(studentUrl =>

@@ -30,6 +30,7 @@ export default function EmailStudents() {
 
   // These variables are used to notice if search or filters have changed
   const [search, setSearch] = useState("");
+  let [sortby, setSortby] = useState("");
   const [localFilters, setLocalFilters] = useState([-1, -1]);
 
   // This represents the filters, filters[0] contains the general filters and filters[1] contains the decision filters
@@ -46,8 +47,10 @@ export default function EmailStudents() {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will provoke
       // the second part of useEffect to filter the students again.
-      if ((!students) || (router.query.search !== search)) {
+      if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
         setSearch(router.query.search);
+        setSortby(router.query.sortby);
+
         // the urlManager returns the url for the list of students
         urlManager.getStudents().then(url =>
           getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
