@@ -1,5 +1,4 @@
 import datetime
-import json
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
@@ -13,7 +12,7 @@ from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
     QuestionTagNotFoundException)
 from app.models.answer import Answer
-from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
+from app.models.edition import Edition, EditionCoach, EditionOutExtended, EditionOutSimple
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
@@ -77,16 +76,7 @@ async def get_edition(year: int, edition: EditionChecker() = Depends(), session:
     :rtype: dict
     """
 
-    user_ids = [u.id for u in edition.coaches]
-
-    # get the admins
-    res = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
-    user_ids += [admin.id for admin in res]
-
-    edition_json = json.loads(edition.json())
-    edition_json["user_ids"] = user_ids
-
-    return EditionOutExtended.parse_raw(json.dumps(edition_json))
+    return EditionOutExtended.parse_raw(edition.json())
 
 
 @router.patch("/{year}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="updated edition")
@@ -108,6 +98,22 @@ async def update_edition(year: int, edition: Edition = Body(...), session: Async
         setattr(result, key, value)
     await update(result, session)
     return EditionOutSimple.parse_raw(result.json()).uri
+
+
+@router.get("/{year}/users", response_description="Users retrieved")
+async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
+    """get_users get all the User instances from the database in edition with given year
+
+    :return: list of users
+    :rtype: dict
+    """
+
+    edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
+    user_ids = [coach.coach_id for coach in edition_coaches]
+    # get the admins
+    admins = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
+    user_ids += [admin.id for admin in admins]
+    return [f"{config.api_url}users/{str(id)}" for id in user_ids]
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
