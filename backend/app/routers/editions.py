@@ -77,16 +77,7 @@ async def get_edition(year: int, edition: EditionChecker() = Depends(), session:
     :rtype: dict
     """
 
-    user_ids = [u.id for u in edition.coaches]
-
-    # get the admins
-    res = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
-    user_ids += [admin.id for admin in res]
-
-    edition_json = json.loads(edition.json())
-    edition_json["user_ids"] = user_ids
-
-    return EditionOutExtended.parse_raw(json.dumps(edition_json))
+    return EditionOutExtended.parse_raw(edition.json())
 
 
 @router.patch("/{year}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="updated edition")
@@ -117,8 +108,13 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
     :return: list of users
     :rtype: dict
     """
-    results = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
-    return [f"{config.api_url}users/{str(res.coach_id)}" for res in results]
+
+    edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
+    user_ids = [coach.coach_id for coach in edition_coaches]
+    # get the admins
+    admins = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
+    user_ids += [admin.id for admin in admins]
+    return [f"{config.api_url}users/{str(id)}" for id in user_ids]
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
