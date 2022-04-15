@@ -2,11 +2,10 @@ import datetime
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
-from app.database import db, get_session
+from app.database import get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
-                                               SuggestionRetrieveException,
                                                YearAlreadyOverException)
 from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
@@ -19,10 +18,9 @@ from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
 from app.models.student import Student
-from app.models.suggestion import Suggestion, SuggestionOption
+from app.models.suggestion import SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
-from app.utils.response import response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.exc import IntegrityError
