@@ -1,6 +1,6 @@
 from random import choice, randrange, sample
 
-from app.crud import update
+from app.crud import update, clear_data
 from app.database import get_session
 from app.models.answer import Answer
 from app.models.edition import Edition
@@ -280,8 +280,9 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
     return suggestions
 
 
-@router.get("/", response_description="Data inserted")
+@router.post("/", response_description="Data cleared and reinserted")
 async def add_dummy_data(session: AsyncSession = Depends(get_session)):
+    await clear_data(session)
     user_admin = User(
         email="user_admin@test.be",
         name="admin",
@@ -404,3 +405,8 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     await session.commit()
 
     return response(None, "Dummy data inserted")
+
+
+@router.delete("/", response_description="Data cleared")
+async def clear_database(session: AsyncSession = Depends(get_session)):
+    await clear_data(session)
