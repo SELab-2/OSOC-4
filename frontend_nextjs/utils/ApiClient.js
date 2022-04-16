@@ -95,7 +95,6 @@ class UrlManager {
         }
         if (this._current_edition) {
             let editionData = await axios.get(this._current_edition, config);
-            console.log(editionData)
             this._year = editionData.data['year'];
             this._students = editionData.data["students"];
             this._projects = editionData.data["projects"];
