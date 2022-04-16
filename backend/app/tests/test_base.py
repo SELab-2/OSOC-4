@@ -48,10 +48,8 @@ class Status(IntEnum):
 
 
 class TestBase(unittest.IsolatedAsyncioTestCase):
-    def __init__(self, generator, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.generator = generator
-
         self.bad_id = 0
         self.users = {}
         self.saved_objects = {
