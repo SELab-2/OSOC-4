@@ -18,7 +18,8 @@ import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 import { urlManager } from "../../utils/ApiClient";
-import {getDecisionString} from "./StudentListelement";
+import { getDecisionString } from "./StudentListelement";
+import { useSession } from "next-auth/react";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -42,6 +43,8 @@ export default function StudentDetails(props) {
   const [suggestion, setSuggestion] = useState(0);
   const [decideField, setDecideField] = useState(-1);
 
+  const { data: session, status } = useSession()
+
   // This function inserts the data in the variables
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
@@ -49,6 +52,13 @@ export default function StudentDetails(props) {
       setStudentId(props.student_id);
       if (!props.student) {
         getJson(urlManager.baseUrl + "/students/" + props.student_id).then(res => {  //todo use urlManager
+
+          Object.values(res["suggestions"]).forEach((item, index) => {
+            if (item["suggested_by_id"] == session["userid"]) {
+              res["own_suggestion"] = item;
+            }
+          });
+
           setStudent(res);
 
           // Fill in the suggestions field, this contains all the suggestions which are not definitive
@@ -147,10 +157,15 @@ export default function StudentDetails(props) {
   return (
     <Col className="fill_height student-details-window" style={{ visibility: props.visibility }} >
 
-      <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
-      <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
-      <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
-      <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
+      {student["mandatory"] &&
+        <div>
+          <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
+          <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
+          <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
+          <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
+        </div>
+      }
+
 
       <Row className="details-upper-layer">
         <Col md="auto">

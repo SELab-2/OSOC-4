@@ -68,7 +68,15 @@ export default function SelectStudents() {
                 // the urlManager returns the url for the list of students
                 urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
                     Promise.all(res.map(studentUrl =>
-                        getJson(studentUrl).then(res => res)
+                        getJson(studentUrl).then(res => {
+                            Object.values(res["suggestions"]).forEach((item, index) => {
+                                if (item["suggested_by_id"] == session["userid"]) {
+                                    res["own_suggestion"] = item;
+                                }
+                            });
+                            console.log(res)
+                            return res;
+                        })
                     )).then(students => {
                         setStudents(students);
                         setLocalFilters([0, 0, 0]);
@@ -127,6 +135,7 @@ export default function SelectStudents() {
                     return o;
                 }
             });
+
             return foundStudent;
         }
         return undefined;

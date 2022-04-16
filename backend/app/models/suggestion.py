@@ -38,7 +38,7 @@ class SuggestionCreate(BaseModel):
 
     student_id: int
     project_id: Optional[int]
-    suggested_by_id: Optional[int]
+    # suggested_by_id: Optional[int]
     # skill_name: str
 
 class MySuggestionOut(BaseModel):
@@ -55,11 +55,12 @@ class SuggestionExtended(BaseModel):
 
     student_id: str
     suggested_by_id: str
-    project_id: str
+    project_id: Optional[str]
     # skill_name: str
 
     def __init__(self, **data):
         data["student_id"] = f"{config.api_url}students/{str(data['student_id'])}"
         data["suggested_by_id"] = f"{config.api_url}users/{str(data['suggested_by_id'])}"
-        data["project_id"] = f"{config.api_url}project/{str(data['project_id'])}"
+        if data['project_id']:
+            data["project_id"] = f"{config.api_url}project/{str(data['project_id'])}"
         super().__init__(**data)

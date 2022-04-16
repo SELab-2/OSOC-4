@@ -1,13 +1,13 @@
 from app.config import config
 from app.database import get_session
 from app.models.answer import Answer
+from app.models.participation import Participation, ParticipationOutStudent
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
 from app.models.suggestion import (MySuggestionOut, Suggestion,
                                    SuggestionExtended)
-from app.models.participation import Participation, ParticipationOutStudent
 from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Depends
@@ -45,10 +45,6 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session), 
     info["listtags"] = listTags
     info["detailtags"] = detailTags
 
-    # student suggestions
-    r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
-    student_info = r.all()
-    info["suggestions"] = [SuggestionExtended.parse_raw(s.json()) for (s,) in student_info]
     # student participations
     r = await session.execute(select(Participation).select_from(Participation).where(Participation.student_id == int(student_id)))
     student_info = r.all()
@@ -56,14 +52,10 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session), 
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
 
-    suggestions = {}
-    info["own_suggestion"] = None
-    for (s,) in student_info:
-        suggestions[s.id] = SuggestionExtended.parse_raw(s.json())
-        if s.suggested_by_id == Authorize.get_jwt_subject():
-            info["own_suggestion"] = MySuggestionOut.parse_raw(s.json())
-    info["suggestions"] = suggestions
-
+    # student suggestions
+    r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
+    student_info = r.all()
+    info["suggestions"] = {s.id: SuggestionExtended.parse_raw(s.json()) for (s,) in student_info}
     return info
 
 

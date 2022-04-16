@@ -53,6 +53,7 @@ export default function PopUpWindow(props) {
       ...suggestion,
       ["student_id"]: props.student["id_int"]
     });
+    console.log(suggestion)
     props.updateSuggestion(suggestion)
     setPopUpShow(false);
   }
@@ -69,7 +70,7 @@ export default function PopUpWindow(props) {
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
           Suggest '{getSuggestion()}' for {props.student.mandatory["first name"] + " " +
-          props.student.mandatory["last name"]}
+            props.student.mandatory["last name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Body>
