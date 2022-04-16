@@ -22,5 +22,3 @@ class WebSocketManager:
         print("broadcasting ...")
         for conn in self.active_connections:
             await conn.send_json(message)
-
-

@@ -1,5 +1,3 @@
-import json
-
 from app.crud import read_where, update
 from app.database import get_session, websocketManager
 from app.exceptions.suggestion_exception import SuggestionNotFound
@@ -9,11 +7,11 @@ from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
 from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
-from fastapi.routing import APIRouter
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/suggestions")
+
 
 @router.post("/create", response_description="Suggestion created")
 async def create_suggestion(suggestion: SuggestionCreate, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
@@ -40,5 +38,3 @@ async def get_suggestion_with_id(id: int, session: AsyncSession = Depends(get_se
         raise SuggestionNotFound()
 
     return SuggestionExtended.parse_raw(suggestion.json())
-
-

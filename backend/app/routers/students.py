@@ -6,10 +6,9 @@ from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
-from app.models.suggestion import (MySuggestionOut, Suggestion,
-                                   SuggestionExtended)
+from app.models.suggestion import Suggestion, SuggestionExtended
 from app.models.user import UserRole
-from app.utils.checkers import EditionChecker, RoleChecker
+from app.utils.checkers import RoleChecker
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession

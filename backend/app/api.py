@@ -1,7 +1,7 @@
 import inspect
 import re
 
-from fastapi import APIRouter, FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
@@ -11,8 +11,8 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from app.config import config
 from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
-from app.routers import (auth, ddd, editions, projects, reset_password,
-                         skills, students, suggestions, tally, user_invites, users, websocket)
+from app.routers import (auth, ddd, editions, projects, reset_password, skills,
+                         students, suggestions, tally, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -71,7 +71,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocketManager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
+            await websocket.receive_text()
     except WebSocketDisconnect as e:
         websocketManager.disconnect(websocket)
         print(e)

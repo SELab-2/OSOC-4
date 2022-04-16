@@ -41,12 +41,6 @@ class SuggestionCreate(BaseModel):
     # suggested_by_id: Optional[int]
     # skill_name: str
 
-class MySuggestionOut(BaseModel):
-    decision: int
-    definitive: Optional[bool]
-    reason: str
-
-    project_id: Optional[int]
 
 class SuggestionExtended(BaseModel):
     decision: int
