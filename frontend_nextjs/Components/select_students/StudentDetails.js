@@ -18,6 +18,7 @@ import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 import { urlManager } from "../../utils/ApiClient";
+import {getDecisionString} from "./StudentListelement";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -31,7 +32,7 @@ export default function StudentDetails(props) {
   const [decision, setDecision] = useState(-1);
   const [questionAnswers, setQuestionAnswers] = useState([])
 
-  // These constant define wheater the pop-up windows should be shown or not
+  // These constants define wheater the pop-up windows should be shown or not
   const [suggestionPopUpShow, setSuggestionPopUpShow] = useState(false);
   const [decisionPopUpShow, setDecisionPopUpShow] = useState(false);
   const [emailPopUpShow, setEmailPopUpShow] = useState(false);
@@ -43,7 +44,6 @@ export default function StudentDetails(props) {
 
   // This function inserts the data in the variables
   useEffect(() => {
-
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
@@ -69,15 +69,6 @@ export default function StudentDetails(props) {
       })
     }
   }, [studentId, props.student_id])
-
-  // return a string representation of the decision
-  function getDecision() {
-    if (decision === -1) {
-      return "Undecided"
-    }
-    let decisionwords = ["No", "Maybe", "Yes"];
-    return decisionwords[decision];
-  }
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {
@@ -190,7 +181,7 @@ export default function StudentDetails(props) {
       <Row className="remaining-height-details" md="auto" style={{}}>
         <Col md="auto" className="fill_height scroll-overflow student-details">
           <Row md="auto" className="decision">
-            <GeneralInfo listelement={false} student={student} decision={getDecision()} />
+            <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
           </Row>
           <Row md="auto">
             <Button className="send-email-button" disabled={decision === -1} onClick={() => setEmailPopUpShow(true)}>

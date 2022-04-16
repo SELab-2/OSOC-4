@@ -36,7 +36,8 @@ export default function PopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Suggest '{getSuggestion()}' for {props.student["name"]}
+          Suggest '{getSuggestion()}' for {props.student.mandatory["first name"] + " " +
+          props.student.mandatory["last name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Body>

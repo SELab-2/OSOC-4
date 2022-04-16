@@ -4,6 +4,15 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
 
+// get the decision for the student (yes, maybe, no or undecided)
+export function getDecisionString(value) {
+  if (value === -1) {
+    return "Undecided";
+  }
+  let possibleDecisions = ["No", "Maybe", "Yes"];
+  return possibleDecisions[value];
+}
+
 // represents one list element card in the student list
 export default function StudentListelement(props) {
 
@@ -24,15 +33,6 @@ export default function StudentListelement(props) {
       }
     }
   });
-
-  // get the decision for the student (yes, maybe, no or undecided)
-  function getDecision() {
-    if (decision === -1) {
-      return "Undecided";
-    }
-    let possibleDecisions = ["No", "Maybe", "Yes"];
-    return possibleDecisions[decision];
-  }
 
   // get a list of the skills of the student in HTML format
   function getSkills() {
@@ -103,7 +103,7 @@ export default function StudentListelement(props) {
       </Row>
 
       <Row id="info" className="info">
-        <GeneralInfo listelement={true} student={props.student} decision={getDecision()} />
+        <GeneralInfo listelement={true} student={props.student} decision={getDecisionString(decision)} />
         <Col id="skills" align="right" className="skills" md="auto">
           <ul>
             {getSkills()}
