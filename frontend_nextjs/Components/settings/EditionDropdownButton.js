@@ -51,7 +51,7 @@ export default function EditionDropdownButton() {
     const ChangeSelectedVersion = async (edition) => {
         log("change edition dropdown")
         log(edition)
-        await urlManager._setCurrentEdition(edition.year)
+        await urlManager.setCurrentEdition(edition.year)
         await setCurrentVersion({"year": edition.year, "name": edition.name});
     }
 
