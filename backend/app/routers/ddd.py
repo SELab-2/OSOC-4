@@ -45,7 +45,7 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
     return suggestions
 
 
-@router.post("/", response_description="Data cleared and reinserted")
+@router.get("/", response_description="Data cleared and reinserted")
 async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     await clear_data(session)
 

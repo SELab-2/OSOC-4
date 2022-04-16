@@ -36,7 +36,8 @@ export default function SendEmailPopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Send &apos;{getDecision()}&apos; email to {props.student["name"]}
+          Send &apos;{getDecision()}&apos; email to {props.student.mandatory["first name"] + " " +
+          props.student.mandatory["last name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">

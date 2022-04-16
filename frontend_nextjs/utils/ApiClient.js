@@ -63,7 +63,6 @@ class UrlManager {
         return this._questiontags;
     }
 
-
     async _setUsers() {
         log("Setting users")
         let res = await getJson("");
