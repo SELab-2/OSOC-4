@@ -11,6 +11,7 @@ from app.models.project import Project, ProjectRequiredSkill
 from app.models.skill import Skill
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
+from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
 from app.utils.response import response
@@ -48,6 +49,10 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
 async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     await clear_data(session)
 
+    #########
+    # users #
+    #########
+
     user_generator = UserGenerator(session)
 
     user_generator.generate_data(role=UserRole.COACH, active=False, approved=False, disabled=False),
@@ -58,16 +63,18 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     admins = user_generator.generate_n_of_data(2, role=UserRole.ADMIN)
     coaches = user_generator.generate_n_of_data(5, role=UserRole.COACH)
 
+    ##########
+    # skills #
+    ##########
+
+    skill_generator = SkillGenerator(session)
+    skills = skill_generator.generate_n_of_data(-1)
+
     edition = Edition(
         name="2019 Summer Fest",
         year=2019,
         coaches=coaches
     )
-
-    skills = [Skill(name=skill) for skill in
-              ["Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
-               "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
-               "Photographer"]]
 
     project = Project(
         name="Student Volunteer Project",

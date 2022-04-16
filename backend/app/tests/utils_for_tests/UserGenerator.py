@@ -6,7 +6,6 @@ from app.utils.cryptography import get_password_hash
 
 
 class UserGenerator(DataGenerator):
-
     def __init__(self, session):
         super().__init__(session)
         # Default users

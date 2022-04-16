@@ -2,6 +2,8 @@ from typing import Any, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.crud import update
+
 first_names = ["Eva", "Mark", "Jonathan", "Christine", "Sebatian", "Ava",
                "Blake", "Andrea", "Joanne", "Frank", "Emma", "Ruth", "Leah",
                "Jacob", "Megan", "Richard", "Piers", "Felicity", "Melanie",
@@ -15,12 +17,11 @@ emails = ["gmail.com", "outlook.com", "yahoo.com", "hotmail.com"]
 
 
 class DataGenerator:
-    data: List[Any] = []
-
     def __init__(self, session: AsyncSession):
+        self.data: List[Any] = []
         self.session: AsyncSession = session
 
-    def generate_n_of_data(self, n: int, **args):
+    def generate_n_of_data(self, n: int, **args) -> List[Any]:
         return [self.generate_data(args) for _ in range(n)]
 
     def generate_data(self, *args):
@@ -28,6 +29,6 @@ class DataGenerator:
 
     async def add_to_session(self):
         for d in self.data:
-            self.session.add(d)
+            await update(d, self.session)
 
         return self

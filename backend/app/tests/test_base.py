@@ -11,8 +11,8 @@ from app.api import app
 from app.crud import read_where, update, clear_data, read_all_where
 from app.database import engine
 from app.models.edition import Edition
-from app.models.skill import Skill
 from app.models.user import User, UserRole
+from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
 
 
@@ -53,13 +53,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
         self.bad_id = 0
         self.objects = {
-            "projectleider": Skill(name="projectleider"),
-            "Systeembeheerder": Skill(name="Systeembeheerder"),
-            "API-beheerder": Skill(name="API-beheerder"),
-            "testverantwoordelijke": Skill(name="testverantwoordelijke"),
-            "documentatie verantwoordelijke": Skill(name="documentatie verantwoordelijke"),
-            "customer relations": Skill(name="customer relations"),
-            "frontend": Skill(name="frontend"),
             "2022_edition": Edition(year=2022, name="Summer edition 2022", coaches=[], students=[]),
         }
 
@@ -79,16 +72,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.saved_objects["passwords"] = user_generator.passwords
         await user_generator.add_to_session()
 
+        skill_generator = SkillGenerator(self.session)
+        skill_generator.generate_n_of_data(-1)
+        await skill_generator.add_to_session()
+
         for key, obj in self.objects.items():
             await update(obj, session=self.session)
-
-    async def get_users_by(self, roles: List[UserRole], active=True, approved=True, disabled=False) -> Set[str]:
-        users = await read_all_where(User, session=self.session)
-        return {user.name for user in users
-                if user.role in roles and
-                user.active == active and
-                user.approved == approved and
-                user.disabled == disabled}
 
     async def asyncTearDown(self) -> None:
         await clear_data(self.session)
@@ -96,6 +85,14 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         await self.lf.__aexit__()
         await self.client.aclose()
         await self.session.close()
+
+    async def get_users_by(self, roles: List[UserRole], active=True, approved=True, disabled=False) -> Set[str]:
+        users = await read_all_where(User, session=self.session)
+        return {user.name for user in users
+                if user.role in roles
+                and user.active == active
+                and user.approved == approved
+                and user.disabled == disabled}
 
     async def get_user_by_name(self, user_name: str) -> Optional[Type[User]]:
         return await read_where(User, User.name == user_name, session=self.session)
