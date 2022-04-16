@@ -5,12 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import update, clear_data
 from app.database import get_session
-from app.models.edition import Edition
 from app.models.participation import Participation
 from app.models.project import Project, ProjectRequiredSkill
-from app.models.skill import Skill
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
+from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
@@ -70,11 +69,12 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     skill_generator = SkillGenerator(session)
     skills = skill_generator.generate_n_of_data(-1)
 
-    edition = Edition(
-        name="2019 Summer Fest",
-        year=2019,
-        coaches=coaches
-    )
+    ############
+    # Editions #
+    ############
+
+    edition_generator = EditionGenerator(session, coaches)
+    edition = edition_generator.generate_data()
 
     project = Project(
         name="Student Volunteer Project",
@@ -82,7 +82,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Free real estate",
         partner_name="UGent",
         partner_description="De C in UGent staat voor communicatie",
-        coaches=coaches[:2],
+        coaches=sample(edition.coaches, 2),
         edition=edition.year)
 
     project1_skills = [ProjectRequiredSkill(
@@ -97,7 +97,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Hackers & Cyborgs",
         partner_name="HoGent",
         partner_description="Like UGent but worse",
-        coaches=coaches[2:],
+        coaches=sample(edition.coaches, 2),
         edition=edition.year)
     await update(project, session)
 
@@ -130,8 +130,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
             participations.append(Participation(student=student, project=project,
                                                 skill=required_skill.skill))
 
-    session.add(edition)
-
     session.add(project)
     session.add(project2)
 
@@ -140,6 +138,8 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     for skill in project2_skills:
         session.add(skill)
 
+    await user_generator.add_to_session()
+    await edition_generator.add_to_session()
     await student_generator.add_to_session()
 
     for suggestion in suggestions:

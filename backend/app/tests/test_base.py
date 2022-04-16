@@ -8,10 +8,10 @@ from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import app
-from app.crud import read_where, update, clear_data, read_all_where
+from app.crud import read_where, clear_data, read_all_where
 from app.database import engine
-from app.models.edition import Edition
 from app.models.user import User, UserRole
+from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
 
@@ -52,9 +52,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         super().__init__(*args, **kwargs)
 
         self.bad_id = 0
-        self.objects = {
-            "2022_edition": Edition(year=2022, name="Summer edition 2022", coaches=[], students=[]),
-        }
 
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
@@ -70,14 +67,19 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         user_generator = UserGenerator(self.session)
         self.users = {user.name: user for user in user_generator.data}
         self.saved_objects["passwords"] = user_generator.passwords
-        await user_generator.add_to_session()
 
         skill_generator = SkillGenerator(self.session)
         skill_generator.generate_n_of_data(-1)
-        await skill_generator.add_to_session()
 
-        for key, obj in self.objects.items():
-            await update(obj, session=self.session)
+        edition_generator = EditionGenerator(
+            self.session,
+            [user for user in user_generator.data if user.role == UserRole.COACH]
+        )
+        edition_generator.generate_data()
+
+        await user_generator.add_to_session()
+        await skill_generator.add_to_session()
+        await edition_generator.add_to_session()
 
     async def asyncTearDown(self) -> None:
         await clear_data(self.session)
