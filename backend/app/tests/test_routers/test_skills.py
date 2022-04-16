@@ -7,11 +7,19 @@ from app.crud import read_all_where
 from app.models.skill import Skill
 from app.models.user import UserRole
 from app.tests.test_base import TestBase, Request
+from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
 
 
 class TestSkills(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    async def asyncSetUp(self) -> None:
+        await super().asyncSetUp()
+
+        skill_generator = SkillGenerator(self.session)
+        skill_generator.generate_n_of_data(-1)
+        await skill_generator.add_to_session()
 
     async def test_get_skills(self):
         path = "/skills"
