@@ -33,15 +33,15 @@ class EditionOutExtended(BaseModel):
     year: int
     name: Optional[str] = ""
     description: Optional[str] = ""
-    user_ids: List[str]
 
+    users: str = ""
     students: str = ""
     projects: str = ""
     questiontags: str = ""
 
     def __init__(self, **data):
         data["uri"] = config.api_url + "editions/" + str(data["year"])
-        data["user_ids"] = [config.api_url + "users/" + str(user) for user in data["user_ids"]]
+        data["users"] = f"{config.api_url}editions/{data['year']}/users"
         data["students"] = f"{config.api_url}editions/{data['year']}/students"
         data["projects"] = f"{config.api_url}editions/{data['year']}/projects"
         data["questiontags"] = f"{config.api_url}editions/{data['year']}/questiontags"

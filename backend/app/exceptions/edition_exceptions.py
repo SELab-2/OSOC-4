@@ -21,11 +21,6 @@ class EditionYearModifyException(BaseException):
         super().__init__(400, "Edition year can't be modified")
 
 
-class SuggestionRetrieveException(BaseException):
-    def __init__(self):
-        super().__init__(400, "Unable to retrieve suggestions")
-
-
 class StudentNotFoundException(BaseException):
     def __init__(self):
         super().__init__(400, "Student not found")

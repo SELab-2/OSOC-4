@@ -5,11 +5,10 @@ from typing import Set, Dict, Any, Tuple, Optional, Type
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
-from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import app
-from app.crud import read_where, update, read_all_where
+from app.crud import read_where, update, clear_data
 from app.database import engine
 from app.models.edition import Edition
 from app.models.skill import Skill
@@ -149,32 +148,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             await update(obj, session=self.session)
 
     async def asyncTearDown(self) -> None:
-        async with engine.connect() as conn:
-            # tables in dependency order (delete last first and/or cascade)
-            tables = await conn.run_sync(
-                lambda sync_conn: inspect(sync_conn).get_sorted_table_and_fkc_names()
-            )
-
-        for table in reversed(tables):
-            # TODO: fix this, doing "TRUNCATE user CASCADE" gives syntax error, thus workaround
-            if table[0] == "user":  # workaround for user table
-                users = await read_all_where(User, session=self.session)
-                for user in users:
-                    await self.session.delete(user)
-            elif table[0] is not None:
-                await self.session.execute(f"TRUNCATE {table[0]} CASCADE")  # successful on edition fails on user
-
-            await self.session.commit()
-
-        # old way of doing things, this should result in the same empty database as the above function
-        # The above way of doing it ensures all tables are emptied instead of only those in this loop which may change
-        # for model in [Answer, Edition, Participation, Project, Question,
-        #               QuestionAnswer, Student, User, Skill, Suggestion]:
-        #     objects = await read_all_where(model, session=self.session)
-        #     for obj in objects:
-        #         await self.session.delete(obj)
-        #
-        #     await self.session.commit()
+        await clear_data(self.session)
 
         await self.lf.__aexit__()
         await self.client.aclose()
