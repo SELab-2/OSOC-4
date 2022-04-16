@@ -11,8 +11,6 @@ from app.api import app
 from app.crud import read_where, clear_data, read_all_where
 from app.database import engine
 from app.models.user import User, UserRole
-from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
-from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
 
 
