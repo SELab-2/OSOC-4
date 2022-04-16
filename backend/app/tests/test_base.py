@@ -48,11 +48,12 @@ class Status(IntEnum):
 
 
 class TestBase(unittest.IsolatedAsyncioTestCase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, generator, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.generator = generator
 
         self.bad_id = 0
-
+        self.users = {}
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         }
@@ -64,9 +65,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         await self.lf.__aenter__()
         self.session: AsyncSession = AsyncSession(engine)
 
+        ###
+        # Needs to be done for all testcases
         user_generator = UserGenerator(self.session)
         self.users = {user.name: user for user in user_generator.data}
         self.saved_objects["passwords"] = user_generator.passwords
+        ###
 
         skill_generator = SkillGenerator(self.session)
         skill_generator.generate_n_of_data(-1)
@@ -75,7 +79,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             self.session,
             [user for user in user_generator.data if user.role == UserRole.COACH]
         )
-        edition_generator.generate_data()
+        edition_generator.generate_data(2022)
 
         await user_generator.add_to_session()
         await skill_generator.add_to_session()

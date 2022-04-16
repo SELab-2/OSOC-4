@@ -74,7 +74,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     ############
 
     edition_generator = EditionGenerator(session, coaches)
-    edition = edition_generator.generate_data()
+    edition = edition_generator.generate_data(2022)
 
     project = Project(
         name="Student Volunteer Project",
