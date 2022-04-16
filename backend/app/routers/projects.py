@@ -4,6 +4,7 @@ from app.database import get_session
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
                                 ProjectOutExtended, ProjectOutSimple)
+from app.models.participation import Participation, ParticipationOutProject
 from app.models.user import UserRole, User
 from app.utils.checkers import RoleChecker
 from app.utils.response import response
@@ -57,6 +58,8 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
     projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers.all()]
     projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
     projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]
+    projectParticipations = await session.execute(select(Participation).where(Participation.project_id == int(id)))
+    projectOutExtended.participations = [ParticipationOutProject.parse_raw(s.json()) for (s,) in projectParticipations.all()]
     return projectOutExtended
 
 

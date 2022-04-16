@@ -6,6 +6,7 @@ from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
 from app.models.suggestion import Suggestion, SuggestionExtended
+from app.models.participation import Participation, ParticipationOutStudent
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
 from fastapi import APIRouter, Depends
@@ -58,12 +59,17 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session)):
     info["mandatory"] = mandatory
     info["listtags"] = listTags
     info["detailtags"] = detailTags
+
     # student suggestions
     r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
     student_info = r.all()
+    info["suggestions"] = [SuggestionExtended.parse_raw(s.json()) for (s,) in student_info]
+    # student participations
+    r = await session.execute(select(Participation).select_from(Participation).where(Participation.student_id == int(student_id)))
+    student_info = r.all()
+    info["participations"] = [ParticipationOutStudent.parse_raw(s.json()) for (s,) in student_info]
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
-    info["suggestions"] = [SuggestionExtended.parse_raw(s.json()) for (s,) in student_info]
     return info
 
 
