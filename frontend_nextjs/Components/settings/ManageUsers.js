@@ -3,7 +3,7 @@ import { Button, Form, Table } from "react-bootstrap";
 import UserTr from "./UserTr";
 import { getJson, postCreate } from "../../utils/json-requests";
 import { log } from "../../utils/logger";
-import { urlManager } from "../../utils/ApiClient";
+import {engine} from "../../utils/ApiClient";
 
 export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
@@ -20,18 +20,18 @@ export default function ManageUsers(props) {
         if (Boolean(props.initialize)) {
             if (!users.length && !loading) {
                 setLoading(true)
-                urlManager.getUsers().then(url => getJson(url).then(res => {
+                engine.getUsers().then(res => {
                     log("manage users:")
                     log(res)
                     for (let u of res) {
-                        getJson(u.id).then(async user => {
+                        engine.getJson(u.id).then(async user => {
                             if (user.data) {
                                 await setUsers(prevState => [...prevState, user.data]);
                                 await setShownUsers(prevState => [...prevState, user.data]);
                             }
                         }).then(() => setLoading(false))
                     }
-                }));
+                });
             }
         }
     }, [users.length, loading, props.initialize])
@@ -45,7 +45,7 @@ export default function ManageUsers(props) {
         log("handle submit invite");
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
-        let user_url = await urlManager.getUsers();
+        let user_url = await engine.getUrl(engine.names.users);
         emails.forEach(email => {
             // post to create
             postCreate(user_url + "/create", { "email": email }).then(resp => {

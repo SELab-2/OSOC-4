@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { getJson } from "../utils/json-requests";
+import React, {useEffect, useState} from "react";
+import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
-import { Col, Form, Row } from "react-bootstrap";
+import {Col, Row} from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
-import { useSession } from "next-auth/react";
-import { websocketManager, urlManager } from "../utils/ApiClient";
-import { useRouter } from "next/router";
+import {useSession} from "next-auth/react";
+import {engine} from "../utils/ApiClient";
+import {useRouter} from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
-import { WebSocketManager } from "../utils/ApiClient"
 
 // This function filters the list of students, it is also used in email-students
 export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
@@ -57,7 +56,7 @@ export default function SelectStudents() {
 
         }
 
-    }, [students])
+    }, [students, updateFromWebsocket, ws])
 
     useEffect(() => {
         if (session) {
@@ -66,11 +65,11 @@ export default function SelectStudents() {
                 setSortby(router.query.sortby);
 
                 // the urlManager returns the url for the list of students
-                urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
+                engine.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
                     Promise.all(res.map(studentUrl =>
                         getJson(studentUrl).then(res => {
                             Object.values(res["suggestions"]).forEach((item, index) => {
-                                if (item["suggested_by_id"] == session["userid"]) {
+                                if (item["suggested_by_id"] === session["userid"]) {
                                     res["own_suggestion"] = item;
                                 }
                             });
@@ -81,8 +80,7 @@ export default function SelectStudents() {
                         setStudents(students);
                         setLocalFilters([0, 0, 0]);
                     })
-                })
-                );
+                });
             }
             if (students &&
                 (localFilters.some((filter, index) => filter !== filters[index].length))) {
@@ -93,7 +91,7 @@ export default function SelectStudents() {
                 setVisibleStudents(students);
             }
         }
-    })
+    }, [session, students, router.query.search, router.query.sortby, search, sortby, localFilters, filters, filterStudentsDecision])
 
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
@@ -130,13 +128,11 @@ export default function SelectStudents() {
 
     function getStudentById() {
         if (students) {
-            let foundStudent = students.find((o, i) => {
+            return students.find((o, i) => {
                 if (o["id_int"] === studentId) {
                     return o;
                 }
             });
-
-            return foundStudent;
         }
         return undefined;
     }

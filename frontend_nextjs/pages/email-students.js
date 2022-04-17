@@ -3,7 +3,7 @@ import {getJson} from "../utils/json-requests";
 import {Button, Col, Row} from "react-bootstrap";
 
 import {useSession} from "next-auth/react";
-import {urlManager} from "../utils/ApiClient";
+import {engine} from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 import EmailStudentsFilters from "../Components/email-students/EmailStudentsFilters";
@@ -52,15 +52,14 @@ export default function EmailStudents() {
         setSortby(router.query.sortby);
 
         // the urlManager returns the url for the list of students
-        urlManager.getStudents().then(url =>
-          getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
-            Promise.all(res.map(studentUrl =>
-              getJson(studentUrl).then(res => res)
-            )).then(students => {
-              setStudents(students);
-              setLocalFilters([-1, -1]);
-            })
-          })
+        engine.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
+              Promise.all(res.map(studentUrl =>
+                  getJson(studentUrl).then(res => res)
+              )).then(students => {
+                setStudents(students);
+                setLocalFilters([-1, -1]);
+              })
+            }
         );
       }
 
@@ -82,7 +81,7 @@ export default function EmailStudents() {
    */
   function filterUndecided() {
     return students.filter(
-      student => student["suggestions"].filter(suggestion => suggestion["definitive"]).length !== 0
+      student => Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]).length !== 0
     );
   }
 
@@ -113,7 +112,7 @@ export default function EmailStudents() {
     let decisionNumbers = filters[1].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
 
     return filteredStudents.filter(student => {
-      let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
+      let decisions = Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]);
       return decisionNumbers.length === 0 || decisionNumbers.includes(decisions[0]["decision"]);
     });
   }
