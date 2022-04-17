@@ -33,7 +33,7 @@ export default function StudentListelement(props) {
         (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
       }
     }
-  });
+  }, []);
 
   // get a list of the skills of the student in HTML format
   function getSkills() {

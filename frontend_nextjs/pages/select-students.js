@@ -1,14 +1,15 @@
-import React, {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
+import React, { useEffect, useState } from "react";
+import { getJson } from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
-import {Col, Row} from "react-bootstrap";
-
+import { Col, Row } from "react-bootstrap";
+import StudentListelement from "../Components/select_students/StudentListelement";
 import StudentList from "../Components/select_students/StudentList";
-import {useSession} from "next-auth/react";
-import {engine} from "../utils/ApiClient";
-import {useRouter} from "next/router";
+import { useSession } from "next-auth/react";
+import { engine } from "../utils/ApiClient";
+import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 // This function filters the list of students, it is also used in email-students
 export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
@@ -27,7 +28,9 @@ export default function SelectStudents() {
     const router = useRouter();
 
     // These constants are initialized empty, the data will be inserted in useEffect
-    const [students, setStudents] = useState(undefined);
+    const [students, setStudents] = useState([]);
+    const [studentUrls, setStudentUrls] = useState([]);
+
     const [visibleStudent, setVisibleStudents] = useState(undefined);
     const studentId = router.query.studentId
 
@@ -60,38 +63,56 @@ export default function SelectStudents() {
 
     useEffect(() => {
         if (session) {
-            if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
+            if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
                 setSearch(router.query.search);
                 setSortby(router.query.sortby);
 
                 // the urlManager returns the url for the list of students
                 engine.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
-                    Promise.all(res.map(studentUrl =>
+
+                    setLocalFilters([0, 0, 0]);
+                    let p1 = res.slice(0, 10);
+                    let p2 = res.slice(10);
+                    setStudentUrls(p2);
+                    Promise.all(p1.map(studentUrl =>
                         getJson(studentUrl).then(res => {
                             Object.values(res["suggestions"]).forEach((item, index) => {
                                 if (item["suggested_by_id"] === session["userid"]) {
                                     res["own_suggestion"] = item;
                                 }
                             });
-                            console.log(res)
                             return res;
                         })
-                    )).then(students => {
-                        setStudents(students);
-                        setLocalFilters([0, 0, 0]);
+                    )).then(newstudents => {
+
+                        setStudents([...students, ...newstudents]);
                     })
+                    // Promise.all(res.map(studentUrl =>
+                    //     getJson(studentUrl).then(res => {
+                    //         Object.values(res["suggestions"]).forEach((item, index) => {
+                    //             if (item["suggested_by_id"] === session["userid"]) {
+                    //                 res["own_suggestion"] = item;
+                    //             }
+                    //         });
+                    //         console.log(res)
+                    //         return res;
+                    //     })
+                    // )).then(students => {
+                    //     setStudents(students);
+                    //     setLocalFilters([0, 0, 0]);
+                    // })
                 });
             }
-            if (students &&
-                (localFilters.some((filter, index) => filter !== filters[index].length))) {
-                let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
-                filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents);
-            }
-            if (filters.every(filter => filter.length === 0)) {
-                setVisibleStudents(students);
-            }
+            // if (students &&
+            //     (localFilters.some((filter, index) => filter !== filters[index].length))) {
+            //     let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
+            //     filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents);
+            // }
+            // if (filters.every(filter => filter.length === 0)) {
+            //     setVisibleStudents(students);
+            // }
         }
-    }, [session, students, router.query.search, router.query.sortby, search, sortby, localFilters, filters, filterStudentsDecision])
+    }, [session, students, studentUrls, router.query.search, router.query.sortby, search, sortby, localFilters, filters, filterStudentsDecision])
 
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
@@ -137,6 +158,29 @@ export default function SelectStudents() {
         return undefined;
     }
 
+
+    const fetchData = () => {
+
+        let p1 = studentUrls.slice(0, 10);
+        let p2 = studentUrls.slice(10);
+        // 
+        Promise.all(p1.map(studentUrl =>
+            getJson(studentUrl).then(res => {
+                Object.values(res["suggestions"]).forEach((item, index) => {
+                    if (item["suggested_by_id"] === session["userid"]) {
+                        res["own_suggestion"] = item;
+                    }
+                });
+                return res;
+            })
+        )).then(newstudents => {
+            setStudents([...students, ...newstudents]);
+            setStudentUrls(p2);
+        })
+    }
+
+
+
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">
@@ -147,7 +191,33 @@ export default function SelectStudents() {
                     <Col className="fill_height students-list-paddingtop">
                         <SearchSortBar />
                         <Row className="student-list-positioning">
-                            <StudentList students={visibleStudent} />
+                            <InfiniteScroll
+                                dataLength={students.length} //This is important field to render the next data
+                                next={fetchData}
+                                hasMore={studentUrls.length > 0}
+                                loader={<h4>Loading...</h4>}
+                                endMessage={
+                                    <p style={{ textAlign: 'center' }}>
+                                        <b>Yay! You have seen it all</b>
+                                    </p>
+                                }
+                            // below props only if you need pull down functionality
+                            // refreshFunction={this.refresh}
+                            // pullDownToRefresh
+                            // pullDownToRefreshThreshold={50}
+                            // pullDownToRefreshContent={
+                            //     <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+                            // }
+                            // releaseToRefreshContent={
+                            //     <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+                            // }
+                            >
+                                {students.map((i, index) => (
+
+                                    <StudentListelement key={index} student={i} />
+
+                                ))}
+                            </InfiniteScroll>
                         </Row>
                     </Col>
                     {(studentId) ? <StudentDetails student={getStudentById()} student_id={studentId} /> : null}
