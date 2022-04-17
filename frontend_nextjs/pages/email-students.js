@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
 import {Button, Col, Row} from "react-bootstrap";
 
 import {useSession} from "next-auth/react";
-import {api} from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 import EmailStudentsFilters from "../Components/email-students/EmailStudentsFilters";
@@ -52,15 +51,15 @@ export default function EmailStudents() {
         setSortby(router.query.sortby);
 
         // the urlManager returns the url for the list of students
-        api.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
-              Promise.all(res.map(studentUrl =>
-                  getJson(studentUrl).then(res => res)
-              )).then(students => {
-                setStudents(students);
-                setLocalFilters([-1, -1]);
-              })
-            }
-        );
+        Url.fromName(api.students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+          if (res.success) {
+            Promise.all(res.data.map(studentUrl =>
+                Url.fromUrl(studentUrl).get().then(res => res.data)
+            )).then(students => {
+              setStudents(students);
+              setLocalFilters([-1, -1]);
+            })
+          }});
       }
 
       // Check if the real filters have changed from the local filters. If so, update the localfilters and

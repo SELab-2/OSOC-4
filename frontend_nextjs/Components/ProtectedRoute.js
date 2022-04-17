@@ -1,7 +1,8 @@
 import useSWR from 'swr';
 import axios from 'axios'
-import { getJson, isStillAuthenticated } from "../utils/json-requests";
+import { isStillAuthenticated } from "../utils/json-requests";
 import { useEffect, useState } from "react";
+import {api, Url} from "../utils/ApiClient";
 
 //check if you are on the client (browser) or server
 const isBrowser = () => typeof window !== "undefined";
@@ -11,7 +12,7 @@ const ProtectedRoute = ({ router, children }) => {
     let [loggedInAs, setLoggedInAs] = useState(null);
 
     if (isStillAuthenticated()) {
-        getJson("/users/me").then(resp => setLoggedInAs(resp.data.id))
+        Url.fromName(api.me).get().then(resp => setLoggedInAs(resp.data.id))
     }
 
     let unprotectedRoutes = [

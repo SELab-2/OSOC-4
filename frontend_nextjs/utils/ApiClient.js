@@ -40,7 +40,7 @@ export class Url {
     }
 
     async get(context = null) {
-        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'name' is undefined`);}
+        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
         this._headers = await api._headers(context);
         if (!this._url) {this._url = await api.getUrl(this._name, context);}
         try {
@@ -52,11 +52,11 @@ export class Url {
     }
 
     async post(context = null) {
-        if (!this._name) {throw Error(`ApiPath not properly instantiated, 'url' is undefined`)}
+        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
         this._headers = await api._headers(context);
         if (!this._url) {this._url = await api.getUrl(this._name, context);}
         try {
-            const resp = await axios.patch(this._url, this._body, this._headers);
+            const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
             return {success: false, error: e};
@@ -64,11 +64,11 @@ export class Url {
     }
 
     async patch(context = null) {
-        if (!this._name) {throw Error(`ApiPath not properly instantiated, 'url' is undefined`)}
+        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
         this._headers = await api._headers(context);
         if (!this._url) {this._url = await api.getUrl(this._name, context);}
         try {
-            const resp = await axios.patch(this._url, this._body, this._headers);
+            const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
             return {success: false, error: e};

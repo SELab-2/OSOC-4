@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getJson } from "../utils/json-requests";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
 import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
