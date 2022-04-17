@@ -35,11 +35,13 @@ export default function Settings(props) {
         if ((user === undefined || name === "" || email === "") && !loading) {
             setLoading(true)
             Url.fromName(api.me).get().then(res => {
-                log(res.data)
-                setUser(res.data);
-                setName(res.data.name);
-                setEmail(res.data.email);
-                setRole(res.data.role);
+                if (res.success) {
+                    res = res.data.data;
+                    setUser(res);
+                    setName(res.name);
+                    setEmail(res.email);
+                    setRole(res.role);
+                }
             }).then(() => setLoading(false))
         }
     }, [loading, user, name, email]);

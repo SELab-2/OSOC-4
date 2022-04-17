@@ -20,15 +20,20 @@ export default function ManageUsers(props) {
             if (!users.length && !loading) {
                 setLoading(true)
                 Url.fromName(api.users).get().then(res => {
-                    log("manage users:")
-                    log(res)
-                    for (let u of res) {
-                        Url.fromUrl(u.id).get().then(async user => {
-                            if (user.data) {
-                                await setUsers(prevState => [...prevState, user.data]);
-                                await setShownUsers(prevState => [...prevState, user.data]);
-                            }
-                        }).then(() => setLoading(false))
+                    if (res.success) {
+                        log("manage users:")
+                        log(res)
+                        for (let u of res.data) {
+                            Url.fromUrl(u.id).get().then(async res2 => {
+                                if (res2.success) {
+                                    const user = res2.data
+                                    if (user) {
+                                        await setUsers(prevState => [...prevState, user.data]);
+                                        await setShownUsers(prevState => [...prevState, user.data]);
+                                    }
+                                }
+                            }).then(() => setLoading(false))
+                        }
                     }
                 });
             }

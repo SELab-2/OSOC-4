@@ -14,8 +14,10 @@ export default function QuestionTag(props) {
         setLoading(true)
         Url.fromUrl(props.url).get()
             .then(res => {
-                setPreviousTag(res);
-                setQuestionTag(res);
+                if(res.success) {
+                    setPreviousTag(res.data);
+                    setQuestionTag(res.data);
+                }
             })
             .then(() => setLoading(false))
     }, [props.url]);

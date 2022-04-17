@@ -13,33 +13,44 @@ export default function EditionDropdownButton() {
     useEffect(() => {
         if(currentVersion === undefined && ! loadingCurrentVersion){
             setLoadingCurrentVersion(true);
-            Url.fromName(api.current_edition).get().then(edition => {
-                log(edition)
-                setCurrentVersion({"year": edition.year, "name": edition.name})
-                setLoadingCurrentVersion(false)
+            Url.fromName(api.current_edition).get().then(res => {
+                if (res.success) {
+                    const edition = res.data;
+                    console.log("PIPO");
+                    console.log(edition);
+                    setCurrentVersion({"year": edition.year, "name": edition.name})
+                    setLoadingCurrentVersion(false)
+                }
+
             })
         }
 
         if (editionList.length === 0 && ! loadingEditionList) {
             setLoadingEditionList(true)
             Url.fromName(api.editions).get().then(async res => {
+                if (res.success) {
                     log("load all editions")
                     log(res)
-                    for(let e of res) {
+                    for(let e of res.data) {
                         log("load specific edition")
                         log(e)
-                        Url.fromUrl(e).get().then(async edition => {
-                            if (edition) {
-                                await setEditionList(prevState => [...prevState, {
-                                    "year": edition.year,
-                                    "name": edition.name
-                                }])
+                        Url.fromUrl(e).get().then(async res2 => {
+                            if (res2.success) {
+                                const edition = res2.data;
+                                if (edition) {
+                                    await setEditionList(prevState => [...prevState, {
+                                        "year": edition.year,
+                                        "name": edition.name
+                                    }])
+                                }
                             }
+
                         }).then(async () => {
                             setLoadingEditionList(false)
 
                         })
                     }
+                }
             })
         }
     }, [currentVersion, loadingEditionList, editionList.length, loadingCurrentVersion])

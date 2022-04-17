@@ -12,10 +12,9 @@ export default function QuestionTags() {
     useEffect(() => {
         setLoading(true)
         Url.fromName(api.questiontags).get().then(res => {
-                console.log(res)
+            if (res.success) {
                 setQuestionTags(res.data);
-            }
-            ).then(() => setLoading(false))
+            }}).then(() => setLoading(false))
     }, []);
 
     const handleNewTagChange = (event) => {
