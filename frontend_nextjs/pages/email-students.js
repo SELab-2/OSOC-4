@@ -81,7 +81,7 @@ export default function EmailStudents() {
    */
   function filterUndecided() {
     return students.filter(
-      student => student["suggestions"].filter(suggestion => suggestion["definitive"]).length !== 0
+      student => Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]).length !== 0
     );
   }
 
@@ -112,7 +112,7 @@ export default function EmailStudents() {
     let decisionNumbers = filters[1].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
 
     return filteredStudents.filter(student => {
-      let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
+      let decisions = Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]);
       return decisionNumbers.length === 0 || decisionNumbers.includes(decisions[0]["decision"]);
     });
   }

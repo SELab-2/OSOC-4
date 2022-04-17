@@ -21,12 +21,12 @@ export default function StudentTableRow(props) {
   useEffect(() => {
     if (props.student["suggestions"]) {
       // a decision is a suggestion which is definitive
-      let decisions = props.student["suggestions"].filter(suggestion => suggestion["definitive"])
+      let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"])
       if (decisions.length !== 0) {
         setDecisionSuggesion(decisions[0]);
       }
     }
-  });
+  }, [props.student]);
 
   /**
    * This function uses the 'decisionSuggestion' to return a string that corresponds with the decision of a student
