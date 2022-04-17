@@ -5,10 +5,11 @@ import { Col, Form, Row } from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
-import { urlManager } from "../utils/ApiClient";
+import { websocketManager, urlManager } from "../utils/ApiClient";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
+import { WebSocketManager } from "../utils/ApiClient"
 
 // This function filters the list of students, it is also used in email-students
 export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
@@ -41,8 +42,23 @@ export default function SelectStudents() {
     (router.query.skills) ? router.query.skills.split(",") : [],
     (router.query.decision) ? router.query.decision.split(",") : []]
 
+    const [ws, setWs] = useState(undefined);
+
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
+
+    useEffect(() => {
+        if (ws) {
+            ws.onmessage = (event) => updateFromWebsocket(event);
+        } else {
+            const new_ws = new WebSocket("ws://localhost:8000/ws")
+            new_ws.onmessage = (event) => updateFromWebsocket(event);
+            setWs(new_ws);
+
+        }
+
+    }, [students])
+
     useEffect(() => {
         if (session) {
             if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
@@ -52,7 +68,15 @@ export default function SelectStudents() {
                 // the urlManager returns the url for the list of students
                 urlManager.getStudents().then(url => getJson(url, { search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
                     Promise.all(res.map(studentUrl =>
-                        getJson(studentUrl).then(res => res)
+                        getJson(studentUrl).then(res => {
+                            Object.values(res["suggestions"]).forEach((item, index) => {
+                                if (item["suggested_by_id"] == session["userid"]) {
+                                    res["own_suggestion"] = item;
+                                }
+                            });
+                            console.log(res)
+                            return res;
+                        })
                     )).then(students => {
                         setStudents(students);
                         setLocalFilters([0, 0, 0]);
@@ -71,8 +95,17 @@ export default function SelectStudents() {
         }
     })
 
-    async function retrieveStudents() {
-
+    const updateFromWebsocket = (event) => {
+        let data = JSON.parse(event.data)
+        console.log(students)
+        students.find((o, i) => {
+            if (o["id"] === data["suggestion"]["student_id"]) {
+                let new_students = [...students]
+                new_students[i]["suggestions"][data["id"]] = data["suggestion"];
+                setStudents(new_students);
+                return true; // stop searching
+            }
+        });
     }
 
     function filterStudentsFilters(filteredStudents) {
@@ -95,6 +128,19 @@ export default function SelectStudents() {
         return filteredStudents;
     }
 
+    function getStudentById() {
+        if (students) {
+            let foundStudent = students.find((o, i) => {
+                if (o["id_int"] === studentId) {
+                    return o;
+                }
+            });
+
+            return foundStudent;
+        }
+        return undefined;
+    }
+
     // the html that displays the overview of students
     return (
         <Row className="remaining_height fill_width">
@@ -108,7 +154,7 @@ export default function SelectStudents() {
                             <StudentList students={visibleStudent} />
                         </Row>
                     </Col>
-                    {(studentId) ? <StudentDetails student_id={studentId} /> : null}
+                    {(studentId) ? <StudentDetails student={getStudentById()} student_id={studentId} /> : null}
                 </Row>
             </Col>
         </Row>

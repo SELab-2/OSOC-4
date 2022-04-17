@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
+from app.utils.websocketmanager import WebSocketManager
+
 load_dotenv()
 
 POSTGRES_URL = os.getenv('POSTGRES_URL')
@@ -58,6 +60,7 @@ class Database:
 
 
 db = Database()
+websocketManager = WebSocketManager()
 
 
 async def disconnect_db():

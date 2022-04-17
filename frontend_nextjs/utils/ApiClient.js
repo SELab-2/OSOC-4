@@ -47,13 +47,13 @@ class UrlManager {
         return this._projects;
     }
 
-    async getSkills(){
-        if (! this._skills) { await this._setSkills() }
+    async getSkills() {
+        if (!this._skills) { await this._setSkills() }
         return this._skills;
     }
 
-    async getCurrentYear(){
-        if(! this._year) {await this._setCurrentEdition();}
+    async getCurrentYear() {
+        if (!this._year) { await this._setCurrentEdition(); }
         return this._year;
     }
 
@@ -107,7 +107,7 @@ class UrlManager {
     }
 
     //TODO make this not hardcoded
-    async _setSkills(){
+    async _setSkills() {
         this._skills = "/skills"
     }
 }
