@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
 import {Button, Col, Modal, Row} from "react-bootstrap";
-import {engine} from "../../utils/ApiClient";
+import {api} from "../../utils/ApiClient";
 
 const Project = () => {
     const router = useRouter()

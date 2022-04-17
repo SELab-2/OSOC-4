@@ -4,7 +4,7 @@ import {log} from "../utils/logger";
 import ProjectCard from "../Components/ProjectCard";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {useRouter} from "next/router";
-import {engine} from "../utils/ApiClient";
+import {api} from "../utils/ApiClient";
 
 export default function Projects(props) {
     const [allProjects, setAllProjects] = useState([])
@@ -17,7 +17,7 @@ export default function Projects(props) {
 
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
-            engine.getProjects().then(projects => {
+            api.getProjects().then(projects => {
                 log("load project")
                 log(projects)
                 for (let p of projects) {

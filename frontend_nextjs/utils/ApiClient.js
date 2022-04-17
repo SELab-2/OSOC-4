@@ -3,20 +3,97 @@ import {getCsrfToken, getSession} from 'next-auth/react';
 import {log} from "./logger";
 
 
-class Engine {
-    baseUrl = process.env.NEXT_API_URL;
+export class Url {
+    _url = null;
+    _name = null;
+    _extension = "";
+    _headers = {};
+    _params = {};
+    _body = {};
 
-    names = {
-        editions: "editions",
-        users: "users",
-        current_edition: "current_edition",
-        students: "students",
-        projects: "projects",
-        questiontags: "questiontags",
-        skills: "skills"
+    constructor(name, url) {
+        this._name = name;
+        this._url = url;
     }
 
+    static fromName(name) {
+        return new Url(name, null);
+    }
+
+    static fromUrl(url) {
+        return new Url(null, url);
+    }
+
+    extend(extension = "") {
+        this._extension = extension;
+        return this;
+    }
+
+    setParams(params = {}) {
+        this._params = params;
+        return this;
+    }
+
+    setBody(body) {
+        this._body = body;
+        return this;
+    }
+
+    async get(context = null) {
+        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'name' is undefined`);}
+        this._headers = await api._headers(context);
+        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        try {
+            const resp = await axios.get(this._url + this._extension, {"headers": this._headers, "params": this._params });
+            return {success: true, data: resp.data};
+        } catch (e) {
+            return {success: false, error: e};
+        }
+    }
+
+    async post(context = null) {
+        if (!this._name) {throw Error(`ApiPath not properly instantiated, 'url' is undefined`)}
+        this._headers = await api._headers(context);
+        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        try {
+            const resp = await axios.patch(this._url, this._body, this._headers);
+            return {success: true, data: resp.data};
+        } catch (e) {
+            return {success: false, error: e};
+        }
+    }
+
+    async patch(context = null) {
+        if (!this._name) {throw Error(`ApiPath not properly instantiated, 'url' is undefined`)}
+        this._headers = await api._headers(context);
+        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        try {
+            const resp = await axios.patch(this._url, this._body, this._headers);
+            return {success: true, data: resp.data};
+        } catch (e) {
+            return {success: false, error: e};
+        }
+    }
+
+}
+
+
+class API {
+    baseUrl = process.env.NEXT_API_URL;
+
+    year = null;
+
+    me = "me";
+    editions = "editions";
+    users = "users";
+    current_edition = "current_edition";
+    students = "students";
+    projects = "projects";
+    questiontags = "questiontags";
+    skills = "skills";
+
     _paths = {
+        me: null,
         editions: null,
         users: null,
         current_edition: null,
@@ -25,7 +102,6 @@ class Engine {
         questiontags: null,
         skills: null
     }
-    _year = null;
     _ready = false;
 
     invalidate() {
@@ -42,81 +118,40 @@ class Engine {
         else {return await getCsrfToken();}
     }
 
-    _config(accessToken, csrfToken) {
-        return {"headers": {
+    async _headers(context = null) {
+        const session = await this._session(context);
+        const csrfToken = await this._csrfToken(context);
+        if (!session) {throw Error("Engine:_setup: session is undefined");}
+        return {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-                "Authorization": `Bearer ${accessToken}`,
-                "X-CSRF-TOKEN": csrfToken}}
+                "Authorization": `Bearer ${session.accessToken}`,
+                "X-CSRF-TOKEN": csrfToken
+        }
     }
 
-    async getUrl(name = null, year = null, context = null) {
-        if (!this._ready) {await this._setup(year, context);}
+    async getUrl(name = null, context = null) {
+        if (!this._ready) {await this._setup(context);}
         if (!this._paths[name]) {throw Error( `UrlManager not properly instantiated, UrlManager path for '${name}' is undefined`);}
         return this._paths[name];
     }
 
-    async _getJson(name = null, params = {}, year = null, context = null) {
-        if (!this._ready) {await this._setup(year, context);}
-        if (!this._paths[name]) {throw Error( `UrlManager not properly instantiated, UrlManager path for '${name}' is undefined`);}
-        const session = await this._session(context);
-        const csrfToken = await this._csrfToken(context);
-        const res = await axios.get(this._paths[name], { ...(this._config(session.accessToken, csrfToken)), params: params });
-        return res.data
-    }
-
-    async getJson(url, params = {}, year = null, context = null) {
-        if (!url) {throw Error( `UrlManager not properly instantiated, UrlManager.getJson : 'url' is undefined`);}
-        const session = await this._session(context);
-        const csrfToken = await this._csrfToken(context);
-        const res = await axios.get(url, { ...(this._config(session.accessToken, csrfToken)), params: params });
-        return res.data;
-    }
-
-    async getEditions(params = {}, year = null, context = null) {
-        return await this._getJson(this.names.editions, params, year, context);
-    }
-
-    async getUsers(params = {}, year = null, context = null) {
-        return await this._getJson(this.names.users, params, year, context);
-    }
-
-    async getCurrentEdition(params = {}, year = null, context = null) {
-        return await this._getJson(this.names.current_edition, params, year, context);
-    }
-
-    async getStudents(params = {}, year = null, context = null) {
-        return await this._getJson(this.names.students, params, year, context);
-    }
-
-    async getProjects(params = {}, year = null, context = null) {
-        return await this._getJson(this.names.projects, params, year, context);
-    }
-
-    async getSkills(params = {}, year = null, context = null){
-        return await this._getJson(this.names.skills, params, year, context);
-    }
-
-    async getQuestionTags(params = {}, year = null, context = null) {
-        return await this._getJson(this.names.questiontags, params, year, context);
-
-    }
-
-
-    async _setup(year = null, context = null) {
+    async _setup(context = null) {
         log("Engine:setup");
         const session = await this._session(context);
         const csrfToken = await this._csrfToken(context);
         if (!session) {throw Error("Engine:_setup: session is undefined");}
 
         // set up all urls
-        const config = this._config(session.accessToken, csrfToken);
+        const headers = await this._headers(context);
+        const config = {"headers": headers};
+        this._paths.me = session.userid;
         let res = await axios.get(this.baseUrl, config);
-        this._paths.editions = res.data[this.names.editions];
-        this._paths.users = res.data[this.names.users];
-        this._paths.skills = res.data[this.names.skills];
-        if (year) {
-            this._paths.current_edition = this._paths.editions + "/" + year;
+        this._paths.editions = res.data[this.editions];
+        this._paths.users = res.data[this.users];
+        this._paths.skills = res.data[this.skills];
+        if (this._year) {
+            this._paths.current_edition = this._paths.editions + "/" + this._year;
         } else { // get the latest edition if any
             let res = await axios.get(this._paths.editions, config);
             this._paths.current_edition = (res.data.length)? res.data[0] : null;
@@ -124,9 +159,9 @@ class Engine {
         if (this._paths.current_edition) {
             let editionData = await axios.get(this._paths.current_edition, config);
             this._year = editionData.data["year"];
-            this._paths.students = editionData.data[this.names.students];
-            this._paths.projects = editionData.data[this.names.projects];
-            this._paths.questiontags = editionData.data[this.names.questiontags];
+            this._paths.students = editionData.data[this.students];
+            this._paths.projects = editionData.data[this.projects];
+            this._paths.questiontags = editionData.data[this.questiontags];
         }
     }
     async setCurrentEdition(year = null) {
@@ -136,12 +171,12 @@ class Engine {
 
 }
 
-export const engine = new Engine()
+export const api = new API();
 
 
 function AxiosClient(auth_headers = true) {
     const defaultOptions = {
-        baseURL: engine.baseUrl,
+        baseURL: api.baseUrl,
     };
 
     const instance = axios.create(defaultOptions);
@@ -172,7 +207,7 @@ function AxiosClient(auth_headers = true) {
     );
 
     return instance;
-};
+}
 
 export const ApiClient = AxiosClient(false);
 

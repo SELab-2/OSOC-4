@@ -1,8 +1,7 @@
 import {Dropdown} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {get_edition, getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
-import {engine} from "../../utils/ApiClient";
+import {api, Url} from "../../utils/ApiClient";
 
 export default function EditionDropdownButton() {
     const [editionList, setEditionList] = useState([]);
@@ -14,22 +13,22 @@ export default function EditionDropdownButton() {
     useEffect(() => {
         if(currentVersion === undefined && ! loadingCurrentVersion){
             setLoadingCurrentVersion(true);
-            engine.getCurrentEdition().then(edition => {
-                    log(edition)
-                    setCurrentVersion({"year": edition.year, "name": edition.name})
-                    setLoadingCurrentVersion(false)
-                })
+            Url.fromName(api.current_edition).get().then(edition => {
+                log(edition)
+                setCurrentVersion({"year": edition.year, "name": edition.name})
+                setLoadingCurrentVersion(false)
+            })
         }
 
         if (editionList.length === 0 && ! loadingEditionList) {
             setLoadingEditionList(true)
-            engine.getEditions().then(async res => {
+            Url.fromName(api.editions).get().then(async res => {
                     log("load all editions")
                     log(res)
                     for(let e of res) {
                         log("load specific edition")
                         log(e)
-                        engine.getJson(e).then(async edition => {
+                        Url.fromUrl(e).get().then(async edition => {
                             if (edition) {
                                 await setEditionList(prevState => [...prevState, {
                                     "year": edition.year,
@@ -48,7 +47,7 @@ export default function EditionDropdownButton() {
     const ChangeSelectedVersion = async (edition) => {
         log("change edition dropdown")
         log(edition)
-        await engine.setCurrentEdition(edition.year)
+        await api.setCurrentEdition(edition.year)
         await setCurrentVersion({"year": edition.year, "name": edition.name});
     }
 

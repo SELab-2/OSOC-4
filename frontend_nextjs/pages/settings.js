@@ -11,7 +11,7 @@ import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
 import { log } from "../utils/logger";
-import { engine } from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 import ChangeTheme from "../Components/settings/ChangeTheme";
 import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
@@ -34,17 +34,13 @@ export default function Settings(props) {
     useEffect(() => {
         if ((user === undefined || name === "" || email === "") && !loading) {
             setLoading(true)
-            engine.getUrl(engine.names.users).then(users_url => {
-                getJson(users_url + "/me").then(res => {
-                    log(res.data)
-                    setUser(res.data);
-                    setName(res.data.name);
-                    setEmail(res.data.email);
-                    setRole(res.data.role);
-                }
-                ).then(() => setLoading(false))
-            })
-
+            Url.fromName(api.me).get().then(res => {
+                log(res.data)
+                setUser(res.data);
+                setName(res.data.name);
+                setEmail(res.data.email);
+                setRole(res.data.role);
+            }).then(() => setLoading(false))
         }
     }, [loading, user, name, email]);
 

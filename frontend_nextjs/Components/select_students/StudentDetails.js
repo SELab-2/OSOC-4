@@ -18,7 +18,7 @@ import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import { engine } from "../../utils/ApiClient";
+import { api } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 
@@ -52,7 +52,7 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       if (!props.student) {
-        engine.getUrl(engine.names.students).then(url => engine.getJson(url + props.student_id).then(res => {
+        api.getUrl(api.names.students).then(url => api.getJson(url + props.student_id).then(res => {
 
           Object.values(res["suggestions"]).forEach((item, index) => {
             if (item["suggested_by_id"] === session["userid"]) {

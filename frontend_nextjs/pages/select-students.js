@@ -5,7 +5,7 @@ import {Col, Row} from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 import {useSession} from "next-auth/react";
-import {engine} from "../utils/ApiClient";
+import {api} from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
@@ -65,7 +65,7 @@ export default function SelectStudents() {
                 setSortby(router.query.sortby);
 
                 // the urlManager returns the url for the list of students
-                engine.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
+                api.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
                     Promise.all(res.map(studentUrl =>
                         getJson(studentUrl).then(res => {
                             Object.values(res["suggestions"]).forEach((item, index) => {

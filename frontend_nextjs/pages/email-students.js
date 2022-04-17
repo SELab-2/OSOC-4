@@ -3,7 +3,7 @@ import {getJson} from "../utils/json-requests";
 import {Button, Col, Row} from "react-bootstrap";
 
 import {useSession} from "next-auth/react";
-import {engine} from "../utils/ApiClient";
+import {api} from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 import EmailStudentsFilters from "../Components/email-students/EmailStudentsFilters";
@@ -52,7 +52,7 @@ export default function EmailStudents() {
         setSortby(router.query.sortby);
 
         // the urlManager returns the url for the list of students
-        engine.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
+        api.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
               Promise.all(res.map(studentUrl =>
                   getJson(studentUrl).then(res => res)
               )).then(students => {
