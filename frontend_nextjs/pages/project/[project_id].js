@@ -14,11 +14,13 @@ const Project = () => {
 
     useEffect(() => {
         if (! loaded) {
-                Url.fromName(api.projects).extend(project_id).get().then(res => {
-                    log("load project")
-                    log(res)
-                    setProject(res)
-                    setLoaded(true)
+                Url.fromUrl(api.baseUrl).extend("/projects/" + project_id).get().then(res => {
+                    if (res.success) {
+                        log("load project")
+                        log(res)
+                        setProject(res.data)
+                        setLoaded(true)
+                    }
                 });
         }
     })
