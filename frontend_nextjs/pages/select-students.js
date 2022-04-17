@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 import {Col, Row} from "react-bootstrap";
 
 import StudentList from "../Components/select_students/StudentList";
 import {useSession} from "next-auth/react";
-import {engine} from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
@@ -65,21 +64,26 @@ export default function SelectStudents() {
                 setSortby(router.query.sortby);
 
                 // the urlManager returns the url for the list of students
-                engine.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
-                    Promise.all(res.map(studentUrl =>
-                        getJson(studentUrl).then(res => {
-                            Object.values(res["suggestions"]).forEach((item, index) => {
-                                if (item["suggested_by_id"] === session["userid"]) {
-                                    res["own_suggestion"] = item;
+                Url.fromName(api.students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+                    if (res.success) {
+                        Promise.all(res.data.map(studentUrl =>
+                            Url.fromUrl(studentUrl).get().then(res => {
+                                if (res.success) {
+                                    res = res.data;
+                                    Object.values(res["suggestions"]).forEach((item, index) => {
+                                        if (item["suggested_by_id"] === session["userid"]) {
+                                            res["own_suggestion"] = item;
+                                        }
+                                    });
+                                    console.log(res)
+                                    return res;
                                 }
-                            });
-                            console.log(res)
-                            return res;
+                            })
+                        )).then(students => {
+                            setStudents(students);
+                            setLocalFilters([0, 0, 0]);
                         })
-                    )).then(students => {
-                        setStudents(students);
-                        setLocalFilters([0, 0, 0]);
-                    })
+                    }
                 });
             }
             if (students &&

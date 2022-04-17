@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getJson } from "../utils/json-requests";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
 import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
@@ -11,7 +10,7 @@ import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
 import { log } from "../utils/logger";
-import { engine } from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 import ChangeTheme from "../Components/settings/ChangeTheme";
 import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
@@ -34,17 +33,15 @@ export default function Settings(props) {
     useEffect(() => {
         if ((user === undefined || name === "" || email === "") && !loading) {
             setLoading(true)
-            engine.getUrl(engine.names.users).then(users_url => {
-                getJson(users_url + "/me").then(res => {
-                    log(res.data)
-                    setUser(res.data);
-                    setName(res.data.name);
-                    setEmail(res.data.email);
-                    setRole(res.data.role);
+            Url.fromName(api.me).get().then(res => {
+                if (res.success) {
+                    res = res.data.data;
+                    setUser(res);
+                    setName(res.name);
+                    setEmail(res.email);
+                    setRole(res.role);
                 }
-                ).then(() => setLoading(false))
-            })
-
+            }).then(() => setLoading(false))
         }
     }, [loading, user, name, email]);
 

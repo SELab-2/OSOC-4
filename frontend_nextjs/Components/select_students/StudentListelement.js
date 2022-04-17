@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getJson } from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";

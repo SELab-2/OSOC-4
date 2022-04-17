@@ -1,7 +1,6 @@
 import {Col, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
-import {getStudentPath} from "../../routes";
+import {Url} from "../../utils/ApiClient";
 
 // displays the counts of the suggestions for a student
 export default function Suggestion(props) {
@@ -12,7 +11,7 @@ export default function Suggestion(props) {
   // This function inserts the data in the variables
   useEffect( () => {
     if (suggestedBy === "") {
-      getJson(props.suggestion["suggested_by_id"]).then(res => setSuggestedBy(res.data["name"]));
+      Url.fromUrl(props.suggestion["suggested_by_id"]).get().then(res => setSuggestedBy(res.data["name"]));
     }
   })
 
