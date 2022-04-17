@@ -88,9 +88,6 @@ class QuestionAnswerGenerator(DataGenerator):
             self.answers_multiple_choice2.append(
                 [Answer(answer=answer_text) for answer_text in qa[1:]])
 
-        self.question_tags = []
-
-    def generate_question_tags(self):
         self.question_tags = \
             [QuestionTag(question=self.question_first_name,
                          edition=self.edition.year, mandatory=True, tag="first name"),
@@ -154,7 +151,7 @@ class QuestionAnswerGenerator(DataGenerator):
 
         self.question_answers += qa
 
-    async def add_to_session(self):
+    def add_to_session(self):
         self.session.add(self.question_first_name)
         self.session.add(self.question_last_name)
         self.session.add(self.question_email)
@@ -191,3 +188,42 @@ class QuestionAnswerGenerator(DataGenerator):
 
         for question_tag in self.question_tags:
             self.session.add(question_tag)
+
+    async def commit(self):
+        await self.session.commit()
+        await self.session.refresh(self.question_first_name)
+        await self.session.refresh(self.question_last_name)
+        await self.session.refresh(self.question_email)
+        await self.session.refresh(self.question_phone_number)
+        for answer in self.other_answers:
+            await self.session.refresh(answer)
+
+        for question in self.questions_yes_no:
+            await self.session.refresh(question)
+        for answers in self.answers_yes_no:
+            for answer in answers:
+                await self.session.refresh(answer)
+
+        for question in self.questions_text:
+            await self.session.refresh(question)
+        for answers in self.answers_text:
+            for answer in answers:
+                await self.session.refresh(answer)
+
+        for question in self.questions_multiple_choice:
+            await self.session.refresh(question)
+        for answers in self.answers_multiple_choice:
+            for answer in answers:
+                await self.session.refresh(answer)
+
+        for question in self.questions_multiple_choice2:
+            await self.session.refresh(question)
+        for answers in self.answers_multiple_choice2:
+            for answer in answers:
+                await self.session.refresh(answer)
+
+        for question_answer in self.question_answers:
+            await self.session.refresh(question_answer)
+
+        for question_tag in self.question_tags:
+            await self.session.refresh(question_tag)

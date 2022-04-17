@@ -10,7 +10,7 @@ from app.models.project import Project, ProjectRequiredSkill
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
-from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
+from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
 from app.utils.response import response
@@ -73,8 +73,8 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     # Editions #
     ############
 
-    edition_generator = EditionGenerator(session, coaches)
-    edition = edition_generator.generate_data(2022)
+    edition_generator = EditionGenerator(session)
+    edition = edition_generator.generate_data(2022, coaches)
 
     project = Project(
         name="Student Volunteer Project",
@@ -82,7 +82,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Free real estate",
         partner_name="UGent",
         partner_description="De C in UGent staat voor communicatie",
-        coaches=sample(edition.coaches, 2),
+        coaches=coaches[:2],
         edition=edition.year)
 
     project1_skills = [ProjectRequiredSkill(
@@ -97,7 +97,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Hackers & Cyborgs",
         partner_name="HoGent",
         partner_description="Like UGent but worse",
-        coaches=sample(edition.coaches, 2),
+        coaches=coaches[2:],
         edition=edition.year)
     await update(project, session)
 

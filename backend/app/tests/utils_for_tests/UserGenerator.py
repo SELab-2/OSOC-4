@@ -67,7 +67,7 @@ class UserGenerator(DataGenerator):
         for user in self.data:
             user.password = get_password_hash(user.password)
 
-    def generate_data(self, role=UserRole.COACH, active=True, approved=True, disabled=False):
+    def generate_user(self, role=UserRole.COACH, active=True, approved=True, disabled=False):
         first_name = choice(first_names)
         last_name = choice(last_names)
 
@@ -77,4 +77,8 @@ class UserGenerator(DataGenerator):
                     role=role,
                     active=active, approved=approved, disabled=disabled)
         self.passwords[user.name] = "justapassword"
+        self.data.append(user)
         return user
+
+    def generate_users(self, role=UserRole.COACH):
+        return [self.generate_user(role)]

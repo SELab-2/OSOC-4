@@ -4,22 +4,24 @@ from app.tests.utils_for_tests.QuestionAnswerGenerator import QuestionAnswerGene
 
 
 class StudentGenerator(DataGenerator):
-    edition_years = []
-
     def __init__(self, session, edition):
         super().__init__(session)
         self.edition = edition
         self.question_answer_generator = QuestionAnswerGenerator(session, edition)
 
-    def generate_data(self):
-        if self.edition.year not in self.edition_years:
-            self.edition_years.append(self.edition.year)
-            self.question_answer_generator.generate_question_tags()
+    def generate_student(self):
         student = Student(edition=self.edition)
         self.data.append(student)
         self.question_answer_generator.generate_question_answers(student)
         return student
 
-    async def add_to_session(self):
-        await super().add_to_session()
-        await self.question_answer_generator.add_to_session()
+    def generate_students(self, number: int):
+        return [self.generate_student() for _ in range(number)]
+
+    def add_to_session(self):
+        super().add_to_session()
+        self.question_answer_generator.add_to_session()
+
+    async def commit(self):
+        await super().commit()
+        await self.question_answer_generator.commit()
