@@ -17,8 +17,7 @@ export default function Projects(props) {
 
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
-            engine.getProjects().then(res => {
-                let projects = res.data;
+            engine.getProjects().then(projects => {
                 log("load project")
                 log(projects)
                 for (let p of projects) {

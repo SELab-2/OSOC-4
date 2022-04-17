@@ -18,7 +18,7 @@ import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import { urlManager } from "../../utils/ApiClient";
+import { engine } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 
@@ -52,10 +52,10 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       if (!props.student) {
-        getJson(urlManager.baseUrl + "/students/" + props.student_id).then(res => {  //todo use urlManager
+        engine.getUrl(engine.names.students).then(url => engine.getJson(url + props.student_id).then(res => {
 
           Object.values(res["suggestions"]).forEach((item, index) => {
-            if (item["suggested_by_id"] == session["userid"]) {
+            if (item["suggested_by_id"] === session["userid"]) {
               res["own_suggestion"] = item;
             }
           });
@@ -78,7 +78,7 @@ export default function StudentDetails(props) {
           getJson(res["question-answers"]).then(res => {
             setQuestionAnswers(res);
           })
-        })
+        }));
       } else {
         setStudent(props.student);
         setSuggestions(props.student["suggestions"]);
@@ -95,7 +95,7 @@ export default function StudentDetails(props) {
         })
       }
     }
-    }, [studentId, props.student_id])
+    }, [studentId, props.student_id, props.student, session])
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {

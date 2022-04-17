@@ -125,7 +125,7 @@ class Engine {
             let editionData = await axios.get(this._paths.current_edition, config);
             this._year = editionData.data["year"];
             this._paths.students = editionData.data[this.names.students];
-            this._paths.projects = editionData.data[this.names.students];
+            this._paths.projects = editionData.data[this.names.projects];
             this._paths.questiontags = editionData.data[this.names.questiontags];
         }
     }

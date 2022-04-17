@@ -3,7 +3,7 @@ import { Button, Form, Table } from "react-bootstrap";
 import UserTr from "./UserTr";
 import { getJson, postCreate } from "../../utils/json-requests";
 import { log } from "../../utils/logger";
-import { urlManager } from "../../utils/ApiClient";
+import {engine} from "../../utils/ApiClient";
 
 export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
@@ -24,7 +24,7 @@ export default function ManageUsers(props) {
                     log("manage users:")
                     log(res)
                     for (let u of res) {
-                        getJson(u.id).then(async user => {
+                        engine.getJson(u.id).then(async user => {
                             if (user.data) {
                                 await setUsers(prevState => [...prevState, user.data]);
                                 await setShownUsers(prevState => [...prevState, user.data]);
