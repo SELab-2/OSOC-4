@@ -121,7 +121,6 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-
     student_query = select(Student).where(Student.edition_year == year).subquery()
     if search:
         student_query = select(Student).where(Student.edition_year == year).join(QuestionAnswer).join(Answer)

@@ -17,7 +17,7 @@ import { useRouter } from "next/router";
 import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
-import { urlManager } from "../../utils/ApiClient";
+import { engine } from "../../utils/ApiClient";
 import {getDecisionString} from "./StudentListelement";
 
 // This function returns the details of a student
@@ -47,7 +47,7 @@ export default function StudentDetails(props) {
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
-      getJson(urlManager.baseUrl + "/students/" + props.student_id).then(res => {  //todo use urlManager
+      engine.getUrl(engine.names.students).then(url => getJson(url + props.student_id).then(res => {  //todo use urlManager
         setStudent(res);
 
         // Fill in the suggestions field, this contains all the suggestions which are not definitive
@@ -66,9 +66,10 @@ export default function StudentDetails(props) {
         getJson(res["question-answers"]).then(res => {
           setQuestionAnswers(res);
         })
-      })
+
+      }))
     }
-  }, [studentId, props.student_id])
+    }, [studentId, props.student_id])
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {

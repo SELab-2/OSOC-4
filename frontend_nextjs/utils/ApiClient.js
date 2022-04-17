@@ -1,23 +1,45 @@
 import axios from 'axios';
-import { getSession, getCsrfToken } from 'next-auth/react';
+import {getCsrfToken, getSession} from 'next-auth/react';
 import {log} from "./logger";
 
 
-class UrlManager {
+class Engine {
     baseUrl = process.env.NEXT_API_URL;
-    _editions = null;
-    _users = null;
-    _year = null;
-    _current_edition = null;
-    _students = null;
-    _projects = null;
-    _questiontags = null;
-    _skills = null;
 
+    names = {
+        editions: "editions",
+        users: "users",
+        current_edition: "current_edition",
+        students: "students",
+        projects: "projects",
+        questiontags: "questiontags",
+        skills: "skills"
+    }
+
+    _paths = {
+        editions: null,
+        users: null,
+        current_edition: null,
+        students: null,
+        projects: null,
+        questiontags: null,
+        skills: null
+    }
+    _year = null;
     _ready = false;
 
     invalidate() {
         this._ready = false;
+    }
+
+    async _session(context = null) {
+        if (context) {return await getSession(context);}
+        else {return await getSession();}
+    }
+
+    async _csrfToken(context = null) {
+        if (context) {return await getCsrfToken(context);}
+        else {return await getCsrfToken();}
     }
 
     _config(accessToken, csrfToken) {
@@ -28,85 +50,82 @@ class UrlManager {
                 "X-CSRF-TOKEN": csrfToken}}
     }
 
-    async getEditions(year = null, context = null) {
-        if (!this._ready) {await this._setup(year, context); }
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, editions is undefined")}
-        return this._editions;
+    async getUrl(name = null, year = null, context = null) {
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._paths[name]) {throw Error( `UrlManager not properly instantiated, UrlManager path for '${name}' is undefined`);}
+        return this._paths[name];
     }
 
-    async getUsers(year = null, context = null) {
+    async _getJson(name = null, params = {}, year = null, context = null) {
         if (!this._ready) {await this._setup(year, context);}
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, users is undefined")}
-        return this._users;
+        if (!this._paths[name]) {throw Error( `UrlManager not properly instantiated, UrlManager path for '${name}' is undefined`);}
+        const session = await this._session(context);
+        const csrfToken = await this._csrfToken(context);
+        const res = await axios.get(this._paths[name], { ...(this._config(session.accessToken, csrfToken)), params: params });
+        return res.data
     }
 
-    async getCurrentEdition(year = null, context = null) {
-        if (!this._ready) {await this._setup(year, context);}
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, current edition is undefined")}
-        return this._current_edition;
+    async getJson(url, params = {}, year = null, context = null) {
+        if (!url) {throw Error( `UrlManager not properly instantiated, UrlManager.getJson : 'url' is undefined`);}
+        const session = await this._session(context);
+        const csrfToken = await this._csrfToken(context);
+        const res = await axios.get(url, { ...(this._config(session.accessToken, csrfToken)), params: params });
+        return res.data;
     }
 
-    async getStudents(year = null, context = null) {
-        if (!this._ready) {await this._setup(year, context);}
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, students is undefined")}
-        return this._students;
+    async getEditions(params = {}, year = null, context = null) {
+        return await this._getJson(this.names.editions, params, year, context);
     }
 
-    async getProjects(year = null, context = null) {
-        if (!this._ready) {await this._setup(year, context);}
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, projects is undefined")}
-        return this._projects;
+    async getUsers(params = {}, year = null, context = null) {
+        return await this._getJson(this.names.users, params, year, context);
     }
 
-    async getSkills(year = null, context = null){
-        if (!this._ready) {await this._setup(year, context);}
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, skills is undefined")}
-        return this._skills;
+    async getCurrentEdition(params = {}, year = null, context = null) {
+        return await this._getJson(this.names.current_edition, params, year, context);
     }
 
-    async getCurrentYear(year = null, context = null){
-        if (!this._ready) {await this._setup(year, context);}
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, current year is undefined")}
-        return this._year;
+    async getStudents(params = {}, year = null, context = null) {
+        return await this._getJson(this.names.students, params, year, context);
     }
 
-    async getQuestionTags(year = null, context = null) {
-        if (!this._ready) {await this._setup(year, context);}
-        if (!this._editions) {throw Error("UrlManager not properly instantiated, questiontags is undefined")}
-        return this._questiontags;
+    async getProjects(params = {}, year = null, context = null) {
+        return await this._getJson(this.names.projects, params, year, context);
+    }
+
+    async getSkills(params = {}, year = null, context = null){
+        return await this._getJson(this.names.skills, params, year, context);
+    }
+
+    async getQuestionTags(params = {}, year = null, context = null) {
+        return await this._getJson(this.names.questiontags, params, year, context);
     }
 
 
     async _setup(year = null, context = null) {
-        log("UrlManager:setup");
-        this._skills = this.baseUrl + "/skills"; //TODO make this not hardcoded
-        let session, csrfToken;
-        if (context) {
-            session = await getSession(context);
-            csrfToken = await getCsrfToken(context);
-        } else {
-            session = await getSession();
-            csrfToken = await getCsrfToken();
-        }
-        if (!session) {throw Error("UrlManager:_setup: session is undefined");}
+        log("Engine:setup");
+        const session = await this._session(context);
+        const csrfToken = await this._csrfToken(context);
+        if (!session) {throw Error("Engine:_setup: session is undefined");}
 
         // set up all urls
         const config = this._config(session.accessToken, csrfToken);
         let res = await axios.get(this.baseUrl, config);
-        this._editions = res.data["editions"];
-        this._users = res.data["users"];
+        this._paths.editions = res.data[this.names.editions];
+        this._paths.users = res.data[this.names.users];
+        this._paths.skills = res.data[this.names.skills];
         if (year) {
-            this._current_edition = this._editions + "/" + year;
+            this._paths.current_edition = this._paths.editions + "/" + year;
         } else { // get the latest edition if any
-            let res = await axios.get(this._editions, config);
-            this._current_edition = (res.data.length)? res.data[0] : null;
+            let res = await axios.get(this._paths.editions, config);
+            this._paths.current_edition = (res.data.length)? res.data[0] : null;
         }
-        if (this._current_edition) {
-            let editionData = await axios.get(this._current_edition, config);
-            this._year = editionData.data['year'];
-            this._students = editionData.data["students"];
-            this._projects = editionData.data["projects"];
-            this._questiontags = editionData.data["questiontags"];
+        if (this._paths.current_edition) {
+            let editionData = await axios.get(this._paths.current_edition, config);
+            this._year = editionData.data["year"];
+            this._paths.students = editionData.data[this.names.students];
+            this._paths.projects = editionData.data[this.names.students];
+            this._paths.questiontags = editionData.data[this.names.questiontags];
         }
     }
     async setCurrentEdition(year = null) {
@@ -116,12 +135,12 @@ class UrlManager {
 
 }
 
-export const urlManager = new UrlManager()
+export const engine = new Engine()
 
 
 function AxiosClient(auth_headers = true) {
     const defaultOptions = {
-        baseURL: urlManager.baseUrl,
+        baseURL: engine.baseUrl,
     };
 
     const instance = axios.create(defaultOptions);

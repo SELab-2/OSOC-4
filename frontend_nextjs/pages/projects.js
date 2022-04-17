@@ -4,7 +4,7 @@ import {log} from "../utils/logger";
 import ProjectCard from "../Components/ProjectCard";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {useRouter} from "next/router";
-import {urlManager} from "../utils/ApiClient";
+import {engine} from "../utils/ApiClient";
 
 export default function Projects(props) {
     const [allProjects, setAllProjects] = useState([])
@@ -17,8 +17,8 @@ export default function Projects(props) {
 
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
-            urlManager.getProjects().then(async projects_url => {
-                let projects = await getJson(projects_url)
+            engine.getProjects().then(res => {
+                let projects = res.data;
                 log("load project")
                 log(projects)
                 for (let p of projects) {

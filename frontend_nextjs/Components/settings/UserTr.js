@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Dropdown} from "react-bootstrap";
 import {log} from "../../utils/logger";
-import {urlManager} from "../../utils/ApiClient";
+import {engine} from "../../utils/ApiClient";
 import {patchEdit} from "../../utils/json-requests";
 
 export default function UserTr(props) {
@@ -13,7 +13,7 @@ export default function UserTr(props) {
             return
         }
 
-        let user_url = await urlManager.getUsers();
+        let user_url = await engine.getUrl(engine.names.users);
         let json = props.user
         json.disabled = role === 0;
         json.role = role

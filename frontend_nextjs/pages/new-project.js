@@ -4,7 +4,7 @@ import {log} from "../utils/logger";
 import {useRouter} from "next/router";
 import {getJson, postCreate} from "../utils/json-requests";
 import SelectSearch, {fuzzySearch} from "react-select-search";
-import {urlManager} from "../utils/ApiClient";
+import {engine} from "../utils/ApiClient";
 
 
 export default function NewProjects() {
@@ -28,8 +28,7 @@ export default function NewProjects() {
 
     useEffect(() => {
         if (skills.length === 0) {
-            urlManager.getSkills().then(skills_url => {
-                getJson(skills_url).then(async res => {
+            engine.getSkills().then(async res => {
                     log("load skills")
                     log(res)
                     if(res){
@@ -38,7 +37,6 @@ export default function NewProjects() {
                         res.map(skill => array.push({"value":skill, "name":skill}));
                         setSkills(array);
                     }
-                })
             })
 
         }
@@ -76,7 +74,7 @@ export default function NewProjects() {
     async function handleSubmitChange(event){
         event.preventDefault()
         log("Creating new project")
-        let edition = await urlManager.getCurrentYear();
+        let edition = await engine.getCurrentYear();
         // TODO check forms
         let body = {
             "name":projectName,

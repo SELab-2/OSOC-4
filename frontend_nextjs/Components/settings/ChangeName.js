@@ -3,7 +3,7 @@ import {Button, Form} from "react-bootstrap";
 import {log} from "../../utils/logger";
 import {patchEdit, postCreate} from "../../utils/json-requests";
 import {useSession} from "next-auth/react";
-import {urlManager} from "../../utils/ApiClient";
+import {engine} from "../../utils/ApiClient";
 
 export default function ChangeName(props) {
 
@@ -20,7 +20,7 @@ export default function ChangeName(props) {
         log("handle submit change name");
         event.preventDefault();
 
-        let users_url = await urlManager.getUsers();
+        let users_url = await engine.getUrl(engine.names.users);
         let response = await patchEdit(users_url + "/me", {"name": changeName});
         if (response.success) {
             setSavedSuccess(true);
