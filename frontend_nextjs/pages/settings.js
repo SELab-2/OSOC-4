@@ -18,6 +18,8 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import edition from "/public/assets/edition.png"
 import QuestionTags from "../Components/settings/QuestionTags";
+import Link from 'next/link'
+
 
 export default function Settings(props) {
     const [user, setUser] = useState(undefined);
@@ -53,6 +55,10 @@ export default function Settings(props) {
 
     function clickAdminSettings() {
         setInitializeUsers(true);
+    }
+
+    function getCurrentEditionUrl() {
+        return `/editions/${api.year}`
     }
 
     return (
@@ -97,6 +103,7 @@ export default function Settings(props) {
                             </SettingCards>
                             <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
                                 <EditionDropdownButton />
+                                <Link href={`/editions/${api.year}`}>View Edition</Link>
                             </SettingCards>
                         </div>
                     </AccordionBody>

@@ -150,22 +150,22 @@ class API {
         this._paths.editions = res.data[this.editions];
         this._paths.users = res.data[this.users];
         this._paths.skills = res.data[this.skills];
-        if (this._year) {
-            this._paths.current_edition = this._paths.editions + "/" + this._year;
+        if (this.year) {
+            this._paths.current_edition = this._paths.editions + "/" + this.year;
         } else { // get the latest edition if any
             let res = await axios.get(this._paths.editions, config);
             this._paths.current_edition = (res.data.length)? res.data[0] : null;
         }
         if (this._paths.current_edition) {
             let editionData = await axios.get(this._paths.current_edition, config);
-            this._year = editionData.data["year"];
+            this.year = editionData.data["year"];
             this._paths.students = editionData.data[this.students];
             this._paths.projects = editionData.data[this.projects];
             this._paths.questiontags = editionData.data[this.questiontags];
         }
     }
     async setCurrentEdition(year = null) {
-        this._year = year;
+        this.year = year;
         this.invalidate();
     }
 
