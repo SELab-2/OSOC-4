@@ -30,41 +30,49 @@ class UrlManager {
 
     async getEditions(year = null, context = null) {
         if (!this._ready) {await this._setup(year, context); }
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, editions is undefined")}
         return this._editions;
     }
 
     async getUsers(year = null, context = null) {
-        if (!this._ready) { await this._setup(year, context); }
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, users is undefined")}
         return this._users;
     }
 
     async getCurrentEdition(year = null, context = null) {
-        if (!this._ready) { await this._setup(year, context); }
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, current edition is undefined")}
         return this._current_edition;
     }
 
     async getStudents(year = null, context = null) {
-        if (!this._ready) { await this._setup(year, context); }
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, students is undefined")}
         return this._students;
     }
 
     async getProjects(year = null, context = null) {
-        if (!this._ready) { await this._setup(year, context); }
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, projects is undefined")}
         return this._projects;
     }
 
     async getSkills(year = null, context = null){
-        if (!this._ready) { await this._setup(year, context); }
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, skills is undefined")}
         return this._skills;
     }
 
     async getCurrentYear(year = null, context = null){
-        if (!this._ready) { await this._setup(year, context); }
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, current year is undefined")}
         return this._year;
     }
 
     async getQuestionTags(year = null, context = null) {
-        if (!this._ready) { await this._setup(year, context); }
+        if (!this._ready) {await this._setup(year, context);}
+        if (!this._editions) {throw Error("UrlManager not properly instantiated, questiontags is undefined")}
         return this._questiontags;
     }
 
