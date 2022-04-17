@@ -2,6 +2,8 @@ import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
 import LoadingPage from "../LoadingPage";
 
+import { useEffect, useState } from "react";
+
 export default function StudentList(props) {
 
   // function to get a list of students

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getJson } from "../../utils/json-requests";
 import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
@@ -17,7 +18,7 @@ export function getDecisionString(value) {
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [decision, setDecision] = useState(-2);
+  const [decision, setDecision] = useState(-1);
   let prevDecision = -2;
 
   const router = useRouter()
@@ -26,7 +27,7 @@ export default function StudentListelement(props) {
   useEffect(() => {
     if (props.student["suggestions"] && (decision === -2 || prevDecision !== decision)) {
       // a decision is a suggestion which is definitive
-      let decisions = props.student["suggestions"].filter(suggestion => suggestion["definitive"])
+      let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"])
       if (decisions) {
         (decisions.length === 0) ? setDecision(-1) : setDecision(decisions[0]["decision"]);
         (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
@@ -81,7 +82,7 @@ export default function StudentListelement(props) {
     if (!props.student["suggestions"]) {
       return 0;
     }
-    return props.student["suggestions"].filter(suggestion => !suggestion["definitive"] && suggestion["decision"] === decision).length
+    return Object.values(props.student["suggestions"]).filter(suggestion => suggestion["decision"] === decision).length
   }
 
   // The html representation of a list-element

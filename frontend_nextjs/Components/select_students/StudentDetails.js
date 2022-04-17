@@ -17,8 +17,10 @@ import { useRouter } from "next/router";
 import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
-import { engine } from "../../utils/ApiClient";
-import {getDecisionString} from "./StudentListelement";
+
+import { urlManager } from "../../utils/ApiClient";
+import { getDecisionString } from "./StudentListelement";
+import { useSession } from "next-auth/react";
 
 // This function returns the details of a student
 export default function StudentDetails(props) {
@@ -42,20 +44,45 @@ export default function StudentDetails(props) {
   const [suggestion, setSuggestion] = useState(0);
   const [decideField, setDecideField] = useState(-1);
 
+  const { data: session, status } = useSession()
+
   // This function inserts the data in the variables
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
-      engine.getUrl(engine.names.students).then(url => getJson(url + props.student_id).then(res => {  //todo use urlManager
-        setStudent(res);
+      if (!props.student) {
+        getJson(urlManager.baseUrl + "/students/" + props.student_id).then(res => {  //todo use urlManager
 
-        // Fill in the suggestions field, this contains all the suggestions which are not definitive
-        setSuggestions(res["suggestions"].filter(suggestion => !suggestion["definitive"]));
+          Object.values(res["suggestions"]).forEach((item, index) => {
+            if (item["suggested_by_id"] == session["userid"]) {
+              res["own_suggestion"] = item;
+            }
+          });
 
-        // Fill in the decisions field, this contains the decision for the student if there is one,
-        // this decision is stored as a suggestion which is definitive
-        let decisions = res["suggestions"].filter(suggestion => suggestion["definitive"]);
+          setStudent(res);
+
+          // Fill in the suggestions field, this contains all the suggestions which are not definitive
+          setSuggestions(res["suggestions"]);
+
+          // Fill in the decisions field, this contains the decision for the student if there is one,
+          // this decision is stored as a suggestion which is definitive
+          let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
+          if (decisions.length !== 0) {
+            setDecision(decisions[0]["decision"]);
+          } else {
+            setDecision(-1);
+          }
+
+          // Fill in the questionAnswers
+          getJson(res["question-answers"]).then(res => {
+            setQuestionAnswers(res);
+          })
+        })
+      } else {
+        setStudent(props.student);
+        setSuggestions(props.student["suggestions"]);
+        let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
         if (decisions.length !== 0) {
           setDecision(decisions[0]["decision"]);
         } else {
@@ -63,17 +90,16 @@ export default function StudentDetails(props) {
         }
 
         // Fill in the questionAnswers
-        getJson(res["question-answers"]).then(res => {
+        getJson(props.student["question-answers"]).then(res => {
           setQuestionAnswers(res);
         })
-
-      }))
+      }
     }
     }, [studentId, props.student_id])
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {
-    return suggestions.filter(suggestion => suggestion["decision"] === decision).length;
+    return Object.values(suggestions).filter(suggestion => suggestion["decision"] === decision).length;
   }
 
   // returns a list of html suggestions, with the correct css classes.
@@ -82,8 +108,8 @@ export default function StudentDetails(props) {
     let result = [];
     const classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
 
-    for (let i = 0; i < suggestions.length; i++) {
-      let suggestion = suggestions[i];
+    for (let i = 0; i < Object.values(suggestions).length; i++) {
+      let suggestion = Object.values(suggestions)[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
       result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames} />)
     }
@@ -120,14 +146,26 @@ export default function StudentDetails(props) {
     )
   }
 
+  function updateSuggestion(suggestion) {
+    setStudent(prevState => ({
+      ...prevState,
+      ["own_suggestion"]: suggestion
+    }));
+  }
+
   // returns the html for student details
   return (
     <Col className="fill_height student-details-window" style={{ visibility: props.visibility }} >
 
-      <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} decision={suggestion} student={student} />
-      <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
-      <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
-      <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
+      {student["mandatory"] &&
+        <div>
+          <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
+          <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow} decision={decideField} student={student} />
+          <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow} decision={decision} student={student} />
+          <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
+        </div>
+      }
+
 
       <Row className="details-upper-layer">
         <Col md="auto">
@@ -148,13 +186,13 @@ export default function StudentDetails(props) {
         <Col />
         <Col md="auto">
           <Row>
-            <Col md="auto"><button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>
+            <Col md="auto"><button className={`suggest-yes-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 2 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(2)}>
               Suggest yes</button>
             </Col>
-            <Col md="auto"><button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>
+            <Col md="auto"><button className={`suggest-maybe-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 1 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(1)}>
               Suggest maybe</button>
             </Col>
-            <Col md="auto"><button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>
+            <Col md="auto"><button className={`suggest-no-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 0 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(0)}>
               Suggest no</button>
             </Col>
             <Col md="auto" className="close-button">
@@ -178,7 +216,7 @@ export default function StudentDetails(props) {
             </Col>
           </Row>
         </Col>
-      </Row>
+      </Row >
       <Row className="remaining-height-details" md="auto" style={{}}>
         <Col md="auto" className="fill_height scroll-overflow student-details">
           <Row md="auto" className="decision">
@@ -202,6 +240,6 @@ export default function StudentDetails(props) {
         </Col>
       </Row>
 
-    </Col>
+    </Col >
   )
 }

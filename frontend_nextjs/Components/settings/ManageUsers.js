@@ -3,7 +3,7 @@ import { Button, Form, Table } from "react-bootstrap";
 import UserTr from "./UserTr";
 import { getJson, postCreate } from "../../utils/json-requests";
 import { log } from "../../utils/logger";
-import {engine} from "../../utils/ApiClient";
+import { urlManager } from "../../utils/ApiClient";
 
 export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
