@@ -31,9 +31,6 @@ export default function EmailStudents() {
       })
     }
   }, [role]);
-  if (role !== 2) {
-    return (<h1>Unauthorized</h1>)
-  }
 
 
   // These constant define wheater the pop-up windows should be shown or not
@@ -89,6 +86,10 @@ export default function EmailStudents() {
       }
     }
   })
+
+  if (role !== 2) {
+    return (<h1>Unauthorized</h1>)
+  }
 
   /**
    * The email students tab does not show students with the decision 'Undecided',

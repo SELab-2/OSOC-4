@@ -6,8 +6,8 @@ import { useRouter } from 'next/router'
 import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
-import {forgot} from "../utils/json-requests";
 import LoadingPage from "../Components/LoadingPage";
+import {api, Url} from "../utils/ApiClient";
 
 const Login = props => {
     const [email, setEmail] = useState("");
@@ -50,8 +50,7 @@ const Login = props => {
         });
         log(credentials)
         // post, if any errors, show them
-        let output = await forgot(credentials);
-        console.log(output)
+        let output = Url.fromName(api.forgot).setBody(credentials).post();
         if (output.success) {
         }
         setShowForgot(false)

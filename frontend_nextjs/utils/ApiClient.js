@@ -11,16 +11,19 @@ export class Url {
     _params = {};
     _body = {};
 
-    constructor(name, url) {
+    _useAuth = false;
+
+    constructor(name, url, useAuth) {
         this._name = name;
         this._url = url;
+        this._useAuth = useAuth;
     }
 
-    static fromName(name) {
+    static fromName(name, useAuth = false) {
         return new Url(name, null);
     }
 
-    static fromUrl(url) {
+    static fromUrl(url, useAuth = false) {
         return new Url(null, url);
     }
 
@@ -41,7 +44,20 @@ export class Url {
 
     async get(context = null) {
         if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
-        this._headers = await api._headers(context);
+        this._headers = await api._headers(context, this._useAuth);
+        if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
+        try {
+            console.log(`API: GET ${this._url}`)
+            const resp = await axios.get(this._url, {"headers": this._headers, "params": this._params });
+            return {success: true, data: resp.data};
+        } catch (e) {
+            return {success: false, error: e};
+        }
+    }
+
+    async getPublic(context = null) {
+        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
+        this._headers = await api._headers(context, this._useAuth);
         if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
         try {
             console.log(`API: GET ${this._url}`)
@@ -54,11 +70,11 @@ export class Url {
 
     async post(context = null) {
         if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
-        this._headers = await api._headers(context);
+        this._headers = await api._headers(context, this._useAuth);
         if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
         try {
             console.log(`API: POST ${this._url}`)
-            const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
+            const resp = await axios.post(this._url, this._body, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
             return {success: false, error: e};
@@ -67,11 +83,24 @@ export class Url {
 
     async patch(context = null) {
         if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
-        this._headers = await api._headers(context);
+        this._headers = await api._headers(context, this._useAuth);
         if (!this._url) {this._url = await api.getUrl(this._name, context)  + this._extension;}
         try {
             console.log(`API: PATCH ${this._url}`)
             const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
+            return {success: true, data: resp.data};
+        } catch (e) {
+            return {success: false, error: e};
+        }
+    }
+
+    async delete(context = null) {
+        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
+        this._headers = await api._headers(context, this._useAuth);
+        if (!this._url) {this._url = await api.getUrl(this._name, context)  + this._extension;}
+        try {
+            console.log(`API: DELETE ${this._url}`)
+            const resp = await axios.delete(this._url, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
             return {success: false, error: e};
@@ -83,6 +112,11 @@ export class Url {
 
 class API {
     baseUrl = process.env.NEXT_API_URL;
+    login = "login";
+    forgot = "forgot";
+    invite = "invite";
+    resetpassword = "resetpassword";
+
 
     year = null;
 
@@ -98,6 +132,11 @@ class API {
     skills = "skills";
 
     _paths = {
+        login: this.baseUrl + "/login",
+        forgot: this.baseUrl + "/forgot",
+        invite: this.baseUrl + "/invite",
+        resetpassword: this.baseUrl + "/resetpassword",
+
         me: null,
         students: null,
         projects: null,
@@ -125,13 +164,17 @@ class API {
         else {return await getCsrfToken();}
     }
 
-    async _headers(context = null) {
+    async _headers(context = null, isPublic = false) {
+        let headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+        }
+        if (isPublic) {return headers;}
         const session = await this._session(context);
         const csrfToken = await this._csrfToken(context);
-        if (!session) {throw Error("Engine:_setup: session is undefined");}
+        if (!session) {return headers;}
         return {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
+                ...headers,
                 "Authorization": `Bearer ${session.accessToken}`,
                 "X-CSRF-TOKEN": csrfToken
         }
@@ -145,35 +188,40 @@ class API {
 
     async _setup(context = null) {
         log("Engine:setup");
-        const session = await this._session(context);
-        const csrfToken = await this._csrfToken(context);
-        if (!session) {throw Error("Engine:_setup: session is undefined");}
+        try {
+            const session = await this._session(context);
+            const csrfToken = await this._csrfToken(context);
+            if (!session) {throw Error("Engine:_setup: session is undefined");}
 
-        // set up all urls
-        const headers = await this._headers(context);
-        const config = {"headers": headers};
-        this._paths.me = session.userid;
-        let res = await axios.get(this.baseUrl, config);
-        console.log("PIPO")
-        console.log(res)
-        this._paths.students = res.data[this.students];
-        this._paths.projects = res.data[this.projects];
-        this._paths.editions = res.data[this.editions];
-        this._paths.users = res.data[this.users];
-        this._paths.skills = res.data[this.skills];
-        if (this._year) {
-            this._paths.current_edition = this._paths.editions + "/" + this._year;
-        } else { // get the latest edition if any
-            let res = await axios.get(this._paths.editions, config);
-            this._paths.current_edition = (res.data.length)? res.data[0] : null;
+            // set up all urls
+            const headers = await this._headers(context);
+            const config = {"headers": headers};
+            this._paths.me = session.userid;
+            let res = await axios.get(this.baseUrl, config);
+            console.log("PIPO")
+            console.log(res)
+            this._paths.students = res.data[this.students];
+            this._paths.projects = res.data[this.projects];
+            this._paths.editions = res.data[this.editions];
+            this._paths.users = res.data[this.users];
+            this._paths.skills = res.data[this.skills];
+            if (this._year) {
+                this._paths.current_edition = this._paths.editions + "/" + this._year;
+            } else { // get the latest edition if any
+                let res = await axios.get(this._paths.editions, config);
+                this._paths.current_edition = (res.data.length)? res.data[0] : null;
+            }
+            if (this._paths.current_edition) {
+                let editionData = await axios.get(this._paths.current_edition, config);
+                this._year = editionData.data["year"];
+                this._paths.editions_students = editionData.data[this.students];
+                this._paths.editions_projects = editionData.data[this.projects];
+                this._paths.editions_questiontags = editionData.data["questiontags"];
+            }
+        } catch (e) {
+            console.log("API: setup failed")
         }
-        if (this._paths.current_edition) {
-            let editionData = await axios.get(this._paths.current_edition, config);
-            this._year = editionData.data["year"];
-            this._paths.editions_students = editionData.data[this.students];
-            this._paths.editions_projects = editionData.data[this.projects];
-            this._paths.editions_questiontags = editionData.data["questiontags"];
-        }
+
     }
     async setCurrentEdition(year = null) {
         this._year = year;
@@ -183,43 +231,3 @@ class API {
 }
 
 export const api = new API();
-
-
-function AxiosClient(auth_headers = true) {
-    const defaultOptions = {
-        baseURL: api.baseUrl,
-    };
-
-    const instance = axios.create(defaultOptions);
-
-    instance.interceptors.request.use(async (request) => {
-        request.headers["Content-Type"] = "application/json"
-        request.headers["Access-Control-Allow-Origin"] = "*"
-
-        if (auth_headers) {
-            const session = await getSession();
-            const csrfToken = await getCsrfToken();
-            if (session) {
-                request.headers.Authorization = `Bearer ${session.accessToken}`;
-                request.headers["X-CSRF-TOKEN"] = csrfToken
-            }
-        }
-        return request;
-    });
-
-    instance.interceptors.response.use(
-        (response) => {
-            return response;
-        },
-        (error) => {
-            console.log(`error`, error);
-            throw error;
-        },
-    );
-
-    return instance;
-}
-
-export const ApiClient = AxiosClient(false);
-
-export const AuthApiClient = AxiosClient();
