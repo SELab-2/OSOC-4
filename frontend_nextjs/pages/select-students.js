@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getJson } from "../utils/json-requests";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 import { Col, Row } from "react-bootstrap";
 import StudentListelement from "../Components/select_students/StudentListelement";
 import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
-import { engine } from "../utils/ApiClient";
+import { api, Url } from "../utils/ApiClient";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
@@ -68,39 +67,30 @@ export default function SelectStudents() {
                 setSortby(router.query.sortby);
 
                 // the urlManager returns the url for the list of students
-                engine.getStudents({ search: router.query.search || "", orderby: router.query.sortby || "" }).then(res => {
 
-                    setLocalFilters([0, 0, 0]);
-                    let p1 = res.slice(0, 10);
-                    let p2 = res.slice(10);
-                    setStudentUrls(p2);
-                    Promise.all(p1.map(studentUrl =>
-                        getJson(studentUrl).then(res => {
-                            Object.values(res["suggestions"]).forEach((item, index) => {
-                                if (item["suggested_by_id"] === session["userid"]) {
-                                    res["own_suggestion"] = item;
+                Url.fromName(api.students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+                    if (res.success) {
+                        setLocalFilters([0, 0, 0]);
+                        let p1 = res.data.slice(0, 10);
+                        let p2 = res.data.slice(10);
+                        setStudentUrls(p2);
+                        Promise.all(p1.map(studentUrl =>
+                            Url.fromUrl(studentUrl).get().then(res => {
+                                if (res.success) {
+                                    res = res.data;
+                                    Object.values(res["suggestions"]).forEach((item, index) => {
+                                        if (item["suggested_by_id"] === session["userid"]) {
+                                            res["own_suggestion"] = item;
+                                        }
+                                    });
+                                    return res;
                                 }
-                            });
-                            return res;
+                            })
+                        )).then(newstudents => {
+                            setStudents([...students, ...newstudents]);
+                            setLocalFilters([0, 0, 0]);
                         })
-                    )).then(newstudents => {
-
-                        setStudents([...students, ...newstudents]);
-                    })
-                    // Promise.all(res.map(studentUrl =>
-                    //     getJson(studentUrl).then(res => {
-                    //         Object.values(res["suggestions"]).forEach((item, index) => {
-                    //             if (item["suggested_by_id"] === session["userid"]) {
-                    //                 res["own_suggestion"] = item;
-                    //             }
-                    //         });
-                    //         console.log(res)
-                    //         return res;
-                    //     })
-                    // )).then(students => {
-                    //     setStudents(students);
-                    //     setLocalFilters([0, 0, 0]);
-                    // })
+                    }
                 });
             }
             // if (students &&
@@ -165,13 +155,16 @@ export default function SelectStudents() {
         let p2 = studentUrls.slice(10);
         // 
         Promise.all(p1.map(studentUrl =>
-            getJson(studentUrl).then(res => {
-                Object.values(res["suggestions"]).forEach((item, index) => {
-                    if (item["suggested_by_id"] === session["userid"]) {
-                        res["own_suggestion"] = item;
-                    }
-                });
-                return res;
+            Url.fromUrl(studentUrl).get().then(res => {
+                if (res.success) {
+                    res = res.data;
+                    Object.values(res["suggestions"]).forEach((item, index) => {
+                        if (item["suggested_by_id"] === session["userid"]) {
+                            res["own_suggestion"] = item;
+                        }
+                    });
+                    return res;
+                }
             })
         )).then(newstudents => {
             setStudents([...students, ...newstudents]);

@@ -1,16 +1,13 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import {log} from "../../utils/logger";
-import {patchEdit} from "../../utils/json-requests";
-import {useSession} from "next-auth/react";
+import {api, Url} from "../../utils/ApiClient";
 
 export default function ChangePassword(props) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [changedSuccess, setChangedSuccess] = useState(false);
-
-    const { data: session, status } = useSession()
 
     const handleChangeCurrentPassword = (event) => {
         event.preventDefault()
@@ -39,8 +36,7 @@ export default function ChangePassword(props) {
                 "confirm_password":confirmPassword
             }
 
-            let url = session.userid + "/password"
-            let response = await patchEdit(url, body)
+            let response = await Url.fromName(api.me).extend("/password").setBody(body).patch();
             log(response)
             if (response.success) { setChangedSuccess(true); }
         }

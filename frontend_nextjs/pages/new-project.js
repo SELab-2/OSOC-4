@@ -2,9 +2,8 @@ import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {log} from "../utils/logger";
 import {useRouter} from "next/router";
-import {getJson, postCreate} from "../utils/json-requests";
 import SelectSearch, {fuzzySearch} from "react-select-search";
-import {engine} from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 
 
 export default function NewProjects() {
@@ -28,7 +27,9 @@ export default function NewProjects() {
 
     useEffect(() => {
         if (skills.length === 0) {
-            engine.getSkills().then(async res => {
+            Url.fromName(api.skills).get().then(async res => {
+                if (res.success) {
+                    res = res.data;
                     log("load skills")
                     log(res)
                     if(res){
@@ -37,6 +38,7 @@ export default function NewProjects() {
                         res.map(skill => array.push({"value":skill, "name":skill}));
                         setSkills(array);
                     }
+                }
             })
 
         }
@@ -74,7 +76,7 @@ export default function NewProjects() {
     async function handleSubmitChange(event){
         event.preventDefault()
         log("Creating new project")
-        let edition = await engine.getCurrentYear();
+        let edition = await api.getCurrentYear();
         // TODO check forms
         let body = {
             "name":projectName,
@@ -85,7 +87,7 @@ export default function NewProjects() {
             "edition": edition
         }
         // TODO add skills to project
-        await postCreate("projects/create", body)
+        await Url.fromName(api.projects).extend("projects/create").setBody(body).post();
     }
 
 

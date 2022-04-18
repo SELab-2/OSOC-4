@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
 import {log} from "../utils/logger";
 import ProjectCard from "../Components/ProjectCard";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {useRouter} from "next/router";
-import {engine} from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 
 export default function Projects(props) {
     const [allProjects, setAllProjects] = useState([])
@@ -17,21 +16,27 @@ export default function Projects(props) {
 
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
-            engine.getProjects().then(projects => {
-                log("load project")
-                log(projects)
-                for (let p of projects) {
-                    log(p)
-                    getJson(p).then(async project => {
-                        log(project)
-                        if (project) {
-                            await setAllProjects(prevState => [...prevState, project]);
-                            // TODO clean this up (currently only works if updated here
-                            await setVisibleProjects(prevState => [...prevState, project]);
-                        }
-                    })
+            Url.fromName(api.projects).get().then(res => {
+                if (res.success) {
+                    const projects = res.data;
+                    log("load project");
+                    log(projects);
+                    for (let p of projects) {
+                        log(p)
+                        Url.fromUrl(p).get().then(async project => {
+                            if (project.success) {
+                                project = project.data;
+                                log(project)
+                                if (project) {
+                                    await setAllProjects(prevState => [...prevState, project]);
+                                    // TODO clean this up (currently only works if updated here
+                                    await setVisibleProjects(prevState => [...prevState, project]);
+                                }
+                            }
+                        });
+                    }
+                    setLoaded(true);
                 }
-                setLoaded(true)
             })
         }
     })

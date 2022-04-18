@@ -7,18 +7,16 @@ import React, { useEffect, useState } from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
-import { getJson } from "../../utils/json-requests";
 import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
 import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
 import deleteIcon from '../../public/assets/delete.svg';
 import DeletePopUpWindow from "./DeletePopUpWindow";
 import { useRouter } from "next/router";
-import { getStudentPath } from "../../routes";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import { engine } from "../../utils/ApiClient";
+import {api, Url} from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 
@@ -52,33 +50,36 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       if (!props.student) {
-        engine.getUrl(engine.names.students).then(url => engine.getJson(url + props.student_id).then(res => {
+        Url.fromName(api.students).extend(props.student_id).get().then(res => {
+              if (res.success) {
+                res = res.data;
+                Object.values(res["suggestions"]).forEach((item, index) => {
+                  if (item["suggested_by_id"] === session["userid"]) {
+                    res["own_suggestion"] = item;
+                  }
+                });
 
-          Object.values(res["suggestions"]).forEach((item, index) => {
-            if (item["suggested_by_id"] === session["userid"]) {
-              res["own_suggestion"] = item;
+                setStudent(res);
+
+                // Fill in the suggestions field, this contains all the suggestions which are not definitive
+                setSuggestions(res["suggestions"]);
+
+                // Fill in the decisions field, this contains the decision for the student if there is one,
+                // this decision is stored as a suggestion which is definitive
+                let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
+                if (decisions.length !== 0) {
+                  setDecision(decisions[0]["decision"]);
+                } else {
+                  setDecision(-1);
+                }
+
+                // Fill in the questionAnswers
+                Url.fromUrl(res["question-answers"]).get().then(res => {
+                  if (res.success) {setQuestionAnswers(res.data);}
+                })
+              }
             }
-          });
-
-          setStudent(res);
-
-          // Fill in the suggestions field, this contains all the suggestions which are not definitive
-          setSuggestions(res["suggestions"]);
-
-          // Fill in the decisions field, this contains the decision for the student if there is one,
-          // this decision is stored as a suggestion which is definitive
-          let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
-          if (decisions.length !== 0) {
-            setDecision(decisions[0]["decision"]);
-          } else {
-            setDecision(-1);
-          }
-
-          // Fill in the questionAnswers
-          getJson(res["question-answers"]).then(res => {
-            setQuestionAnswers(res);
-          })
-        }));
+        );
       } else {
         setStudent(props.student);
         setSuggestions(props.student["suggestions"]);
@@ -90,8 +91,10 @@ export default function StudentDetails(props) {
         }
 
         // Fill in the questionAnswers
-        getJson(props.student["question-answers"]).then(res => {
-          setQuestionAnswers(res);
+        Url.fromUrl(props.student["question-answers"]).get().then(res => {
+          if (res.success) {
+            setQuestionAnswers(res.data);
+          }
         })
       }
     }

@@ -1,9 +1,8 @@
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
 import {Button, Col, Modal, Row} from "react-bootstrap";
-import {engine} from "../../utils/ApiClient";
+import {api, Url} from "../../utils/ApiClient";
 
 const Project = () => {
     const router = useRouter()
@@ -15,11 +14,13 @@ const Project = () => {
 
     useEffect(() => {
         if (! loaded) {
-                getJson("projects/" + project_id).then(res => {
-                    log("load project")
-                    log(res)
-                    setProject(res)
-                    setLoaded(true)
+                Url.fromUrl(api.baseUrl).extend("/projects/" + project_id).get().then(res => {
+                    if (res.success) {
+                        log("load project")
+                        log(res)
+                        setProject(res.data)
+                        setLoaded(true)
+                    }
                 });
         }
     })
