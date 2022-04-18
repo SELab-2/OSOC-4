@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import '../styles/globals.css'
 import "../styles/colors.css"
+import "../styles/index.css"
 import "../styles/login.css"
 import "../styles/settings.css"
 import "../styles/settingcards.css"
