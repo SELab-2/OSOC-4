@@ -80,5 +80,5 @@ class UserGenerator(DataGenerator):
         self.data.append(user)
         return user
 
-    def generate_users(self, role=UserRole.COACH):
-        return [self.generate_user(role)]
+    def generate_users(self, n=1, role=UserRole.COACH):
+        return [self.generate_user(role) for _ in range(n)]
