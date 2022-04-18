@@ -9,6 +9,8 @@ import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 import InfiniteScroll from 'react-infinite-scroll-component';
+import useWindowDimensions from '../utils/WindowDimensions';
+import CheeseburgerMenu from 'cheeseburger-menu'
 
 // This function filters the list of students, it is also used in email-students
 export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
@@ -47,6 +49,9 @@ export default function SelectStudents() {
 
     // This function inserts the data in the variables
     const { data: session, status } = useSession()
+    const { height, width } = useWindowDimensions();
+
+    const [showFilter, setShowFilter] = useState(false);
 
     useEffect(() => {
         if (ws) {
@@ -176,47 +181,49 @@ export default function SelectStudents() {
 
     // the html that displays the overview of students
     return (
-        <Row className="remaining_height fill_width">
-            <Col className="fill_height">
-                <Row className="fill_height">
-                    {(!studentId) ? <StudentsFilters students={students}
-                        filters={filters} /> : null}
-                    <Col className="fill_height students-list-paddingtop">
-                        <SearchSortBar />
-                        <Row className="student-list-positioning">
-                            <InfiniteScroll
-                                dataLength={students.length} //This is important field to render the next data
-                                next={fetchData}
-                                hasMore={studentUrls.length > 0}
-                                loader={<h4>Loading...</h4>}
-                                endMessage={
-                                    <p style={{ textAlign: 'center' }}>
-                                        <b>Yay! You have seen it all</b>
-                                    </p>
-                                }
-                            // below props only if you need pull down functionality
-                            // refreshFunction={this.refresh}
-                            // pullDownToRefresh
-                            // pullDownToRefreshThreshold={50}
-                            // pullDownToRefreshContent={
-                            //     <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
-                            // }
-                            // releaseToRefreshContent={
-                            //     <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
-                            // }
-                            >
-                                {students.map((i, index) => (
 
-                                    <StudentListelement key={index} student={i} />
+        <Row>
+            {width > 1000 ?
+                <Col md="auto">
+                    <div style={{ width: "400px" }}>
+                        <StudentsFilters students={students} filters={filters} />
+                    </div>
 
-                                ))}
-                            </InfiniteScroll>
-                        </Row>
-                    </Col>
-                    {(studentId) ? <StudentDetails student={getStudentById()} student_id={studentId} /> : null}
-                </Row>
+                </Col>
+                :
+                <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
+                    <StudentsFilters students={students} filters={filters} />
+                </CheeseburgerMenu>
+            }
+            <Col>
+                <Col><button onClick={() => setShowFilter(!showFilter)} >Filter</button></Col>
+                <Col><SearchSortBar /></Col>
+
+                <InfiniteScroll
+                    dataLength={students.length} //This is important field to render the next data
+                    next={fetchData}
+                    hasMore={studentUrls.length > 0}
+                    loader={<h4>Loading...</h4>}
+                    endMessage={
+                        <p style={{ textAlign: 'center' }}>
+                            <b>Yay! You have seen it all</b>
+                        </p>
+                    }
+                >
+                    {students.map((i, index) => (
+
+                        <StudentListelement key={index} student={i} />
+
+                    ))}
+                </InfiniteScroll>
             </Col>
-        </Row>
+            {
+                (studentId) &&
+                <Col>
+                    <StudentDetails student={getStudentById()} student_id={studentId} />
+                </Col>
+            }
+        </Row >
     )
 
 }
