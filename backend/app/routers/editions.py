@@ -7,6 +7,7 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
                                                YearAlreadyOverException)
+from app.exceptions.permissions import NotPermittedException
 from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
     QuestionTagNotFoundException)
@@ -36,15 +37,19 @@ def get_sorting(sortstr: str):
     return {t[0]: False if t[1] == "asc" else True for t in sorting}
 
 
-@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Editions retrieved")
-async def get_editions(session: AsyncSession = Depends(get_session)):
+@router.get("", response_description="Editions retrieved")
+async def get_editions(session: AsyncSession = Depends(get_session), role: RoleChecker(UserRole.COACH) = Depends()):
     """get_editions get all the Edition instances from the database
 
     :return: list of editions
     :rtype: dict
     """
     results = await read_all_where(Edition, session=session)
-    return [r.uri for r in [EditionOutSimple.parse_raw(r.json()) for r in results]]
+    results = [EditionOutSimple.parse_raw(r.json()) for r in sorted(results, key=lambda x: x.year, reverse=True)]
+    if role == UserRole.ADMIN:
+        return [r.uri for r in results]
+    if role == UserRole.COACH:
+        return [results[0].uri] if results else []
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
@@ -77,8 +82,8 @@ async def get_edition(year: int, edition: EditionChecker() = Depends(), session:
     return EditionOutExtended.parse_raw(edition.json())
 
 
-@router.patch("/{year}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="updated edition")
-async def update_edition(year: int, edition: Edition = Body(...), session: AsyncSession = Depends(get_session)):
+@router.patch("/{year}", response_description="updated edition")
+async def update_edition(year: int, edition: Edition = Body(...), role: RoleChecker(UserRole.COACH) = Depends(), Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """update_edition update the Edition instance with given year
 
     :return: the updated edition
@@ -90,6 +95,13 @@ async def update_edition(year: int, edition: Edition = Body(...), session: Async
     result = await read_where(Edition, Edition.year == edition.year, session=session)
     if not result:
         raise EditionNotFound()
+
+    # check that the coach has access to that edition
+    if not role != UserRole.ADMIN:
+        edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
+        user_ids = [coach.coach_id for coach in edition_coaches]
+        if not Authorize.get_jwt_subject() in user_ids:
+            raise NotPermittedException()
 
     new_edition_data = edition.dict(exclude_unset=True)
     for key, value in new_edition_data.items():
