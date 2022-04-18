@@ -3,8 +3,9 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useSession } from "next-auth/react"
 import LoadingPage from "../Components/LoadingPage"
-import {useEffect} from "react";
 import {api, Url} from "../utils/ApiClient";
+import {Button, Card, Carousel} from "react-bootstrap";
+import osocEmblem from '../public/assets/osoc-screen.png';
 
 function Home({ current_edition, students_length, projects_length }) {
   const { data: session, status } = useSession({ required: true })
@@ -13,12 +14,40 @@ function Home({ current_edition, students_length, projects_length }) {
   console.log("cool")
   console.log(current_edition);
 
+  const INTERVAL = 3000;
+
   if (isUser) {
     return (
         <>
-          <h1>{current_edition.name}</h1>
-          <h5>There are {projects_length} projects, and {students_length} students!</h5>
-        </>
+          <Card style={{ width: "100%", height: "auto", margin: "auto" }}>
+            <Card.Header>
+              <h3 style={{ marginLeft: "10%"}}>Welcome back</h3>
+            </Card.Header>
+
+            <Carousel >
+
+              <Carousel.Item interval={INTERVAL}>
+                <Card.Body>
+                  <Card.Title style={{ marginLeft: "10%"}}><h1>{current_edition.name}</h1></Card.Title>
+                </Card.Body>
+              </Carousel.Item>
+
+              <Carousel.Item interval={INTERVAL}>
+                <Card.Body>
+                  <Card.Title style={{ marginLeft: "10%"}}><h1>{projects_length} Projects</h1></Card.Title>
+                </Card.Body>
+              </Carousel.Item>
+
+              <Carousel.Item interval={INTERVAL}>
+                <Card.Body>
+                  <Card.Title style={{ marginLeft: "10%"}}><h1>{students_length} Students</h1></Card.Title>
+                </Card.Body>
+              </Carousel.Item>
+
+            </Carousel>
+          </Card>
+
+    </>
     )
 
   }
@@ -31,18 +60,23 @@ function Home({ current_edition, students_length, projects_length }) {
 export default Home
 
 export async function getServerSideProps(context) {
-  const current_edition =  await Url.fromName(api.current_edition).get(context)
+  console.log("A")
   let props_out = {}
+
+  const current_edition =  await Url.fromName(api.current_edition).get(context)
+  console.log("B")
   if (current_edition.success) {
     props_out["current_edition"] = current_edition.data;
   }
 
   const students = await Url.fromName(api.students).get(context)
+  console.log("C")
   if (students.success) {
     props_out["students_length"] = students.data.length;
   }
 
   const projects = await Url.fromName(api.projects).get(context)
+  console.log("D")
   if (projects.success) {
     props_out["projects_length"] = projects.data.length;
   }
