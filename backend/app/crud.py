@@ -88,6 +88,26 @@ async def update(model: T, session: AsyncSession) -> Optional[T]:
     return model
 
 
+async def update_all(models: List[T], session: AsyncSession) -> Optional[List[T]]:
+    """update this function updates all entries from models (the one with the same id, or else it adds the id)
+
+    example new_user is the updated version of the old user but the id remained:  update(new_user)
+
+    :param models: a list of instances of models to update / create
+    :type models: List[SQLModel]
+    :return: the updated user upon success
+    :rtype: Optional[SQLModel]
+    """
+
+    session.add_all(models)
+    await session.commit()
+
+    for model in models:
+        await session.refresh(model)
+
+    return models
+
+
 async def clear_data(session: AsyncSession = get_session()):
     # Get all tables
     async with engine.connect() as conn:
