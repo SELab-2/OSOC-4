@@ -60,7 +60,9 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     user_generator.generate_user(role=UserRole.COACH, active=True, approved=True, disabled=True)
 
     admins = user_generator.generate_users(2, role=UserRole.ADMIN)
-    coaches = user_generator.generate_users(5, role=UserRole.COACH)
+    coaches = [user for user in user_generator.data
+               if user.role == UserRole.COACH and user.active and user.approved and not user.disabled]
+    coaches.extend(user_generator.generate_users(5, role=UserRole.COACH))
 
     ##########
     # skills #
