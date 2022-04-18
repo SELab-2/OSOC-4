@@ -14,14 +14,13 @@ const Project = () => {
 
     useEffect(() => {
         if (! loaded) {
-                Url.fromUrl(api.baseUrl).extend("/projects/" + project_id).get().then(res => {
-                    if (res.success) {
-                        log("load project")
-                        log(res)
-                        setProject(res.data)
-                        setLoaded(true)
-                    }
-                });
+            api.invalidate();
+            Url.fromName(api.projects).extend(`/${project_id}`).get().then(res => {
+                if (res.success) {
+                    setProject(res.data)
+                    setLoaded(true)
+                }
+            });
         }
     })
 
@@ -74,8 +73,6 @@ const Project = () => {
                     <h2>About the project</h2>
                     <p>{project.description}</p>
 
-                    <h2>Goals</h2>
-                    {project.goals.split("\n").map((goal, index) => (<p key={index}>- {goal}</p>))}
                     {/*TODO nog iets met user?*/}
                 </div>) : null}
         </div>

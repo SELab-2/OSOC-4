@@ -42,9 +42,10 @@ export class Url {
     async get(context = null) {
         if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
         this._headers = await api._headers(context);
-        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
         try {
-            const resp = await axios.get(this._url + this._extension, {"headers": this._headers, "params": this._params });
+            console.log(`API: GET ${this._url}`)
+            const resp = await axios.get(this._url, {"headers": this._headers, "params": this._params });
             return {success: true, data: resp.data};
         } catch (e) {
             return {success: false, error: e};
@@ -54,8 +55,9 @@ export class Url {
     async post(context = null) {
         if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
         this._headers = await api._headers(context);
-        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
         try {
+            console.log(`API: POST ${this._url}`)
             const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
@@ -66,8 +68,9 @@ export class Url {
     async patch(context = null) {
         if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
         this._headers = await api._headers(context);
-        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        if (!this._url) {this._url = await api.getUrl(this._name, context)  + this._extension;}
         try {
+            console.log(`API: PATCH ${this._url}`)
             const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
@@ -84,22 +87,26 @@ class API {
     year = null;
 
     me = "me";
+    students = "students"
+    projects = "projects"
     editions = "editions";
     users = "users";
     current_edition = "current_edition";
-    students = "students";
-    projects = "projects";
-    questiontags = "questiontags";
+    editions_students = "editions_students";
+    edition_projects = "editions_projects";
+    editions_questiontags = "editions_questiontags";
     skills = "skills";
 
     _paths = {
         me: null,
+        students: null,
+        projects: null,
         editions: null,
         users: null,
         current_edition: null,
-        students: null,
-        projects: null,
-        questiontags: null,
+        editions_students: null,
+        editions_projects: null,
+        editions_questiontags: null,
         skills: null
     }
     _ready = false;
@@ -147,6 +154,10 @@ class API {
         const config = {"headers": headers};
         this._paths.me = session.userid;
         let res = await axios.get(this.baseUrl, config);
+        console.log("PIPO")
+        console.log(res)
+        this._paths.students = res.data[this.students];
+        this._paths.projects = res.data[this.projects];
         this._paths.editions = res.data[this.editions];
         this._paths.users = res.data[this.users];
         this._paths.skills = res.data[this.skills];
@@ -159,9 +170,9 @@ class API {
         if (this._paths.current_edition) {
             let editionData = await axios.get(this._paths.current_edition, config);
             this._year = editionData.data["year"];
-            this._paths.students = editionData.data[this.students];
-            this._paths.projects = editionData.data[this.projects];
-            this._paths.questiontags = editionData.data[this.questiontags];
+            this._paths.editions_students = editionData.data[this.students];
+            this._paths.editions_projects = editionData.data[this.projects];
+            this._paths.editions_questiontags = editionData.data["questiontags"];
         }
     }
     async setCurrentEdition(year = null) {

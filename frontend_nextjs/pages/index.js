@@ -2,6 +2,7 @@ import { useSession } from "next-auth/react"
 import LoadingPage from "../Components/LoadingPage"
 import {api, Url} from "../utils/ApiClient";
 import {Card, Carousel} from "react-bootstrap";
+import Login from "./login";
 
 function Home({ current_edition, students_length, projects_length }) {
   const { data: session } = useSession({ required: true })
@@ -63,12 +64,15 @@ export async function getServerSideProps(context) {
     props_out["current_edition"] = current_edition.data;
   }
 
-  const students = await Url.fromName(api.students).get(context)
+  const students = await Url.fromName(api.editions_students).get(context)
+  console.log("STUDENTS")
+  console.log(api.editions_students)
+  console.log(students);
   if (students.success) {
     props_out["students_length"] = students.data.length;
   }
 
-  const projects = await Url.fromName(api.projects).get(context)
+  const projects = await Url.fromName(api.edition_projects).get(context)
   if (projects.success) {
     props_out["projects_length"] = projects.data.length;
   }
