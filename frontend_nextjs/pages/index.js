@@ -1,17 +1,51 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
 import { useSession } from "next-auth/react"
 import LoadingPage from "../Components/LoadingPage"
-import {useEffect} from "react";
+import {api, Url} from "../utils/ApiClient";
+import {Card, Carousel} from "react-bootstrap";
 
-function Home(props) {
-
-  const { data: session, status } = useSession({ required: true })
+function Home({ current_edition, students_length, projects_length }) {
+  const { data: session } = useSession({ required: true })
   const isUser = session?.user
 
+  console.log("cool")
+  console.log(current_edition);
+
+  const INTERVAL = 3000;
+
   if (isUser) {
-    return (<h1>COOL DASHBOARD</h1>)
+    return (
+        <>
+          <Card style={{ width: "100%", height: "auto", margin: "auto" }}>
+            <Card.Header>
+              <h3 className={"index-header"}>Welcome back</h3>
+            </Card.Header>
+
+            <Carousel >
+
+              <Carousel.Item interval={INTERVAL}>
+                <Card.Body>
+                  <Card.Title className={"index-card-title"}><h1>{current_edition.name}</h1></Card.Title>
+                </Card.Body>
+              </Carousel.Item>
+
+              <Carousel.Item interval={INTERVAL}>
+                <Card.Body>
+                  <Card.Title className={"index-card-title"}><h1>{projects_length} Projects</h1></Card.Title>
+                </Card.Body>
+              </Carousel.Item>
+
+              <Carousel.Item interval={INTERVAL}>
+                <Card.Body>
+                  <Card.Title className={"index-card-title"}><h1>{students_length} Students</h1></Card.Title>
+                </Card.Body>
+              </Carousel.Item>
+
+            </Carousel>
+          </Card>
+
+    </>
+    )
+
   }
 
   // Session is being fetched, or no user.
@@ -20,3 +54,26 @@ function Home(props) {
 }
 
 export default Home
+
+export async function getServerSideProps(context) {
+  let props_out = {}
+
+  const current_edition =  await Url.fromName(api.current_edition).get(context)
+  if (current_edition.success) {
+    props_out["current_edition"] = current_edition.data;
+  }
+
+  const students = await Url.fromName(api.students).get(context)
+  if (students.success) {
+    props_out["students_length"] = students.data.length;
+  }
+
+  const projects = await Url.fromName(api.projects).get(context)
+  if (projects.success) {
+    props_out["projects_length"] = projects.data.length;
+  }
+
+  return {
+    props: props_out
+  }
+}
