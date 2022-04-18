@@ -95,9 +95,11 @@ export default function Settings(props) {
                             <SettingCards image={dark_theme} title={"Dark theme"} subtitle={"Customize the layout of the website to reduce the glow and calm your eyes"}>
                                 <ChangeTheme />
                             </SettingCards>
-                            <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
-                                <EditionDropdownButton />
-                            </SettingCards>
+                            {(role === 2) ?
+                                <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
+                                    <EditionDropdownButton />
+                                </SettingCards>
+                                : null}
                         </div>
                     </AccordionBody>
                 </AccordionItem>

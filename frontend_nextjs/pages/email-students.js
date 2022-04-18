@@ -19,6 +19,23 @@ import {getChangeDefaultEmailsPath} from "../routes";
 export default function EmailStudents() {
   const router = useRouter();
 
+  // check if authorized
+  const [role, setRole] = useState(0)
+  useEffect(() => {
+    if (role === 0 ) {
+      Url.fromName(api.me).get().then(res => {
+        if (res.success) {
+          res = res.data.data;
+          setRole(res.role);
+        }
+      })
+    }
+  }, [role]);
+  if (role !== 2) {
+    return (<h1>Unauthorized</h1>)
+  }
+
+
   // These constant define wheater the pop-up windows should be shown or not
   const [sendEmailsPopUpShow, setSendEmailsPopUpShow] = useState(false);
 
