@@ -4,10 +4,58 @@ from app.models.answer import Answer
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
-from app.tests.utils_for_tests.DataGenerator import DataGenerator, first_names, last_names, emails
+from app.tests.utils_for_tests.DataGenerator import DataGenerator
 
 
 class QuestionAnswerGenerator(DataGenerator):
+    questionstrings_yes_no = [
+        "Will you live in Belgium in July 2022?",
+        "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
+        "Would you like to be called by a different name than your birth name?",
+        "Would you like to add your pronouns?",
+        "Have you participated in osoc before?",
+        "Would you like to be a student coach this year?"
+    ]
+
+    questionstrings_text = [
+        "Are there any responsibilities you might have which could hinder you during the day?",
+        "Tell us a fun fact about yourself.",
+        "How many years does your degree take?",
+        "Which year of your degree are you in?",
+        "What is the name of your college or university?",
+        "Which skill would you list as your best one?"
+    ]
+
+    qa_multiple_choice = [
+        ["Are you able to work 128 hours with a student employment agreement, or as a volunteer?",
+         "Yes, I can work with a student employee agreement in Belgium",
+         "Yes, I can work as a volunteer in Belgium",
+         "No, but I would like to join this experience for free",
+         "No, I won't be able to work as a student, as a volunteer or for free."],
+        ["What is your gender?", "female", "male", "transgender", "rather not say"],
+        ["What language are you most fluent in?", "dutch", "english", "french", "german", "other"],
+        ["How would you rate your English",
+         "1 I can understand form, but it is hard for me to reply.",
+         "2 I can have simple conversations.",
+         "3 I can express myself, understand people and get a point across.",
+         "4 I can have extensive and complicated conversations.",
+         "5 I am fluent."],
+        ["What kind of diploma are you currently going for?",
+         "a professional bachelor", "an academic bachelor", "an associate degree",
+         "a master's degree", "doctoral degree", "no diploma, I am self taught", "other"]
+    ]
+
+    # multiple choice questions with max 2 answers
+    qa_multiple_choice2 = [
+        ["What do/did you study?",
+         "backend developer", "business management", "communication sciences",
+         "computer sciences", "design", "frontend development", "marketing",
+         "photography", "videography", "other"],
+        ["Which role are you applying for?",
+         "Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
+         "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
+         "Photographer", "Other"]]
+
     def __init__(self, session, edition):
         super().__init__(session)
         self.other_answers = []
@@ -20,46 +68,16 @@ class QuestionAnswerGenerator(DataGenerator):
         self.question_phone_number = Question(question="Phone number", field_id="", edition=edition.year)
 
         self.questions_yes_no = \
-            [Question(question=q, field_id="", edition=edition.year) for q in
-             ["Will you live in Belgium in July 2022?",
-              "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
-              "Would you like to be called by a different name than your birth name?",
-              "Would you like to add your pronouns?",
-              "Have you participated in osoc before?",
-              "Would you like to be a student coach this year?"]]
+            [Question(question=q, field_id="", edition=edition.year) for q in self.questionstrings_yes_no]
 
         self.answers_yes_no = [[Answer(answer=yn) for yn in ["yes", "no"]]
                                for question in self.questions_yes_no]
 
         self.questions_text = \
-            [Question(question=q, field_id="", edition=edition.year) for q in
-             ["Are there any responsibilities you might have which could hinder you during the day?",
-              "Tell us a fun fact about yourself.",
-              "How many years does your degree take?",
-              "Which year of your degree are you in?",
-              "What is the name of your college or university?",
-              "Which skill would you list as your best one?"]]
+            [Question(question=q, field_id="", edition=edition.year) for q in self.questionstrings_text]
 
         self.answers_text = [[Answer(answer=f"text{t}")
                               for t in range(1, 4)] for question in self.questions_text]
-
-        self.qa_multiple_choice = [
-            ["Are you able to work 128 hours with a student employment agreement, or as a volunteer?",
-             "Yes, I can work with a student employee agreement in Belgium",
-             "Yes, I can work as a volunteer in Belgium",
-             "No, but I would like to join this experience for free",
-             "No, I won't be able to work as a student, as a volunteer or for free."],
-            ["What is your gender?", "female", "male", "transgender", "rather not say"],
-            ["What language are you most fluent in?", "dutch", "english", "french", "german", "other"],
-            ["How would you rate your English",
-             "1 I can understand form, but it is hard for me to reply.",
-             "2 I can have simple conversations.",
-             "3 I can express myself, understand people and get a point across.",
-             "4 I can have extensive and complicated conversations.",
-             "5 I am fluent."],
-            ["What kind of diploma are you currently going for?",
-             "a professional bachelor", "an academic bachelor", "an associate degree",
-             "a master's degree", "doctoral degree", "no diploma, I am self taught", "other"]]
 
         self.questions_multiple_choice = []
         self.answers_multiple_choice = []
@@ -68,17 +86,6 @@ class QuestionAnswerGenerator(DataGenerator):
             self.questions_multiple_choice.append(Question(question=qa[0], field_id="", edition=edition.year))
             self.answers_multiple_choice.append(
                 [Answer(answer=answer_text) for answer_text in qa[1:]])
-
-        # multiple choice questions with max 2 answers
-        self.qa_multiple_choice2 = [
-            ["What do/did you study?",
-             "backend developer", "business management", "communication sciences",
-             "computer sciences", "design", "frontend development", "marketing",
-             "photography", "videography", "other"],
-            ["Which role are you applying for?",
-             "Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
-             "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
-             "Photographer", "Other"]]
 
         self.questions_multiple_choice2 = []
         self.answers_multiple_choice2 = []
@@ -106,13 +113,22 @@ class QuestionAnswerGenerator(DataGenerator):
              QuestionTag(question=self.questions_multiple_choice[4],
                          edition=self.edition.year, tag="type of degree")]
 
+        self.data = [self.question_first_name, self.question_last_name,
+                     self.question_email, self.question_phone_number] + \
+            self.questions_yes_no + self.questions_text + self.questions_multiple_choice + \
+            self.questions_multiple_choice2 + self.question_tags + \
+            [answer for answers in self.answers_yes_no for answer in answers] + \
+            [answer for answers in self.answers_text for answer in answers] + \
+            [answer for answers in self.answers_multiple_choice for answer in answers] + \
+            [answer for answers in self.answers_multiple_choice2 for answer in answers]
+
     def generate_question_answers(self, student):
-        first_name = choice(first_names)
-        last_name = choice(last_names)
+        first_name = choice(self.first_names)
+        last_name = choice(self.last_names)
 
         answer_first_name = Answer(answer=first_name)
         answer_last_name = Answer(answer=last_name)
-        answer_email = Answer(answer=f"{first_name.lower()}.{last_name.lower()}@{choice(emails)}")
+        answer_email = Answer(answer=f"{first_name.lower()}.{last_name.lower()}@{choice(self.emails)}")
         answer_phone_number = Answer(answer=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}")
 
         self.other_answers += [answer_first_name, answer_last_name,
@@ -150,80 +166,4 @@ class QuestionAnswerGenerator(DataGenerator):
                    for answer in sample(self.answers_multiple_choice2[i], k=randrange(1, 3))]
 
         self.question_answers += qa
-
-    def add_to_session(self):
-        self.session.add(self.question_first_name)
-        self.session.add(self.question_last_name)
-        self.session.add(self.question_email)
-        self.session.add(self.question_phone_number)
-        for answer in self.other_answers:
-            self.session.add(answer)
-
-        for question in self.questions_yes_no:
-            self.session.add(question)
-        for answers in self.answers_yes_no:
-            for answer in answers:
-                self.session.add(answer)
-
-        for question in self.questions_text:
-            self.session.add(question)
-        for answers in self.answers_text:
-            for answer in answers:
-                self.session.add(answer)
-
-        for question in self.questions_multiple_choice:
-            self.session.add(question)
-        for answers in self.answers_multiple_choice:
-            for answer in answers:
-                self.session.add(answer)
-
-        for question in self.questions_multiple_choice2:
-            self.session.add(question)
-        for answers in self.answers_multiple_choice2:
-            for answer in answers:
-                self.session.add(answer)
-
-        for question_answer in self.question_answers:
-            self.session.add(question_answer)
-
-        for question_tag in self.question_tags:
-            self.session.add(question_tag)
-
-    async def commit(self):
-        await self.session.commit()
-        await self.session.refresh(self.question_first_name)
-        await self.session.refresh(self.question_last_name)
-        await self.session.refresh(self.question_email)
-        await self.session.refresh(self.question_phone_number)
-        for answer in self.other_answers:
-            await self.session.refresh(answer)
-
-        for question in self.questions_yes_no:
-            await self.session.refresh(question)
-        for answers in self.answers_yes_no:
-            for answer in answers:
-                await self.session.refresh(answer)
-
-        for question in self.questions_text:
-            await self.session.refresh(question)
-        for answers in self.answers_text:
-            for answer in answers:
-                await self.session.refresh(answer)
-
-        for question in self.questions_multiple_choice:
-            await self.session.refresh(question)
-        for answers in self.answers_multiple_choice:
-            for answer in answers:
-                await self.session.refresh(answer)
-
-        for question in self.questions_multiple_choice2:
-            await self.session.refresh(question)
-        for answers in self.answers_multiple_choice2:
-            for answer in answers:
-                await self.session.refresh(answer)
-
-        for question_answer in self.question_answers:
-            await self.session.refresh(question_answer)
-
-        for question_tag in self.question_tags:
-            await self.session.refresh(question_tag)
+        self.data += qa

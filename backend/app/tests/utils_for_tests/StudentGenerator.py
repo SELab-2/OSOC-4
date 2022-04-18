@@ -18,10 +18,6 @@ class StudentGenerator(DataGenerator):
     def generate_students(self, number: int):
         return [self.generate_student() for _ in range(number)]
 
-    def add_to_session(self):
-        super().add_to_session()
-        self.question_answer_generator.add_to_session()
-
-    async def commit(self):
-        await super().commit()
-        await self.question_answer_generator.commit()
+    async def add_to_db(self):
+        await super().add_to_db()
+        await self.question_answer_generator.add_to_db()

@@ -139,17 +139,15 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     for skill in project2_skills:
         session.add(skill)
 
-    await user_generator.add_to_session()
-    await edition_generator.add_to_session()
-    await student_generator.add_to_session()
+    await user_generator.add_to_db()
+    await edition_generator.add_to_db()
+    await student_generator.add_to_db()
 
     for suggestion in suggestions:
         session.add(suggestion)
 
     for participation in participations:
         session.add(participation)
-
-    await session.commit()
 
     return response(None, "Dummy data inserted")
 

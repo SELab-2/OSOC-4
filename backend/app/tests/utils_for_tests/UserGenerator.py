@@ -1,7 +1,7 @@
 from random import choice
 
 from app.models.user import User, UserRole
-from app.tests.utils_for_tests.DataGenerator import DataGenerator, first_names, last_names, emails
+from app.tests.utils_for_tests.DataGenerator import DataGenerator
 from app.utils.cryptography import get_password_hash
 
 
@@ -68,10 +68,10 @@ class UserGenerator(DataGenerator):
             user.password = get_password_hash(user.password)
 
     def generate_user(self, role=UserRole.COACH, active=True, approved=True, disabled=False):
-        first_name = choice(first_names)
-        last_name = choice(last_names)
+        first_name = choice(self.first_names)
+        last_name = choice(self.last_names)
 
-        user = User(email=f"{first_name.lower()}.{last_name.lower()}@{choice(emails)}",
+        user = User(email=f"{first_name.lower()}.{last_name.lower()}@{choice(self.emails)}",
                     name=f"{first_name} {last_name}",
                     password=get_password_hash("justapassword"),
                     role=role,
