@@ -105,9 +105,9 @@ An example .env file for the frontend directory of the application.
 
 ```
 NEXT_BASE_PATH=""
-NEXTAUTH_URL="http://localhost:3000/api/auth"
-NEXT_API_URL="http://localhost:8000"
-NEXT_INTERNAL_API_URL="http://localhost:8000"
+NEXTAUTH_URL="http://127.0.0.1:3000/api/auth"
+NEXT_API_URL="http://127.0.0.1:8000"
+NEXT_INTERNAL_API_URL="http://127.0.0.1:8000"
 NODE_ENV="development"  # or production
 ```
 
