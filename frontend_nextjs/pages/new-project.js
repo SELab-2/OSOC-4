@@ -1,6 +1,5 @@
 import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {log} from "../utils/logger";
 import {useRouter} from "next/router";
 import SelectSearch, {fuzzySearch} from "react-select-search";
 import {api, Url} from "../utils/ApiClient";
@@ -30,8 +29,6 @@ export default function NewProjects() {
             Url.fromName(api.skills).get().then(async res => {
                 if (res.success) {
                     res = res.data;
-                    log("load skills")
-                    log(res)
                     if(res){
                         // scuffed way to get unique skills (should be fixed in backend soon)
                         let array = [];
@@ -45,11 +42,9 @@ export default function NewProjects() {
     })
 
     async function DeleteStudent(index) {
-        log("delete student")
         if (students.length > 1) {
             await setStudents(students.filter((_, i) => i !== index))
         }
-        log(students)
     }
 
     function changeSkillStudent(index, value){
@@ -75,7 +70,6 @@ export default function NewProjects() {
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        log("Creating new project")
         let edition = await api.getCurrentYear();
         // TODO check forms
         let body = {
@@ -87,7 +81,7 @@ export default function NewProjects() {
             "edition": edition
         }
         // TODO add skills to project
-        await Url.fromName(api.projects).extend("projects/create").setBody(body).post();
+        await Url.fromName(api.edition_projects).extend("projects/create").setBody(body).post();
     }
 
 

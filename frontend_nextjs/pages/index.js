@@ -7,9 +7,6 @@ function Home({ current_edition, students_length, projects_length }) {
   const { data: session } = useSession({ required: true })
   const isUser = session?.user
 
-  console.log("cool")
-  console.log(current_edition);
-
   const INTERVAL = 3000;
 
   if (isUser) {
@@ -63,12 +60,12 @@ export async function getServerSideProps(context) {
     props_out["current_edition"] = current_edition.data;
   }
 
-  const students = await Url.fromName(api.students).get(context)
+  const students = await Url.fromName(api.editions_students).get(context)
   if (students.success) {
     props_out["students_length"] = students.data.length;
   }
 
-  const projects = await Url.fromName(api.projects).get(context)
+  const projects = await Url.fromName(api.edition_projects).get(context)
   if (projects.success) {
     props_out["projects_length"] = projects.data.length;
   }

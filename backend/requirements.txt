@@ -9,3 +9,4 @@ redis
 sqlalchemy
 sqlmodel
 uvicorn
+websockets

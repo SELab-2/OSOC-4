@@ -1,6 +1,5 @@
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
-import {log} from "../../utils/logger";
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 
@@ -14,14 +13,13 @@ const Project = () => {
 
     useEffect(() => {
         if (! loaded) {
-                Url.fromUrl(api.baseUrl).extend("/projects/" + project_id).get().then(res => {
-                    if (res.success) {
-                        log("load project")
-                        log(res)
-                        setProject(res.data)
-                        setLoaded(true)
-                    }
-                });
+            api.invalidate();
+            Url.fromName(api.projects).extend(`/${project_id}`).get().then(res => {
+                if (res.success) {
+                    setProject(res.data)
+                    setLoaded(true)
+                }
+            });
         }
     })
 
@@ -56,7 +54,6 @@ const Project = () => {
                                     <Button variant="secondary" onClick={() => {
                                         setShowDelete(false)
                                         deleteProject()
-                                        log("DELETE PROJECT")
                                         router.push("/projects")
                                     }}>
                                         Delete project
@@ -74,8 +71,6 @@ const Project = () => {
                     <h2>About the project</h2>
                     <p>{project.description}</p>
 
-                    <h2>Goals</h2>
-                    {project.goals.split("\n").map((goal, index) => (<p key={index}>- {goal}</p>))}
                     {/*TODO nog iets met user?*/}
                 </div>) : null}
         </div>

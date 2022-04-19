@@ -66,6 +66,8 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
 @router.get('/')
 def root(role: RoleChecker(UserRole.COACH) = Depends()):
     paths = {"editions": f"{config.api_url}editions",
+             "students": f"{config.api_url}students",
+             "projects": f"{config.api_url}projects",
              "skills": f"{config.api_url}skills"}
     if role == UserRole.ADMIN:
         paths["users"] = f"{config.api_url}users"
@@ -97,8 +99,9 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
             disabled=False)
         u = await update(new_user, session)
     else:
-        u = await read_where(User, User.email == user.email and not User.disabled, session=session)
-
+        u = await read_where(User,
+                             User.email == user.email, User.disabled == False, User.active == True,
+                             User.approved == True, session=session)
     if u:
         if not verify_password(user.password, u.password):
             raise InvalidEmailOrPasswordException()
