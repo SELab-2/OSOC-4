@@ -50,7 +50,6 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       if (!props.student) {
-        console.log("INSIDE")
         Url.fromName(api.students).extend(`/${props.student_id}`).get().then(res => {
           if (res.success) {
                 res = res.data;
@@ -83,6 +82,8 @@ export default function StudentDetails(props) {
         );
       } else {
         setStudent(props.student);
+        console.log("PIPO")
+        console.log(props.student)
         setSuggestions(props.student["suggestions"]);
         let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
         if (decisions.length !== 0) {
