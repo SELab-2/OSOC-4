@@ -50,8 +50,9 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       if (!props.student) {
-        Url.fromName(api.students).extend(props.student_id).get().then(res => {
-              if (res.success) {
+        console.log("INSIDE")
+        Url.fromName(api.students).extend(`/${props.student_id}`).get().then(res => {
+          if (res.success) {
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
                   if (item["suggested_by_id"] === session["userid"]) {

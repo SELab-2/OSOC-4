@@ -31,9 +31,6 @@ export default function EmailStudents() {
       })
     }
   }, [role]);
-  if (role !== 2) {
-    return (<h1>Unauthorized</h1>)
-  }
 
 
   // These constant define wheater the pop-up windows should be shown or not
@@ -68,7 +65,7 @@ export default function EmailStudents() {
         setSortby(router.query.sortby);
 
         // the urlManager returns the url for the list of students
-        Url.fromName(api.students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
           if (res.success) {
             Promise.all(res.data.map(studentUrl =>
                 Url.fromUrl(studentUrl).get().then(res => res.data)
@@ -89,6 +86,10 @@ export default function EmailStudents() {
       }
     }
   })
+
+  if (role !== 2) {
+    return (<h1>Unauthorized</h1>)
+  }
 
   /**
    * The email students tab does not show students with the decision 'Undecided',

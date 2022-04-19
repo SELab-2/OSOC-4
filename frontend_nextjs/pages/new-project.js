@@ -87,7 +87,7 @@ export default function NewProjects() {
             "edition": edition
         }
         // TODO add skills to project
-        await Url.fromName(api.projects).extend("projects/create").setBody(body).post();
+        await Url.fromName(api.edition_projects).extend("projects/create").setBody(body).post();
     }
 
 

@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
 import Error from 'next/error'
 import React, { useEffect } from 'react'
-import {check_resetkey, set_password, use_resetkey} from '../../utils/json-requests'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
 import { Form, Button } from 'react-bootstrap';
+import {api, Url} from "../../utils/ApiClient";
 
 const Reset = () => {
     const router = useRouter()
@@ -32,17 +32,18 @@ const Reset = () => {
             "password": password,
             "validate_password": validatePassword
         }
-        const resp = await use_resetkey(resetkey, data);
-        if (resp) {
-            alert(resp["message"]);
+        const resp = await Url.fromName(api.resetpassword).extend(`/${resetkey}`).setBody(data).post();
+
+        if (resp.success) {
+            alert(resp.data["message"]);
             await router.push('/login');
         }
     }
 
     useEffect(() => {
-        check_resetkey(resetkey).then(resp => {
+        Url.fromName(api.resetpassword).extend(`/${resetkey}`).get().then(resp => {
             console.log(resp);
-            if (resp) {setValidkey(true);}
+            if (resp.success) {setValidkey(true);}
             setLoading(false);
         });
     }, [resetkey])

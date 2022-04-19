@@ -16,7 +16,7 @@ export default function Projects(props) {
 
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
-            Url.fromName(api.projects).get().then(res => {
+            Url.fromName(api.edition_projects).get().then(res => {
                 if (res.success) {
                     const projects = res.data;
                     log("load project");

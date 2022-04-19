@@ -1,10 +1,9 @@
 import { useRouter } from 'next/router'
-import Error from 'next/error'
 import React, { useEffect } from 'react'
-import { check_invitekey, set_password } from '../../utils/json-requests'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
 import { Form, Button } from 'react-bootstrap';
+import {api, Url} from "../../utils/ApiClient";
 
 const Invite = () => {
     const router = useRouter()
@@ -38,18 +37,18 @@ const Invite = () => {
             "password": password,
             "name": name,
         }
-        const resp = await set_password(invitekey, j);
+        const resp = await Url.fromName(api.invite).extend(`/${invitekey}`).setBody(j).post();
         if (resp) {
             await router.push('/login')
         }
     }
 
     useEffect(async () => {
-        const resp = await check_invitekey(invitekey);
+        const resp = await Url.fromName(api.invite).extend(`/${invitekey}`).get();
         console.log("INVITE")
         console.log(resp);
 
-        if (resp) {
+        if (resp.success) {
             setValidkey(true);
         }
         setLoading(false);
