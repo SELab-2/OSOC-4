@@ -4,7 +4,7 @@
 }
 
 .fill_height {
-    height: 100vh;
+    height: 100%;
 }
 
 .scroll-overflow {
@@ -92,5 +92,5 @@
 
 .hamburger {
     margin-top: 22px;
-    margin-left: 22px;
+    margin-left: 2px;
 }

@@ -159,7 +159,7 @@ export default function StudentDetails(props) {
 
   // returns the html for student details
   return (
-    <Col className="fill_height student-details-window" style={{ visibility: props.visibility }} >
+    <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)", visibility: props.visibility }} >
 
       {student["mandatory"] &&
         <div>

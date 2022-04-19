@@ -62,8 +62,8 @@ export default function SearchSortBar(props) {
       <Col xs="auto" className="align-self-center">
         <select className="dropdown-sortby" id="dropdown-decision" value={sortby}
           onChange={(ev) => sort(ev.target.value)}>
-          <option value={"firstname+asc,lastname+asc"}>Name A-Z</option>
-          <option value={"firstname+dc,lastname+desc"}>Name Z-A</option>
+          <option value={"first name+asc,last name+asc"}>Name A-Z</option>
+          <option value={"first name+dc,last name+desc"}>Name Z-A</option>
         </select>
       </Col>
     </Row>
