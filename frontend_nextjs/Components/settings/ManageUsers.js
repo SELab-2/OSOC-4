@@ -45,7 +45,6 @@ export default function ManageUsers(props) {
     async function handleSubmitInvite(event) {
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
-        let user_url = await api.getUrl(api.users);
         emails.forEach(email => {
             // post to create
             Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(resp => {
@@ -70,7 +69,7 @@ export default function ManageUsers(props) {
 
             <Form id="invite-users" onSubmit={handleSubmitInvite}>
                 <Form.Group controlId="inviteUserTextarea">
-                    <Form.Label>List of e-mailadres(ess) of users you want to invite </Form.Label>
+                    <Form.Label>List of email-address(es) of the users you want to invite </Form.Label>
                     <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
                 </Form.Group>
                 <br />

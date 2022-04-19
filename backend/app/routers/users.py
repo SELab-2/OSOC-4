@@ -172,6 +172,32 @@ async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession 
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
+@router.delete("/{user_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)):
+    """delete_user this deletes a user (soft delete, disables the user & resets password related things)
+
+    :param user_id: the user id
+    :type user_id: str
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    user = await read_where(User, User.id == int(user_id), session=session)
+
+    if user is None:
+        raise UserNotFoundException()
+
+    user.disabled = True
+    user.active = False
+    user.approved = False
+    user.password = ""
+
+    user = await update(user, session=session)
+
+    return response(UserOut.parse_raw(user.json()), "User deleted successfully")
+
+
 @router.patch("/{user_id}/password", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def update_password(user_id: str, passwords: ChangePassword, session: AsyncSession = Depends(get_session)):
     """"update_password this changes the password of given user if previous password is given
