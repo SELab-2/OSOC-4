@@ -1,6 +1,7 @@
 import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
 import LoadingPage from "../LoadingPage";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { useEffect, useState } from "react";
 

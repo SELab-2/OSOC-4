@@ -32,7 +32,7 @@ export default function StudentListelement(props) {
         (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
       }
     }
-  });
+  }, []);
 
   // get a list of the skills of the student in HTML format
   function getSkills() {
@@ -86,17 +86,17 @@ export default function StudentListelement(props) {
 
   // The html representation of a list-element
   return (
-    <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
+    <Container id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
       onClick={() => studentDetails()}>
       <Row className="upper-layer">
-        <Col id="name" className="name" md="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
-        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
+        <Col id="name" className="name" xs="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
+        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
           No practical problems
         </Col>
         <Col />
-        <Col md="auto">
-          <Row md="auto" className="nomargin">
-            <Col className="suggestions" md="auto">Suggestions:</Col>
+        <Col xs="auto">
+          <Row xs="auto" className="nomargin">
+            <Col className="suggestions" xs="auto">Suggestions:</Col>
             <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
         </Col>
@@ -104,7 +104,7 @@ export default function StudentListelement(props) {
 
       <Row id="info" className="info">
         <GeneralInfo listelement={true} student={props.student} decision={getDecisionString(decision)} />
-        <Col id="skills" align="right" className="skills" md="auto">
+        <Col id="skills" align="right" className="skills" sm="auto">
           <ul>
             {getSkills()}
           </ul>

@@ -4,10 +4,10 @@
 
 .suggest-button {
     font-size: 13px;
-    width: 110px;
+    width: 80px;
     -webkit-text-fill-color: black;
-    border-width: 0;
-    margin: 8px 5px;
+    border-width: 4px;
+    margin: 8px 0px;
     padding-top: 7px;
     padding-bottom: 7px;
 
@@ -41,7 +41,7 @@
 }
 
 .details-upper-layer {
-    margin: 0 30px;
+    margin: 0 20px;
 }
 
 .dropdown-decision {
@@ -105,6 +105,10 @@
 }
 
 .student-details-window {
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: lightgray;
+
     margin-left: 20px;
     padding-top: 15px;
     padding-right: 25px;
