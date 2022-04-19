@@ -3,11 +3,12 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from 'next-auth/react';
 import {api, Url} from "../../../utils/ApiClient";
+import {log} from "../../../utils/logger";
 
 async function refreshAccessToken(tokenObject) {
     const csrfToken = await getCsrfToken()
     try {
-        console.log("sending refresh request")
+        log("sending refresh request")
         // Get a new set of tokens with a refreshToken
 
         const url = process.env.NEXT_INTERNAL_API_URL;

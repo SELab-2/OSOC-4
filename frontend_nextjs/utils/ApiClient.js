@@ -190,7 +190,6 @@ class API {
         log("Engine:setup");
         try {
             const session = await this._session(context);
-            const csrfToken = await this._csrfToken(context);
             if (!session) {throw Error("Engine:_setup: session is undefined");}
 
             // set up all urls
@@ -217,7 +216,7 @@ class API {
                 this._paths.editions_questiontags = editionData.data["questiontags"];
             }
         } catch (e) {
-            console.log("API: setup failed")
+            log("API: setup failed")
         }
 
     }

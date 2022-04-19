@@ -82,8 +82,6 @@ export default function StudentDetails(props) {
         );
       } else {
         setStudent(props.student);
-        console.log("PIPO")
-        console.log(props.student)
         setSuggestions(props.student["suggestions"]);
         let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
         if (decisions.length !== 0) {
