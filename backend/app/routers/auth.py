@@ -100,7 +100,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
         u = await update(new_user, session)
     else:
         u = await read_where(User,
-                             User.email == user.email, User.disabled is False, User.active is True, User.approved is True,
+                             User.email == user.email, User.disabled == False, User.active == True, User.approved == True,
                              session=session)
     if u:
         if not verify_password(user.password, u.password):
