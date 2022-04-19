@@ -1,9 +1,6 @@
 from random import choice, randrange, sample
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.crud import update, clear_data
+from app.crud import clear_data, update
 from app.database import get_session
 from app.models.participation import Participation
 from app.models.project import Project, ProjectRequiredSkill
@@ -14,6 +11,8 @@ from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
 from app.utils.response import response
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/ddd")
 

@@ -1,11 +1,10 @@
+from random import randint, sample
 from typing import List
-from random import sample, randint
-
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.edition import Edition
 from app.models.user import User
 from app.tests.utils_for_tests.DataGenerator import DataGenerator
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class EditionGenerator(DataGenerator):
@@ -16,7 +15,7 @@ class EditionGenerator(DataGenerator):
         edition: Edition = Edition(
             name=f"{year} Summer Fest",
             year=year,
-            coaches=coaches)
+            coaches=coaches, read_only=False)
         self.data.append(edition)
         return edition
 
