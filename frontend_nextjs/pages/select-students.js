@@ -120,7 +120,7 @@ export default function SelectStudents() {
         let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
         if (filters[2].length !== 0) {
             filteredStudents = filteredStudents.filter(student => {
-                let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
+                let decisions = Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]);
                 let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
                 return decisionNumbers.includes(decisionNumber);
             })
