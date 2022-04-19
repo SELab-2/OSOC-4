@@ -99,8 +99,9 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
             disabled=False)
         u = await update(new_user, session)
     else:
-        u = await read_where(User, User.email == user.email and not User.disabled, session=session)
-
+        u = await read_where(User,
+                             User.email == user.email, User.disabled == False, User.active == True,
+                             User.approved == True, session=session)
     if u:
         if not verify_password(user.password, u.password):
             raise InvalidEmailOrPasswordException()

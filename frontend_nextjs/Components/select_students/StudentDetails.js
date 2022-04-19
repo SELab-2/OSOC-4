@@ -50,7 +50,6 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       if (!props.student) {
-        console.log("INSIDE")
         Url.fromName(api.students).extend(`/${props.student_id}`).get().then(res => {
           if (res.success) {
                 res = res.data;

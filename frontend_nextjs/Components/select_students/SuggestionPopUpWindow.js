@@ -53,7 +53,6 @@ export default function PopUpWindow(props) {
       ...suggestion,
       ["student_id"]: props.student["id_int"]
     }).post();
-    console.log(suggestion)
     props.updateSuggestion(suggestion)
     setPopUpShow(false);
   }

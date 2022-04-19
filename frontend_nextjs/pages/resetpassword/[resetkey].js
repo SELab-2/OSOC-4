@@ -42,7 +42,6 @@ const Reset = () => {
 
     useEffect(() => {
         Url.fromName(api.resetpassword).extend(`/${resetkey}`).get().then(resp => {
-            console.log(resp);
             if (resp.success) {setValidkey(true);}
             setLoading(false);
         });

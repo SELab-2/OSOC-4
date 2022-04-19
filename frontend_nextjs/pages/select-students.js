@@ -75,7 +75,6 @@ export default function SelectStudents() {
                                             res["own_suggestion"] = item;
                                         }
                                     });
-                                    console.log(res)
                                     return res;
                                 }
                             })
@@ -99,7 +98,6 @@ export default function SelectStudents() {
 
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
-        console.log(students)
         students.find((o, i) => {
             if (o["id"] === data["suggestion"]["student_id"]) {
                 let new_students = [...students]
@@ -122,7 +120,7 @@ export default function SelectStudents() {
         let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
         if (filters[2].length !== 0) {
             filteredStudents = filteredStudents.filter(student => {
-                let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
+                let decisions = Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]);
                 let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
                 return decisionNumbers.includes(decisionNumber);
             })

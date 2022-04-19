@@ -1,9 +1,6 @@
-import Head from 'next/head'
 import Image from 'next/image'
-import styles from '../styles/Home.module.css'
 import { useState } from 'react';
 import { useRouter } from 'next/router'
-import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
 import LoadingPage from "../Components/LoadingPage";
@@ -43,12 +40,10 @@ const Login = props => {
 
 
     async function handleSubmitForgot(event) {
-        log("handle forgot submit")
         event.preventDefault();
         let credentials = JSON.stringify({
             "email": emailForgot,
         });
-        log(credentials)
         // post, if any errors, show them
         let output = Url.fromName(api.forgot).setBody(credentials).post();
         if (output.success) {

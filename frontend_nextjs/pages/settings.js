@@ -9,7 +9,6 @@ import { Accordion } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
-import { log } from "../utils/logger";
 import {api, Url} from "../utils/ApiClient";
 import ChangeTheme from "../Components/settings/ChangeTheme";
 import change_email_image from "/public/assets/change_email.png"

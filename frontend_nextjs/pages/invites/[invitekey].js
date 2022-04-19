@@ -4,6 +4,7 @@ import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
 import { Form, Button } from 'react-bootstrap';
 import {api, Url} from "../../utils/ApiClient";
+import {log} from "../../utils/logger";
 
 const Invite = () => {
     const router = useRouter()
@@ -45,8 +46,6 @@ const Invite = () => {
 
     useEffect(async () => {
         const resp = await Url.fromName(api.invite).extend(`/${invitekey}`).get();
-        console.log("INVITE")
-        console.log(resp);
 
         if (resp.success) {
             setValidkey(true);

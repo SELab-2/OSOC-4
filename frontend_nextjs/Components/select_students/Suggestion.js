@@ -1,6 +1,7 @@
 import {Col, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {Url} from "../../utils/ApiClient";
+import Login from "../../pages/login";
 
 // displays the counts of the suggestions for a student
 export default function Suggestion(props) {
@@ -11,7 +12,12 @@ export default function Suggestion(props) {
   // This function inserts the data in the variables
   useEffect( () => {
     if (suggestedBy === "") {
-      Url.fromUrl(props.suggestion["suggested_by_id"]).get().then(res => setSuggestedBy(res.data["name"]));
+      Url.fromUrl(props.suggestion["suggested_by_id"]).get().then(res =>  {
+        if (res.success) {
+          res = res.data;
+          setSuggestedBy(res.data["name"]);
+        }
+      });
     }
   })
 

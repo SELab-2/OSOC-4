@@ -2,14 +2,10 @@ import { useSession } from "next-auth/react"
 import LoadingPage from "../Components/LoadingPage"
 import {api, Url} from "../utils/ApiClient";
 import {Card, Carousel} from "react-bootstrap";
-import Login from "./login";
 
 function Home({ current_edition, students_length, projects_length }) {
   const { data: session } = useSession({ required: true })
   const isUser = session?.user
-
-  console.log("cool")
-  console.log(current_edition);
 
   const INTERVAL = 3000;
 
@@ -65,9 +61,6 @@ export async function getServerSideProps(context) {
   }
 
   const students = await Url.fromName(api.editions_students).get(context)
-  console.log("STUDENTS")
-  console.log(api.editions_students)
-  console.log(students);
   if (students.success) {
     props_out["students_length"] = students.data.length;
   }
