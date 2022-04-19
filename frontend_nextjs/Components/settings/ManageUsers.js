@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import {Button, Col, Form, Row, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
+import CheckboxFilter from "../CheckboxFilter";
 
 export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
@@ -63,6 +64,22 @@ export default function ManageUsers(props) {
         setShownUsers(users.filter(user => user.name.includes(search)))
     }
 
+    let filters = [];
+
+    function setFilter(filter, val) {
+        if (val) {
+            filters.push([filter, val])
+        } else {
+            filters = filters.filter(val => val[0] === filter)
+        }
+
+        setShownUsers(users.filter(user => {
+            if (!user.name.includes(search)) {return false;}
+            console.log(filters)
+            filters.every(filter => user[filter[0]] === filter[1]);
+        } ))
+    }
+
     return (
         <div>
             <h4>Invite new users</h4>
@@ -76,9 +93,18 @@ export default function ManageUsers(props) {
                 <Button variant={"outline-secondary"} type="submit"> Invite users</Button>
             </Form>
             <br />
+
             <h4>Manage users</h4>
             <Table className={"table-manage-users"}>
                 <thead>
+                    <tr>
+                        Filters:
+                        <CheckboxFilter filter_id="active-checkbox" filter_text="Active"
+                                        onChange={(ev) => setFilter("active", ev.target.checked)}/>
+                        <CheckboxFilter filter_id="approved-checkbox" filter_text="Approved"
+                                        onChange={(ev) => setFilter("approved", ev.target.checked)}/>
+
+                    </tr>
                     <tr>
                         <th>
                             <Form onSubmit={handleSearchSubmit}>

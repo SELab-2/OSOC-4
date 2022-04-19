@@ -37,7 +37,6 @@ export default function UserTr(props) {
     }
 
     function getStatusField() {
-        // todo make remove buttons work
         if (!active) {
             return (<Button disabled className="user-button-inactive">Not yet active</Button>);
         }
