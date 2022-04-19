@@ -1,7 +1,7 @@
 import axios from 'axios';
 import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getSession, getCsrfToken } from 'next-auth/react';
+import { getCsrfToken } from 'next-auth/react';
 import {api, Url} from "../../../utils/ApiClient";
 
 async function refreshAccessToken(tokenObject) {
@@ -45,7 +45,6 @@ const providers = [
                 }
                 return null;
             } catch (e) {
-                console.log(e);
                 throw new Error(e);
             }
         }

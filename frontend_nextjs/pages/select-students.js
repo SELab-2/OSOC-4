@@ -75,7 +75,6 @@ export default function SelectStudents() {
                                             res["own_suggestion"] = item;
                                         }
                                     });
-                                    console.log(res)
                                     return res;
                                 }
                             })
@@ -99,7 +98,6 @@ export default function SelectStudents() {
 
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
-        console.log(students)
         students.find((o, i) => {
             if (o["id"] === data["suggestion"]["student_id"]) {
                 let new_students = [...students]

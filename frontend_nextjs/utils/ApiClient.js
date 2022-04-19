@@ -47,7 +47,7 @@ export class Url {
         try {
             this._headers = await api._headers(context, this._useAuth);
             if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
-            console.log(`API: GET ${this._url}`)
+            log(`API: GET ${this._url}`)
             const resp = await axios.get(this._url, {"headers": this._headers, "params": this._params });
             return {success: true, data: resp.data};
         } catch (e) {
@@ -60,7 +60,7 @@ export class Url {
         try {
             this._headers = await api._headers(context, this._useAuth);
             if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
-            console.log(`API: GET ${this._url}`)
+            log(`API: GET ${this._url}`)
             const resp = await axios.get(this._url, {"headers": this._headers, "params": this._params });
             return {success: true, data: resp.data};
         } catch (e) {
@@ -73,7 +73,7 @@ export class Url {
         try {
             this._headers = await api._headers(context, this._useAuth);
             if (!this._url) {this._url = await api.getUrl(this._name, context) + this._extension;}
-            console.log(`API: POST ${this._url}`)
+            log(`API: POST ${this._url}`)
             const resp = await axios.post(this._url, this._body, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
@@ -86,7 +86,7 @@ export class Url {
         try {
             this._headers = await api._headers(context, this._useAuth);
             if (!this._url) {this._url = await api.getUrl(this._name, context)  + this._extension;}
-            console.log(`API: PATCH ${this._url}`)
+            log(`API: PATCH ${this._url}`)
             const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
@@ -99,7 +99,7 @@ export class Url {
         try {
             this._headers = await api._headers(context, this._useAuth);
             if (!this._url) {this._url = await api.getUrl(this._name, context)  + this._extension;}
-            console.log(`API: DELETE ${this._url}`)
+            log(`API: DELETE ${this._url}`)
             const resp = await axios.delete(this._url, {"headers": this._headers});
             return {success: true, data: resp.data};
         } catch (e) {
@@ -198,8 +198,6 @@ class API {
             const config = {"headers": headers};
             this._paths.me = session.userid;
             let res = await axios.get(this.baseUrl, config);
-            console.log("PIPO")
-            console.log(res)
             this._paths.students = res.data[this.students];
             this._paths.projects = res.data[this.projects];
             this._paths.editions = res.data[this.editions];

@@ -1,6 +1,5 @@
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
-import {log} from "../../utils/logger";
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 
@@ -55,7 +54,6 @@ const Project = () => {
                                     <Button variant="secondary" onClick={() => {
                                         setShowDelete(false)
                                         deleteProject()
-                                        log("DELETE PROJECT")
                                         router.push("/projects")
                                     }}>
                                         Delete project
