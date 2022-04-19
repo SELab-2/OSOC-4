@@ -65,7 +65,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.users = {user.name: user for user in user_generator.data}
         self.saved_objects["passwords"] = user_generator.passwords
 
-        await user_generator.add_to_session()
+        await user_generator.add_to_db()
 
     async def asyncTearDown(self) -> None:
         await clear_data(self.session)

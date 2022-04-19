@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { sendDelete } from "../../utils/json-requests";
 import { Form, Button } from 'react-bootstrap';
 import deleteIcon from '../../public/assets/delete.svg';
 import Image from "next/image";
@@ -41,8 +40,10 @@ export default function QuestionTag(props) {
 
     const deleteTag = (event) => {
         event.preventDefault()
-        sendDelete(props.url).then(result => {
-            props.deleteTag(props.url)
+        Url.fromUrl(props.url).delete().then(res => {
+            if (res.success) {
+                props.deleteTag(props.url)
+            }
         })
     }
 

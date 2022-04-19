@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {log} from "../utils/logger";
 import ProjectCard from "../Components/ProjectCard";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {useRouter} from "next/router";
@@ -16,17 +15,13 @@ export default function Projects(props) {
 
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
-            Url.fromName(api.projects).get().then(res => {
+            Url.fromName(api.edition_projects).get().then(res => {
                 if (res.success) {
                     const projects = res.data;
-                    log("load project");
-                    log(projects);
                     for (let p of projects) {
-                        log(p)
                         Url.fromUrl(p).get().then(async project => {
                             if (project.success) {
                                 project = project.data;
-                                log(project)
                                 if (project) {
                                     await setAllProjects(prevState => [...prevState, project]);
                                     // TODO clean this up (currently only works if updated here
@@ -44,17 +39,14 @@ export default function Projects(props) {
     async function handleSearchSubmit(event) {
         event.preventDefault();
         setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
-        log("SUBMIT")
     }
 
     async function changePeopleNeeded(event){
         event.preventDefault()
-        log(peopleNeeded)
         setPeopleNeeded(event.target.checked)
     }
 
     const handleNewProject = () => {
-        log("navigate to new project")
         router.push("/new-project")
     }
 

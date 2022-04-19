@@ -50,7 +50,7 @@ export default function StudentDetails(props) {
     if (studentId !== props.student_id && props.student_id) {
       setStudentId(props.student_id);
       if (!props.student) {
-        Url.fromName(api.students).extend(props.student_id).get().then(res => {
+        Url.fromName(api.students).extend(`/${props.student_id}`).get().then(res => {
           if (res.success) {
             res = res.data;
             Object.values(res["suggestions"]).forEach((item, index) => {
@@ -78,9 +78,10 @@ export default function StudentDetails(props) {
               if (res.success) { setQuestionAnswers(res.data); }
             })
           }
-        }
-        );
-      } else {
+        });
+      }
+
+      else {
         setStudent(props.student);
         setSuggestions(props.student["suggestions"]);
         let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
@@ -98,7 +99,7 @@ export default function StudentDetails(props) {
         })
       }
     }
-  }, [studentId, props.student_id, props.student, session])
+  }, [studentId, props.student_id, props.student, session]);
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {

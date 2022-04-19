@@ -19,6 +19,20 @@ import {getChangeDefaultEmailsPath} from "../routes";
 export default function EmailStudents() {
   const router = useRouter();
 
+  // check if authorized
+  const [role, setRole] = useState(0)
+  useEffect(() => {
+    if (role === 0 ) {
+      Url.fromName(api.me).get().then(res => {
+        if (res.success) {
+          res = res.data.data;
+          setRole(res.role);
+        }
+      })
+    }
+  }, [role]);
+
+
   // These constant define wheater the pop-up windows should be shown or not
   const [sendEmailsPopUpShow, setSendEmailsPopUpShow] = useState(false);
 
@@ -51,7 +65,7 @@ export default function EmailStudents() {
         setSortby(router.query.sortby);
 
         // the urlManager returns the url for the list of students
-        Url.fromName(api.students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
           if (res.success) {
             Promise.all(res.data.map(studentUrl =>
                 Url.fromUrl(studentUrl).get().then(res => res.data)
@@ -72,6 +86,10 @@ export default function EmailStudents() {
       }
     }
   })
+
+  if (role !== 2) {
+    return (<h1>Unauthorized</h1>)
+  }
 
   /**
    * The email students tab does not show students with the decision 'Undecided',

@@ -16,8 +16,6 @@ export default function EditionDropdownButton() {
             Url.fromName(api.current_edition).get().then(res => {
                 if (res.success) {
                     const edition = res.data;
-                    console.log("PIPO");
-                    console.log(edition);
                     setCurrentVersion({"year": edition.year, "name": edition.name})
                     setLoadingCurrentVersion(false)
                 }

@@ -11,7 +11,7 @@ export default function QuestionTags() {
 
     useEffect(() => {
         setLoading(true)
-        Url.fromName(api.questiontags).get().then(res => {
+        Url.fromName(api.editions_questiontags).get().then(res => {
             if (res.success) {
                 setQuestionTags(res.data);
             }}).then(() => setLoading(false))
@@ -23,7 +23,7 @@ export default function QuestionTags() {
 
     async function submitNewTag(event) {
         event.preventDefault()
-        Url.fromName(api.questiontags).setBody({"tag": newTag}).post().then(resp => {
+        Url.fromName(api.editions_questiontags).setBody({"tag": newTag}).post().then(resp => {
             setQuestionTags([...questionTags, resp["data"]])
             setNewTag("");
         })

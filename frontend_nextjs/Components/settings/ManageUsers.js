@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 import UserTr from "./UserTr";
-import { log } from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
 export default function ManageUsers(props) {
@@ -21,8 +20,6 @@ export default function ManageUsers(props) {
                 setLoading(true)
                 Url.fromName(api.users).get().then(res => {
                     if (res.success) {
-                        log("manage users:")
-                        log(res)
                         for (let u of res.data) {
                             Url.fromUrl(u.id).get().then(async res2 => {
                                 if (res2.success) {
@@ -46,16 +43,17 @@ export default function ManageUsers(props) {
     }
 
     async function handleSubmitInvite(event) {
-        log("handle submit invite");
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
         let user_url = await api.getUrl(api.users);
         emails.forEach(email => {
             // post to create
             Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(resp => {
-                log(resp.data.data)
-                if (resp.data.data.id) {
-                    Url.fromUrl(resp.data.id).extend("/invite").post();
+                if (resp.success) {
+                    resp = resp.data
+                    if (resp.data.id) {
+                        Url.fromUrl(resp.data.id).extend("/invite").post();
+                    }
                 }
             })
         })

@@ -72,8 +72,7 @@ export default function SelectStudents() {
                 setSortby(router.query.sortby);
 
                 // the urlManager returns the url for the list of students
-
-                Url.fromName(api.students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+                Url.fromName(api.editions_students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
                     if (res.success) {
                         setLocalFilters([0, 0, 0]);
                         let p1 = res.data.slice(0, 10);
@@ -111,7 +110,6 @@ export default function SelectStudents() {
 
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
-        console.log(students)
         students.find((o, i) => {
             if (o["id"] === data["suggestion"]["student_id"]) {
                 let new_students = [...students]
@@ -134,7 +132,7 @@ export default function SelectStudents() {
         let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
         if (filters[2].length !== 0) {
             filteredStudents = filteredStudents.filter(student => {
-                let decisions = student["suggestions"].filter(suggestion => suggestion["definitive"]);
+                let decisions = Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]);
                 let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
                 return decisionNumbers.includes(decisionNumber);
             })
