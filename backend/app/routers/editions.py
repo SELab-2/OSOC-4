@@ -280,7 +280,7 @@ async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSess
     return f"{config.api_url}editions/{str(year)}/questiontags/{tag.tag}"
 
 
-@router.delete("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)),Depends(EditionChecker(update=True))])
+@router.delete("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
 async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
     """delete_question_tag delete the questiontag
 
