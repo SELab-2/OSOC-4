@@ -12,6 +12,7 @@ import "../styles/navheader.css"
 import "../styles/studentDetails.css"
 import "../styles/emailStudents.css"
 
+import { ThemeProvider } from "react-bootstrap";
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import RefreshTokenHandler from '../Components/refreshTokenHandler';
@@ -30,7 +31,11 @@ function MyApp({ Component, pageProps }) {
     <SessionProvider session={pageProps.session} refetchInterval={interval} basePath={`${process.env.NEXT_BASE_PATH}/api/auth`}>
 
       <RouteGuard auth={!no_auth.includes(Component)}>
-        <Component {...pageProps} />
+        <ThemeProvider
+          breakpoints={['xxxl', 'xxl', 'xl', 'lg', 'md', 'sm', 'xs', 'xxs']}
+        >
+          <Component {...pageProps} />
+        </ThemeProvider>
         <RefreshTokenHandler setInterval={setInterval} />
       </RouteGuard>
 

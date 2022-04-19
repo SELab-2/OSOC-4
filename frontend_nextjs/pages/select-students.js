@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 import { Col, Row } from "react-bootstrap";
 import StudentListelement from "../Components/select_students/StudentListelement";
-import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
 import { api, Url } from "../utils/ApiClient";
 import { useRouter } from "next/router";
@@ -11,6 +10,7 @@ import SearchSortBar from "../Components/select_students/SearchSortBar";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import useWindowDimensions from '../utils/WindowDimensions';
 import CheeseburgerMenu from 'cheeseburger-menu'
+import HamburgerMenu from 'react-hamburger-menu'
 
 // This function filters the list of students, it is also used in email-students
 export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
@@ -183,9 +183,9 @@ export default function SelectStudents() {
     return (
 
         <Row>
-            {width > 1000 ?
+            {((width > 1500) || (width > 1000 && !studentId)) ?
                 <Col md="auto">
-                    <div style={{ width: "400px" }}>
+                    <div style={{ width: "300px" }}>
                         <StudentsFilters students={students} filters={filters} />
                     </div>
 
@@ -195,28 +195,57 @@ export default function SelectStudents() {
                     <StudentsFilters students={students} filters={filters} />
                 </CheeseburgerMenu>
             }
-            <Col>
-                <Col><button onClick={() => setShowFilter(!showFilter)} >Filter</button></Col>
-                <Col><SearchSortBar /></Col>
+            {(width > 800 || !studentId) &&
 
-                <InfiniteScroll
-                    dataLength={students.length} //This is important field to render the next data
-                    next={fetchData}
-                    hasMore={studentUrls.length > 0}
-                    loader={<h4>Loading...</h4>}
-                    endMessage={
-                        <p style={{ textAlign: 'center' }}>
-                            <b>Yay! You have seen it all</b>
-                        </p>
-                    }
-                >
-                    {students.map((i, index) => (
 
-                        <StudentListelement key={index} student={i} />
+                <Col>
+                    <Row>
+                        {!((width > 1500) || (width > 1000 && !studentId)) &&
+                            <Col xs="auto">
+                                <div className="hamburger">
+                                    <HamburgerMenu
+                                        isOpen={showFilter}
+                                        menuClicked={() => setShowFilter(!showFilter)}
+                                        width={18}
+                                        height={15}
+                                        strokeWidth={1}
+                                        rotate={0}
+                                        color='black'
+                                        borderRadius={0}
+                                        animationDuration={0.5}
+                                    />
+                                </div>
+                            </Col>
 
-                    ))}
-                </InfiniteScroll>
-            </Col>
+                        }
+                        <Col><SearchSortBar /></Col>
+                    </Row>
+
+                    <InfiniteScroll
+                        style={{
+                            "height": "calc(100vh - 180px)",
+                        }}
+                        dataLength={students.length} //This is important field to render the next data
+                        next={fetchData}
+                        hasMore={studentUrls.length > 0}
+                        loader={<h4>Loading...</h4>}
+                        endMessage={
+                            <p style={{ textAlign: 'center' }}>
+                                <b>Yay! You have seen it all</b>
+                            </p>
+                        }
+                    >
+                        {students.map((i, index) => (
+
+                            <StudentListelement key={index} student={i} />
+
+                        ))}
+                    </InfiniteScroll>
+
+                </Col>
+
+            }
+
             {
                 (studentId) &&
                 <Col>
