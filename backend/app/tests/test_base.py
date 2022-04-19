@@ -49,7 +49,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.bad_id = 0
-        self.users = {}
+        self.users: Dict[str, User] = {}
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         }
@@ -149,11 +149,13 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
     ) -> Dict[str, Response]:
         responses: Dict[str, Response] = {}
         # Allowed users
-        for user in allowed_users:
-            responses[user] = await self.do_request(request_type, path, user, Status.SUCCESS, json_body=body)
+        for user_name in allowed_users:
+            responses[user_name] = await self.do_request(request_type, path, user_name, Status.SUCCESS, json_body=body)
         # Disallowed users
-        for user in set(self.users.keys()).difference(allowed_users):
-            await self.do_request(request_type, path, user, Status.FORBIDDEN, json_body=body)
+        for user_name in set(self.users.keys()).difference(allowed_users):
+            user = self.users[user_name]
+            if user.active and user.approved and not user.disabled:
+                await self.do_request(request_type, path, user_name, Status.FORBIDDEN, json_body=body)
 
         return responses
 
@@ -189,11 +191,13 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         """
         responses: Dict[str, Response] = {}
 
-        for user, (path, body) in allowed_users_path_and_body.items():
+        for user_name, (path, body) in allowed_users_path_and_body.items():
             await self._auth_test_request(request_type, path, body)
-            responses[user] = await self.do_request(request_type, path, user, Status.SUCCESS, json_body=body)
+            responses[user_name] = await self.do_request(request_type, path, user_name, Status.SUCCESS, json_body=body)
 
-        for user, (path, body) in blocked_users_path_and_body.items():
-            await self.do_request(request_type, path, user, Status.FORBIDDEN, json_body=body)
+        for user_name, (path, body) in blocked_users_path_and_body.items():
+            user = await self.get_user_by_name(user_name)
+            if user.active and user.approved and not user.disabled:
+                await self.do_request(request_type, path, user_name, Status.FORBIDDEN, json_body=body)
 
         return responses
