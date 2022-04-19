@@ -1,6 +1,7 @@
 from app.crud import read_where, update
 from app.database import get_session, websocketManager
 from app.exceptions.suggestion_exception import SuggestionNotFound
+from app.models.student import Student
 from app.models.suggestion import (Suggestion, SuggestionCreate,
                                    SuggestionExtended)
 from app.models.user import UserRole
@@ -13,8 +14,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter(prefix="/suggestions")
 
 
-@router.post("/create", dependencies=[Depends(EditionChecker(update=True))], response_description="Suggestion created")
+@router.post("/create", response_description="Suggestion created")
 async def create_suggestion(suggestion: SuggestionCreate, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+
+    # check edition
+    student = await read_where(Student, Student.id == suggestion.student_id, session=session)
+    await EditionChecker(update=True)(student.edition_year, Authorize, session)
 
     old_suggestion = await read_where(Suggestion, Suggestion.suggested_by_id == Authorize.get_jwt_subject(), Suggestion.student_id == suggestion.student_id, session=session)
 
