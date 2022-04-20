@@ -46,17 +46,14 @@ export default function ManageUsers(props) {
     async function handleSubmitInvite(event) {
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
-        emails.forEach(email => {
-            // post to create
-            Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(resp => {
-                if (resp.success) {
-                    resp = resp.data
-                    if (resp.data.id) {
-                        Url.fromUrl(resp.data.id).extend("/invite").post();
-                    }
+        await Promise.all(emails.map(email =>
+            Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(async resp => {
+                if (resp.success && resp.data.data.id) {
+                    await Url.fromUrl(resp.data.data.id).extend("/invite").post();
                 }
-            })
-        })
+            }))
+        );
+        alert("Invites have been sent.");
     }
 
     async function handleSearchSubmit(event) {

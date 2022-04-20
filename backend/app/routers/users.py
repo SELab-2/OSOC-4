@@ -242,6 +242,12 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
     elif user.active:
         raise UserAlreadyActiveException()
 
+    # if the user was disabled, we need to re-enable him
+    if user.disabled:
+        user.disabled = False
+        await update(user, session=session)
+        # todo add user to latest edition, else it is useless that we invite him
+
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key()
     # save it
