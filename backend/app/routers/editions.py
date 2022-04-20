@@ -19,7 +19,8 @@ from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
-from app.models.student import Student
+from app.models.skill import StudentSkill
+from app.models.student import DecisionOption, Student
 from app.models.suggestion import SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
@@ -128,19 +129,24 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-    student_query = select(Student).where(Student.edition_year == year).subquery()
-    if search:
-        student_query = select(Student).where(Student.edition_year == year).join(QuestionAnswer).join(Answer)
-        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
-        student_query = student_query.distinct().subquery()
 
-    ua = aliased(Student, student_query)
+    student_query = select(Student).where(Student.edition_year == year)
+
+    if decision:
+        student_query = student_query.where(Student.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
+    if search:
+        student_query = student_query.join(QuestionAnswer).join(Answer)
+        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
+    if skills:
+        student_query = student_query.join(StudentSkill).where(StudentSkill.skill_name.in_(skills.split(",")))
+
+    ua = aliased(Student, student_query.distinct().subquery())
     res = await session.execute(select(ua.id))
     res = res.all()
 
