@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 import { Col, Row } from "react-bootstrap";
-import StudentList from "../Components/select_students/StudentList";
 import StudentListelement from "../Components/select_students/StudentListelement";
 import { useSession } from "next-auth/react";
 import { api, Url } from "../utils/ApiClient";
@@ -122,8 +121,6 @@ export default function SelectStudents() {
             // }
         }
     }, [session, students, studentUrls, router.query.search, router.query.sortby, search, sortby, localFilters, filters, filterStudentsDecision])
-
-    async function retrieveStudents() {
 
 
     const updateFromWebsocket = (event) => {
