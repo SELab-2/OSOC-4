@@ -61,23 +61,33 @@ export default function ManageUsers(props) {
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
-        setShownUsers(users.filter(user => user.name.includes(search)))
+        setShownUsers(users.filter(user => user.name.toLowerCase().includes(search.toLowerCase())))
     }
 
-    let filters = [];
+    const [filters, setFilters] = useState({
+        "show-all-users": true,
+        "show-approved": false,
+        "show-unapproved": false,
+        "show-inactive": false
+    });
 
-    function setFilter(filter, val) {
-        if (val) {
-            filters.push([filter, val])
-        } else {
-            filters = filters.filter(val => val[0] === filter)
+    function updateFilters(ev) {
+        const temp = {
+            "show-all-users": false,
+            "show-approved": false,
+            "show-unapproved": false,
+            "show-inactive": false
         }
+        temp[ev.target.id] = true
+        setFilters(temp);
 
-        setShownUsers(users.filter(user => {
-            if (!user.name.includes(search)) {return false;}
-            console.log(filters)
-            filters.every(filter => user[filter[0]] === filter[1]);
-        } ))
+        setShownUsers([...users.filter(user => {
+            if (!user.name.toLowerCase().includes(search.toLowerCase())) {return false;}
+            if (ev.target.id === "show-all-users") {return true;}
+            if (ev.target.id === "show-approved") {return user.approved;}
+            if (ev.target.id === "show-unapproved") {return user.active && !user.approved;}
+            if (ev.target.id === "show-inactive") {return !user.active;}
+        })]);
     }
 
     return (
@@ -98,12 +108,40 @@ export default function ManageUsers(props) {
             <Table className={"table-manage-users"}>
                 <thead>
                     <tr>
-                        Filters:
-                        <CheckboxFilter filter_id="active-checkbox" filter_text="Active"
-                                        onChange={(ev) => setFilter("active", ev.target.checked)}/>
-                        <CheckboxFilter filter_id="approved-checkbox" filter_text="Approved"
-                                        onChange={(ev) => setFilter("approved", ev.target.checked)}/>
-
+                        <div key={`inline-radio`} className="mb-3">
+                            <Form.Check
+                                label="All users"
+                                name="group-users"
+                                type="radio"
+                                id="show-all-users"
+                                checked={filters["show-all-users"]}
+                                onClick={updateFilters}
+                            />
+                            <Form.Check
+                                label="Approved users"
+                                name="group-users"
+                                type="radio"
+                                id="show-approved"
+                                checked={filters["show-approved"]}
+                                onClick={updateFilters}
+                            />
+                            <Form.Check
+                                label="Not yet approved users"
+                                name="group-users"
+                                type="radio"
+                                id="show-unapproved"
+                                checked={filters["show-unapproved"]}
+                                onClick={updateFilters}
+                            />
+                            <Form.Check
+                                label="Not yet active users"
+                                name="group-users"
+                                type="radio"
+                                id="show-inactive"
+                                checked={filters["show-inactive"]}
+                                onClick={updateFilters}
+                            />
+                        </div>
                     </tr>
                     <tr>
                         <th>
