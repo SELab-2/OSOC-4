@@ -4,13 +4,16 @@ from app.crud import read_all_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
-from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
+from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
+                                            PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
-                                            UserNotFoundException, InvalidEmailOrPasswordException)
+                                            UserNotFoundException)
+from app.models.edition import Edition
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import (User, UserCreate, UserOut,
-                             UserOutSimple, UserRole, ChangeUser, ChangePassword, UserMe, ChangeUserMe)
+from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
+                             UserCreate, UserMe, UserOut, UserOutSimple,
+                             UserRole)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
@@ -19,6 +22,8 @@ from app.utils.response import response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlmodel import select
 
 router = APIRouter(prefix="/users")
 
@@ -247,6 +252,19 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
         user.disabled = False
         await update(user, session=session)
         # todo add user to latest edition, else it is useless that we invite him
+
+        # get the latest edition
+        stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())
+        editionres = await session.execute(stat)
+        try:
+            edition = editionres.first()
+            edition.coaches.append(user)
+            
+            session.add(edition)
+            session.commit()
+
+        except Exception:
+            pass
 
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key()
