@@ -152,22 +152,22 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
     students = [r for (r,) in res]
 
+
     if orderby:
         sorting = get_sorting(orderby).items()
-        studentobjects = {}
+        studentobjects = {i: {"id": i} for i in students}
         for key, val in sorting:
+            if key == "id":
+                continue
             res = await session.execute(select(ua.id, QuestionTag.tag, Answer.answer).join(QuestionAnswer, ua.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == key).join(Answer).order_by(ua.id))
             res = res.all()
 
             for (id, _, r) in res:
-                if id not in studentobjects:
-                    studentobjects[id] = {"id": id}
                 studentobjects[id][key] = r
 
         sorted_students = studentobjects.values()
         for k, val in reversed(sorting):
             sorted_students = sorted(sorted_students, key=lambda d: d[k], reverse=val)
-
         students = [str(student["id"]) for student in sorted_students]
     return [config.api_url + "students/" + str(id) for id in students]
 
