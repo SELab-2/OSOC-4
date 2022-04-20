@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
 import { useRouter } from "next/router";
+import { api, Url } from "../../utils/ApiClient";
 
 // this function adds or removes a skill from the filters, this function is also used in EmailStudentsFilters
 export function addFilterGlobal(query, filter, startItems, itemName, value) {
@@ -31,6 +32,18 @@ export default function StudentsFilters(props) {
   const filters = props.filters[0];
   const chosenSkills = props.filters[1];
   const decision = props.filters[2];
+
+  useEffect(() => {
+    Url.fromName(api.skills).get().then(async res => {
+      if (res.success) {
+        res = res.data;
+        if (res) {
+          // scuffed way to get unique skills (should be fixed in backend soon)
+          setAllSkills(res);
+        }
+      }
+    })
+  }, [])
 
   // called when pressed on "reset filters"
   function resetFilters() {
@@ -65,9 +78,9 @@ export default function StudentsFilters(props) {
       }
 
       return shownSkills.map((skill, index) =>
-        <StudentsFilter filter_id={skill.id} filter_text={skill.name}
-          value={chosenSkills.includes(skill.name)}
-          onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)} />
+        <StudentsFilter filter_id={skill} filter_text={skill}
+          value={chosenSkills.includes(skill)}
+          onChange={(ev) => addFilter("skills", chosenSkills, skill, ev.target.checked)} />
       );
     }
     return null;
