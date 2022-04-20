@@ -1,6 +1,6 @@
 import axios from 'axios';
-import {getCsrfToken, getSession} from 'next-auth/react';
-import {log} from "./logger";
+import { getCsrfToken, getSession } from 'next-auth/react';
+import { log } from "./logger";
 
 
 export class Url {
@@ -43,72 +43,72 @@ export class Url {
     }
 
     async get(context = null) {
-        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
+        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`); }
         try {
             this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) {this._url = await api.getUrl(this._name, context);}
+            if (!this._url) { this._url = await api.getUrl(this._name, context); }
             this._url += this._extension;
             log(`API: GET ${this._url}`)
-            const resp = await axios.get(this._url, {"headers": this._headers, "params": this._params });
-            return {success: true, data: resp.data};
+            const resp = await axios.get(this._url, { "headers": this._headers, "params": this._params });
+            return { success: true, data: resp.data };
         } catch (e) {
-            return {success: false, error: e};
+            return { success: false, error: e };
         }
     }
 
     async getPublic(context = null) {
-        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
+        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`); }
         try {
             this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) {this._url = await api.getUrl(this._name, context);}
+            if (!this._url) { this._url = await api.getUrl(this._name, context); }
             this._url += this._extension;
             log(`API: GET ${this._url}`)
-            const resp = await axios.get(this._url, {"headers": this._headers, "params": this._params });
-            return {success: true, data: resp.data};
+            const resp = await axios.get(this._url, { "headers": this._headers, "params": this._params });
+            return { success: true, data: resp.data };
         } catch (e) {
-            return {success: false, error: e};
+            return { success: false, error: e };
         }
     }
 
     async post(context = null) {
-        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
+        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`) }
         try {
             this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) {this._url = await api.getUrl(this._name, context);}
+            if (!this._url) { this._url = await api.getUrl(this._name, context); }
             this._url += this._extension;
             log(`API: POST ${this._url}`)
-            const resp = await axios.post(this._url, this._body, {"headers": this._headers});
-            return {success: true, data: resp.data};
+            const resp = await axios.post(this._url, this._body, { "headers": this._headers });
+            return { success: true, data: resp.data };
         } catch (e) {
-            return {success: false, error: e};
+            return { success: false, error: e };
         }
     }
 
     async patch(context = null) {
-        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
+        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`) }
         try {
             this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) {this._url = await api.getUrl(this._name, context);}
+            if (!this._url) { this._url = await api.getUrl(this._name, context); }
             this._url += this._extension;
             log(`API: PATCH ${this._url}`)
-            const resp = await axios.patch(this._url, this._body, {"headers": this._headers});
-            return {success: true, data: resp.data};
+            const resp = await axios.patch(this._url, this._body, { "headers": this._headers });
+            return { success: true, data: resp.data };
         } catch (e) {
-            return {success: false, error: e};
+            return { success: false, error: e };
         }
     }
 
     async delete(context = null) {
-        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`)}
+        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`) }
         try {
             this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) {this._url = await api.getUrl(this._name, context);}
+            if (!this._url) { this._url = await api.getUrl(this._name, context); }
             this._url += this._extension;
             log(`API: DELETE ${this._url}`)
-            const resp = await axios.delete(this._url, {"headers": this._headers});
-            return {success: true, data: resp.data};
+            const resp = await axios.delete(this._url, { "headers": this._headers });
+            return { success: true, data: resp.data };
         } catch (e) {
-            return {success: false, error: e};
+            return { success: false, error: e };
         }
     }
 
@@ -160,13 +160,13 @@ class API {
     }
 
     async _session(context = null) {
-        if (context) {return await getSession(context);}
-        else {return await getSession();}
+        if (context) { return await getSession(context); }
+        else { return await getSession(); }
     }
 
     async _csrfToken(context = null) {
-        if (context) {return await getCsrfToken(context);}
-        else {return await getCsrfToken();}
+        if (context) { return await getCsrfToken(context); }
+        else { return await getCsrfToken(); }
     }
 
     async _headers(context = null, isPublic = false) {
@@ -174,20 +174,20 @@ class API {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
         }
-        if (isPublic) {return headers;}
+        if (isPublic) { return headers; }
         const session = await this._session(context);
         const csrfToken = await this._csrfToken(context);
-        if (!session) {return headers;}
+        if (!session) { return headers; }
         return {
-                ...headers,
-                "Authorization": `Bearer ${session.accessToken}`,
-                "X-CSRF-TOKEN": csrfToken
+            ...headers,
+            "Authorization": `Bearer ${session.accessToken}`,
+            "X-CSRF-TOKEN": csrfToken
         }
     }
 
     async getUrl(name = null, context = null) {
-        if (!this._ready) {await this._setup(context);}
-        if (!this._paths[name]) {throw Error( `UrlManager not properly instantiated, UrlManager path for '${name}' is undefined`);}
+        if (!this._ready) { await this._setup(context); }
+        if (!this._paths[name]) { throw Error(`UrlManager not properly instantiated, UrlManager path for '${name}' is undefined`); }
         return this._paths[name];
     }
 
@@ -195,11 +195,11 @@ class API {
         log("Engine:setup");
         try {
             const session = await this._session(context);
-            if (!session) {throw Error("Engine:_setup: session is undefined");}
+            if (!session) { throw Error("Engine:_setup: session is undefined"); }
 
             // set up all urls
             const headers = await this._headers(context);
-            const config = {"headers": headers};
+            const config = { "headers": headers };
             this._paths.me = session.userid;
             let res = await axios.get(this.baseUrl, config);
             this._paths.students = res.data[this.students];
@@ -211,7 +211,7 @@ class API {
                 this._paths.current_edition = this._paths.editions + "/" + this._year;
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
-                this._paths.current_edition = (res.data.length)? res.data[0] : null;
+                this._paths.current_edition = (res.data.length) ? res.data[0] : null;
             }
             if (this._paths.current_edition) {
                 let editionData = await axios.get(this._paths.current_edition, config);
@@ -221,6 +221,7 @@ class API {
                 this._paths.editions_questiontags = editionData.data["questiontags"];
             }
         } catch (e) {
+            log(e)
             log("API: setup failed")
         }
 

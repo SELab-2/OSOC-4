@@ -1,6 +1,6 @@
 import { Button, Modal, ModalHeader, ModalTitle } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
-import {Url, api} from "../../utils/ApiClient";
+import { Url, api } from "../../utils/ApiClient";
 
 // This view shows the pop up window when making a suggestion about a student.
 export default function PopUpWindow(props) {
@@ -49,12 +49,15 @@ export default function PopUpWindow(props) {
   // called on submitting the suggestion
   async function submitSuggestion() {
 
-    await Url.fromUrl(api.baseUrl).extend("/suggestions/create").setBody({
+    Url.fromUrl(api.baseUrl).extend("/suggestions/create").setBody({
       ...suggestion,
       ["student_id"]: props.student["id_int"]
-    }).post();
-    props.updateSuggestion(suggestion)
-    setPopUpShow(false);
+    }).post().then(res => {
+      if (res.success === true) {
+        props.updateSuggestion(suggestion)
+        setPopUpShow(false);
+      }
+    });
   }
 
   // returns the html representation for the pop up window
