@@ -1,5 +1,5 @@
 import random
-from random import randrange, sample
+from random import sample
 
 from app.models.student import DecisionOption, Student
 from app.tests.utils_for_tests.DataGenerator import DataGenerator

@@ -6,7 +6,7 @@ from app.models.edition import Edition
 from app.models.participation import Participation
 from app.models.question_answer import QuestionAnswer
 from app.models.skill import Skill, StudentSkill
-from app.models.suggestion import Suggestion, SuggestionOption
+from app.models.suggestion import Suggestion
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -16,7 +16,6 @@ class DecisionOption(int, Enum):
     NO = 0
     MAYBE = 1
     YES = 2
-
 
 
 class Student(SQLModel, table=True):

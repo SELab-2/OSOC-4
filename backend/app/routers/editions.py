@@ -152,7 +152,6 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
     students = [r for (r,) in res]
 
-
     if orderby:
         sorting = get_sorting(orderby).items()
         studentobjects = {i: {"id": i} for i in students}
