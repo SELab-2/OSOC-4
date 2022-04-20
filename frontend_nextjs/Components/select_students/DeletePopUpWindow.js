@@ -37,7 +37,8 @@ export default function DeletePopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Are you sure you want to delete {props.student["name"]}
+          Are you sure you want to delete {props.student.mandatory["first name"] + " " +
+          props.student.mandatory["last name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Footer>

@@ -1,14 +1,14 @@
 import axios from 'axios';
 import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getSession, getCsrfToken } from 'next-auth/react';
+import { getCsrfToken } from 'next-auth/react';
+import {api, Url} from "../../../utils/ApiClient";
 import {log} from "../../../utils/logger";
-import {getJson, login} from '../../../utils/json-requests';
 
 async function refreshAccessToken(tokenObject) {
     const csrfToken = await getCsrfToken()
     try {
-        console.log("sending refresh request")
+        log("sending refresh request")
         // Get a new set of tokens with a refreshToken
 
         const url = process.env.NEXT_INTERNAL_API_URL;
@@ -35,7 +35,7 @@ const providers = [
         authorize: async (credentials) => {
             try {
                 // Authenticate user with credentials
-                const user = await login({ "email": credentials.email, "password": credentials.password });
+                const user = await Url.fromName(api.login).setBody({ "email": credentials.email, "password": credentials.password }).post();
 
                 if (!user.success) {return null;}
 
@@ -46,7 +46,6 @@ const providers = [
                 }
                 return null;
             } catch (e) {
-                console.log(e);
                 throw new Error(e);
             }
         }

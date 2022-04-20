@@ -3,6 +3,29 @@ import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
 import {useRouter} from "next/router";
 
+/**
+   * this function adds or removes a filter from the filters, the changes are made in the url.
+   * @param query The old query of the url.
+   * @param filter The name of the filter category from which the filter must be added/removed.
+   * @param startItems The current filters in the filter chosen filter category.
+   * @param itemName The name of the filter that must be added or removed.
+   * @param value True if the filter must be added, False if it must be removed.
+   */
+export function addFilterGlobal(query, filter, startItems, itemName, value) {
+  let newQuery = query;
+  let newItems = startItems;
+  if (value) {
+    newItems = startItems.concat([itemName]);
+  } else {
+    let index = startItems.indexOf(itemName);
+    if (index > -1) {
+      startItems.splice(index, 1);
+      newItems = startItems;
+    }
+  }
+  newQuery[filter] = newItems.join(",");
+  return newQuery
+}
 
 export default function StudentsFilters(props) {
 
@@ -47,32 +70,6 @@ export default function StudentsFilters(props) {
   }
 
   /**
-   * this function adds or removes a filter from the filters, the changes are made in the url.
-   * @param filter The name of the filter category from which the filter must be added/removed.
-   * @param startItems The current filters in the filter chosen filter category.
-   * @param itemName The name of the filter that must be added or removed.
-   * @param value True if the filter must be added, False if it must be removed.
-   */
-  function addFilter(filter, startItems, itemName, value) {
-    let newQuery = router.query;
-    let newItems = startItems;
-    if (value) {
-      newItems = startItems.concat([itemName]);
-    } else {
-      let index = startItems.indexOf(itemName);
-      if (index > -1) {
-        startItems.splice(index, 1);
-        newItems = startItems;
-      }
-    }
-    newQuery[filter] = newItems.join(",");
-    router.push({
-      pathname: router.pathname,
-      query: newQuery
-    }, undefined, {shallow: true})
-  }
-
-  /**
    * returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
    * list are rendered depending on extendedRoleList.
    * @returns {unknown[]|null} A list of html StudentFilters, which represents the skills of students, only 5 elements
@@ -108,10 +105,25 @@ export default function StudentsFilters(props) {
   }
 
   /**
+   * this function adds or removes a filter from the filters, the changes are made in the url.
+   * @param filter The name of the filter category from which the filter must be added/removed.
+   * @param startItems The current filters in the filter chosen filter category.
+   * @param itemName The name of the filter that must be added or removed.
+   * @param value True if the filter must be added, False if it must be removed.
+   */
+  function addFilter(filter, startItems, itemName, value) {
+    let newQuery = addFilterGlobal(router.query, filter, startItems, itemName, value)
+    router.push({
+      pathname: router.pathname,
+      query: newQuery
+    }, undefined, {shallow: true})
+  }
+
+  /**
    * The HTML representation of the filters in the 'Select students' tab
    */
   return (
-    <Col md="auto" className="filters fill_height scroll-overflow" style={{visibility: props.visibility}}>
+    <Col md="auto" className="filters fill_height scroll-overflow">
       <Row className="title-row-filters">
         <Col>
           <h2 className="filters-title">Filters</h2>

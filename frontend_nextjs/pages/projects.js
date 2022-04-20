@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {getJson} from "../utils/json-requests";
-import {log} from "../utils/logger";
 import ProjectCard from "../Components/ProjectCard";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import {useRouter} from "next/router";
-import {urlManager} from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 
 export default function Projects(props) {
     const [allProjects, setAllProjects] = useState([])
@@ -17,22 +15,23 @@ export default function Projects(props) {
 
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
-            urlManager.getProjects().then(async projects_url => {
-                let projects = await getJson(projects_url)
-                log("load project")
-                log(projects)
-                for (let p of projects) {
-                    log(p)
-                    getJson(p).then(async project => {
-                        log(project)
-                        if (project) {
-                            await setAllProjects(prevState => [...prevState, project]);
-                            // TODO clean this up (currently only works if updated here
-                            await setVisibleProjects(prevState => [...prevState, project]);
-                        }
-                    })
+            Url.fromName(api.edition_projects).get().then(res => {
+                if (res.success) {
+                    const projects = res.data;
+                    for (let p of projects) {
+                        Url.fromUrl(p).get().then(async project => {
+                            if (project.success) {
+                                project = project.data;
+                                if (project) {
+                                    await setAllProjects(prevState => [...prevState, project]);
+                                    // TODO clean this up (currently only works if updated here
+                                    await setVisibleProjects(prevState => [...prevState, project]);
+                                }
+                            }
+                        });
+                    }
+                    setLoaded(true);
                 }
-                setLoaded(true)
             })
         }
     })
@@ -40,17 +39,14 @@ export default function Projects(props) {
     async function handleSearchSubmit(event) {
         event.preventDefault();
         setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
-        log("SUBMIT")
     }
 
     async function changePeopleNeeded(event){
         event.preventDefault()
-        log(peopleNeeded)
         setPeopleNeeded(event.target.checked)
     }
 
     const handleNewProject = () => {
-        log("navigate to new project")
         router.push("/new-project")
     }
 

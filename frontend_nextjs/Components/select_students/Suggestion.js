@@ -1,6 +1,7 @@
 import {Col, Row} from "react-bootstrap";
 import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
+import {Url} from "../../utils/ApiClient";
+import Login from "../../pages/login";
 
 /**
  * Component that represents a suggestion in the student details.
@@ -19,7 +20,12 @@ export default function Suggestion(props) {
    */
   useEffect( () => {
     if (suggestedBy === "") {
-      getJson(props.suggestion["suggested_by_id"]).then(res => setSuggestedBy(res.data["name"]));
+      Url.fromUrl(props.suggestion["suggested_by_id"]).get().then(res =>  {
+        if (res.success) {
+          res = res.data;
+          setSuggestedBy(res.data["name"]);
+        }
+      });
     }
   }, [suggestedBy]);
 

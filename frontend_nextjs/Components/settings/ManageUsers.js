@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 import UserTr from "./UserTr";
-import { getJson, postCreate } from "../../utils/json-requests";
-import { log } from "../../utils/logger";
-import {urlManager} from "../../utils/ApiClient";
+import {api, Url} from "../../utils/ApiClient";
 
 export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
@@ -20,18 +18,21 @@ export default function ManageUsers(props) {
         if (Boolean(props.initialize)) {
             if (!users.length && !loading) {
                 setLoading(true)
-                urlManager.getUsers().then(url => getJson(url).then(res => {
-                    log("manage users:")
-                    log(res)
-                    for (let u of res) {
-                        getJson(u.id).then(async user => {
-                            if (user.data) {
-                                await setUsers(prevState => [...prevState, user.data]);
-                                await setShownUsers(prevState => [...prevState, user.data]);
-                            }
-                        }).then(() => setLoading(false))
+                Url.fromName(api.users).get().then(res => {
+                    if (res.success) {
+                        for (let u of res.data) {
+                            Url.fromUrl(u.id).get().then(async res2 => {
+                                if (res2.success) {
+                                    const user = res2.data
+                                    if (user) {
+                                        await setUsers(prevState => [...prevState, user.data]);
+                                        await setShownUsers(prevState => [...prevState, user.data]);
+                                    }
+                                }
+                            }).then(() => setLoading(false))
+                        }
                     }
-                }));
+                });
             }
         }
     }, [users.length, loading, props.initialize])
@@ -42,16 +43,17 @@ export default function ManageUsers(props) {
     }
 
     async function handleSubmitInvite(event) {
-        log("handle submit invite");
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
-        let user_url = await urlManager.getUsers();
+        let user_url = await api.getUrl(api.users);
         emails.forEach(email => {
             // post to create
-            postCreate(user_url + "/create", { "email": email }).then(resp => {
-                log(resp.data.data)
-                if (resp.data.data.id) {
-                    postCreate(resp.data.data.id + "/invite", {});
+            Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(resp => {
+                if (resp.success) {
+                    resp = resp.data
+                    if (resp.data.id) {
+                        Url.fromUrl(resp.data.id).extend("/invite").post();
+                    }
                 }
             })
         })

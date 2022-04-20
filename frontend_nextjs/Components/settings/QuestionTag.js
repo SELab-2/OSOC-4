@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { getJson, sendDelete, patchEdit } from "../../utils/json-requests";
 import { Form, Button } from 'react-bootstrap';
 import deleteIcon from '../../public/assets/delete.svg';
 import Image from "next/image";
+import {Url} from "../../utils/ApiClient";
 
 export default function QuestionTag(props) {
     const [previousTag, setPreviousTag] = useState({});
@@ -11,13 +11,15 @@ export default function QuestionTag(props) {
 
     useEffect(() => {
         setLoading(true)
-        getJson(props.url)
+        Url.fromUrl(props.url).get()
             .then(res => {
-                setPreviousTag(res);
-                setQuestionTag(res);
+                if(res.success) {
+                    setPreviousTag(res.data);
+                    setQuestionTag(res.data);
+                }
             })
             .then(() => setLoading(false))
-    }, []);
+    }, [props.url]);
 
     const handleChange = (event) => {
         event.preventDefault()
@@ -38,14 +40,16 @@ export default function QuestionTag(props) {
 
     const deleteTag = (event) => {
         event.preventDefault()
-        sendDelete(props.url).then(result => {
-            props.deleteTag(props.url)
+        Url.fromUrl(props.url).delete().then(res => {
+            if (res.success) {
+                props.deleteTag(props.url)
+            }
         })
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        patchEdit(props.url, questionTag).then(res => {
+        Url.fromUrl(props.url).setBody(questionTag).patch().then(res => {
             if (previousTag["tag"] !== questionTag["tag"]) {
                 props.renameTag(props.url, res["data"])
             }

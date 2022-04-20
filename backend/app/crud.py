@@ -1,7 +1,11 @@
 from typing import List, Optional, Type, TypeVar
 
+from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select, SQLModel
+
+from app.database import get_session, engine
+from app.models.user import User
 
 T = TypeVar("T", SQLModel, object)
 
@@ -82,3 +86,44 @@ async def update(model: T, session: AsyncSession) -> Optional[T]:
     await session.commit()
     await session.refresh(model)
     return model
+
+
+async def update_all(models: List[T], session: AsyncSession) -> Optional[List[T]]:
+    """update this function updates all entries from models (the one with the same id, or else it adds the id)
+
+    example new_user is the updated version of the old user but the id remained:  update(new_user)
+
+    :param models: a list of instances of models to update / create
+    :type models: List[SQLModel]
+    :return: the updated user upon success
+    :rtype: Optional[SQLModel]
+    """
+
+    session.add_all(models)
+    await session.commit()
+
+    for model in models:
+        await session.refresh(model)
+
+    return models
+
+
+async def clear_data(session: AsyncSession = get_session()):
+    # Get all tables
+    async with engine.connect() as conn:
+        # tables in dependency order (delete last first and/or cascade)
+        tables = await conn.run_sync(
+            lambda sync_conn: inspect(sync_conn).get_sorted_table_and_fkc_names()
+        )
+
+    # Delete tables in reversed order
+    for table in reversed(tables):
+        # TODO: fix this, doing "TRUNCATE user CASCADE" gives syntax error, thus workaround
+        if table[0] == "user":  # workaround for user table
+            users = await read_all_where(User, session=session)
+            for user in users:
+                await session.delete(user)
+        elif table[0] is not None:  # One of the tables is None
+            await session.execute(f"TRUNCATE {table[0]} CASCADE")
+
+        await session.commit()  # apply changes to table (has to happen per table)

@@ -1,29 +1,28 @@
 import datetime
-import json
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
-from app.database import db, get_session
+from app.database import get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
-                                               SuggestionRetrieveException,
                                                YearAlreadyOverException)
+from app.exceptions.permissions import NotPermittedException
 from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
     QuestionTagNotFoundException)
 from app.models.answer import Answer
-from app.models.edition import Edition, EditionOutExtended, EditionOutSimple
+from app.models.edition import (Edition, EditionCoach, EditionOutExtended,
+                                EditionOutSimple)
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
 from app.models.student import Student
-from app.models.suggestion import Suggestion, SuggestionOption
+from app.models.suggestion import SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
-from app.utils.response import response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.exc import IntegrityError
@@ -39,15 +38,19 @@ def get_sorting(sortstr: str):
     return {t[0]: False if t[1] == "asc" else True for t in sorting}
 
 
-@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Editions retrieved")
-async def get_editions(session: AsyncSession = Depends(get_session)):
+@router.get("", response_description="Editions retrieved")
+async def get_editions(session: AsyncSession = Depends(get_session), role: RoleChecker(UserRole.COACH) = Depends()):
     """get_editions get all the Edition instances from the database
 
     :return: list of editions
     :rtype: dict
     """
     results = await read_all_where(Edition, session=session)
-    return [r.uri for r in [EditionOutSimple.parse_raw(r.json()) for r in results]]
+    results = [EditionOutSimple.parse_raw(r.json()) for r in sorted(results, key=lambda x: x.year, reverse=True)]
+    if role == UserRole.ADMIN:
+        return [r.uri for r in results]
+    if role == UserRole.COACH:
+        return [results[0].uri] if results else []
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
@@ -77,20 +80,11 @@ async def get_edition(year: int, edition: EditionChecker() = Depends(), session:
     :rtype: dict
     """
 
-    user_ids = [u.id for u in edition.coaches]
-
-    # get the admins
-    res = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
-    user_ids += [admin.id for admin in res]
-
-    edition_json = json.loads(edition.json())
-    edition_json["user_ids"] = user_ids
-
-    return EditionOutExtended.parse_raw(json.dumps(edition_json))
+    return EditionOutExtended.parse_raw(edition.json())
 
 
-@router.patch("/{year}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="updated edition")
-async def update_edition(year: int, edition: Edition = Body(...), session: AsyncSession = Depends(get_session)):
+@router.patch("/{year}", response_description="updated edition")
+async def update_edition(year: int, edition: Edition = Body(...), role: RoleChecker(UserRole.COACH) = Depends(), Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """update_edition update the Edition instance with given year
 
     :return: the updated edition
@@ -103,11 +97,34 @@ async def update_edition(year: int, edition: Edition = Body(...), session: Async
     if not result:
         raise EditionNotFound()
 
+    # check that the coach has access to that edition
+    if not role != UserRole.ADMIN:
+        edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
+        user_ids = [coach.coach_id for coach in edition_coaches]
+        if not Authorize.get_jwt_subject() in user_ids:
+            raise NotPermittedException()
+
     new_edition_data = edition.dict(exclude_unset=True)
     for key, value in new_edition_data.items():
         setattr(result, key, value)
     await update(result, session)
     return EditionOutSimple.parse_raw(result.json()).uri
+
+
+@router.get("/{year}/users", response_description="Users retrieved")
+async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
+    """get_users get all the User instances from the database in edition with given year
+
+    :return: list of users
+    :rtype: dict
+    """
+
+    edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
+    user_ids = [coach.coach_id for coach in edition_coaches]
+    # get the admins
+    admins = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
+    user_ids += [admin.id for admin in admins]
+    return [f"{config.api_url}users/{str(id)}" for id in user_ids]
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
@@ -117,7 +134,6 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-
     student_query = select(Student).where(Student.edition_year == year).subquery()
     if search:
         student_query = select(Student).where(Student.edition_year == year).join(QuestionAnswer).join(Answer)
@@ -168,55 +184,28 @@ async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = De
     return [ProjectOutSimple.parse_raw(r.json()).id for r in results]
 
 
-@router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker())], response_description="Students retrieved")
-async def get_conflicting_students(year: int):
+@router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
+async def get_conflicting_students(year: int, session: AsyncSession = Depends(get_session)):
     """get_conflicting_students gets all students with conflicts in their confirmed suggestions
     within an edition
 
     :param year: year of the edition
     :type year: int
-    :return: list of students with conflicting suggestions
-             each entry is a dictionary with keys "student_id" and "suggestion_ids"
-    :rtype: dict
+    :return: list of student_ids with conflicting suggestions
+    :rtype: list
     """
 
-    collection = db.engine.get_collection(Suggestion)
-    if not collection:
-        raise SuggestionRetrieveException()
+    student_ids = await session.execute(
+        f"""
+        SELECT student.id
+        FROM student, suggestion
+        WHERE student.id = suggestion.student_id AND suggestion.definitive = 't' AND suggestion.decision = {SuggestionOption.YES}
+        GROUP BY student.id
+        HAVING COUNT (*) > 1;
+        """
+    )
 
-    students = await db.engine.find(Student, {"edition": year})
-    students = [student.id for student in students]
-
-    pipeline = [
-        # get confirmed suggestions for students in the current edition that say yes
-        {"$match": {
-            "definitive": True,
-            "student": {"$in": students},
-            "decision": SuggestionOption.YES}},
-        # group by student_form, create set of suggestions and get count of suggestions
-        {"$group": {
-            "_id": "$student",
-            "suggestion_ids": {"$addToSet": "$_id"},
-            "count": {"$sum": 1}}},
-        # only match if count of suggestions > 0, since this means there is a conflict
-        {"$match": {
-            "_id": {"$ne": None},
-            "count": {"$gt": 1}}},
-        # change field names
-        {"$project": {
-            "student_id": "$_id",
-            "suggestion_ids": 1,
-            "_id": 0}}
-    ]
-
-    documents = await collection.aggregate(pipeline).to_list(length=None)
-    students = []
-    for doc in documents:
-        students.append(doc)
-        students[-1]["student_id"] = str(students[-1]["student_id"])
-        students[-1]["suggestion_ids"] = [str(s_id) for s_id in students[-1]["suggestion_ids"]]
-
-    return response(students, "Students with conflicting suggestions retrieved succesfully")
+    return [f"{config.api_url}/students/{id}" for (id,) in student_ids]
 
 
 # Question Tag Endpoints
@@ -253,7 +242,7 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
     return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, showInList=qtag.showInList, question=q)
 
 
-@router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Tags retrieved")
+@router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker(update=True))], response_description="Tags retrieved")
 async def get_showinlist_question_tags(year: int, session: AsyncSession = Depends(get_session)):
     """get_showinlist_question_tags return list of qusetiontags that must be shown in the listview
 
@@ -269,7 +258,7 @@ async def get_showinlist_question_tags(year: int, session: AsyncSession = Depend
     return [tag.tag for (tag,) in tags]
 
 
-@router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Added question tag")
+@router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))], response_description="Added question tag")
 async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSession = Depends(get_session)):
     """add_question_tag Create new questiontag
 
@@ -291,7 +280,7 @@ async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSess
     return f"{config.api_url}editions/{str(year)}/questiontags/{tag.tag}"
 
 
-@router.delete("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.delete("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
 async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
     """delete_question_tag delete the questiontag
 
@@ -325,7 +314,7 @@ async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depen
     await session.commit()
 
 
-@router.patch("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.patch("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
 async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate, session: AsyncSession = Depends(get_session)):
     """modify_question_tag Modify a question tag to link a question
 
@@ -379,5 +368,4 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
             questiontag.question_id = newquestion.id
 
     await update(questiontag, session=session)
-    print(questiontag)
     return f"{config.api_url}editions/{str(year)}/questiontags/{questiontag.tag}"

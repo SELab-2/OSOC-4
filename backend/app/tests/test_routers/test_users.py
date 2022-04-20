@@ -18,7 +18,7 @@ class TestUsers(TestBase):
 
     async def test_get_users(self):
         path = "/users"
-        allowed_users = {"user_admin"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
 
         # Test authorization & access-control
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
@@ -38,7 +38,7 @@ class TestUsers(TestBase):
 
     async def test_get_users_me(self):
         path = "/users/me"
-        allowed_users = {"user_admin", "user_approved_coach"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
         # Test authorization & access-control
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
@@ -54,7 +54,7 @@ class TestUsers(TestBase):
         # otherwise the same user will be created multiple times thus not every user will create a new user
 
         path = "/users/create"
-        allowed_users = {"user_admin"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         body = {"email": "added_user@test.com"}
 
         # Test authorization & access-control
@@ -73,7 +73,7 @@ class TestUsers(TestBase):
 
     async def test_post_forgot(self):
         path: str = "/users/forgot/"
-        allowed_users: Set[str] = {"user_admin", "user_approved_coach"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
         allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
         blocked_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
 
@@ -110,7 +110,7 @@ class TestUsers(TestBase):
         for user_title in allowed_users:
             user: User = await self.get_user_by_name(user_title)
 
-            self.assertTrue(verify_password(f"Test123!{user_title}", user.password),
+            self.assertTrue(verify_password(self.saved_objects["passwords"][user_title], user.password),
                             "The password was changed after bad requests")
 
         #######################################
@@ -146,7 +146,7 @@ class TestUsers(TestBase):
     async def test_get_users_id(self):
         expected_user = await self.get_user_by_name("user_admin")
         path = "/users/" + str(expected_user.id)
-        allowed_users = {"user_admin", "user_approved_coach"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
         bad_path = "/users/" + str(self.bad_id)
 
@@ -165,7 +165,7 @@ class TestUsers(TestBase):
 
     async def test_patch_update_user(self):
         path: str = "/users/"
-        allowed_users: Set[str] = {"user_admin"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
         blocked_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
 
@@ -227,7 +227,7 @@ class TestUsers(TestBase):
         unactivated_user = await self.get_user_by_name("user_unactivated_coach")
 
         path = f"/users/{unactivated_user.id}/invite"
-        allowed_users = {"user_admin"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         body = {}
 
         unactivated_user.email = "Stef.VandenHaute+SEL2TEST@UGent.be"  # TODO: set in env
@@ -253,7 +253,7 @@ class TestUsers(TestBase):
     async def test_post_approve_user(self):
         activated_user: User = await self.get_user_by_name("user_activated_coach")
         path: str = f"/users/{str(activated_user.id)}/approve"
-        allowed_users: Set[str] = {"user_admin"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         body: Dict[str, str] = {}
 
         approved_user: User = await self.get_user_by_name("user_approved_coach")

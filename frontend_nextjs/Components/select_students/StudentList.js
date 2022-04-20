@@ -1,6 +1,9 @@
 import { Col } from "react-bootstrap";
 import StudentListelement from "./StudentListelement";
 import LoadingPage from "../LoadingPage";
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+import { useEffect, useState } from "react";
 
 /**
  * This component represents te list of students in the 'select students' tab.

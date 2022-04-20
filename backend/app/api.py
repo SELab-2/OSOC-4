@@ -1,7 +1,7 @@
 import inspect
 import re
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
@@ -9,10 +9,10 @@ from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app.config import config
-from app.database import init_db, disconnect_db
+from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
-from app.routers import (auth, ddd, dummy, editions, projects, reset_password,
-                         skills, students, tally, user_invites, users)
+from app.routers import (auth, ddd, editions, projects, reset_password, skills,
+                         students, suggestions, tally, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -38,8 +38,6 @@ async def startup():
 async def shutdown():
     await disconnect_db()
 
-
-app.include_router(dummy.router)
 app.include_router(ddd.router)
 # app.include_router(answers.router)
 app.include_router(auth.router)
@@ -50,7 +48,7 @@ app.include_router(projects.router)
 # app.include_router(questions.router)
 app.include_router(skills.router)
 app.include_router(students.router)
-# app.include_router(suggestions.router)
+app.include_router(suggestions.router)
 app.include_router(tally.router)
 # app.include_router(user_invites.router)
 app.include_router(user_invites.router)
@@ -66,6 +64,17 @@ async def my_exception_handler(request: Request, exception: BaseException):
 @app.exception_handler(AuthJWTException)
 async def auth_exception_handler(request: Request, exception: AuthJWTException):
     return JSONResponse(status_code=exception.status_code, content={"message": exception.message})
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocketManager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect as e:
+        websocketManager.disconnect(websocket)
+        print(e)
 
 
 def custom_openapi():
