@@ -1,3 +1,4 @@
-// const FRONTEND_LOGS = (!import.meta.env.PROD) || false;
-// todo: fix env var
-export function log(msg) {if (true) console.log(msg);}
+
+const mode = process.env.NODE_ENV || ""
+
+export function log(msg) {if (mode ===  "development") console.log(msg);}

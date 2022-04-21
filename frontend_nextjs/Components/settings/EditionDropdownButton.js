@@ -1,8 +1,7 @@
 import {Dropdown} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {get_edition, getJson} from "../../utils/json-requests";
 import {log} from "../../utils/logger";
-import {urlManager} from "../../utils/ApiClient";
+import {api, Url} from "../../utils/ApiClient";
 
 export default function EditionDropdownButton() {
     const [editionList, setEditionList] = useState([]);
@@ -14,36 +13,42 @@ export default function EditionDropdownButton() {
     useEffect(() => {
         if(currentVersion === undefined && ! loadingCurrentVersion){
             setLoadingCurrentVersion(true);
-            urlManager.getCurrentEdition().then(url => {
-                getJson(url).then(edition => {
-                    log(edition)
+            Url.fromName(api.current_edition).get().then(res => {
+                if (res.success) {
+                    const edition = res.data;
                     setCurrentVersion({"year": edition.year, "name": edition.name})
                     setLoadingCurrentVersion(false)
-                })
+                }
+
             })
         }
 
         if (editionList.length === 0 && ! loadingEditionList) {
             setLoadingEditionList(true)
-            urlManager.getEditions().then(url => {
-                log("this is the url thing")
-                log(url)
-                getJson(url).then(async res => {
+            Url.fromName(api.editions).get().then(async res => {
+                if (res.success) {
                     log("load all editions")
                     log(res)
-                    for(let e of res){
+                    for(let e of res.data) {
                         log("load specific edition")
                         log(e)
-                        getJson(e).then(async edition => {
-                            if(edition){
-                                await setEditionList(prevState => [...prevState, {"year": edition.year, "name": edition.name}])
+                        Url.fromUrl(e).get().then(async res2 => {
+                            if (res2.success) {
+                                const edition = res2.data;
+                                if (edition) {
+                                    await setEditionList(prevState => [...prevState, {
+                                        "year": edition.year,
+                                        "name": edition.name
+                                    }])
+                                }
                             }
+
                         }).then(async () => {
                             setLoadingEditionList(false)
 
                         })
                     }
-                })
+                }
             })
         }
     }, [currentVersion, loadingEditionList, editionList.length, loadingCurrentVersion])
@@ -51,7 +56,7 @@ export default function EditionDropdownButton() {
     const ChangeSelectedVersion = async (edition) => {
         log("change edition dropdown")
         log(edition)
-        await urlManager._setCurrentEdition(edition.year)
+        await api.setCurrentEdition(edition.year)
         await setCurrentVersion({"year": edition.year, "name": edition.name});
     }
 

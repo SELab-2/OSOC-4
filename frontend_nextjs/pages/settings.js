@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { getJson } from "../utils/json-requests";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
 import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
@@ -10,8 +9,7 @@ import { Accordion } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
-import { log } from "../utils/logger";
-import { urlManager } from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 import ChangeTheme from "../Components/settings/ChangeTheme";
 import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
@@ -34,17 +32,15 @@ export default function Settings(props) {
     useEffect(() => {
         if ((user === undefined || name === "" || email === "") && !loading) {
             setLoading(true)
-            urlManager.getUsers().then(users_url => {
-                getJson(users_url + "/me").then(res => {
-                    log(res.data)
-                    setUser(res.data);
-                    setName(res.data.name);
-                    setEmail(res.data.email);
-                    setRole(res.data.role);
+            Url.fromName(api.me).get().then(res => {
+                if (res.success) {
+                    res = res.data.data;
+                    setUser(res);
+                    setName(res.name);
+                    setEmail(res.email);
+                    setRole(res.role);
                 }
-                ).then(() => setLoading(false))
-            })
-
+            }).then(() => setLoading(false))
         }
     }, [loading, user, name, email]);
 
@@ -98,9 +94,11 @@ export default function Settings(props) {
                             <SettingCards image={dark_theme} title={"Dark theme"} subtitle={"Customize the layout of the website to reduce the glow and calm your eyes"}>
                                 <ChangeTheme />
                             </SettingCards>
-                            <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
-                                <EditionDropdownButton />
-                            </SettingCards>
+                            {(role === 2) ?
+                                <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
+                                    <EditionDropdownButton />
+                                </SettingCards>
+                                : null}
                         </div>
                     </AccordionBody>
                 </AccordionItem>

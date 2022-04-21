@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import QuestionTag from "./QuestionTag";
-import { urlManager } from "../../utils/ApiClient";
-import { getJson, postCreate } from "../../utils/json-requests";
+import {api, Url} from "../../utils/ApiClient";
 import { Form, Button } from 'react-bootstrap';
 
 export default function QuestionTags() {
@@ -12,13 +11,10 @@ export default function QuestionTags() {
 
     useEffect(() => {
         setLoading(true)
-        urlManager.getQuestionTags().then(questiontags_url => {
-            getJson(questiontags_url).then(res => {
-                console.log(res)
-                setQuestionTags(res);
-            }
-            ).then(() => setLoading(false))
-        })
+        Url.fromName(api.editions_questiontags).get().then(res => {
+            if (res.success) {
+                setQuestionTags(res.data);
+            }}).then(() => setLoading(false))
     }, []);
 
     const handleNewTagChange = (event) => {
@@ -27,8 +23,7 @@ export default function QuestionTags() {
 
     async function submitNewTag(event) {
         event.preventDefault()
-        const questiontag_url = await urlManager.getQuestionTags()
-        postCreate(questiontag_url, { "tag": newTag }).then(resp => {
+        Url.fromName(api.editions_questiontags).setBody({"tag": newTag}).post().then(resp => {
             setQuestionTags([...questionTags, resp["data"]])
             setNewTag("");
         })

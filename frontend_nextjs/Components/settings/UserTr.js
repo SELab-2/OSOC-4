@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 import {Dropdown} from "react-bootstrap";
 import {log} from "../../utils/logger";
-import {urlManager} from "../../utils/ApiClient";
-import {patchEdit} from "../../utils/json-requests";
+import {api, Url} from "../../utils/ApiClient";
 
 export default function UserTr(props) {
     const [statusAccount, setStatusAccount] = useState((props.user.disabled) ? 3 : ((props.user.role === 2)? 2 : 1))
@@ -13,12 +12,11 @@ export default function UserTr(props) {
             return
         }
 
-        let user_url = await urlManager.getUsers();
         let json = props.user
         json.disabled = role === 0;
         json.role = role
         log(json)
-        let response = await patchEdit(user_url + "/" + props.user.id, json)
+        let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody(json).patch();
         log(response)
         if (response.success){setStatusAccount(role)}
     }

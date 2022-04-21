@@ -1,10 +1,27 @@
-import {Button, Modal, ModalHeader, ModalTitle} from "react-bootstrap";
+import { Button, Modal, ModalHeader, ModalTitle } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Url, api } from "../../utils/ApiClient";
 
 // This view shows the pop up window when making a suggestion about a student.
 export default function PopUpWindow(props) {
 
   // defines wheater or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
+
+  const [suggestion, setSuggestion] = useState({ "reason": "" });
+
+  useEffect(() => {
+    if (props.popUpShow && props.student["own_suggestion"]) {
+      setSuggestion(props.student["own_suggestion"])
+    } else {
+      setSuggestion({ "reason": "" })
+    }
+    setSuggestion(prevState => ({
+      ...prevState,
+      ["decision"]: props.decision
+    }));
+
+  }, [props.popUpShow])
 
   // returns the string for suggestion for the student
   function getSuggestion() {
@@ -20,9 +37,27 @@ export default function PopUpWindow(props) {
     setPopUpShow(false);
   }
 
+  const handleChange = (event) => {
+    event.preventDefault()
+    const { name, value } = event.target;
+    setSuggestion(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  }
+
   // called on submitting the suggestion
-  function submitSuggestion() {
-    setPopUpShow(false);
+  async function submitSuggestion() {
+
+    Url.fromUrl(api.baseUrl).extend("/suggestions/create").setBody({
+      ...suggestion,
+      ["student_id"]: props.student["id_int"]
+    }).post().then(res => {
+      if (res.success === true) {
+        props.updateSuggestion(suggestion)
+        setPopUpShow(false);
+      }
+    });
   }
 
   // returns the html representation for the pop up window
@@ -36,12 +71,13 @@ export default function PopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Suggest '{getSuggestion()}' for {props.student["name"]}
+          Suggest '{getSuggestion()}' for {props.student.mandatory["first name"] + " " +
+            props.student.mandatory["last name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Body>
         <h4>Why are you making this decision?</h4>
-        <input id="suggestion-reason" type="text" className="fill_width suggestion-reason"/>
+        <input id="suggestin-reason" name="reason" type="text" className="fill_width suggestion-reason" onChange={handleChange} value={suggestion["reason"]} />
         A reason is not required, but will open up discussion and help us and your fellow coaches to understand.
       </Modal.Body>
       <Modal.Footer>

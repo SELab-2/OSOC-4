@@ -1,4 +1,6 @@
 import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Url} from "../../utils/ApiClient";
 
 // displays the counts of the suggestions for a student
 export default function SuggestionsCount(props) {
@@ -6,7 +8,7 @@ export default function SuggestionsCount(props) {
   // get the info of the basic questions shown in the list element
   function getInfo() {
     if (props.student["suggestions"]) {
-      let decisions = props.student["suggestions"].filter(sugg => sugg["definitive"]);
+      let decisions = Object.values(props.student["suggestions"]).filter(sugg => sugg["definitive"]);
       let decision = (decisions.length === 0) ? "Undecided" : ["No", "Maybe", "Yes"][decisions[0]["decision"]];
 
       let rows = [];

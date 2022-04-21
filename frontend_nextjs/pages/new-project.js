@@ -1,10 +1,8 @@
 import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {log} from "../utils/logger";
 import {useRouter} from "next/router";
-import {getJson, postCreate} from "../utils/json-requests";
 import SelectSearch, {fuzzySearch} from "react-select-search";
-import {urlManager} from "../utils/ApiClient";
+import {api, Url} from "../utils/ApiClient";
 
 
 export default function NewProjects() {
@@ -28,28 +26,25 @@ export default function NewProjects() {
 
     useEffect(() => {
         if (skills.length === 0) {
-            urlManager.getSkills().then(skills_url => {
-                getJson(skills_url).then(async res => {
-                    log("load skills")
-                    log(res)
+            Url.fromName(api.skills).get().then(async res => {
+                if (res.success) {
+                    res = res.data;
                     if(res){
                         // scuffed way to get unique skills (should be fixed in backend soon)
                         let array = [];
                         res.map(skill => array.push({"value":skill, "name":skill}));
                         setSkills(array);
                     }
-                })
+                }
             })
 
         }
     })
 
     async function DeleteStudent(index) {
-        log("delete student")
         if (students.length > 1) {
             await setStudents(students.filter((_, i) => i !== index))
         }
-        log(students)
     }
 
     function changeSkillStudent(index, value){
@@ -75,8 +70,7 @@ export default function NewProjects() {
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        log("Creating new project")
-        let edition = await urlManager.getCurrentYear();
+        let edition = await api.getCurrentYear();
         // TODO check forms
         let body = {
             "name":projectName,
@@ -87,7 +81,7 @@ export default function NewProjects() {
             "edition": edition
         }
         // TODO add skills to project
-        await postCreate("projects/create", body)
+        await Url.fromName(api.edition_projects).extend("projects/create").setBody(body).post();
     }
 
 
