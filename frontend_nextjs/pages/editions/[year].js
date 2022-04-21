@@ -14,34 +14,21 @@ const Edition = () => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        Url.fromName(api.editions).extend(`/${year}`).get().then(resp => {
-            if (resp.success) {
-                setEdition(resp.data);
-                Url.fromUrl(resp.data.users).get().then(async res2 => {
-                    //console.log("test");
+        Url.fromName(api.editions).extend(`/${year}`).get().then(res => {
+            if (res.success) {
+                setEdition(res.data);
+                Url.fromUrl(res.data.users).get().then(async res2 => {
                     if (res2.success){
-                        // console.log("-----------\n---------\nres2");
-                        // console.log(res2);
-                        for (let u of res2.data){
-                            Url.fromUrl(u).get().then(async res3 => {
-                                if (res3.success) {
-                                    console.log("res3");
-                                    console.log(res3);
-                                    const user = res3.data;
-                                    //console.log(user);
-                                    if (user && user.data.role === 0) {
-                                        
-                                        await setUsers(prevState => [...prevState, user.data]);
-                                        //await setShownUsers(prevState => [...prevState, user.data]);
+                        Promise.all(res2.data.map(u => { Url.fromUrl(u).get().then(async res3 => {
+                                    if (res3.success) {
+                                        const user = res3.data;
+                                        if (user && user.data.role === 0) {
+                                            setUsers(prevState => [...prevState, user.data]);
+                                        }
                                     }
-                                }
+                                })
                             })
-                            // Url.fromUrl(u).get().then((async res3 => {
-                            //     if (res3.success){
-                            //         console.log(res3.data);
-                            //     }
-                            // }))
-                        }
+                        )
                     }
                 })
             }
@@ -53,39 +40,39 @@ const Edition = () => {
         return <LoadingPage />
     }
 
-    // console.log("The current edition:");
-    // console.log(edition);
-    console.log(users);
+    console.log("The current edition:");
+    console.log(edition);
 
     return (
         <>
-            <h1>Naam</h1>
-            <p>{edition.name}</p>
-            <h2>Beschrijving</h2>
-            <p>{edition.description}</p>
+            <header>
+                <h1>{edition.name}</h1>
+                <p>{(edition.description) ? edition.description : "No description available"}</p>
+            </header>
+            <body>
             <h2>Coaches</h2>
-            <p>{edition.users}</p>
-            { <Table className={"table-manage-users"}>
-                <thead>
-                    <th>
-                        <p>
-                            begeleider
-                        </p>
-                    </th>
-                    <th>
-                        <p>
-                            role
-                        </p>
-                    </th>
-                </thead>
-                <tbody>
-                {(users.length) ? (users.map((user, index) => (
-                    <tr>
-                        <td>{user.name}</td>
-                        <td>{user.role}</td>
-                    </tr>))) : null}
-                </tbody>
-            </Table> }
+                { <Table className={"table-manage-users"}>
+                    <thead>
+                        <th>
+                            <p>
+                                Name
+                            </p>
+                        </th>
+                        <th>
+                            <p>
+                                Email
+                            </p>
+                        </th>
+                    </thead>
+                    <tbody>
+                    {(users.length) ? (users.map((user, index) => (
+                        <tr>
+                            <td>{user.name}</td>
+                            <td>{user.email}</td>
+                        </tr>))) : null}
+                    </tbody>
+                </Table> }
+            </body>
         </>
     )
 }
