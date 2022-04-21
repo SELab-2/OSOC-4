@@ -1,6 +1,8 @@
 import {Button, Col, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
 import {useState} from "react";
 import {getDecisionString} from "./StudentListelement";
+import {getPostSuggestionsPath} from "../../routes";
+import {Url} from "../../utils/ApiClient";
 
 // This view shows the pop up window when making a decision about a student.
 export default function DecisionPopUpWindow(props) {
@@ -9,6 +11,8 @@ export default function DecisionPopUpWindow(props) {
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
   const [textAreaDisabled, setTextAreaDisabled] = useState(true);
 
+  const [emailText, setEmailText] = useState("default email")
+
   // called when the pop up window is closed
   function onHide() {
     setPopUpShow(false);
@@ -16,6 +20,8 @@ export default function DecisionPopUpWindow(props) {
 
   // called on submitting the decision
   function submitDecision() {
+    Url.fromUrl(getPostSuggestionsPath()).post(
+      {"decision": props.decision, "definitive": true, "student_id": props.student.id});
     setPopUpShow(false);
   }
 
@@ -54,7 +60,8 @@ export default function DecisionPopUpWindow(props) {
         </Row>
         <Row className={getTextClassName()}>
           <textarea id="decision-email" className={"fill_width suggestion-reason " + getTextClassName()}
-                    disabled={textAreaDisabled} defaultValue="default email"/>
+                    disabled={textAreaDisabled} value={emailText}
+                    onChange={(ev) => setEmailText(ev.target.value)}/>
         </Row>
       </Modal.Body>
       <Modal.Footer>
