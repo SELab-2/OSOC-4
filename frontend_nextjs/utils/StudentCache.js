@@ -3,7 +3,7 @@ import { Url } from "../utils/ApiClient";
 export class StudentCache {
     cache = {};
 
-    async getStudent(url) {
+    async getStudent(url, userid) {
         let student = cache[url];
         if (student) {
             return student
@@ -13,7 +13,7 @@ export class StudentCache {
             if (res.success) {
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
-                    if (item["suggested_by_id"] === session["userid"]) {
+                    if (item["suggested_by_id"] === userid) {
                         res["own_suggestion"] = item;
                     }
                 });

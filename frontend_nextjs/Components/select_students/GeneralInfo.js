@@ -8,8 +8,7 @@ export default function SuggestionsCount(props) {
   // get the info of the basic questions shown in the list element
   function getInfo() {
     if (props.student["suggestions"]) {
-      let decisions = Object.values(props.student["suggestions"]).filter(sugg => sugg["definitive"]);
-      let decision = (decisions.length === 0) ? "Undecided" : ["No", "Maybe", "Yes"][decisions[0]["decision"]];
+      let decision = (props.student.decision === -1) ? "Undecided" : ["No", "Maybe", "Yes"][props.student.decision];
 
       let rows = [];
 

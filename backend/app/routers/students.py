@@ -12,6 +12,7 @@ from app.utils.checkers import RoleChecker
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 router = APIRouter(prefix="/students")
@@ -20,16 +21,21 @@ router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
 @router.get("/{student_id}", response_description="Student retrieved")
-async def get_student(student_id, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+async def get_student(student_id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
     """get_student get the Student instances with id from the database
 
     :return: student with id
     :rtype: StudentOutExtended
     """
 
+    studentstat = select(Student).where(Student.id == student_id).options(selectinload(Student.skills))
+    studentres = await session.execute(studentstat)
+    (student, ) = studentres.one()
+
     # student info
     info = {"id": f"{config.api_url}students/{student_id}"}
 
+    info["skills"] = student.skills
     info["id_int"] = student_id
 
     # student info from tags
@@ -51,10 +57,13 @@ async def get_student(student_id, session: AsyncSession = Depends(get_session), 
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
 
+    info["decision"] = student.decision
+
     # student suggestions
     r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
     student_info = r.all()
     info["suggestions"] = {s.id: SuggestionExtended.parse_raw(s.json()) for (s,) in student_info}
+
     return info
 
 
