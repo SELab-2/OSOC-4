@@ -7,6 +7,7 @@ import {Accordion, Table } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
+import QuestionTags from "../../Components/settings/QuestionTags";
 
 const Edition = () => {
     console.log("--------\n--------------\n------------");
@@ -56,7 +57,6 @@ const Edition = () => {
                         <h3>Coaches</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                    <h2>Coaches</h2>
                         { <Table className={"table-manage-users"}>
                             <thead>
                                 <th>
@@ -82,10 +82,12 @@ const Edition = () => {
                 </AccordionItem>
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
-                        <h2>Questiontags</h2>
+                        <h3>Question Tags</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                        <p>TODO</p>
+                        <div className="personal-settings">
+                            <QuestionTags />
+                        </div>
                     </AccordionBody>
                 </AccordionItem>
             </Accordion>

@@ -84,16 +84,6 @@ export default function Settings(props) {
                 </AccordionItem>
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
-                        <h3>Question Tags</h3>
-                    </AccordionHeader>
-                    <AccordionBody>
-                        <div className="personal-settings">
-                            <QuestionTags />
-                        </div>
-                    </AccordionBody>
-                </AccordionItem>
-                <AccordionItem eventKey="2">
-                    <AccordionHeader>
                         <h3>Website settings</h3>
                     </AccordionHeader>
                     <AccordionBody>
