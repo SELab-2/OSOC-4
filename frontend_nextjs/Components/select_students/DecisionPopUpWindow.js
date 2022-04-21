@@ -47,10 +47,11 @@ export default function DecisionPopUpWindow(props) {
           <Col md="auto" className="send-email-checkbox">
             <input id="send_email" type="checkbox" onChange={val => setTextAreaDisabled(! val.target.checked)}/>
           </Col>
-          <Col><label htmlFor="send_email">Send email to {props.student["name"]}</label></Col>
+          <Col><label htmlFor="send_email">Send email to {props.student.mandatory["first name"] + " " +
+            props.student.mandatory["last name"]}</label></Col>
         </Row>
         <Row className={getTextClassName()}>
-          Message to {props.student["name"]}:
+          Message:
         </Row>
         <Row className={getTextClassName()}>
           <textarea id="decision-email" className={"fill_width suggestion-reason " + getTextClassName()}
