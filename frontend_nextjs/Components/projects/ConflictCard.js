@@ -1,11 +1,8 @@
 import {Button, Card} from "react-bootstrap";
 import {useEffect, useState} from "react";
-import {getJson} from "../../utils/json-requests";
-import {urlManager} from "../../utils/ApiClient";
-import {log} from "../../utils/logger";
 
 
-export default function ConflictCard(props) {
+export default function ConflictCard() {
     const [conflicts, setConflicts] = useState([])
 
 

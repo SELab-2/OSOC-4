@@ -261,6 +261,4 @@ class API {
     }
 }
 
-}
-
 export const api = new API();
