@@ -11,6 +11,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import useWindowDimensions from '../utils/WindowDimensions';
 import CheeseburgerMenu from 'cheeseburger-menu'
 import HamburgerMenu from 'react-hamburger-menu'
+import { cache } from '../utils/StudentCache';
 
 // This function filters the list of students, it is also used in email-students
 export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
@@ -32,7 +33,6 @@ export default function SelectStudents() {
     const [students, setStudents] = useState([]);
     const [studentUrls, setStudentUrls] = useState([]);
 
-    const [visibleStudent, setVisibleStudents] = useState(undefined);
     const studentId = router.query.studentId
 
     // These variables are used to notice if search or filters have changed
@@ -66,7 +66,6 @@ export default function SelectStudents() {
     }, [students, updateFromWebsocket, ws])
 
     useEffect(() => {
-        console.log(router.query.sortby)
         if (session) {
             if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
                 setSearch(router.query.search);
@@ -80,18 +79,9 @@ export default function SelectStudents() {
                         let p2 = res.data.slice(10);
                         setStudentUrls(p2);
                         Promise.all(p1.map(studentUrl =>
-                            Url.fromUrl(studentUrl).get().then(res => {
-                                if (res.success) {
-                                    res = res.data;
-                                    Object.values(res["suggestions"]).forEach((item, index) => {
-                                        if (item["suggested_by_id"] === session["userid"]) {
-                                            res["own_suggestion"] = item;
-                                        }
-                                    });
-                                    return res;
-                                }
-                            })
+                            cache.getStudent(studentUrl)
                         )).then(newstudents => {
+                            console.log(newstudents)
                             setStudents([...newstudents]);
                             setLocalFilters([0, 0, 0]);
                         })
@@ -159,17 +149,7 @@ export default function SelectStudents() {
         let p2 = studentUrls.slice(10);
         // 
         Promise.all(p1.map(studentUrl =>
-            Url.fromUrl(studentUrl).get().then(res => {
-                if (res.success) {
-                    res = res.data;
-                    Object.values(res["suggestions"]).forEach((item, index) => {
-                        if (item["suggested_by_id"] === session["userid"]) {
-                            res["own_suggestion"] = item;
-                        }
-                    });
-                    return res;
-                }
-            })
+            cache.getStudent(studentUrl)
         )).then(newstudents => {
             setStudents([...students, ...newstudents]);
             setStudentUrls(p2);
