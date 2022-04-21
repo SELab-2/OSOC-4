@@ -3,7 +3,10 @@ import React, { useEffect } from 'react'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
 import {api, Url} from "../../utils/ApiClient";
-import { Button, Form, Table } from "react-bootstrap";
+import {Accordion, Table } from "react-bootstrap";
+import AccordionItem from "react-bootstrap/AccordionItem";
+import AccordionBody from "react-bootstrap/AccordionBody";
+import AccordionHeader from "react-bootstrap/AccordionHeader";
 
 const Edition = () => {
     console.log("--------\n--------------\n------------");
@@ -44,36 +47,49 @@ const Edition = () => {
     console.log(edition);
 
     return (
-        <>
-            <header>
-                <h1>{edition.name}</h1>
-                <p>{(edition.description) ? edition.description : "No description available"}</p>
-            </header>
-            <body>
-            <h2>Coaches</h2>
-                { <Table className={"table-manage-users"}>
-                    <thead>
-                        <th>
-                            <p>
-                                Name
-                            </p>
-                        </th>
-                        <th>
-                            <p>
-                                Email
-                            </p>
-                        </th>
-                    </thead>
-                    <tbody>
-                    {(users.length) ? (users.map((user, index) => (
-                        <tr>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                        </tr>))) : null}
-                    </tbody>
-                </Table> }
-            </body>
-        </>
+        <div classname="body-editiondetail">
+            <h1>{edition.name}</h1>
+            <p>{(edition.description) ? edition.description : "No description available"}</p>
+            <Accordion defaultActiveKey="0">
+                <AccordionItem eventkey="0">
+                    <AccordionHeader>
+                        <h3>Coaches</h3>
+                    </AccordionHeader>
+                    <AccordionBody>
+                    <h2>Coaches</h2>
+                        { <Table className={"table-manage-users"}>
+                            <thead>
+                                <th>
+                                    <p>
+                                        Name
+                                    </p>
+                                </th>
+                                <th>
+                                    <p>
+                                        Email
+                                    </p>
+                                </th>
+                            </thead>
+                            <tbody>
+                            {(users.length) ? (users.map((user, index) => (
+                                <tr>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                </tr>))) : null}
+                            </tbody>
+                        </Table> }
+                    </AccordionBody>
+                </AccordionItem>
+                <AccordionItem eventKey="1">
+                    <AccordionHeader>
+                        <h2>Questiontags</h2>
+                    </AccordionHeader>
+                    <AccordionBody>
+                        <p>TODO</p>
+                    </AccordionBody>
+                </AccordionItem>
+            </Accordion>
+        </div>
     )
 }
 

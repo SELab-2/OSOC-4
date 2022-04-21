@@ -65,9 +65,9 @@ export default function Settings(props) {
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
                 <AccordionItem eventKey="0">
-                    <Accordion.Header>
+                    <AccordionHeader>
                         <h3>Personal settings</h3>
-                    </Accordion.Header>
+                    </AccordionHeader>
                     <AccordionBody>
                         <div className="personal-settings">
                             <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
