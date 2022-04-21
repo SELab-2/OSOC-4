@@ -33,7 +33,7 @@ export default function SearchSortBar(props) {
 
   // return html representation of the suggestion counts for a student
   return (
-    <Row className="searchbar-row">
+    <Row className="nomargin">
       <Col>
         <Form onSubmit={ev => {
           ev.preventDefault();
