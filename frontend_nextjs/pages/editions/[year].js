@@ -10,7 +10,6 @@ import AccordionHeader from "react-bootstrap/AccordionHeader";
 import QuestionTags from "../../Components/settings/QuestionTags";
 
 const Edition = () => {
-    console.log("--------\n--------------\n------------");
     const router = useRouter()
     const [loading, setLoading] = useState(true);
     const [edition, setEdition] = useState(true);
@@ -60,18 +59,14 @@ const Edition = () => {
                         { <Table className={"table-manage-users"}>
                             <thead>
                                 <th>
-                                    <p>
-                                        Name
-                                    </p>
+                                    <p>Name</p>
                                 </th>
                                 <th>
-                                    <p>
-                                        Email
-                                    </p>
+                                    <p>Email</p>
                                 </th>
                             </thead>
                             <tbody>
-                            {(users.length) ? (users.map((user, index) => (
+                            {(users.length) ? (users.map((user, _) => (
                                 <tr>
                                     <td>{user.name}</td>
                                     <td>{user.email}</td>
