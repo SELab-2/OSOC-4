@@ -65,13 +65,7 @@ export default function StudentDetails(props) {
             setSuggestions(res["suggestions"]);
 
             // Fill in the decisions field, this contains the decision for the student if there is one,
-            // this decision is stored as a suggestion which is definitive
-            let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
-            if (decisions.length !== 0) {
-              setDecision(decisions[0]["decision"]);
-            } else {
-              setDecision(-1);
-            }
+            setDecision(res["decision"])
 
             // Fill in the questionAnswers
             Url.fromUrl(res["question-answers"]).get().then(res => {
@@ -83,13 +77,9 @@ export default function StudentDetails(props) {
 
       else {
         setStudent(props.student);
+        setDecision(props.student["decision"])
         setSuggestions(props.student["suggestions"]);
-        let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
-        if (decisions.length !== 0) {
-          setDecision(decisions[0]["decision"]);
-        } else {
-          setDecision(-1);
-        }
+
 
         // Fill in the questionAnswers
         Url.fromUrl(props.student["question-answers"]).get().then(res => {
@@ -206,11 +196,11 @@ export default function StudentDetails(props) {
           <Row>
             <Col>
               <select className="dropdown-decision" id="dropdown-decision"
-                onChange={(ev) => setDecideField(ev.target.value)}>
-                <option value="-1">Decision</option>
-                <option value="2">Yes</option>
-                <option value="1">Maybe</option>
-                <option value="0">No</option>
+                onChange={(ev) => setDecideField(ev.target.value)} value={decision}>
+                <option value={-1}>Undecided</option>
+                <option value={0}>No</option>
+                <option value={1}>Maybe</option>
+                <option value={2}>Yes</option>
               </select>
             </Col>
             <Col md="auto">

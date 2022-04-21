@@ -64,6 +64,8 @@ export default function SearchSortBar(props) {
           onChange={(ev) => sort(ev.target.value)}>
           <option value={"first name+asc,last name+asc"}>Name A-Z</option>
           <option value={"first name+dc,last name+desc"}>Name Z-A</option>
+          <option value={"id+asc"}>Old-New</option>
+          <option value={"id+desc"}>New-Old</option>
         </select>
       </Col>
     </Row>

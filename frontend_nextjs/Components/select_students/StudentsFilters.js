@@ -1,7 +1,8 @@
-import {useState } from "react";
+import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
+import { api, Url } from "../../utils/ApiClient";
 
 // this function adds or removes a skill from the filters, this function is also used in EmailStudentsFilters
 export function addFilterGlobal(query, filter, startItems, itemName, value) {
@@ -32,6 +33,18 @@ export default function StudentsFilters(props) {
   const chosenSkills = props.filters[1];
   const decision = props.filters[2];
 
+  useEffect(() => {
+    Url.fromName(api.skills).get().then(async res => {
+      if (res.success) {
+        res = res.data;
+        if (res) {
+          // scuffed way to get unique skills (should be fixed in backend soon)
+          setAllSkills(res);
+        }
+      }
+    })
+  }, [])
+
   // called when pressed on "reset filters"
   function resetFilters() {
     let newQuery = router.query;
@@ -41,7 +54,7 @@ export default function StudentsFilters(props) {
     router.push({
       pathname: router.pathname,
       query: newQuery
-    }, undefined, {shallow: true})
+    }, undefined, { shallow: true })
   }
 
   // this function makes all the roles visible
@@ -65,9 +78,9 @@ export default function StudentsFilters(props) {
       }
 
       return shownSkills.map((skill, index) =>
-        <StudentsFilter filter_id={skill.id} filter_text={skill.name}
-                        value={chosenSkills.includes(skill.name)}
-                        onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)}/>
+        <StudentsFilter filter_id={skill} filter_text={skill}
+          value={chosenSkills.includes(skill)}
+          onChange={(ev) => addFilter("skills", chosenSkills, skill, ev.target.checked)} />
       );
     }
     return null;
@@ -87,7 +100,7 @@ export default function StudentsFilters(props) {
     router.push({
       pathname: router.pathname,
       query: newQuery
-    }, undefined, {shallow: true})
+    }, undefined, { shallow: true })
   }
 
   // The HTML representation of the filters in the 'Select students' tab
@@ -106,19 +119,19 @@ export default function StudentsFilters(props) {
       </Row>
 
       <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni" value={filters.includes("alumn")}
-                      onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)}/>
+        onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)} />
       <StudentsFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers"
-                      value={filters.includes("student-coach")}
-                      onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)}/>
+        value={filters.includes("student-coach")}
+        onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)} />
       <StudentsFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for"
-                      value={filters.includes("not-suggested")}
-                      onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)}/>
+        value={filters.includes("not-suggested")}
+        onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)} />
       <StudentsFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
-                      value={filters.includes("unmatched")}
-                      onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)}/>
+        value={filters.includes("unmatched")}
+        onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)} />
       <StudentsFilter filter_id="practical-problems-checkbox" filter_text="Only students without practical problems"
-                      value={filters.includes("practical-problems")}
-                      onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)}/>
+        value={filters.includes("practical-problems")}
+        onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)} />
 
       <Row className="filter-title">
         <Col><h3>Skills</h3></Col>
@@ -138,13 +151,13 @@ export default function StudentsFilters(props) {
       </Row>
 
       <StudentsFilter filter_id="yes-checkbox" filter_text="Yes" value={decision.includes("yes")}
-                      onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)}/>
+        onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)} />
       <StudentsFilter filter_id="maybe-checkbox" filter_text="Maybe" value={decision.includes("maybe")}
-                      onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
+        onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
       <StudentsFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
-                      onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
+        onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
       <StudentsFilter filter_id="undecided-checkbox" filter_text="Undecided" value={decision.includes("undecided")}
-                      onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
+        onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
 
     </Col>
   )
