@@ -177,10 +177,7 @@ export default function SelectStudents() {
         <Row>
             {((width > 1500) || (width > 1000 && !studentId)) ?
                 <Col md="auto">
-                    <div style={{ width: "300px" }}>
-                        <StudentsFilters students={students} filters={filters} />
-                    </div>
-
+                    <StudentsFilters students={students} filters={filters} />
                 </Col>
                 :
                 <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
@@ -189,16 +186,10 @@ export default function SelectStudents() {
             }
             {(width > 800 || !studentId) &&
 
-
-                <Col style={{
-                    "border-left-width": "1px",
-                    "border-left-style": "solid",
-                    "border-left-color": "lightgray",
-                }}>
-                    <div>
-                        <Row>
+                <Col className="nomargin student-list-positioning">
+                        <Row className="nomargin">
                             {!((width > 1500) || (width > 1000 && !studentId)) &&
-                                <Col xs="auto">
+                                <Col md="auto">
                                     <div className="hamburger">
                                         <HamburgerMenu
                                             isOpen={showFilter}
@@ -217,28 +208,28 @@ export default function SelectStudents() {
                             }
                             <Col><SearchSortBar /></Col>
                         </Row>
+                        <Row className="infinite-scroll">
+                            <InfiniteScroll
+                              style={{
+                                  "height": "calc(100vh - 146px)",
+                              }}
+                              dataLength={students.length} //This is important field to render the next data
+                              next={fetchData}
+                              hasMore={studentUrls.length > 0}
+                              loader={<h4>Loading...</h4>}
+                              endMessage={
+                                  <p style={{ textAlign: 'center' }}>
+                                      <b>Yay! You have seen it all</b>
+                                  </p>
+                              }
+                            >
+                                {students.map((i, index) => (
 
-                        <InfiniteScroll
-                            style={{
-                                "height": "calc(100vh - 140px)",
-                            }}
-                            dataLength={students.length} //This is important field to render the next data
-                            next={fetchData}
-                            hasMore={studentUrls.length > 0}
-                            loader={<h4>Loading...</h4>}
-                            endMessage={
-                                <p style={{ textAlign: 'center' }}>
-                                    <b>Yay! You have seen it all</b>
-                                </p>
-                            }
-                        >
-                            {students.map((i, index) => (
+                                  <StudentListelement key={index} student={i} />
 
-                                <StudentListelement key={index} student={i} />
-
-                            ))}
-                        </InfiniteScroll>
-                    </div>
+                                ))}
+                            </InfiniteScroll>
+                        </Row>
                 </Col>
 
             }

@@ -6,12 +6,11 @@
     font-size: 13px;
     width: 80px;
     -webkit-text-fill-color: black;
-    border-width: 4px;
-    margin: 8px 0px;
-    padding-top: 7px;
-    padding-bottom: 7px;
-
-    border-radius: 4px;
+    margin: 8px 4px;
+    border-width: 0;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-radius: 3px;
 }
 
 .suggest-button-selected {
@@ -32,16 +31,17 @@
 }
 
 .suggest-confirm-button {
+    border-radius: 3px;
     font-size: 13px;
-    width: 110px;
-    padding-top: 7px;
-    padding-bottom: 7px;
+    width: 100px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     margin-left: 3px;
-    margin-right: 3px;
+    margin-right: 4px;
 }
 
 .details-upper-layer {
-    margin: 0 20px;
+    margin: 0 0 0 20px;
 }
 
 .dropdown-decision {
@@ -51,7 +51,7 @@
     background-color: white;
     border-style: solid;
     border-radius: 5px;
-    margin-left: 5px;
+    margin-left: 4px;
     margin-right: 5px;
     width: 95%;
     font-size: 15px;
@@ -109,7 +109,7 @@
     border-left-style: solid;
     border-left-color: lightgray;
 
-    margin-left: 20px;
+    margin-left: 0;
     padding-top: 15px;
     padding-right: 25px;
     padding-bottom: 25px;
@@ -164,8 +164,7 @@
     padding: 0;
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
-    margin-top: 15px;
-    margin-left: 15px;
+    margin-top: 20px;
 }
 
 .student-details-question {
@@ -177,4 +176,8 @@
 .student-details-answer {
     margin-top: 10px;
     font-size: 15px;
+}
+
+.buttongroup-paddingtop{
+    padding-top: 5px;
 }

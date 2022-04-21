@@ -1,4 +1,6 @@
 import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Url} from "../../utils/ApiClient";
 
 // displays the counts of the suggestions for a student
 export default function SuggestionsCount(props) {

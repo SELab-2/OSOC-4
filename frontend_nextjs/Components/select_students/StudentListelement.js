@@ -78,7 +78,7 @@ export default function StudentListelement(props) {
           No practical problems
         </Col>
         <Col />
-        <Col xs="auto">
+        <Col xs="auto" className="nopadding">
           <Row xs="auto" className="nomargin">
             <Col className="suggestions" xs="auto">Suggestions:</Col>
             <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />

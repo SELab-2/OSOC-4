@@ -178,19 +178,19 @@ export default function StudentDetails(props) {
           </Row>
         </Col>
         <Col />
-        <Col xs="auto">
+        <Col xs="auto" className="buttongroup-paddingtop">
           <Row>
-            <Col xs="auto"><button className={`suggest-yes-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 2 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(2)}>
+            <Col xs="auto" className="nopadding"><button className={`suggest-yes-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 2 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(2)}>
               Yes</button>
             </Col>
-            <Col xs="auto"><button className={`suggest-maybe-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 1 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(1)}>
+            <Col xs="auto" className="nopadding"><button className={`suggest-maybe-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 1 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(1)}>
               Maybe</button>
             </Col>
-            <Col xs="auto"><button className={`suggest-no-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 0 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(0)}>
+            <Col xs="auto" className="nopadding"><button className={`suggest-no-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 0 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(0)}>
               No</button>
             </Col>
             <Col xs="auto" className="close-button">
-              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="44px" height="44px" objectFit={'contain'} />
+              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
             </Col>
           </Row>
           <Row>
@@ -204,7 +204,7 @@ export default function StudentDetails(props) {
               </select>
             </Col>
             <Col md="auto">
-              <Button className="suggest-confirm-button" disabled={decideField === -1} onClick={() => setDecisionPopUpShow(true)}>
+              <Button className="suggest-confirm-button" disabled={decideField < 0} onClick={() => setDecisionPopUpShow(true)}>
                 Confirm
               </Button>
             </Col>
