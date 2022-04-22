@@ -26,19 +26,18 @@ export default function ParticipationCard(props){
     }
 
     return(
-        <div>
+        <div className={"participation-div"}>
             <Row>
-                <Col>
-                    <div>
+                <Col className={"participation-info"}>
+                    <div className={"participation-name"}>
                         {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null }
                     </div>
                     <SkillCard amount={0} name={props.participation.skill}/>
                 </Col>
-                <Col>
-                   <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={100} height={100}/>
+                <Col className={"participation-remove-student"}>
+                   <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={50} height={50}/>
                 </Col>
             </Row>
-
         </div>
     )
 }

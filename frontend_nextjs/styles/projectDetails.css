@@ -2,5 +2,39 @@
     background-color: var(--background-gray);
     font-size: 18px;
     text-align: center;
+    max-width: 300px;
+    margin: 10px 15px 5px 15px;
+}
+
+.participation-name{
+    margin-left: 15px;
+    font-size: 20px;
+}
+
+.participation-div{
+    margin-left: 10px;
+}
+
+.participation-remove-student{
+    margin-top: 10px;
+}
+
+.participation-info{
+    max-width: 300px;
+}
+
+.admin-div{
+    max-width: 300px;
+    font-size: 20px;
+    background-color: var(--no_red_65);
+    text-align: center;
+    margin: 5px 15px 5px 15px;
+}
+
+.coach-div{
+    max-width: 300px;
+    font-size: 20px;
+    background-color: var(--maybe_yellow_65);
+    text-align: center;
     margin: 5px 15px 5px 15px;
 }
