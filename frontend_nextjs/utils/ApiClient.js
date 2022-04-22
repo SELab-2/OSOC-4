@@ -49,7 +49,8 @@ export class Url {
             if (student) {
                 if (!this._url) { this._url = await api.getUrl(this._name, context); }
                 this._url += this._extension;
-                let newstudent = await cache.getStudent(this._url)
+                const sess = await api._session(context)
+                let newstudent = await cache.getStudent(this._url, sess["userid"])
                 return { success: true, data: newstudent }
             }
             if (!this._url) { this._url = await api.getUrl(this._name, context); }
@@ -282,11 +283,10 @@ class Cache {
             if (res.success) {
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
-                    if (item["suggested_by_id"] === userid) {
+                    if (item["suggested_by_id"] == userid) {
                         res["own_suggestion"] = item;
                     }
                 });
-                console.log(res);
                 cache[url] = res;
                 return res;
             }

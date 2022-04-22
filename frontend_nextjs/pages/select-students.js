@@ -66,14 +66,13 @@ export default function SelectStudents() {
 
         }
 
-    }, [students, updateFromWebsocket, ws])
+    }, [students, updateFromWebsocket, ws, student])
 
     useEffect(() => {
         if (session && router.query.studentId) {
             if ((student && student["id_int"] !== router.query.studentId) || !student) {
                 Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(newstudent => {
                     const data = newstudent["data"];
-                    console.log(data)
                     setStudent(data)
                 })
             }
@@ -100,7 +99,6 @@ export default function SelectStudents() {
                         Promise.all(p1.map(studentUrl =>
                             cache.getStudent(studentUrl, session["userid"])
                         )).then(newstudents => {
-                            console.log(newstudents);
                             setStudents([...newstudents]);
                             setLocalFilters([0, 0, 0]);
                         })
@@ -123,7 +121,10 @@ export default function SelectStudents() {
         if (student) {
             let new_student = student
             new_student["suggestions"][data["id"]] = data["suggestion"];
-            setStudent(new_student)
+            if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
+                new_student["own_suggestion"] = data["suggestion"];
+            }
+            setStudent({ ...new_student })
         }
     }
 
