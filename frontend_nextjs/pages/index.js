@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react"
 import LoadingPage from "../Components/LoadingPage"
-import {api, Url} from "../utils/ApiClient";
-import {Card, Carousel} from "react-bootstrap";
+import { api, Url } from "../utils/ApiClient";
+import { Card, Carousel } from "react-bootstrap";
 
 function Home({ current_edition, students_length, projects_length }) {
   const { data: session } = useSession({ required: true })
@@ -11,36 +11,36 @@ function Home({ current_edition, students_length, projects_length }) {
 
   if (isUser) {
     return (
-        <>
-          <Card style={{ width: "100%", height: "auto", margin: "auto" }}>
-            <Card.Header>
-              <h3 className={"index-header"}>Welcome back</h3>
-            </Card.Header>
+      <>
+        <Card style={{ width: "100%", height: "auto", margin: "auto" }}>
+          <Card.Header>
+            <h3 className={"index-header"}>Welcome back</h3>
+          </Card.Header>
 
-            <Carousel >
+          <Carousel >
 
-              <Carousel.Item interval={INTERVAL}>
-                <Card.Body>
-                  <Card.Title className={"index-card-title"}><h1>{current_edition.name}</h1></Card.Title>
-                </Card.Body>
-              </Carousel.Item>
+            <Carousel.Item interval={INTERVAL}>
+              <Card.Body>
+                <Card.Title className={"index-card-title"}><h1>{current_edition.name}</h1></Card.Title>
+              </Card.Body>
+            </Carousel.Item>
 
-              <Carousel.Item interval={INTERVAL}>
-                <Card.Body>
-                  <Card.Title className={"index-card-title"}><h1>{projects_length} Projects</h1></Card.Title>
-                </Card.Body>
-              </Carousel.Item>
+            <Carousel.Item interval={INTERVAL}>
+              <Card.Body>
+                <Card.Title className={"index-card-title"}><h1>{projects_length} Projects</h1></Card.Title>
+              </Card.Body>
+            </Carousel.Item>
 
-              <Carousel.Item interval={INTERVAL}>
-                <Card.Body>
-                  <Card.Title className={"index-card-title"}><h1>{students_length} Students</h1></Card.Title>
-                </Card.Body>
-              </Carousel.Item>
+            <Carousel.Item interval={INTERVAL}>
+              <Card.Body>
+                <Card.Title className={"index-card-title"}><h1>{students_length} Students</h1></Card.Title>
+              </Card.Body>
+            </Carousel.Item>
 
-            </Carousel>
-          </Card>
+          </Carousel>
+        </Card>
 
-    </>
+      </>
     )
 
   }
@@ -55,7 +55,7 @@ export default Home
 export async function getServerSideProps(context) {
   let props_out = {}
 
-  const current_edition =  await Url.fromName(api.current_edition).get(context)
+  const current_edition = await Url.fromName(api.current_edition).get(context)
   if (current_edition.success) {
     props_out["current_edition"] = current_edition.data;
   }

@@ -27,7 +27,6 @@ export default function StudentDetails(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   // These constants contain info about the student
   const [student, setStudent] = useState({});
-  const [studentId, setStudentId] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
   const [decision, setDecision] = useState(-1);
   const [questionAnswers, setQuestionAnswers] = useState([])
@@ -41,57 +40,25 @@ export default function StudentDetails(props) {
   // These constants contain the value of the decide field and which suggestion window should be shown
   const [suggestion, setSuggestion] = useState(0);
   const [decideField, setDecideField] = useState(-1);
-
-  const { data: session, status } = useSession()
-
   // This function inserts the data in the variables
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
-    if (studentId !== props.student_id && props.student_id) {
-      setStudentId(props.student_id);
-      if (!props.student) {
-        Url.fromName(api.students).extend(`/${props.student_id}`).get().then(res => {
-          if (res.success) {
-            res = res.data;
-            Object.values(res["suggestions"]).forEach((item, index) => {
-              if (item["suggested_by_id"] === session["userid"]) {
-                res["own_suggestion"] = item;
-              }
-            });
-
-            setStudent(res);
-
-            // Fill in the suggestions field, this contains all the suggestions which are not definitive
-            setSuggestions(res["suggestions"]);
-
-            // Fill in the decisions field, this contains the decision for the student if there is one,
-            setDecision(res["decision"])
-            setDecideField(res["decision"])
-
-            // Fill in the questionAnswers
-            Url.fromUrl(res["question-answers"]).get().then(res => {
-              if (res.success) { setQuestionAnswers(res.data); }
-            })
-          }
-        });
-      }
-
-      else {
-        setStudent(props.student);
-        setDecision(props.student["decision"])
-        setDecideField(props.student["decision"])
-        setSuggestions(props.student["suggestions"]);
-
-
-        // Fill in the questionAnswers
-        Url.fromUrl(props.student["question-answers"]).get().then(res => {
-          if (res.success) {
-            setQuestionAnswers(res.data);
-          }
-        })
-      }
+    console.log(props.student)
+    if (props.student) {
+      console.log(props.student)
+      setStudent(props.student);
+      setDecision(props.student["decision"])
+      setDecideField(props.student["decision"])
+      setSuggestions(props.student["suggestions"]);
+      // Fill in the questionAnswers
+      Url.fromUrl(props.student["question-answers"]).get().then(res => {
+        if (res.success) {
+          setQuestionAnswers(res["data"]);
+        }
+      })
     }
-  }, [studentId, props.student_id, props.student, session]);
+
+  }, []);
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {

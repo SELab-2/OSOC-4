@@ -42,10 +42,16 @@ export class Url {
         return this;
     }
 
-    async get(context = null) {
+    async get(context = null, student = false) {
         if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`); }
         try {
             this._headers = await api._headers(context, this._useAuth);
+            if (student) {
+                if (!this._url) { this._url = await api.getUrl(this._name, context); }
+                this._url += this._extension;
+                let newstudent = await cache.getStudent(this._url)
+                return { success: true, data: newstudent }
+            }
             if (!this._url) { this._url = await api.getUrl(this._name, context); }
             this._url += this._extension;
             log(`API: GET ${this._url}`)
@@ -191,8 +197,8 @@ class API {
         return this._paths[name];
     }
 
-    async getConflicts(){
-        if (! this._conflicts) { await this._setConflicts();}
+    async getConflicts() {
+        if (!this._conflicts) { await this._setConflicts(); }
         return this._conflicts;
     }
 
@@ -251,14 +257,46 @@ class API {
     }
 
     //TODO make this not hardcoded
-    async _setSkills(){
+    async _setSkills() {
         this._skills = "/skills"
     }
 
-    async _setConflicts(){
-        if(! this._editions) {await this._setCurrentEdition();}
+    async _setConflicts() {
+        if (!this._editions) { await this._setCurrentEdition(); }
         this._conflicts = this._current_edition + "/resolving_conflicts"
     }
 }
 
 export const api = new API();
+
+class Cache {
+    cache = {};
+
+    async getStudent(url, userid) {
+        let student = cache[url];
+        if (student) {
+            return student
+        }
+
+        student = Url.fromUrl(url).get().then(res => {
+            if (res.success) {
+                res = res.data;
+                Object.values(res["suggestions"]).forEach((item, index) => {
+                    if (item["suggested_by_id"] === userid) {
+                        res["own_suggestion"] = item;
+                    }
+                });
+                console.log(res);
+                cache[url] = res;
+                return res;
+            }
+        })
+        if (student) {
+            return student
+        }
+        return undefined;
+    }
+
+}
+
+export const cache = new Cache();

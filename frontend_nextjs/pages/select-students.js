@@ -3,7 +3,7 @@ import StudentsFilters from "../Components/select_students/StudentsFilters";
 import { Col, Row } from "react-bootstrap";
 import StudentListelement from "../Components/select_students/StudentListelement";
 import { useSession } from "next-auth/react";
-import { api, Url } from "../utils/ApiClient";
+import { api, Url, cache } from "../utils/ApiClient";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
@@ -32,7 +32,7 @@ export default function SelectStudents() {
     const [students, setStudents] = useState([]);
     const [studentUrls, setStudentUrls] = useState([]);
 
-    const [student, setStudent] = useState(undefined);
+    const [student, setStudent] = useState({});
 
     // These variables are used to notice if search or filters have changed
     let [search, setSearch] = useState("");
@@ -68,11 +68,15 @@ export default function SelectStudents() {
     }, [students, updateFromWebsocket, ws])
 
     useEffect(() => {
-        if (session) {
-            if (student && student["id_int"] != router.query.studentId) {
-
+        console.log(student)
+        if (session && router.query.studentId) {
+            if ((student.length && student["id_int"] !== router.query.studentId) || !student.length) {
+                Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(newstudent => {
+                    let data = newstudent["data"];
+                    console.log(data)
+                    setStudent({ ...data })
+                })
             }
-
         }
     }, [router.query.studentId])
 
@@ -92,17 +96,7 @@ export default function SelectStudents() {
                         let p2 = res.data.slice(10);
                         setStudentUrls(p2);
                         Promise.all(p1.map(studentUrl =>
-                            Url.fromUrl(studentUrl).get().then(res => {
-                                if (res.success) {
-                                    res = res.data;
-                                    Object.values(res["suggestions"]).forEach((item, index) => {
-                                        if (item["suggested_by_id"] === session["userid"]) {
-                                            res["own_suggestion"] = item;
-                                        }
-                                    });
-                                    return res;
-                                }
-                            })
+                            cache.getStudent(studentUrl, session["userid"])
                         )).then(newstudents => {
                             console.log(newstudents);
                             setStudents([...newstudents]);
@@ -111,14 +105,6 @@ export default function SelectStudents() {
                     }
                 });
             }
-            // if (students &&
-            //     (localFilters.some((filter, index) => filter !== filters[index].length))) {
-            //     let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
-            //     filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents);
-            // }
-            // if (filters.every(filter => filter.length === 0)) {
-            //     setVisibleStudents(students);
-            // }
         }
     }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
 
@@ -132,32 +118,12 @@ export default function SelectStudents() {
                 return true; // stop searching
             }
         });
-        if (student) {
+        if (student.length) {
             let new_student = student
             new_student["suggestions"][data["id"]] = data["suggestion"];
             setStudent(new_student)
         }
     }
-
-    function filterStudentsFilters(filteredStudents) {
-        return filteredStudents;
-    }
-
-    function filterStudentsSkills(filteredStudents) {
-        return filteredStudents;
-    }
-
-    function getStudentById() {
-        if (students) {
-            return students.find((o, i) => {
-                if (o["id_int"] === studentId) {
-                    return o;
-                }
-            });
-        }
-        return undefined;
-    }
-
 
     const fetchData = () => {
 
@@ -165,17 +131,7 @@ export default function SelectStudents() {
         let p2 = studentUrls.slice(10);
 
         Promise.all(p1.map(studentUrl =>
-            Url.fromUrl(studentUrl).get().then(res => {
-                if (res.success) {
-                    res = res.data;
-                    Object.values(res["suggestions"]).forEach((item, index) => {
-                        if (item["suggested_by_id"] === session["userid"]) {
-                            res["own_suggestion"] = item;
-                        }
-                    });
-                    return res;
-                }
-            })
+            cache.getStudent(studentUrl, session["userid"])
         )).then(newstudents => {
             setStudents([...students, ...newstudents]);
             setStudentUrls(p2);
@@ -188,7 +144,7 @@ export default function SelectStudents() {
     return (
 
         <Row>
-            {((width > 1500) || (width > 1000 && !studentId)) ?
+            {((width > 1500) || (width > 1000 && !student.length)) ?
                 <Col md="auto">
                     <StudentsFilters students={students} filters={filters} />
                 </Col>
@@ -197,11 +153,11 @@ export default function SelectStudents() {
                     <StudentsFilters students={students} filters={filters} />
                 </CheeseburgerMenu>
             }
-            {(width > 800 || !studentId) &&
+            {(width > 800 || !student.length) &&
 
                 <Col className="nomargin student-list-positioning">
                     <Row className="nomargin">
-                        {!((width > 1500) || (width > 1000 && !studentId)) &&
+                        {!((width > 1500) || (width > 1000 && !student.length)) &&
                             <Col md="auto">
                                 <div className="hamburger">
                                     <HamburgerMenu
@@ -248,10 +204,11 @@ export default function SelectStudents() {
             }
 
             {
-                (studentId) &&
-                <Col>
-                    <StudentDetails student={student} student_id={studentId} />
-                </Col>
+                (student.length) ?
+                    (<Col>
+                        <StudentDetails student={student} />
+                    </Col>)
+                    : null
             }
         </Row >
     )
