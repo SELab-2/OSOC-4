@@ -54,10 +54,10 @@ const Project = () => {
                             <Button onClick={() => router.back()}>Go back</Button>
                         </Col>
                         <Col>
-                            <h1>{project.name}</h1>
+                            <div className={"project-details-project-title"}>{project.name}</div>
                         </Col>
                         <Col>
-                            {/*TODO make this go to actually edit page*/}
+                            {/*TODO make this actually turn edit on*/}
                             <Button>Edit</Button>
                         </Col>
                         <Col>
@@ -82,23 +82,26 @@ const Project = () => {
                             </Modal>
                         </Col>
                     </Row>
-                    <h2>Project by: {project.partner_name}</h2>
-                    <p>{project.partner_description}</p>
-                    <br/>
-                    <h2>About the project</h2>
-                    <p>{project.description}</p>
 
-                    <br/>
-                    <h3>Assigned staff</h3>
-                    {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
+                    <div className={"project-details-title"} >Project by: {project.partner_name}</div>
+                    <div className={"project-details-subtitle"}>{project.partner_description}</div>
+
+                    <div className={"project-details-title"}>About the project</div>
+                    <div className={"project-details-subtitle"}>{project.description}</div>
+
+                    <div className={"project-details-staff-div"}>
+                        <div className={"project-details-title"}>Assigned staff</div>
+                        {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
+                    </div>
+
                     <Row>
                         <Col>
-                            <h3>Still needed skills:</h3>
+                            <div className={"project-details-title"}>Still needed skills:</div>
                             { (skills.length) ? (skills.map(skill =>
                                 (<SkillCard key={name} name={skill.name} amount={skill.amount} />))): null}
                         </Col>
                         <Col>
-                            <h3>Assigned students</h3>
+                            <div className={"project-card-title"}>Assigned students</div>
                             {(project.participations.length) ?
                                 project.participations.map(participation => (<ParticipationCard key={participation} participation={participation}/>)) :
                                 null

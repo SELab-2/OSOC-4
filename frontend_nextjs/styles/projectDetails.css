@@ -38,3 +38,23 @@
     text-align: center;
     margin: 5px 15px 5px 15px;
 }
+
+.project-details-title{
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.project-details-subtitle{
+    font-weight: lighter;
+    font-size: 18px;
+}
+
+.project-details-project-title{
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.project-details-staff-div{
+
+}
+

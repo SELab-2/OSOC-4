@@ -54,16 +54,20 @@ export default function ProjectCard(props) {
 
                     <Row>
                         <Col>
-                            <div className={"project-card-title"} >Needed</div>
-                            { (skills.length) ? (skills.map(skill =>
-                                (<SkillCard key={name} name={skill.name} amount={skill.amount} />))): null}
+                            <div className={"project-title-list"}>
+                                <div className={"project-card-title"} >Needed</div>
+                                { (skills.length) ? (skills.map(skill =>
+                                    (<SkillCard key={name} name={skill.name} amount={skill.amount} />))): null}
+                            </div>
                         </Col>
                         <Col>
-                            <div className={"project-card-title"} >The team</div>
-                            {(props.project.participations.length) ?
-                                props.project.participations.map(participation => (<ParticipationCard key={participation} participation={participation}/>)) :
-                                null
-                            }
+                            <div className={"project-title-list"}>
+                                <div className={"project-card-title"} >The team</div>
+                                {(props.project.participations.length) ?
+                                    props.project.participations.map(participation => (<ParticipationCard key={participation} participation={participation}/>)) :
+                                    null
+                                }
+                            </div>
                         </Col>
                     </Row>
                 </Card.Body>
