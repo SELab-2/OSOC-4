@@ -32,8 +32,7 @@ export default function SelectStudents() {
     const [students, setStudents] = useState([]);
     const [studentUrls, setStudentUrls] = useState([]);
 
-    const [visibleStudent, setVisibleStudents] = useState(undefined);
-    const studentId = router.query.studentId
+    const [student, setStudent] = useState(undefined);
 
     // These variables are used to notice if search or filters have changed
     let [search, setSearch] = useState("");
@@ -67,6 +66,15 @@ export default function SelectStudents() {
         }
 
     }, [students, updateFromWebsocket, ws])
+
+    useEffect(() => {
+        if (session) {
+            if (student && student["id_int"] != router.query.studentId) {
+
+            }
+
+        }
+    }, [router.query.studentId])
 
     useEffect(() => {
         if (session) {
@@ -124,6 +132,11 @@ export default function SelectStudents() {
                 return true; // stop searching
             }
         });
+        if (student) {
+            let new_student = student
+            new_student["suggestions"][data["id"]] = data["suggestion"];
+            setStudent(new_student)
+        }
     }
 
     function filterStudentsFilters(filteredStudents) {
@@ -187,49 +200,49 @@ export default function SelectStudents() {
             {(width > 800 || !studentId) &&
 
                 <Col className="nomargin student-list-positioning">
-                        <Row className="nomargin">
-                            {!((width > 1500) || (width > 1000 && !studentId)) &&
-                                <Col md="auto">
-                                    <div className="hamburger">
-                                        <HamburgerMenu
-                                            isOpen={showFilter}
-                                            menuClicked={() => setShowFilter(!showFilter)}
-                                            width={18}
-                                            height={15}
-                                            strokeWidth={1}
-                                            rotate={0}
-                                            color='black'
-                                            borderRadius={0}
-                                            animationDuration={0.5}
-                                        />
-                                    </div>
-                                </Col>
+                    <Row className="nomargin">
+                        {!((width > 1500) || (width > 1000 && !studentId)) &&
+                            <Col md="auto">
+                                <div className="hamburger">
+                                    <HamburgerMenu
+                                        isOpen={showFilter}
+                                        menuClicked={() => setShowFilter(!showFilter)}
+                                        width={18}
+                                        height={15}
+                                        strokeWidth={1}
+                                        rotate={0}
+                                        color='black'
+                                        borderRadius={0}
+                                        animationDuration={0.5}
+                                    />
+                                </div>
+                            </Col>
 
+                        }
+                        <Col><SearchSortBar /></Col>
+                    </Row>
+                    <Row className="infinite-scroll">
+                        <InfiniteScroll
+                            style={{
+                                "height": "calc(100vh - 146px)",
+                            }}
+                            dataLength={students.length} //This is important field to render the next data
+                            next={fetchData}
+                            hasMore={studentUrls.length > 0}
+                            loader={<h4>Loading...</h4>}
+                            endMessage={
+                                <p style={{ textAlign: 'center' }}>
+                                    <b>Yay! You have seen it all</b>
+                                </p>
                             }
-                            <Col><SearchSortBar /></Col>
-                        </Row>
-                        <Row className="infinite-scroll">
-                            <InfiniteScroll
-                              style={{
-                                  "height": "calc(100vh - 146px)",
-                              }}
-                              dataLength={students.length} //This is important field to render the next data
-                              next={fetchData}
-                              hasMore={studentUrls.length > 0}
-                              loader={<h4>Loading...</h4>}
-                              endMessage={
-                                  <p style={{ textAlign: 'center' }}>
-                                      <b>Yay! You have seen it all</b>
-                                  </p>
-                              }
-                            >
-                                {students.map((i, index) => (
+                        >
+                            {students.map((i, index) => (
 
-                                  <StudentListelement key={index} student={i} />
+                                <StudentListelement key={index} student={i} />
 
-                                ))}
-                            </InfiniteScroll>
-                        </Row>
+                            ))}
+                        </InfiniteScroll>
+                    </Row>
                 </Col>
 
             }
@@ -237,7 +250,7 @@ export default function SelectStudents() {
             {
                 (studentId) &&
                 <Col>
-                    <StudentDetails student={getStudentById()} student_id={studentId} />
+                    <StudentDetails student={student} student_id={studentId} />
                 </Col>
             }
         </Row >

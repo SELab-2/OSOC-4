@@ -66,6 +66,7 @@ export default function StudentDetails(props) {
 
             // Fill in the decisions field, this contains the decision for the student if there is one,
             setDecision(res["decision"])
+            setDecideField(res["decision"])
 
             // Fill in the questionAnswers
             Url.fromUrl(res["question-answers"]).get().then(res => {
@@ -78,6 +79,7 @@ export default function StudentDetails(props) {
       else {
         setStudent(props.student);
         setDecision(props.student["decision"])
+        setDecideField(props.student["decision"])
         setSuggestions(props.student["suggestions"]);
 
 
@@ -147,6 +149,10 @@ export default function StudentDetails(props) {
     }));
   }
 
+  function updateDecision(decision) {
+
+  }
+
   // returns the html for student details
   return (
     <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)", visibility: props.visibility }} >
@@ -196,7 +202,7 @@ export default function StudentDetails(props) {
           <Row>
             <Col>
               <select className="dropdown-decision" id="dropdown-decision"
-                onChange={(ev) => setDecideField(ev.target.value)} value={decision}>
+                onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
                 <option value={-1}>Undecided</option>
                 <option value={0}>No</option>
                 <option value={1}>Maybe</option>
@@ -204,7 +210,7 @@ export default function StudentDetails(props) {
               </select>
             </Col>
             <Col md="auto">
-              <Button className="suggest-confirm-button" disabled={decideField < 0} onClick={() => setDecisionPopUpShow(true)}>
+              <Button className="suggest-confirm-button" disabled={decideField == decision} onClick={() => setDecisionPopUpShow(true)}>
                 Confirm
               </Button>
             </Col>
