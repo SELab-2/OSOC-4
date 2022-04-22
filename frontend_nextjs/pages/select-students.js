@@ -110,22 +110,42 @@ export default function SelectStudents() {
 
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
-        students.find((o, i) => {
-            if (o["id"] === data["suggestion"]["student_id"]) {
-                let new_students = [...students]
-                new_students[i]["suggestions"][data["id"]] = data["suggestion"];
-                setStudents(new_students);
-                return true; // stop searching
+        if ("suggestion" in data) {
+            students.find((o, i) => {
+                if (o["id"] === data["suggestion"]["student_id"]) {
+                    let new_students = [...students]
+                    new_students[i]["suggestions"][data["id"]] = data["suggestion"];
+                    if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
+                        new_students[i]["own_suggestion"] = data["suggestion"];
+                    }
+                    setStudents(new_students);
+                    return true; // stop searching
+                }
+            });
+            if (student && student["id"] == data["suggestion"]["student_id"]) {
+                let new_student = student
+                new_student["suggestions"][data["id"]] = data["suggestion"];
+                if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
+                    new_student["own_suggestion"] = data["suggestion"];
+                }
+                setStudent({ ...new_student })
             }
-        });
-        if (student) {
-            let new_student = student
-            new_student["suggestions"][data["id"]] = data["suggestion"];
-            if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
-                new_student["own_suggestion"] = data["suggestion"];
+        } else if ("decision" in data) {
+            students.find((o, i) => {
+                if (o["id_int"] === data["id"]) {
+                    let new_students = [...students]
+                    new_students[i]["decision"] = data["decision"]["decision"];
+                    setStudents(new_students);
+                    return true; // stop searching
+                }
+            });
+            if (student && student["id_int"] === data["id"]) {
+                let new_student = student
+                new_student["decision"] = data["decision"]["decision"];
+                setStudent({ ...new_student })
             }
-            setStudent({ ...new_student })
         }
+
     }
 
     const fetchData = () => {

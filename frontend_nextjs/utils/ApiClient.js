@@ -97,6 +97,7 @@ export class Url {
             this._headers = await api._headers(context, this._useAuth);
             if (!this._url) { this._url = await api.getUrl(this._name, context); }
             this._url += this._extension;
+            log(this._body)
             log(`API: PATCH ${this._url}`)
             const resp = await axios.patch(this._url, this._body, { "headers": this._headers });
             return { success: true, data: resp.data };
