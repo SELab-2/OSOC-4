@@ -71,6 +71,15 @@ const Project = () => {
                     <h2>About the project</h2>
                     <p>{project.description}</p>
 
+                    <br/>
+                    <Row>
+                        <Col>
+                            <h3>Assigned students</h3>
+                        </Col>
+                        <Col>
+                            <h3>Still needed skills:</h3>
+                        </Col>
+                    </Row>
                     {/*TODO nog iets met user?*/}
                 </div>) : null}
         </div>
