@@ -42,6 +42,9 @@ export default function SelectStudents() {
     // sortby and filters that we filtered for most recently.
     let [search, setSearch] = useState("");
     let [sortby, setSortby] = useState("first name+asc,last name+asc");
+    const [decisions, setDecisions] = useState("");
+    const [skills, setSkills] = useState("");
+
     const [localFilters, setLocalFilters] = useState([0, 0, 0]);
 
     // These constants represent the filters
@@ -73,18 +76,19 @@ export default function SelectStudents() {
     }, [students, updateFromWebsocket, ws])
 
     useEffect(() => {
-        console.log(router.query.sortby)
         if (session) {
 
             // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
             // variables and update the students list. If the list is updated, we change the local filters. This will
             // provoke the second part of useEffect to filter the students again.
-            if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
+            if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills)) {
                 setSearch(router.query.search);
                 setSortby(router.query.sortby);
+                setDecisions(router.query.decision);
+                setSkills(router.query.skills);
 
                 // the urlManager returns the url for the list of students
-                Url.fromName(api.editions_students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+                Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
                     if (res.success) {
                         setLocalFilters([0, 0, 0]);
                         let p1 = res.data.slice(0, 10);
@@ -103,6 +107,7 @@ export default function SelectStudents() {
                                 }
                             })
                         )).then(newstudents => {
+                            console.log(newstudents);
                             setStudents([...newstudents]);
                             setLocalFilters([0, 0, 0]);
                         })
@@ -120,7 +125,7 @@ export default function SelectStudents() {
             //     setVisibleStudents(students);
             // }
         }
-    }, [session, students, studentUrls, router.query.search, router.query.sortby, search, sortby, localFilters, filters, filterStudentsDecision])
+    }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
 
 
     const updateFromWebsocket = (event) => {
@@ -153,23 +158,6 @@ export default function SelectStudents() {
         return filteredStudents;
     }
 
-    /**
-     * This function filters the students for the decision filters (the filters in filters[2]).
-     * @param filteredStudents The list of students that need to be filtered.
-     * @returns {*} The list of students that are allowed by the decision filters.
-     */
-    function filterStudentsDecision(filteredStudents) {
-        let decisionNumbers = filters[2].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
-        if (filters[2].length !== 0) {
-            filteredStudents = filteredStudents.filter(student => {
-                let decisions = Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]);
-                let decisionNumber = (decisions.length === 0) ? -1 : decisions[0]["decision"];
-                return decisionNumbers.includes(decisionNumber);
-            })
-        }
-        return filteredStudents;
-    }
-
     function getStudentById() {
         if (students) {
             return students.find((o, i) => {
@@ -186,7 +174,7 @@ export default function SelectStudents() {
 
         let p1 = studentUrls.slice(0, 10);
         let p2 = studentUrls.slice(10);
-        // 
+
         Promise.all(p1.map(studentUrl =>
             Url.fromUrl(studentUrl).get().then(res => {
                 if (res.success) {
@@ -215,10 +203,7 @@ export default function SelectStudents() {
         <Row>
             {((width > 1500) || (width > 1000 && !studentId)) ?
                 <Col md="auto">
-                    <div style={{ width: "300px" }}>
-                        <StudentsFilters students={students} filters={filters} />
-                    </div>
-
+                    <StudentsFilters students={students} filters={filters} />
                 </Col>
                 :
                 <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
@@ -227,16 +212,10 @@ export default function SelectStudents() {
             }
             {(width > 800 || !studentId) &&
 
-
-                <Col style={{
-                    "border-left-width": "1px",
-                    "border-left-style": "solid",
-                    "border-left-color": "lightgray",
-                }}>
-                    <div>
-                        <Row>
+                <Col className="nomargin student-list-positioning">
+                        <Row className="nomargin">
                             {!((width > 1500) || (width > 1000 && !studentId)) &&
-                                <Col xs="auto">
+                                <Col md="auto">
                                     <div className="hamburger">
                                         <HamburgerMenu
                                             isOpen={showFilter}
@@ -255,28 +234,28 @@ export default function SelectStudents() {
                             }
                             <Col><SearchSortBar /></Col>
                         </Row>
+                        <Row className="infinite-scroll">
+                            <InfiniteScroll
+                              style={{
+                                  "height": "calc(100vh - 146px)",
+                              }}
+                              dataLength={students.length} //This is important field to render the next data
+                              next={fetchData}
+                              hasMore={studentUrls.length > 0}
+                              loader={<h4>Loading...</h4>}
+                              endMessage={
+                                  <p style={{ textAlign: 'center' }}>
+                                      <b>Yay! You have seen it all</b>
+                                  </p>
+                              }
+                            >
+                                {students.map((i, index) => (
 
-                        <InfiniteScroll
-                            style={{
-                                "height": "calc(100vh - 140px)",
-                            }}
-                            dataLength={students.length} //This is important field to render the next data
-                            next={fetchData}
-                            hasMore={studentUrls.length > 0}
-                            loader={<h4>Loading...</h4>}
-                            endMessage={
-                                <p style={{ textAlign: 'center' }}>
-                                    <b>Yay! You have seen it all</b>
-                                </p>
-                            }
-                        >
-                            {students.map((i, index) => (
+                                  <StudentListelement key={index} student={i} />
 
-                                <StudentListelement key={index} student={i} />
-
-                            ))}
-                        </InfiniteScroll>
-                    </div>
+                                ))}
+                            </InfiniteScroll>
+                        </Row>
                 </Col>
 
             }

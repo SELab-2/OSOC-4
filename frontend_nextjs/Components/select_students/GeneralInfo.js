@@ -1,4 +1,6 @@
 import { Col, Row } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Url} from "../../utils/ApiClient";
 
 /**
  * This element return the basic questions and answers about a student, which questions and answers are shown depends
@@ -11,14 +13,27 @@ import { Col, Row } from "react-bootstrap";
  */
 export default function GeneralInfo(props) {
 
+  const [projects, setProjects] = useState(undefined);
+
+  useEffect(() => {
+    if (! projects && props.student["participations"]) {
+      for (let newProject of props.student["participations"]) {
+        let newProjects = []
+        Url.fromUrl(newProject["project"]).get().then(res => {
+          newProjects = newProjects.concat([res.data["name"]]);
+          setProjects(newProjects);
+        })
+      }
+    }
+  })
+
   /**
    * get the correct questions and answers.
    * @returns {*[]} a list of the questions and answers we want to see.
    */
   function getInfo() {
     if (props.student["suggestions"]) {
-      let decisions = Object.values(props.student["suggestions"]).filter(sugg => sugg["definitive"]);
-      let decision = (decisions.length === 0) ? "Undecided" : ["No", "Maybe", "Yes"][decisions[0]["decision"]];
+      let decision = (props.student.decision === -1) ? "Undecided" : ["No", "Maybe", "Yes"][props.student.decision];
 
       let rows = [];
 
@@ -47,6 +62,15 @@ export default function GeneralInfo(props) {
       }
 
       // add the decision of the student to the general info
+      rows.push(
+        <Row key={"Project"} className="question-answer-row">
+          <Col md="auto" className="info-titles">{"Project"}</Col>
+          <Col md="auto" className="info-answers">
+            {(! projects || projects.length === 0)? "None": projects.join(", ")}
+          </Col>
+        </Row>
+      )
+
       rows.push(
         <Row key={"Decision"} className="question-answer-row">
           <Col md="auto" className="info-titles">{"Decision"}</Col>

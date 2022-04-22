@@ -21,24 +21,7 @@ export function getDecisionString(value) {
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [decision, setDecision] = useState(-1);
-  let prevDecision = -2;
-
   const router = useRouter()
-
-  /**
-   * This function is called when decision is changed
-   */
-  useEffect(() => {
-    if (props.student["suggestions"] && (decision === -2 || prevDecision !== decision)) {
-      // a decision is a suggestion which is definitive
-      let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"])
-      if (decisions) {
-        (decisions.length === 0) ? setDecision(-1) : setDecision(decisions[0]["decision"]);
-        (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
-      }
-    }
-  }, [decision, prevDecision, props.student]);
   
   /**
    * get the list of the skills of the student in HTML format
@@ -57,11 +40,11 @@ export default function StudentListelement(props) {
    * @returns {string} the background color of the student, based on the decision
    */
   function getBackground() {
-    if (decision === -1) {
+    if (props.student.decision === -1) {
       return "white";
     }
     let colors = ["var(--no_red_20)", "var(--maybe_yellow_20)", "var(--yes_green_20)"];
-    return colors[decision];
+    return colors[props.student.decision];
   }
 
   /**
@@ -117,7 +100,7 @@ export default function StudentListelement(props) {
           No practical problems
         </Col>
         <Col />
-        <Col xs="auto">
+        <Col xs="auto" className="nopadding">
           <Row xs="auto" className="nomargin">
             <Col className="suggestions" xs="auto">Suggestions:</Col>
             <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
@@ -126,7 +109,7 @@ export default function StudentListelement(props) {
       </Row>
 
       <Row id="info" className="info">
-        <GeneralInfo listelement={true} student={props.student} decision={getDecisionString(decision)} />
+        <GeneralInfo listelement={true} student={props.student} decision={getDecisionString(props.student.decision)} />
         <Col id="skills" align="right" className="skills" sm="auto">
           <ul>
             {getSkills()}

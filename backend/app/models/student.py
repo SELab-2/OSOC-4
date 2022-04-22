@@ -1,12 +1,21 @@
+from enum import Enum
 from typing import List, Optional
 
 from app.config import config
 from app.models.edition import Edition
 from app.models.participation import Participation
 from app.models.question_answer import QuestionAnswer
+from app.models.skill import Skill, StudentSkill
 from app.models.suggestion import Suggestion
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
+
+
+class DecisionOption(int, Enum):
+    UNDECIDED = -1
+    NO = 0
+    MAYBE = 1
+    YES = 2
 
 
 class Student(SQLModel, table=True):
@@ -14,22 +23,13 @@ class Student(SQLModel, table=True):
     edition_year: Optional[int] = Field(default=None, foreign_key="edition.year")
     edition: Optional[Edition] = Relationship(back_populates="students")
 
+    decision: Optional[DecisionOption] = DecisionOption.UNDECIDED
+
     suggestions: List[Suggestion] = Relationship(back_populates="student")
     participations: List[Participation] = Relationship(back_populates="student")
     question_answers: List[QuestionAnswer] = Relationship(back_populates="student")
 
-    # email: str
-    # name: str
-    # nickname: Optional[str] = ""
-    # phone_number: str
-    # alumn = False
-    # cv: str
-    # question_answers: List[int]
-    # skills: List[int]  # role from skill.py
-    # edition: int
-
-    # __ts_vector__ = Column(TSVector(), Computed("to_tsvector('english', name || ' ' || email || ' ' || nickname)", persisted=True))
-    # __table_args__ = (Index('ix_student___ts_vector__', __ts_vector__, postgresql_using='gin'), )
+    skills: List[Skill] = Relationship(back_populates="students", link_model=StudentSkill)
 
 
 class StudentOutSimple(BaseModel):

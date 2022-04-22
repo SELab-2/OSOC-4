@@ -3,9 +3,8 @@
     border-style: solid;
     border-color: lightgray;
     border-radius: 7px;
-    margin: 15px auto;
-    padding: 10px;
-    width: 96%;
+    margin: 7px 0 7px 0;
+    padding: 10px 12px 10px 10px;
 }
 
 .name {

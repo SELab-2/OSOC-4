@@ -47,7 +47,7 @@ export default function SearchSortBar() {
    * return html representation of the suggestion counts for a student
    */
   return (
-    <Row className="searchbar-row">
+    <Row className="nomargin">
       <Col>
         <Form onSubmit={ev => {
           ev.preventDefault();
@@ -78,6 +78,8 @@ export default function SearchSortBar() {
           onChange={(ev) => sort(ev.target.value)}>
           <option value={"first name+asc,last name+asc"}>Name A-Z</option>
           <option value={"first name+dc,last name+desc"}>Name Z-A</option>
+          <option value={"id+asc"}>Old-New</option>
+          <option value={"id+desc"}>New-Old</option>
         </select>
       </Col>
     </Row>
