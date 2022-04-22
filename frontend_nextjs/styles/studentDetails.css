@@ -7,27 +7,42 @@
     width: 80px;
     -webkit-text-fill-color: black;
     margin: 8px 4px;
-    border-width: 0;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    border-radius: 3px;
+    border-width: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-radius: 5px;
+    transition-duration: 0.4s;
 }
 
-.suggest-button-selected {
-    border-width: 4px;
-    border-color: black;
+.bold_text {
+    font-weight: bold;
 }
 
 .suggest-yes-button {
     background-color: var(--yes_green_65);
+    border-color: var(--yes_green_45);
+}
+
+.suggest-yes-button:hover {
+    background-color: var(--yes_green_45);
 }
 
 .suggest-maybe-button {
     background-color: var(--maybe_yellow_65);
+    border-color: var(--maybe_yellow_45);
+}
+
+.suggest-maybe-button:hover {
+    background-color: var(--maybe_yellow_45);
 }
 
 .suggest-no-button {
     background-color: var(--no_red_65);
+    border-color: var(--no_red_45);
+}
+
+.suggest-no-button:hover {
+    background-color: var(--no_red_45);
 }
 
 .suggest-confirm-button {

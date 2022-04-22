@@ -4,7 +4,14 @@ import StudentsFilter from "./StudentFilter";
 import { useRouter } from "next/router";
 import { api, Url } from "../../utils/ApiClient";
 
-// this function adds or removes a skill from the filters, this function is also used in EmailStudentsFilters
+/**
+   * this function adds or removes a filter from the filters, the changes are made in the url.
+   * @param query The old query of the url.
+   * @param filter The name of the filter category from which the filter must be added/removed.
+   * @param startItems The current filters in the filter chosen filter category.
+   * @param itemName The name of the filter that must be added or removed.
+   * @param value True if the filter must be added, False if it must be removed.
+   */
 export function addFilterGlobal(query, filter, startItems, itemName, value) {
   let newQuery = query;
   let newItems = startItems;
@@ -29,6 +36,7 @@ export default function StudentsFilters(props) {
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [allSkills, setAllSkills] = useState([]);
 
+  // These variables represent the filters of the different categories
   const filters = props.filters[0];
   const chosenSkills = props.filters[1];
   const decision = props.filters[2];
@@ -45,7 +53,10 @@ export default function StudentsFilters(props) {
     })
   }, [])
 
-  // called when pressed on "reset filters"
+  /**
+   * This function is called when pressed on "reset filters", it resets the filters to their original values.
+   * The changes are made to the url.
+   */
   function resetFilters() {
     let newQuery = router.query;
     delete newQuery["filters"];
@@ -57,18 +68,26 @@ export default function StudentsFilters(props) {
     }, undefined, { shallow: true })
   }
 
-  // this function makes all the roles visible
+  /**
+   * this function makes all the skills visible
+   */
   const showMore = () => {
     setExtendedRoleList(true);
   }
 
-  // this function makes only 5 roles visible
+  /**
+   * this function makes only 5 skills visible
+   */
   const showLess = () => {
     setExtendedRoleList(false);
   }
 
-  // returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
-  // list depending on extendedRoleList
+  /**
+   * returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
+   * list are rendered depending on extendedRoleList.
+   * @returns {unknown[]|null} A list of html StudentFilters, which represents the skills of students, only 5 elements
+   * or the whole list are returned depending on extendedRoleList.
+   */
   function getSkills() {
     if (allSkills) {
       let shownSkills = allSkills;
@@ -86,7 +105,11 @@ export default function StudentsFilters(props) {
     return null;
   }
 
-  // returns the html representation for the 'more or less' button, the button to show more or less skills
+  /**
+   * get the html representation for the 'more or less' button, the button to show more or less skills.
+   * @returns {JSX.Element} The html representation for the 'more or less' button, the button to show more or less
+   * skills.
+   */
   function moreOrLessButton() {
     if (extendedRoleList) {
       return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
@@ -94,7 +117,13 @@ export default function StudentsFilters(props) {
     return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
   }
 
-  // this function adds or removes a skill from the filters
+  /**
+   * this function adds or removes a filter from the filters, the changes are made in the url.
+   * @param filter The name of the filter category from which the filter must be added/removed.
+   * @param startItems The current filters in the filter chosen filter category.
+   * @param itemName The name of the filter that must be added or removed.
+   * @param value True if the filter must be added, False if it must be removed.
+   */
   function addFilter(filter, startItems, itemName, value) {
     let newQuery = addFilterGlobal(router.query, filter, startItems, itemName, value)
     router.push({
@@ -103,7 +132,9 @@ export default function StudentsFilters(props) {
     }, undefined, { shallow: true })
   }
 
-  // The HTML representation of the filters in the 'Select students' tab
+  /**
+   * The HTML representation of the filters in the 'Select students' tab
+   */
   return (
     <Col md="auto" className="filters fill_height scroll-overflow">
       <Row className="title-row-filters">

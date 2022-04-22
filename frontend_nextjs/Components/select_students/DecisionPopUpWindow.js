@@ -3,19 +3,30 @@ import { useState } from "react";
 import { getDecisionString } from "./StudentListelement";
 import { Url } from "../../utils/ApiClient";
 
-// This view shows the pop up window when making a decision about a student.
+/**
+ * This element shows the pop up window when making a decision about a student.
+ * @param props props has the fields popUpShow, setPopUpShow, decision and student. popUpShow decided the visibility of
+ * the pop up window. setPopUpShow is used to change popUpShow. decision is the decision we want to make for the
+ * student. student is the student we want to make a decision for.
+ * @returns {JSX.Element} An element that renders the pop-up window when making a decision about a student.
+ * @constructor
+ */
 export default function DecisionPopUpWindow(props) {
 
   // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
   const [textAreaDisabled, setTextAreaDisabled] = useState(true);
 
-  // called when the pop up window is closed
+  /**
+   * This function is called when the pop up window is closed.
+   */
   function onHide() {
     setPopUpShow(false);
   }
 
-  // called on submitting the decision
+  /**
+   * This functin is called on submitting the decision.
+   */
   function submitDecision() {
 
     console.log(props.decision)
@@ -30,7 +41,10 @@ export default function DecisionPopUpWindow(props) {
 
   }
 
-  // returns "disabled-text" if the text area should be disabled
+  /**
+   * This function returns "disabled-text" if the text area should be disabled.
+   * @returns {string} "disabled-text" if the text area should be disabled.
+   */
   function getTextClassName() {
     if (textAreaDisabled) {
       return "disabled-text";
@@ -38,7 +52,9 @@ export default function DecisionPopUpWindow(props) {
     return "";
   }
 
-  // returns the html representation for the pop up window
+  /**
+   * returns the html representation for the pop-up window
+   */
   return (
     <Modal
       show={popUpShow}
