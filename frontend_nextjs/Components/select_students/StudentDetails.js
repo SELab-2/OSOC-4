@@ -20,10 +20,15 @@ import { api, Url } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 
-// This function returns the details of a student
+/**
+ * This component returns the details of a student
+ * @param props props has the field studentId. The studentId holds the url of the student
+ * @returns {JSX.Element} The component that renders the student details
+ */
 export default function StudentDetails(props) {
 
   const router = useRouter();
+
   // These constants are initialized empty, the data will be inserted in useEffect
   // These constants contain info about the student
   const [student, setStudent] = useState({});
@@ -44,7 +49,9 @@ export default function StudentDetails(props) {
 
   const { data: session, status } = useSession()
 
-  // This function inserts the data in the variables
+  /**
+   * This function is called when studentId or props.student_id is changed
+   */
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
@@ -92,12 +99,23 @@ export default function StudentDetails(props) {
   }, [studentId, props.student_id, props.student, session]);
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
+  /**
+   * This function counts the amount of suggestions for a certain value: "yes", "maybe", or "no".
+   * @param decision De type of suggestions that need to be counted ("yes", "maybe", or "no").
+   * @returns {number} The amount of suggestions of the given type for the student.
+   */
   function getSuggestionsCount(decision) {
     return Object.values(suggestions).filter(suggestion => suggestion["decision"] === decision).length;
   }
 
   // returns a list of html suggestions, with the correct css classes.
   // If there are no suggestions: this returns "No suggestions"
+  /**
+   * This function generates a list of html suggestions, with the correct css classes.
+   * If there ar no suggestions this function returns "No suggestions".
+   * @returns {JSX.Element|*[]} A list of html suggestions, with the correct css classes.
+   * If there ar no suggestions this function returns "No suggestions".
+   */
   function getSuggestions() {
     let result = [];
     const classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
@@ -114,14 +132,20 @@ export default function StudentDetails(props) {
     return <Row>No suggestions</Row>
   }
 
-  // called when you click on 'suggest yes', 'suggest maybe' or 'suggest no', it will show the correct pop-up window
+  /**
+   * This function is called when you click on 'suggest yes', 'suggest maybe' or 'suggest no', it will show the correct
+   * pop-up window.
+   * @param suggestion "yes", "maybe" or "no", depending on which button is clicked.
+   */
   function suggest(suggestion) {
     setSuggestion(suggestion);
     setSuggestionPopUpShow(true);
   }
 
-  // this function is called when the student details are closed, it will go back to the student list with filters,
-  // without reloading the page
+  /**
+   * This function is called when the student details are closed, it will go back to the studetn list with filters,
+   * without reloading the page
+   */
   function hideStudentDetails() {
     let newQuery = router.query;
     delete newQuery["studentId"];
@@ -131,6 +155,10 @@ export default function StudentDetails(props) {
     }, undefined, { shallow: true })
   }
 
+  /**
+   * This function renders the (question, answer) pairs from the tally form that don't have a questionTag.
+   * @returns {JSX.Element[][]} A list of (question, answer) pairs from the tally form that don't have a questionTag.
+   */
   function getQuestionAnswers() {
     return questionAnswers.map((questionAnswer, i) =>
       [
@@ -147,7 +175,9 @@ export default function StudentDetails(props) {
     }));
   }
 
-  // returns the html for student details
+  /**
+   * returns the html for student details
+   */
   return (
     <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)", visibility: props.visibility }} >
 

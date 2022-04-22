@@ -24,7 +24,10 @@ export function filterStudents(filterFunctions, students, localFilters, filters,
     setVisibleStudents(filteredStudents);
 }
 
-// The page corresponding with the 'select students' tab
+/**
+ * The page corresponding with the 'select students' tab.
+ * @returns {JSX.Element} A component corresponding with the 'select students' tab.
+ */
 export default function SelectStudents() {
     const router = useRouter();
 
@@ -35,7 +38,8 @@ export default function SelectStudents() {
     const [visibleStudent, setVisibleStudents] = useState(undefined);
     const studentId = router.query.studentId
 
-    // These variables are used to notice if search or filters have changed
+    // These variables are used to notice if search or filters have changed, they will have the values of search,
+    // sortby and filters that we filtered for most recently.
     let [search, setSearch] = useState("");
     let [sortby, setSortby] = useState("first name+asc,last name+asc");
     const [decisions, setDecisions] = useState("");
@@ -48,14 +52,17 @@ export default function SelectStudents() {
     (router.query.skills) ? router.query.skills.split(",") : [],
     (router.query.decision) ? router.query.decision.split(",") : []]
 
-    const [ws, setWs] = useState(undefined);
 
-    // This function inserts the data in the variables
+    const [ws, setWs] = useState(undefined);
+  
     const { data: session, status } = useSession()
     const { height, width } = useWindowDimensions();
 
     const [showFilter, setShowFilter] = useState(false);
 
+    /**
+     * This function is called when students, router.query.sortby, router.query.search or filters is changed
+     */
     useEffect(() => {
         if (ws) {
             ws.onmessage = (event) => updateFromWebsocket(event);
@@ -70,6 +77,10 @@ export default function SelectStudents() {
 
     useEffect(() => {
         if (session) {
+
+            // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
+            // variables and update the students list. If the list is updated, we change the local filters. This will
+            // provoke the second part of useEffect to filter the students again.
             if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills)) {
                 setSearch(router.query.search);
                 setSortby(router.query.sortby);
@@ -103,6 +114,8 @@ export default function SelectStudents() {
                     }
                 });
             }
+            // Check if the real filters have changed from the local filters. If so, update the local filters and
+            // filter the students.
             // if (students &&
             //     (localFilters.some((filter, index) => filter !== filters[index].length))) {
             //     let filterFunctions = [filterStudentsFilters, filterStudentsSkills, filterStudentsDecision];
@@ -113,6 +126,7 @@ export default function SelectStudents() {
             // }
         }
     }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
+
 
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
@@ -126,10 +140,20 @@ export default function SelectStudents() {
         });
     }
 
+    /**
+     * This function filters the students for the general filters (the filters in filters[0]).
+     * @param filteredStudents The list of students that need to be filtered.
+     * @returns {*} The list of students that are allowed by the general filters.
+     */
     function filterStudentsFilters(filteredStudents) {
         return filteredStudents;
     }
 
+    /**
+     * This function filters the students for the skills filters (the filters in filters[1]).
+     * @param filteredStudents The list of students that need to be filtered.
+     * @returns {*} The list of students that are allowed by the skills filters.
+     */
     function filterStudentsSkills(filteredStudents) {
         return filteredStudents;
     }
@@ -171,7 +195,9 @@ export default function SelectStudents() {
 
 
 
-    // the html that displays the overview of students
+    /**
+     * The html that displays the overview of students
+     */
     return (
 
         <Row>
