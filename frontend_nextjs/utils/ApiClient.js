@@ -191,11 +191,18 @@ class API {
         return this._paths[name];
     }
 
+    async getConflicts(){
+        if (! this._conflicts) { await this._setConflicts();}
+        return this._conflicts;
+    }
+
     async _setup(context = null) {
         log("Engine:setup");
         try {
             const session = await this._session(context);
             if (!session) { throw Error("Engine:_setup: session is undefined"); }
+
+
 
             // set up all urls
             const headers = await this._headers(context);
@@ -231,6 +238,27 @@ class API {
         this.invalidate();
     }
 
+    async _setStudents() {
+        await this._setCurrentEdition();
+    }
+
+    async _setProjects() {
+        await this._setCurrentEdition();
+    }
+
+    async _setQuestionTags() {
+        await this._setCurrentEdition();
+    }
+
+    //TODO make this not hardcoded
+    async _setSkills(){
+        this._skills = "/skills"
+    }
+
+    async _setConflicts(){
+        if(! this._editions) {await this._setCurrentEdition();}
+        this._conflicts = this._current_edition + "/resolving_conflicts"
+    }
 }
 
 export const api = new API();

@@ -26,8 +26,7 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
         student=student,
         suggested_by=choice(coaches),
         project=project,
-        skill=choice(student_skills),
-        definitive=False) for _ in range(unconfirmed)]
+        skill=choice(student_skills)) for _ in range(unconfirmed)]
 
     if confirmed_suggestion is not None and admin is not None:
         suggestions.append(Suggestion(
@@ -37,8 +36,7 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
             student=student,
             suggested_by=admin,
             project=project,
-            skill=choice(student_skills),
-            definitive=True))
+            skill=choice(student_skills)))
 
     return suggestions
 
@@ -108,7 +106,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         skill=skill)
         for skill in sample(skills, k=randrange(3, len(skills)))]
 
-    student_generator = StudentGenerator(session, edition)
+    student_generator = StudentGenerator(session, edition, skills)
     # generate students without suggestions
     student_generator.generate_students(3)
 

@@ -1,84 +1,19 @@
-import React, {useEffect, useState} from "react";
-import ProjectCard from "../Components/ProjectCard";
-import {Button, Card, Col, Form, Row} from "react-bootstrap";
-import {useRouter} from "next/router";
-import {api, Url} from "../utils/ApiClient";
+import React from "react";
+import {Button, Card, Col, Container, Form, Row} from "react-bootstrap";
+import ProjectsList from "../Components/projects/ProjectsList";
+import ProjectCard from "../Components/projects/ProjectCard";
 
-export default function Projects(props) {
-    const [allProjects, setAllProjects] = useState([])
-    const [loaded, setLoaded] = useState(false)
-    const [search, handleSearch] = useState("")
-    const [peopleNeeded, setPeopleNeeded] = useState(false)
-    const [visibleProjects, setVisibleProjects] = useState([])
-
-    const router = useRouter()
-
-    useEffect(() => {
-        if (! allProjects.length && ! loaded) {
-            Url.fromName(api.edition_projects).get().then(res => {
-                if (res.success) {
-                    const projects = res.data;
-                    for (let p of projects) {
-                        Url.fromUrl(p).get().then(async project => {
-                            if (project.success) {
-                                project = project.data;
-                                if (project) {
-                                    await setAllProjects(prevState => [...prevState, project]);
-                                    // TODO clean this up (currently only works if updated here
-                                    await setVisibleProjects(prevState => [...prevState, project]);
-                                }
-                            }
-                        });
-                    }
-                    setLoaded(true);
-                }
-            })
-        }
-    })
-
-    async function handleSearchSubmit(event) {
-        event.preventDefault();
-        setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
-    }
-
-    async function changePeopleNeeded(event){
-        event.preventDefault()
-        setPeopleNeeded(event.target.checked)
-    }
-
-    const handleNewProject = () => {
-        router.push("/new-project")
-    }
+export default function Projects() {
 
     return(
-        <div>
-            <Row>
-                <Col>
-                    <Form onSubmit={handleSearchSubmit}>
-                        <Form.Group controlId="searchProjects">
-                            <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
-                        </Form.Group>
-                    </Form>
-                </Col>
-                <Col>
-                    <Card>
-                        2 conflicts
-                    </Card>
-                </Col>
-                <Col>
-                    <Button onClick={handleNewProject}>New project</Button>
-                </Col>
-                <Col>
-                    <Form>
-                        <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                    </Form>
-                </Col>
-            </Row>
-            <div>
-                {
-                    visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
-                }
-            </div>
-        </div>
+        <Row className="remaining_height fill_width">
+            <Col className="fill_height">
+                Students
+            </Col>
+            <Col className="fill_height">
+                <ProjectsList/>
+            </Col>
+        </Row>
+    // Url.fromName(api.edition_projects)
     )
 }

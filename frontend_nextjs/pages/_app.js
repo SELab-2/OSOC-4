@@ -12,6 +12,7 @@ import "../styles/filters.css"
 import "../styles/navheader.css"
 import "../styles/studentDetails.css"
 import "../styles/emailStudents.css"
+import "../styles/projects.css"
 
 import { ThemeProvider } from "react-bootstrap";
 import { SessionProvider } from 'next-auth/react';

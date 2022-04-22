@@ -35,12 +35,7 @@
 
 .close-button {
     margin-top: 3px;
-}
-
-.searchbar-row {
-    margin-top: 12px;
-    margin-left: 18px;
-    margin-right: 19px;
+    padding: 0;
 }
 
 .remaining-height-searchbar {
@@ -69,11 +64,9 @@
 }
 
 .student-list-positioning {
-    position: absolute;
-    top: 60px;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    margin-left: 25px;
+    margin-right: 10px;
+    margin-top: 20px;
 }
 
 .search-button {
@@ -91,6 +84,10 @@
 }
 
 .hamburger {
-    margin-top: 22px;
-    margin-left: 2px;
+    margin-right: 20px;
+    margin-top: 10px
+}
+
+.infinite-scroll {
+    margin-right: 0;
 }
