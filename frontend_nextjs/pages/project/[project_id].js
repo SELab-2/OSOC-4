@@ -2,6 +2,9 @@ import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
+import AdminCard from "../../Components/projects/AdminCard";
+import SkillCard from "../../Components/projects/SkillCard";
+import ParticipationCard from "../../Components/projects/ParticipationCard";
 
 const Project = () => {
     const router = useRouter()
@@ -9,7 +12,7 @@ const Project = () => {
     const [loaded, setLoaded] = useState(false)
     const [project, setProject] = useState(undefined)
     const [showDelete, setShowDelete] = useState(false);
-
+    const [skills, setSkills] = useState([])
 
     useEffect(() => {
         if (! loaded) {
@@ -18,6 +21,20 @@ const Project = () => {
                 if (res.success) {
                     setProject(res.data)
                     setLoaded(true)
+                    let temp_dict = {}
+
+                    res.data.required_skills.map(skill => {
+                        temp_dict[skill.skill_name] = skill.number
+                    })
+
+                    res.data.participations.map(participation => {
+                        temp_dict[participation.skill] = temp_dict[participation.skill] - 1;
+                    })
+                    // let temp_list = []
+                    Object.keys(temp_dict).map(async name => {
+                        await setSkills(prevState => [...prevState, {"amount": temp_dict[name], "name": name}])
+                    })
+                    // setSkills(temp_list)
                 }
             });
         }
@@ -72,12 +89,20 @@ const Project = () => {
                     <p>{project.description}</p>
 
                     <br/>
+                    <h3>Assigned staff</h3>
+                    {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
                     <Row>
                         <Col>
-                            <h3>Assigned students</h3>
+                            <h3>Still needed skills:</h3>
+                            { (skills.length) ? (skills.map(skill =>
+                                (<SkillCard key={name} name={skill.name} amount={skill.amount} />))): null}
                         </Col>
                         <Col>
-                            <h3>Still needed skills:</h3>
+                            <h3>Assigned students</h3>
+                            {(project.participations.length) ?
+                                project.participations.map(participation => (<ParticipationCard key={participation} participation={participation}/>)) :
+                                null
+                            }
                         </Col>
                     </Row>
                     {/*TODO nog iets met user?*/}

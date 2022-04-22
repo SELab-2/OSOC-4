@@ -26,28 +26,25 @@ export default function ProjectCard(props) {
         props.project.required_skills.map(skill => {
             temp_dict[skill.skill_name] = skill.number
         })
-        console.log(temp_dict)
 
         props.project.participations.map(participation => {
             temp_dict[participation.skill] = temp_dict[participation.skill] - 1 ;
         })
-        console.log(temp_dict)
         let temp_list = []
         Object.keys(temp_dict).map(name => {
             temp_list.push({"amount": temp_dict[name], "name": name})
             // setSkills(prevState => [...prevState, {"amount": temp_dict[name], "name": name}])
         })
-        console.log(temp_list)
         setSkills(temp_list)
-        console.log(skills)
     }, [])
 
     return(
         <div className="align-content-center">
-            <Card onClick={handleProjectClick}  className="card">
-                <Card.Title> {props.project.name}</Card.Title>
-                {/*todo make this clickable with link to partner?*/}
+            <Card className="card">
+                {/*TODO give clickable css thing*/}
+                <Card.Title onClick={handleProjectClick}> {props.project.name}</Card.Title>
                 <Card.Subtitle>{props.project.partner_name}</Card.Subtitle>
+                {/*todo make this clickable with link to partner?*/}
                 <Card.Body>
                     <Row>
                         {(props.project.users.length) ? props.project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }

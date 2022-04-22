@@ -1,0 +1,6 @@
+.skills-card{
+    background-color: var(--background-gray);
+    font-size: 18px;
+    text-align: center;
+    margin: 5px 15px 5px 15px;
+}
