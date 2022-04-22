@@ -166,7 +166,9 @@ export default function StudentListAndFilters(props) {
 
     (width > 800 || (!props.studentId && props.studentsTab)) &&
 
-    <Col className="nomargin student-list-positioning" key="studentList" md={(props.studentsTab)? "": "auto"}>
+    <div className={(props.studentsTab)? "col nomargin student-list-positioning":
+      ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
+        "col-4 nomargin student-list-positioning": "col-5 nomargin student-list-positioning"} key="studentList" >
       <Row className="nomargin">
         {!((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) &&
           <Col md="auto">
@@ -210,7 +212,7 @@ export default function StudentListAndFilters(props) {
           ))}
         </InfiniteScroll>
       </Row>
-    </Col>
+    </div>
 
   ]
 }
