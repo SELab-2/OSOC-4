@@ -107,7 +107,6 @@ export default function SelectStudents() {
                                 }
                             })
                         )).then(newstudents => {
-                            console.log(newstudents);
                             setStudents([...newstudents]);
                             setLocalFilters([0, 0, 0]);
                         })

@@ -35,7 +35,7 @@ export default function Suggestion(props) {
   return (
     <Row>
       <Col md="auto" className={props.classNames}/>
-      <Col>{suggestedBy + ": " + props.suggestion["reason"]}</Col>
+      <Col className={props.classNamesText}>{suggestedBy + ": " + props.suggestion["reason"]}</Col>
     </Row>
   )
 }

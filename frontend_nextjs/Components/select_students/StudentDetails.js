@@ -123,7 +123,9 @@ export default function StudentDetails(props) {
     for (let i = 0; i < Object.values(suggestions).length; i++) {
       let suggestion = Object.values(suggestions)[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
-      result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames} />)
+      result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}
+                              classNamesText={(suggestion["suggested_by_id"] === session["userid"])?
+                                "bold_text": "null"}/>)
     }
 
     if (result.length > 0) {
@@ -210,17 +212,18 @@ export default function StudentDetails(props) {
         <Col />
         <Col xs="auto" className="buttongroup-paddingtop">
           <Row>
-            <Col xs="auto" className="nopadding"><button className={`suggest-yes-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 2 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(2)}>
-              Yes</button>
+            <Col xs="auto" className="nopadding">
+              <button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>Yes</button>
             </Col>
-            <Col xs="auto" className="nopadding"><button className={`suggest-maybe-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 1 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(1)}>
-              Maybe</button>
+            <Col xs="auto" className="nopadding">
+              <button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>Maybe</button>
             </Col>
-            <Col xs="auto" className="nopadding"><button className={`suggest-no-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 0 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(0)}>
-              No</button>
+            <Col xs="auto" className="nopadding">
+              <button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>No</button>
             </Col>
             <Col xs="auto" className="close-button">
-              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
+              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
+                     src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
             </Col>
           </Row>
           <Row>
