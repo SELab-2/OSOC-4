@@ -32,7 +32,7 @@ export default function SelectStudents() {
     const [students, setStudents] = useState([]);
     const [studentUrls, setStudentUrls] = useState([]);
 
-    const [student, setStudent] = useState({});
+    const [student, setStudent] = useState(undefined);
 
     // These variables are used to notice if search or filters have changed
     let [search, setSearch] = useState("");
@@ -56,6 +56,7 @@ export default function SelectStudents() {
     const [showFilter, setShowFilter] = useState(false);
 
     useEffect(() => {
+
         if (ws) {
             ws.onmessage = (event) => updateFromWebsocket(event);
         } else {
@@ -68,15 +69,16 @@ export default function SelectStudents() {
     }, [students, updateFromWebsocket, ws])
 
     useEffect(() => {
-        console.log(student)
         if (session && router.query.studentId) {
-            if ((student.length && student["id_int"] !== router.query.studentId) || !student.length) {
+            if ((student && student["id_int"] !== router.query.studentId) || !student) {
                 Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(newstudent => {
-                    let data = newstudent["data"];
+                    const data = newstudent["data"];
                     console.log(data)
-                    setStudent({ ...data })
+                    setStudent(data)
                 })
             }
+        } else {
+            setStudent(undefined);
         }
     }, [router.query.studentId])
 
@@ -118,7 +120,7 @@ export default function SelectStudents() {
                 return true; // stop searching
             }
         });
-        if (student.length) {
+        if (student) {
             let new_student = student
             new_student["suggestions"][data["id"]] = data["suggestion"];
             setStudent(new_student)
@@ -144,7 +146,7 @@ export default function SelectStudents() {
     return (
 
         <Row>
-            {((width > 1500) || (width > 1000 && !student.length)) ?
+            {((width > 1500) || (width > 1000 && !student)) ?
                 <Col md="auto">
                     <StudentsFilters students={students} filters={filters} />
                 </Col>
@@ -153,11 +155,11 @@ export default function SelectStudents() {
                     <StudentsFilters students={students} filters={filters} />
                 </CheeseburgerMenu>
             }
-            {(width > 800 || !student.length) &&
+            {(width > 800 || !student) &&
 
                 <Col className="nomargin student-list-positioning">
                     <Row className="nomargin">
-                        {!((width > 1500) || (width > 1000 && !student.length)) &&
+                        {!((width > 1500) || (width > 1000 && !student)) &&
                             <Col md="auto">
                                 <div className="hamburger">
                                     <HamburgerMenu
@@ -204,7 +206,7 @@ export default function SelectStudents() {
             }
 
             {
-                (student.length) ?
+                (student) ?
                     (<Col>
                         <StudentDetails student={student} />
                     </Col>)

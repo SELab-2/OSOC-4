@@ -43,9 +43,7 @@ export default function StudentDetails(props) {
   // This function inserts the data in the variables
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
-    console.log(props.student)
     if (props.student) {
-      console.log(props.student)
       setStudent(props.student);
       setDecision(props.student["decision"])
       setDecideField(props.student["decision"])
@@ -58,7 +56,7 @@ export default function StudentDetails(props) {
       })
     }
 
-  }, []);
+  }, [props.student]);
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   function getSuggestionsCount(decision) {
