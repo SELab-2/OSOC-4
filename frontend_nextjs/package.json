@@ -6,7 +6,9 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test_watch": "jest --watchAll --verbose"
   },
   "dependencies": {
     "axios": "^0.26.1",
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "eslint": "8.11.0",
-    "eslint-config-next": "12.1.0"
+    "eslint-config-next": "12.1.0",
+    "jest": "^27.5.1"
   }
 }
