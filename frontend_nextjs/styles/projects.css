@@ -4,14 +4,39 @@
     font-weight: bold;
 }
 
+.project-card-div{
+    margin-top: 15px;
+    margin-left: 5px;
+}
+
 .center-component{
     margin-top: 25px;
-    margin-left: 10px;
-    margin-right: 10px;
     align-self: center;
 }
 
 .right-div{
     position:absolute;
     right: 0;
+}
+
+.project-title{
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.partner-title{
+    font-weight: lighter;
+    font-size: 25px;
+    color: var(--gray4);
+}
+
+.project-card-title{
+    font-weight: bold;
+    font-size: 23px;
+    margin-left: 10px;
+}
+
+.card-body{
+    margin-left: 15px;
+    margin-top: 15px;
 }

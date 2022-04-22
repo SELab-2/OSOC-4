@@ -39,24 +39,27 @@ export default function ProjectCard(props) {
     }, [])
 
     return(
-        <div className="align-content-center">
+        <div className="project-card-div">
             <Card className="card">
-                {/*TODO give clickable css thing*/}
-                <Card.Title onClick={handleProjectClick}> {props.project.name}</Card.Title>
-                <Card.Subtitle>{props.project.partner_name}</Card.Subtitle>
-                {/*todo make this clickable with link to partner?*/}
-                <Card.Body>
+                <Card.Body classname={"card-body"}>
+                    <div className={"project-title"} onClick={handleProjectClick}> {props.project.name}</div>
+                    {/*TODO give clickable css thing*/}
+                    <div className={"partner-title"} >{props.project.partner_name}</div>
+                    {/*todo make this clickable with link to partner?*/}
+
+
                     <Row>
                         {(props.project.users.length) ? props.project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
                     </Row>
+
                     <Row>
-                        <Col className={"border-right"}>
-                            <h5>Needed</h5>
+                        <Col>
+                            <div className={"project-card-title"} >Needed</div>
                             { (skills.length) ? (skills.map(skill =>
                                 (<SkillCard key={name} name={skill.name} amount={skill.amount} />))): null}
                         </Col>
                         <Col>
-                            <h5>The team</h5>
+                            <div className={"project-card-title"} >The team</div>
                             {(props.project.participations.length) ?
                                 props.project.participations.map(participation => (<ParticipationCard key={participation} participation={participation}/>)) :
                                 null
