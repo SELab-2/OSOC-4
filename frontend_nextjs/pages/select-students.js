@@ -30,7 +30,7 @@ export default function SelectStudents() {
     const studentId = router.query.studentId
 
     useEffect(() => {
-        setValidStudentId(students.some(student => student["id_int"] == studentId));
+        setValidStudentId(students.some(student => student["id_int"] === parseInt(studentId)));
     }, [students, studentId])
 
 
