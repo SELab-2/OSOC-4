@@ -1,4 +1,4 @@
-import {Url} from "../utils/ApiClient";
+import {Url} from "../../utils/ApiClient";
 
 describe('ApiClient', () => {
     let url
