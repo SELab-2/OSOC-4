@@ -3,7 +3,7 @@ import {log} from "../../utils/logger";
 import {useRouter} from "next/router";
 import SkillCard from "./SkillCard";
 import AdminCard from "./AdminCard";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import ParticipationCard from "./ParticipationCard";
 import Image from 'next/image'
 import details from "/public/assets/details.svg"
@@ -66,17 +66,17 @@ export default function ProjectCard(props) {
                     <Row>
                         <Col>
                             <div className={"project-title-list"}>
-                                <div className={"project-card-title"} >Needed</div>
+                                <div className={"project-card-title"}>Required skills</div>
                                 { (skills.length) ? (skills.map(skill =>
-                                    (<SkillCard key={name} name={skill.name} amount={skill.amount} />))): null}
+                                    (<SkillCard key={`${skill.amount}${skill.name}`} name={skill.name} amount={skill.amount} />))): <div className={"project-empty-list"}>Currently there are no required skills</div>}
                             </div>
                         </Col>
                         <Col>
                             <div className={"project-title-list"}>
-                                <div className={"project-card-title"} >The team</div>
+                                <div className={"project-card-title"}>Assigned students</div>
                                 {(props.project.participations.length) ?
-                                    props.project.participations.map(participation => (<ParticipationCard key={participation} participation={participation}/>)) :
-                                    null
+                                    props.project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
+                                    <div className={"project-empty-list"}>Currently there are no assigned students</div>
                                 }
                             </div>
                         </Col>
