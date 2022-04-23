@@ -1,8 +1,22 @@
 import React, { useEffect, useState } from "react";
-import {Button, Col, Form, Row, Table} from "react-bootstrap";
+import {Button, Form, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
 
+/**
+ * This component displays a settings-screen where you can manage the users in the application
+ * For each user you can see:
+ * - name
+ * - email
+ * - role (Admin or Coach) or approve button (or not yet active)
+ * - revoke access button, which soft deletes a user
+ *      (he won't have access anymore,
+ *      but all action he did (like a suggestion)
+ *      will still be visible that he did that action)
+ *
+ * @param props
+ * @returns {JSX.Element}
+ */
 export default function ManageUsers(props) {
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
@@ -42,6 +56,12 @@ export default function ManageUsers(props) {
         setToInvite(event.target.value)
     }
 
+    /**
+     * This function makes a post request to the api to create a new user with given email address,
+     * after that it makes a post request to invite the (new) user
+     * @param event
+     * @returns {Promise<void>}
+     */
     async function handleSubmitInvite(event) {
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
@@ -67,6 +87,10 @@ export default function ManageUsers(props) {
         "show-inactive": false
     });
 
+    /**
+     * Gets called when a filter gets updated, updates the list of users you can see
+     * @param ev
+     */
     function updateFilters(ev) {
         const temp = {
             "show-all-users": false,

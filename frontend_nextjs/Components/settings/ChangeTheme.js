@@ -1,13 +1,17 @@
-import {Button, Form} from "react-bootstrap";
+import {Form} from "react-bootstrap";
 import React, {useState} from "react";
-import {log} from "../../utils/logger";
 
+/**
+ * This component displays a settings-screen to change the theme of the website.
+ * @returns {JSX.Element}
+ */
 export default function ChangeTheme(props) {
     const [theme, setTheme] = useState('Off')
 
     function handleClick(mode){
         setTheme(mode)
     }
+
     return(
         <div>
             <p className="details-text">Changing the theme can reduces the strain on your eyes. <br/>

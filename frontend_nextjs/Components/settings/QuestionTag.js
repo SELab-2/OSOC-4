@@ -4,11 +4,17 @@ import deleteIcon from '../../public/assets/delete.svg';
 import Image from "next/image";
 import {Url} from "../../utils/ApiClient";
 
+/**
+ * This component displays a settings-screen where you can manage a question tag
+ * @param props
+ * @returns {JSX.Element}
+ */
 export default function QuestionTag(props) {
     const [previousTag, setPreviousTag] = useState({});
     const [questionTag, setQuestionTag] = useState({});
     const [loading, setLoading] = useState(false);
 
+    // fetch the question tag (the url is provided in the props)
     useEffect(() => {
         setLoading(true)
         Url.fromUrl(props.url).get()
