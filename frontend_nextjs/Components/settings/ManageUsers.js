@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {Button, Col, Form, Row, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
-import CheckboxFilter from "../CheckboxFilter";
 
 export default function ManageUsers(props) {
     const [search, setSearch] = useState("");

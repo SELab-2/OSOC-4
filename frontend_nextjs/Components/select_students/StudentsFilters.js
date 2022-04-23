@@ -1,6 +1,6 @@
 import {useState } from "react";
 import { Col, Row } from "react-bootstrap";
-import CheckboxFilter from "../CheckboxFilter";
+import StudentFilter from "./StudentFilter";
 import {useRouter} from "next/router";
 
 // this function adds or removes a skill from the filters, this function is also used in EmailStudentsFilters
@@ -65,9 +65,9 @@ export default function StudentsFilters(props) {
       }
 
       return shownSkills.map((skill, index) =>
-        <CheckboxFilter filter_id={skill.id} filter_text={skill.name}
-                        value={chosenSkills.includes(skill.name)}
-                        onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)}/>
+        <StudentFilter filter_id={skill.id} filter_text={skill.name}
+                       value={chosenSkills.includes(skill.name)}
+                       onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)}/>
       );
     }
     return null;
@@ -105,20 +105,20 @@ export default function StudentsFilters(props) {
         </Col>
       </Row>
 
-      <CheckboxFilter filter_id="alumni_checkbox" filter_text="Only alumni" value={filters.includes("alumn")}
-                      onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)}/>
-      <CheckboxFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers"
-                      value={filters.includes("student-coach")}
-                      onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)}/>
-      <CheckboxFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for"
-                      value={filters.includes("not-suggested")}
-                      onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)}/>
-      <CheckboxFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
-                      value={filters.includes("unmatched")}
-                      onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)}/>
-      <CheckboxFilter filter_id="practical-problems-checkbox" filter_text="Only students without practical problems"
-                      value={filters.includes("practical-problems")}
-                      onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)}/>
+      <StudentFilter filter_id="alumni_checkbox" filter_text="Only alumni" value={filters.includes("alumn")}
+                     onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)}/>
+      <StudentFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers"
+                     value={filters.includes("student-coach")}
+                     onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)}/>
+      <StudentFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for"
+                     value={filters.includes("not-suggested")}
+                     onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)}/>
+      <StudentFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
+                     value={filters.includes("unmatched")}
+                     onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)}/>
+      <StudentFilter filter_id="practical-problems-checkbox" filter_text="Only students without practical problems"
+                     value={filters.includes("practical-problems")}
+                     onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)}/>
 
       <Row className="filter-title">
         <Col><h3>Skills</h3></Col>
@@ -137,14 +137,14 @@ export default function StudentsFilters(props) {
         <Col><h3>Decision</h3></Col>
       </Row>
 
-      <CheckboxFilter filter_id="yes-checkbox" filter_text="Yes" value={decision.includes("yes")}
-                      onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)}/>
-      <CheckboxFilter filter_id="maybe-checkbox" filter_text="Maybe" value={decision.includes("maybe")}
-                      onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
-      <CheckboxFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
-                      onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
-      <CheckboxFilter filter_id="undecided-checkbox" filter_text="Undecided" value={decision.includes("undecided")}
-                      onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
+      <StudentFilter filter_id="yes-checkbox" filter_text="Yes" value={decision.includes("yes")}
+                     onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)}/>
+      <StudentFilter filter_id="maybe-checkbox" filter_text="Maybe" value={decision.includes("maybe")}
+                     onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
+      <StudentFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
+                     onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
+      <StudentFilter filter_id="undecided-checkbox" filter_text="Undecided" value={decision.includes("undecided")}
+                     onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
 
     </Col>
   )

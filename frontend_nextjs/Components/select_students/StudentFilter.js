@@ -1,7 +1,7 @@
 import {Col, Row} from "react-bootstrap";
 
 // Represents one line of a filter, with checkbox and label
-export default function CheckboxFilter(props) {
+export default function StudentFilter(props) {
 
   // The HTML representation of the filters in the 'Select students' tab
   return(

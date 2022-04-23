@@ -1,5 +1,5 @@
 import { Col, Row } from "react-bootstrap";
-import CheckboxFilter from "../CheckboxFilter";
+import StudentFilter from "../select_students/StudentFilter";
 import {useRouter} from "next/router";
 import {addFilterGlobal} from "../select_students/StudentsFilters";
 
@@ -66,20 +66,20 @@ export default function EmailStudentsFilters(props) {
         </Col>
       </Row>
 
-      <CheckboxFilter filter_id="correct-email" filter_text="Only students without correct email"
-                      value={filters.includes("no-correct-email")}
-                      onChange={(ev) => addFilter("filters", filters, "no-correct-email", ev.target.checked)}/>
+      <StudentFilter filter_id="correct-email" filter_text="Only students without correct email"
+                     value={filters.includes("no-correct-email")}
+                     onChange={(ev) => addFilter("filters", filters, "no-correct-email", ev.target.checked)}/>
 
       <Row className="filter-title">
         <Col><h3>Decision</h3></Col>
       </Row>
 
-      <CheckboxFilter filter_id="yes-checkbox" filter_text="Yes" value={decision.includes("yes")}
-                      onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)}/>
-      <CheckboxFilter filter_id="maybe-checkbox" filter_text="Maybe" value={decision.includes("maybe")}
-                      onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
-      <CheckboxFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
-                      onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
+      <StudentFilter filter_id="yes-checkbox" filter_text="Yes" value={decision.includes("yes")}
+                     onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)}/>
+      <StudentFilter filter_id="maybe-checkbox" filter_text="Maybe" value={decision.includes("maybe")}
+                     onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
+      <StudentFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
+                     onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
 
     </Col>
   )
