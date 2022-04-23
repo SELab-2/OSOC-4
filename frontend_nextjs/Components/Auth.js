@@ -24,7 +24,7 @@ export default function RouteGuard(props) {
         } else if (isUser && props.auth && !ws && !creatingConnection) {
             // make a websocket connection    
             setCreatingConnection(true)
-            let newwebconn = new WebSocket("ws://192.168.3.45:8000/ws")
+            let newwebconn = new WebSocket((process.env.NEXT_API_URL + "/ws").replace("http", "ws").replace("https", "ws"))
             newwebconn.addEventListener("message", (event) => {
                 cache.updateCache(event.data, session["userid"])
             })
