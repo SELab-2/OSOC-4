@@ -50,8 +50,6 @@ export default function Settings(props) {
                 }
                 res = await Url.fromName(api.current_edition).get();
                 if (res.success) {
-                    console.log("BOE");
-                    console.log(res.data);
                     setCurrentVersion(res.data);
                 }
                 setLoading(false);
