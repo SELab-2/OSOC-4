@@ -23,7 +23,7 @@ export default function StudentListAndFilters(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = [props.students, props.setStudents];
 
   // These constants represent the filters
   const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
@@ -37,7 +37,7 @@ export default function StudentListAndFilters(props) {
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
 
-  const [localFilters, setLocalFilters] = [props.student, props.setStudents];
+  const [localFilters, setLocalFilters] = useState([0,0,0]);
 
 
   const [ws, setWs] = useState(undefined);
@@ -91,7 +91,6 @@ export default function StudentListAndFilters(props) {
                 }
               })
             )).then(newstudents => {
-              console.log(newstudents);
               setStudents([...newstudents]);
               setLocalFilters([0, 0, 0]);
             })

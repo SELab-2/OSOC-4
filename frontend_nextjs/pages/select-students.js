@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Col, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
@@ -25,8 +25,13 @@ export default function SelectStudents() {
 
     // These constants are initialized empty, the data will be inserted in useEffect
     const [students, setStudents] = useState([]);
+    const [validStudentId, setValidStudentId] = useState(false);
 
     const studentId = router.query.studentId
+
+    useEffect(() => {
+        setValidStudentId(students.some(student => student["id_int"] === parseInt(studentId)));
+    }, [students, studentId])
 
 
     function getStudentById() {
@@ -47,13 +52,10 @@ export default function SelectStudents() {
     return (
         <Row>
             <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={true} studentId={studentId} />
-            {
-                (studentId) &&
-                <Col>
-                    <StudentDetails student={getStudentById()} student_id={studentId} />
-                </Col>
-            }
-        </Row >
+            { (validStudentId) && <Col>
+                <StudentDetails student={getStudentById()} student_id={studentId} />
+            </Col>}
+        </Row>
     )
 
 }
