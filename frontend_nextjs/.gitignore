@@ -8,6 +8,7 @@
 # testing
 /coverage
 cypress-default
+cypress/videos
 
 # next.js
 /.next/
