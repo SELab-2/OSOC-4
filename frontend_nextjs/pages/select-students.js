@@ -36,6 +36,7 @@ export default function SelectStudents() {
     const [studentUrls, setStudentUrls] = useState([]);
 
     const [student, setStudent] = useState(undefined);
+    const [detailLoading, setDetailLoading] = useState(false);
 
     // These variables are used to notice if search or filters have changed, they will have the values of search,
     // sortby and filters that we filtered for most recently.
@@ -53,7 +54,7 @@ export default function SelectStudents() {
 
 
     const [ws, setWs] = useState(undefined);
-  
+
     const { data: session, status } = useSession()
     const { height, width } = useWindowDimensions();
 
@@ -77,10 +78,13 @@ export default function SelectStudents() {
 
     useEffect(() => {
         if (session && router.query.studentId) {
+
             if ((student && student["id_int"] !== router.query.studentId) || !student) {
+                setDetailLoading(true)
                 Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(newstudent => {
                     const data = newstudent["data"];
                     setStudent(data)
+                    setDetailLoading(false)
                 })
             }
         } else {
@@ -244,7 +248,7 @@ export default function SelectStudents() {
             {
                 (student) ?
                     (<Col>
-                        <StudentDetails student={student} />
+                        <StudentDetails student={student} loading={detailLoading} />
                     </Col>)
                     : null
             }

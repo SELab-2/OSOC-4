@@ -16,9 +16,10 @@ import { useRouter } from "next/router";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import { api, Url } from "../../utils/ApiClient";
+import { Url } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
+import LoadingPage from "../LoadingPage"
 
 /**
  * This component returns the details of a student
@@ -95,8 +96,8 @@ export default function StudentDetails(props) {
       let suggestion = Object.values(suggestions)[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
       result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}
-                              classNamesText={(suggestion["suggested_by_id"] === session["userid"])?
-                                "bold_text": "null"}/>)
+        classNamesText={(suggestion["suggested_by_id"] === session["userid"]) ?
+          "bold_text" : "null"} />)
     }
 
     if (result.length > 0) {
@@ -148,9 +149,15 @@ export default function StudentDetails(props) {
     }));
   }
 
+  if (props.loading) {
+    return (
+      <Col className="student-details-window" style={{ "position": "relative", "height": "calc(100vh - 75px)" }} >
+        <LoadingPage />
+      </Col>)
+  }
+
   return (
     <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)", visibility: props.visibility }} >
-
       {student["mandatory"] &&
         <div>
           <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
@@ -191,7 +198,7 @@ export default function StudentDetails(props) {
             </Col>
             <Col xs="auto" className="close-button">
               <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
-                     src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
+                src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
             </Col>
           </Row>
           <Row>
