@@ -1,16 +1,19 @@
 import React, {useState} from "react";
 import {Button, Dropdown} from "react-bootstrap";
-import {log} from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
+/**
+ * This component displays a row of the ManageUsers settings-screen, this component represents a single user in the list
+ * @returns {JSX.Element}
+ */
 export default function UserTr(props) {
-    const [statusAccount, setStatusAccount] = useState(props.user.role)
+    const [role, setRole] = useState(props.user.role)
     const roles = ["No role", "Coach", "Admin", "Disabled"]
     const [active, setActive] = useState(props.user.active);
     const [approved, setApproved] = useState(props.user.approved);
     const [disabled, setDisabled] = useState(props.user.disabled);
 
-    async function changeStatus(role) {
+    async function changeRole(role) {
         if(props.isMe){
             return
         }
@@ -19,7 +22,7 @@ export default function UserTr(props) {
         json.disabled = role === 0;
         json.role = role
         let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody(json).patch();
-        if (response.success){setStatusAccount(role)}
+        if (response.success){setRole(role)}
     }
 
     async function approveUser() {
@@ -36,6 +39,13 @@ export default function UserTr(props) {
         }
     }
 
+    /**
+     * This function returns a:
+     * - message-display "not yet active" when the user has not yet activated his/her account
+     * - button "approve" which approves the user when clicked on, the user has to be active and not approved
+     * - dropdown showing the current user role, and you can select another role for the user
+     * @returns {JSX.Element}
+     */
     function getStatusField() {
         if (!active) {
             return (<Button disabled className="user-button-inactive">Not yet active</Button>);
@@ -46,18 +56,19 @@ export default function UserTr(props) {
         return (
             <Dropdown className={"dropdown-button"}>
                 <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                    {roles[statusAccount]}
+                    {roles[role]}
                 </Dropdown.Toggle>
                 {props.isMe ? null :
                     <Dropdown.Menu aria-disabled className={"dropdown-button"} >
-                        <Dropdown.Item active={statusAccount === 2} onClick={() => changeStatus(2)}>Admin</Dropdown.Item>
-                        <Dropdown.Item active={statusAccount === 1} onClick={() => changeStatus(1)}>Coach</Dropdown.Item>
-                        <Dropdown.Item active={statusAccount === 0} onClick={() => changeStatus(0)}>No role</Dropdown.Item>
+                        <Dropdown.Item active={role === 2} onClick={() => changeRole(2)}>Admin</Dropdown.Item>
+                        <Dropdown.Item active={role === 1} onClick={() => changeRole(1)}>Coach</Dropdown.Item>
+                        <Dropdown.Item active={role === 0} onClick={() => changeRole(0)}>No role</Dropdown.Item>
                     </Dropdown.Menu>
                 }
             </Dropdown>)
     }
 
+    // if the user is disabled, we don't show him at all
     if (disabled) {
         return null;
     }
@@ -65,17 +76,9 @@ export default function UserTr(props) {
     return (
         <tr key={props.user.id}>
             <td>{props.user.name}</td>
-
             <td>{props.user.email}</td>
-
-            <td>
-                {getStatusField()}
-            </td>
-
-            <td>
-                {props.isMe ? null : <Button className="user-button-remove" onClick={deleteUser}>Revoke access</Button>}
-            </td>
-
+            <td>{getStatusField()}</td>
+            <td>{props.isMe ? null : <Button className="user-button-remove" onClick={deleteUser}>Revoke access</Button>}</td>
         </tr>
 
     )

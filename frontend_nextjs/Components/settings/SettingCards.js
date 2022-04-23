@@ -2,6 +2,10 @@ import {useState} from "react";
 import {Card, Button} from "react-bootstrap";
 import Image from 'next/image'
 
+/**
+ * This component displays a card for a simple settings-screen
+ * @returns {JSX.Element}
+ */
 export default function SettingCards(props) {
     const [isOpen, setIsOpen] = useState(false)
     return(

@@ -1,8 +1,11 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
-import {log} from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
+/**
+ * This component displays a settings-screen to change a user's password.
+ * @returns {JSX.Element}
+ */
 export default function ChangePassword(props) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -27,6 +30,10 @@ export default function ChangePassword(props) {
         setConfirmPassword(event.target.value);
     }
 
+    /**
+     * This function makes a patch request to the api with the new password of the user
+     * @param event
+     */
     async function handleSubmitChange(event){
         event.preventDefault()
         if(newPassword === confirmPassword){
@@ -37,7 +44,6 @@ export default function ChangePassword(props) {
             }
 
             let response = await Url.fromName(api.me).extend("/password").setBody(body).patch();
-            log(response)
             if (response.success) { setChangedSuccess(true); }
         }
     }

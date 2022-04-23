@@ -21,7 +21,6 @@ from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
 from app.models.skill import StudentSkill
 from app.models.student import DecisionOption, Student
-from app.models.suggestion import SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
@@ -191,20 +190,20 @@ async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = De
 
 @router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
 async def get_conflicting_students(year: int, session: AsyncSession = Depends(get_session)):
-    """get_conflicting_students gets all students with conflicts in their confirmed suggestions
+    """get_conflicting_students gets all students with conflicts in their participations
     within an edition
 
     :param year: year of the edition
     :type year: int
-    :return: list of student_ids with conflicting suggestions
+    :return: list of student_ids with conflicts
     :rtype: list
     """
 
     student_ids = await session.execute(
-        f"""
+        """
         SELECT student.id
-        FROM student, suggestion
-        WHERE student.id = suggestion.student_id AND suggestion.definitive = 't' AND suggestion.decision = {SuggestionOption.YES}
+        FROM student, participation
+        WHERE student.id = participation.student_id
         GROUP BY student.id
         HAVING COUNT (*) > 1;
         """

@@ -10,6 +10,7 @@ import useWindowDimensions from "../../utils/WindowDimensions";
 import {api, Url} from "../../utils/ApiClient";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
+import LoadingPage from "../LoadingPage";
 
 
 export default function StudentListAndFilters(props) {
@@ -22,7 +23,7 @@ export default function StudentListAndFilters(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
-  const [students, setStudents] = useState([]);
+  const [students, setStudents] = [props.students, props.setStudents];
 
   // These constants represent the filters
   const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
@@ -36,7 +37,7 @@ export default function StudentListAndFilters(props) {
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
 
-  const [localFilters, setLocalFilters] = [props.student, props.setStudents];
+  const [localFilters, setLocalFilters] = useState([0,0,0]);
 
 
   const [ws, setWs] = useState(undefined);
@@ -90,7 +91,6 @@ export default function StudentListAndFilters(props) {
                 }
               })
             )).then(newstudents => {
-              console.log(newstudents);
               setStudents([...newstudents]);
               setLocalFilters([0, 0, 0]);
             })
@@ -194,11 +194,12 @@ export default function StudentListAndFilters(props) {
         <InfiniteScroll
           style={{
             "height": "calc(100vh - 146px)",
+            "position": "relative"
           }}
           dataLength={students.length} //This is important field to render the next data
           next={fetchData}
           hasMore={studentUrls.length > 0}
-          loader={<h4>Loading...</h4>}
+          loader={<LoadingPage />}
           endMessage={
             <p style={{ textAlign: 'center' }}>
               <b>Yay! You have seen it all</b>
@@ -207,7 +208,7 @@ export default function StudentListAndFilters(props) {
         >
           {students.map((i, index) => (
 
-            <StudentListelement key={index} student={i} />
+            <StudentListelement key={index} student={i} studentsTab={props.studentsTab}/>
 
           ))}
         </InfiniteScroll>
