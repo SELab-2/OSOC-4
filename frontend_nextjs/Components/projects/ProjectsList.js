@@ -7,7 +7,7 @@ import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-export default function ProjectsList() {
+export default function ProjectsList(props) {
     const [allProjects, setAllProjects] = useState([])
     const [loaded, setLoaded] = useState(false)
     const [search, handleSearch] = useState("")
@@ -61,6 +61,18 @@ export default function ProjectsList() {
         <div className={"project-top-bar"}>
             <Row className="nomargin">
                 <Col>
+                    <Button> Add student to project</Button>
+                </Col>
+                <Col xs="auto" >
+                    <ConflictCard/>
+                </Col>
+                <Col xs="auto" >
+                    <Button className={"center"} onClick={handleNewProject}>New project</Button>
+                </Col>
+            </Row>
+            <br/>
+            <Row className="nomargin">
+                <Col>
                     <Form onSubmit={handleSearchSubmit}>
                         <Form.Group controlId="searchProjects">
                             <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
@@ -72,16 +84,10 @@ export default function ProjectsList() {
                         <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
                     </Form>
                 </Col >
-                <Col xs="auto" >
-                    <ConflictCard/>
-                </Col>
-                <Col xs="auto" >
-                    <Button className={"center"} onClick={handleNewProject}>New project</Button>
-                </Col>
             </Row>
             <Row>
                     {
-                        visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
+                        visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} key={index} project={project}/>))) : null
                     }
             </Row>
         </div>

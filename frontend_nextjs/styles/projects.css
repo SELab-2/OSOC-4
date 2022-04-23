@@ -7,6 +7,10 @@
 .project-card{
 }
 
+.project-card-selected{
+    --color-background: var(--yellow);
+}
+
 .project-card-div{
     margin-top: 15px;
 }
