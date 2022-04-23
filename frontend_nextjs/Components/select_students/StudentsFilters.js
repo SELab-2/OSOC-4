@@ -35,6 +35,7 @@ export default function StudentsFilters(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [allSkills, setAllSkills] = useState([]);
+  const [filteredSkills, setFilteredSkills] = useState([]);
 
   // These variables represent the filters of the different categories
   const filters = props.filters[0];
@@ -48,6 +49,7 @@ export default function StudentsFilters(props) {
         if (res) {
           // scuffed way to get unique skills (should be fixed in backend soon)
           setAllSkills(res);
+          setFilteredSkills(res);
         }
       }
     })
@@ -89,11 +91,11 @@ export default function StudentsFilters(props) {
    * or the whole list are returned depending on extendedRoleList.
    */
   function getSkills() {
-    if (allSkills) {
-      let shownSkills = allSkills;
+    if (filteredSkills) {
+      let shownSkills = filteredSkills;
 
       if (!extendedRoleList) {
-        shownSkills = allSkills.slice(0, 5);
+        shownSkills = filteredSkills.slice(0, 5);
       }
 
       return shownSkills.map((skill, index) =>
@@ -111,10 +113,12 @@ export default function StudentsFilters(props) {
    * skills.
    */
   function moreOrLessButton() {
-    if (extendedRoleList) {
-      return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
+    if (filteredSkills.length > 5) {
+      if (extendedRoleList) {
+        return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
+      }
+      return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
     }
-    return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
   }
 
   /**
@@ -130,6 +134,13 @@ export default function StudentsFilters(props) {
       pathname: router.pathname,
       query: newQuery
     }, undefined, { shallow: true })
+  }
+
+  function searchSkills(value) {
+    let searchedString = value.toLowerCase();
+    setFilteredSkills(allSkills.filter(skill =>
+      skill.toLowerCase().startsWith(searchedString) ||
+      skill.split(" ").some(partSkill => partSkill.toLowerCase().startsWith(searchedString))));
   }
 
   /**
@@ -169,7 +180,8 @@ export default function StudentsFilters(props) {
       </Row>
       <Row className="skills-search-filters">
         <Col>
-          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills" />
+          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"
+                 onChange={(ev) => searchSkills(ev.target.value)}/>
         </Col>
       </Row>
       {getSkills()}

@@ -213,7 +213,10 @@ export default function StudentDetails(props) {
             </Col>
           </Row>
           <Row className="nomargin">
-            <Col md="auto" className="skill">VIDEO EDITOR</Col>
+            <ul className="nomargin nopadding">
+              {(student["skills"]) && student["skills"].map((skill, index) =>
+              <li className="skill" style={{ display: "inline-block" }} key={index}>{skill["name"].toUpperCase()}</li>)}
+            </ul>
           </Row>
         </Col>
         <Col />
