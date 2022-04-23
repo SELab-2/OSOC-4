@@ -195,7 +195,7 @@ export default function StudentDetails(props) {
 
       <Row className="details-upper-layer">
         <Col md="auto">
-          <Row>
+          <Row className="nomargin">
             <Col xs="auto" className="name_big">
               {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
             </Col>
@@ -205,8 +205,11 @@ export default function StudentDetails(props) {
               </button>
             </Col>
           </Row>
-          <Row>
-            <Col md="auto" className="skill">VIDEO EDITOR</Col>
+          <Row className="nomargin">
+            <ul className="nomargin nopadding">
+              {(student["skills"]) && student["skills"].map((skill, index) =>
+              <li className="skill" style={{ display: "inline-block" }} key={index}>{skill["name"].toUpperCase()}</li>)}
+            </ul>
           </Row>
         </Col>
         <Col />
