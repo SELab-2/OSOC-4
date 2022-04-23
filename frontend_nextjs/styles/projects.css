@@ -6,7 +6,6 @@
 
 .project-card-div{
     margin-top: 15px;
-    margin-left: 5px;
 }
 
 .center-component{
@@ -54,4 +53,8 @@
 
 .project-people-needed{
     margin-top: 5px;
+}
+
+.project-empty-list{
+    margin-left: 15px;
 }

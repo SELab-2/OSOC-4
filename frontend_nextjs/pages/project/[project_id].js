@@ -53,7 +53,7 @@ const Project = () => {
     return (
         <div className="remaining_height fill_width">
             { loaded ? (
-                <div className={"project-details-page"}>
+                <div>
                     <Row className={"project-top-bar"}>
                         <Col xs="auto" >
                             <Image alt={"back button"} onClick={() => router.back()} src={back} width={100} height={33}/>
@@ -88,36 +88,38 @@ const Project = () => {
                             </Modal>
                         </Col>
                     </Row>
+                    <div className={"project-details-page"} >
+                        <div className={"project-details-title"} >Project by: {project.partner_name}</div>
+                        <div className={"project-details-subtitle"}>{project.partner_description}</div>
 
-                    <div className={"project-details-title"} >Project by: {project.partner_name}</div>
-                    <div className={"project-details-subtitle"}>{project.partner_description}</div>
+                        <div className={"project-details-title"}>About the project</div>
+                        <div className={"project-details-subtitle"}>{project.description}</div>
 
-                    <div className={"project-details-title"}>About the project</div>
-                    <div className={"project-details-subtitle"}>{project.description}</div>
+                        <div>
+                            <div className={"project-details-title"}>Assigned staff</div>
+                            {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
+                        </div>
 
-                    <div>
-                        <div className={"project-details-title"}>Assigned staff</div>
-                        {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
+                        <Row>
+                            <Col>
+                                <div>
+                                    <div className={"project-card-title"}>Required skills</div>
+                                    { (skills.length) ? (skills.map(skill =>
+                                        (<SkillCard key={`${skill.amount}${skill.name}`} name={skill.name} amount={skill.amount} />))): <div className={"project-empty-list"}>Currently there are no required skills</div>}
+                                </div>
+                            </Col>
+                            <Col>
+                                <div>
+                                    <div className={"project-card-title"}>Assigned students</div>
+                                    {(project.participations.length) ?
+                                        project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
+                                        <div className={"project-empty-list"}>Currently there are no assigned students</div>
+                                    }
+                                </div>
+                            </Col>
+                        </Row>
                     </div>
 
-                    <Row>
-                        <Col>
-                            <div className={"project-title-list"}>
-                                <div className={"project-card-title"}>Skills</div>
-                                { (skills.length) ? (skills.map(skill =>
-                                    (<SkillCard key={`${skill.amount}${skill.name}`} name={skill.name} amount={skill.amount} />))): null}
-                            </div>
-                        </Col>
-                        <Col>
-                            <div className={"project-title-list"}>
-                                <div className={"project-card-title"}>Assigned students</div>
-                                {(project.participations.length) ?
-                                    project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
-                                    null
-                                }
-                            </div>
-                        </Col>
-                    </Row>
                 </div>) : null}
         </div>
 
