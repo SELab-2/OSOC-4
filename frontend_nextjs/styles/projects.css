@@ -4,14 +4,60 @@
     font-weight: bold;
 }
 
+.project-card{
+}
+
+.project-card-div{
+    margin-top: 15px;
+}
+
 .center-component{
     margin-top: 25px;
-    margin-left: 10px;
-    margin-right: 10px;
     align-self: center;
 }
 
-.right-div{
-    position:absolute;
-    right: 0;
+.project-title{
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.partner-title{
+    font-weight: lighter;
+    font-size: 25px;
+    color: var(--gray4);
+}
+
+.project-card-title{
+    font-weight: bold;
+    font-size: 23px;
+    margin-left: 10px;
+}
+
+.card-body{
+    margin-left: 15px;
+    margin-top: 15px;
+}
+
+.project-title-list{
+    margin-left: auto;
+    margin-right: auto;
+    align-content: center;
+}
+
+.project-top-bar{
+    margin-top: 20px;
+}
+
+.project-people-needed{
+    margin-top: 5px;
+}
+
+.project-empty-list{
+    margin-top: 15px;
+    margin-left: 15px;
+    font-size: 18px;
+}
+
+.project-show-detail{
+    cursor: pointer;
 }
