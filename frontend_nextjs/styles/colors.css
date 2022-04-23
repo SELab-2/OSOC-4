@@ -15,6 +15,10 @@
     --maybe_yellow_65: rgb(255,179,0,0.65);
     --no_red_65: rgb(217,42,45,0.65);
 
+    --yes_green_45: rgb(119,211,83,0.45);
+    --maybe_yellow_45: rgb(255,179,0,0.45);
+    --no_red_45: rgb(217,42,45,0.45);
+
     --yes_green_20: rgb(119,211,83,0.2);
     --maybe_yellow_20: rgb(255,179,0,0.2);
     --no_red_20: rgb(217,42,45,0.2);
@@ -25,6 +29,8 @@
     --gray2: #222;
     --gray3: #333;
     --gray4: #444;
+    --selection-gray: rgb(150, 150, 150);
+    --not-selected-gray: rgb(200, 200, 200);
     --background-gray: #E5E9F2;
 }
 

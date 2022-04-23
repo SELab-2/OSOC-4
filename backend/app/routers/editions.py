@@ -19,7 +19,9 @@ from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
-from app.models.student import Student
+from app.models.skill import StudentSkill
+from app.models.student import DecisionOption, Student
+from app.models.suggestion import SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
@@ -127,19 +129,24 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-    student_query = select(Student).where(Student.edition_year == year).subquery()
-    if search:
-        student_query = select(Student).where(Student.edition_year == year).join(QuestionAnswer).join(Answer)
-        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
-        student_query = student_query.distinct().subquery()
 
-    ua = aliased(Student, student_query)
+    student_query = select(Student).where(Student.edition_year == year)
+
+    if decision:
+        student_query = student_query.where(Student.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
+    if search:
+        student_query = student_query.join(QuestionAnswer).join(Answer)
+        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
+    if skills:
+        student_query = student_query.join(StudentSkill).where(StudentSkill.skill_name.in_(skills.split(",")))
+
+    ua = aliased(Student, student_query.distinct().subquery())
     res = await session.execute(select(ua.id))
     res = res.all()
 
@@ -147,20 +154,19 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
     if orderby:
         sorting = get_sorting(orderby).items()
-        studentobjects = {}
+        studentobjects = {i: {"id": i} for i in students}
         for key, val in sorting:
+            if key == "id":
+                continue
             res = await session.execute(select(ua.id, QuestionTag.tag, Answer.answer).join(QuestionAnswer, ua.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == key).join(Answer).order_by(ua.id))
             res = res.all()
 
             for (id, _, r) in res:
-                if id not in studentobjects:
-                    studentobjects[id] = {"id": id}
                 studentobjects[id][key] = r
 
         sorted_students = studentobjects.values()
         for k, val in reversed(sorting):
             sorted_students = sorted(sorted_students, key=lambda d: d[k], reverse=val)
-
         students = [str(student["id"]) for student in sorted_students]
     return [config.api_url + "students/" + str(id) for id in students]
 

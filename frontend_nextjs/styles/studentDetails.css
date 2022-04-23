@@ -1,47 +1,63 @@
 .name_big {
     font-size: 40px;
+    padding: 0 10px 0 0;
 }
 
 .suggest-button {
     font-size: 13px;
     width: 80px;
     -webkit-text-fill-color: black;
-    border-width: 4px;
-    margin: 8px 0px;
-    padding-top: 7px;
-    padding-bottom: 7px;
-
-    border-radius: 4px;
+    margin: 8px 4px;
+    border-width: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border-radius: 5px;
+    transition-duration: 0.4s;
 }
 
-.suggest-button-selected {
-    border-width: 4px;
-    border-color: black;
+.bold_text {
+    font-weight: bold;
 }
 
 .suggest-yes-button {
     background-color: var(--yes_green_65);
+    border-color: var(--yes_green_45);
+}
+
+.suggest-yes-button:hover {
+    background-color: var(--yes_green_45);
 }
 
 .suggest-maybe-button {
     background-color: var(--maybe_yellow_65);
+    border-color: var(--maybe_yellow_45);
+}
+
+.suggest-maybe-button:hover {
+    background-color: var(--maybe_yellow_45);
 }
 
 .suggest-no-button {
     background-color: var(--no_red_65);
+    border-color: var(--no_red_45);
+}
+
+.suggest-no-button:hover {
+    background-color: var(--no_red_45);
 }
 
 .suggest-confirm-button {
+    border-radius: 3px;
     font-size: 13px;
-    width: 110px;
-    padding-top: 7px;
-    padding-bottom: 7px;
+    width: 100px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     margin-left: 3px;
-    margin-right: 3px;
+    margin-right: 4px;
 }
 
 .details-upper-layer {
-    margin: 0 20px;
+    margin: 0 0 0 20px;
 }
 
 .dropdown-decision {
@@ -51,7 +67,7 @@
     background-color: white;
     border-style: solid;
     border-radius: 5px;
-    margin-left: 5px;
+    margin-left: 4px;
     margin-right: 5px;
     width: 95%;
     font-size: 15px;
@@ -61,11 +77,6 @@
 .remaining-height-details {
     margin-top: 30px;
     margin-left: 20px;
-}
-
-.student-details {
-    padding-left: 12px;
-    padding-right: 15px;
 }
 
 .student-details-suggestions-line {
@@ -95,21 +106,12 @@
     margin-right: 25px;
 }
 
-.h2-titles {
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
-
-.first-h2-titles {
-    margin-bottom: 15px;
-}
-
 .student-details-window {
     border-left-width: 1px;
     border-left-style: solid;
     border-left-color: lightgray;
 
-    margin-left: 20px;
+    margin-left: 0;
     padding-top: 15px;
     padding-right: 25px;
     padding-bottom: 25px;
@@ -164,8 +166,7 @@
     padding: 0;
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
-    margin-top: 15px;
-    margin-left: 15px;
+    margin-top: 20px;
 }
 
 .student-details-question {
@@ -177,4 +178,22 @@
 .student-details-answer {
     margin-top: 10px;
     font-size: 15px;
+}
+
+.buttongroup-paddingtop{
+    padding-top: 5px;
+}
+
+.margins-accordion {
+    margin-top: 30px;
+}
+
+.h2-titles {
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
+
+.suggestion {
+    margin-top: 2px;
+    margin-bottom: 2px;
 }

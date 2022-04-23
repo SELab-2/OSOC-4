@@ -3,6 +3,10 @@ import { getCsrfToken, getSession } from 'next-auth/react';
 import { log } from "./logger";
 
 
+/**
+ * A class that represents an url, you can use it to make http requests (GET, PATCH, ...)
+ *  it uses the Api class to handle session tokens
+ */
 export class Url {
     _url = null;
     _name = null;
@@ -13,41 +17,95 @@ export class Url {
 
     _useAuth = false;
 
+    /**
+     * The constructor, you shouldn't use this one, but rather use the functions Url.fromname() or Url.fromUrl
+     * @param name: from api.[name], other strings won't be accepted
+     * @param url: any url
+     * @param useAuth: whether the request requires authentication (session tokens) or not
+     */
     constructor(name, url, useAuth) {
         this._name = name;
         this._url = url;
         this._useAuth = useAuth;
     }
 
+    /**
+     * Creates an instance of Url from a name of the api
+     *  Example: Url.fromName(api.students)
+     * @param name: from api.[name], other strings won't be accepted
+     * @param useAuth: whether the request requires authentication (session tokens) or not
+     * @returns {Url}
+     */
     static fromName(name, useAuth = false) {
         return new Url(name, null);
     }
 
+    /**
+     * Creates an instance of Url from an url
+     *  Example: Url.fromUrl("http://localhost:8000/students/32753")
+     * @param url: any url
+     * @param useAuth: whether the request requires authentication (session tokens) or not
+     * @returns {Url}
+     */
     static fromUrl(url, useAuth = false) {
         return new Url(null, url);
     }
 
+    /**
+     * This will set an extension (or suffix) to append to the url
+     *  Example: Url.fromName(api.students).extend("/create") will have the url for students but with "/create" appended at the end
+     * @param extension: the suffix / extension (string)
+     * @returns {Url}
+     */
     extend(extension = "") {
         this._extension = extension;
         return this;
     }
 
+    /**
+     * This will set params, used for filtering, sorting, searching, ...
+     * @param params: a dictionary
+     * @returns {Url}
+     */
     setParams(params = {}) {
         this._params = params;
         return this;
     }
 
+    /**
+     * This will set a body, used for POST or PATCH
+     * @param body: a dictionary
+     * @returns {Url}
+     */
     setBody(body) {
         this._body = body;
         return this;
     }
 
+    /**
+     * Prepares to send a request:
+     *  - initializes the url if this was created with Url.fromName()
+     *  - adds the extension to the url
+     *  - initializes the headers
+     * @param context
+     * @returns {Promise<void>}
+     * @private
+     */
+    async _setupRequest(context = null) {
+        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
+        this._headers = await api._headers(context, this._useAuth);
+        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        this._url += this._extension;
+    }
+
+    /**
+     * Makes a GET request to its url
+     * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
+     * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
+     */
     async get(context = null) {
-        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`); }
         try {
-            this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) { this._url = await api.getUrl(this._name, context); }
-            this._url += this._extension;
+            await this._setupRequest(context);
             log(`API: GET ${this._url}`)
             const resp = await axios.get(this._url, { "headers": this._headers, "params": this._params });
             return { success: true, data: resp.data };
@@ -56,26 +114,14 @@ export class Url {
         }
     }
 
-    async getPublic(context = null) {
-        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`); }
-        try {
-            this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) { this._url = await api.getUrl(this._name, context); }
-            this._url += this._extension;
-            log(`API: GET ${this._url}`)
-            const resp = await axios.get(this._url, { "headers": this._headers, "params": this._params });
-            return { success: true, data: resp.data };
-        } catch (e) {
-            return { success: false, error: e };
-        }
-    }
-
+    /**
+     * Makes a POST request to its url
+     * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
+     * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
+     */
     async post(context = null) {
-        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`) }
         try {
-            this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) { this._url = await api.getUrl(this._name, context); }
-            this._url += this._extension;
+            await this._setupRequest(context);
             log(`API: POST ${this._url}`)
             const resp = await axios.post(this._url, this._body, { "headers": this._headers });
             return { success: true, data: resp.data };
@@ -84,12 +130,14 @@ export class Url {
         }
     }
 
+    /**
+     * Makes a PATCH request to its url
+     * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
+     * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
+     */
     async patch(context = null) {
-        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`) }
         try {
-            this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) { this._url = await api.getUrl(this._name, context); }
-            this._url += this._extension;
+            await this._setupRequest(context);
             log(`API: PATCH ${this._url}`)
             const resp = await axios.patch(this._url, this._body, { "headers": this._headers });
             return { success: true, data: resp.data };
@@ -98,12 +146,14 @@ export class Url {
         }
     }
 
+    /**
+     * Makes a DELETE request to its url
+     * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
+     * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
+     */
     async delete(context = null) {
-        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`) }
         try {
-            this._headers = await api._headers(context, this._useAuth);
-            if (!this._url) { this._url = await api.getUrl(this._name, context); }
-            this._url += this._extension;
+            await this._setupRequest(context);
             log(`API: DELETE ${this._url}`)
             const resp = await axios.delete(this._url, { "headers": this._headers });
             return { success: true, data: resp.data };
@@ -115,16 +165,21 @@ export class Url {
 }
 
 
+/**
+ * A class that manages the api urls, makes creating Url requests much easier
+ */
 class API {
     baseUrl = process.env.NEXT_API_URL;
+    // todo
     login = "login";
     forgot = "forgot";
     invite = "invite";
     resetpassword = "resetpassword";
 
-
+    // the year of the current edition
     year = null;
 
+    // the api.[name] fields
     me = "me";
     students = "students"
     projects = "projects"
@@ -136,7 +191,10 @@ class API {
     editions_questiontags = "editions_questiontags";
     skills = "skills";
 
+    // the paths, the key should be the value of the api.[name]
+    //            the value should be the url
     _paths = {
+        // todo
         login: this.baseUrl + "/login",
         forgot: this.baseUrl + "/forgot",
         invite: this.baseUrl + "/invite",
@@ -155,20 +213,42 @@ class API {
     }
     _ready = false;
 
+    /**
+     * Invalidates the api, this will cause it to set itself up again on the next request
+     */
     invalidate() {
         this._ready = false;
     }
 
+    /**
+     * Returns the session object
+     * @param context: for server-side requests
+     * @returns {Promise<Session>}
+     * @private
+     */
     async _session(context = null) {
         if (context) { return await getSession(context); }
         else { return await getSession(); }
     }
 
+    /**
+     * Returns the csrfToken
+     * @param context: for server-side requests
+     * @returns {Promise<string>}
+     * @private
+     */
     async _csrfToken(context = null) {
         if (context) { return await getCsrfToken(context); }
         else { return await getCsrfToken(); }
     }
 
+    /**
+     * Returns the headers needed
+     * @param context: for server-side requests
+     * @param isPublic: if the url is public, set this to true, so you don't use auth headers
+     * @returns {Promise<{Authorization: string, "Access-Control-Allow-Origin": string, "X-CSRF-TOKEN": string, "Content-Type": string}|{"Access-Control-Allow-Origin": string, "Content-Type": string}>}
+     * @private
+     */
     async _headers(context = null, isPublic = false) {
         let headers = {
             "Content-Type": "application/json",
@@ -185,12 +265,24 @@ class API {
         }
     }
 
+    /**
+     * Returns the url for a name in the api (use api.[name])
+     * @param name: the name you want the url for (use api.[name])
+     * @param context: for server-side requests
+     * @returns {Promise<*>}
+     */
     async getUrl(name = null, context = null) {
         if (!this._ready) { await this._setup(context); }
         if (!this._paths[name]) { throw Error(`UrlManager not properly instantiated, UrlManager path for '${name}' is undefined`); }
         return this._paths[name];
     }
 
+    /**
+     * Set up the urls in _paths
+     * @param context: for server-side requests
+     * @returns {Promise<void>}
+     * @private
+     */
     async _setup(context = null) {
         log("Engine:setup");
         try {
@@ -226,11 +318,16 @@ class API {
         }
 
     }
+
+    /**
+     * Set the current edition to another year
+     * @param year: the year of the edition to make requests to
+     * @returns {Promise<void>}
+     */
     async setCurrentEdition(year = null) {
         this._year = year;
         this.invalidate();
     }
-
 }
 
 export const api = new API();

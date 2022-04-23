@@ -1,0 +1,17 @@
+.btn-conflicts{
+    color:white;
+    background-color: red;
+    font-weight: bold;
+}
+
+.center-component{
+    margin-top: 25px;
+    margin-left: 10px;
+    margin-right: 10px;
+    align-self: center;
+}
+
+.right-div{
+    position:absolute;
+    right: 0;
+}

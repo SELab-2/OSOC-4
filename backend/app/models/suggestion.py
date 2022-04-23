@@ -16,7 +16,6 @@ class Suggestion(SQLModel, table=True):
     # mail_sent: bool = Field(default=False)
     id: Optional[int] = Field(default=None, primary_key=True)
     decision: SuggestionOption
-    definitive: bool = False
     reason: str
 
     student_id: int = Field(foreign_key="student.id")
@@ -44,7 +43,6 @@ class SuggestionCreate(BaseModel):
 
 class SuggestionExtended(BaseModel):
     decision: int
-    definitive: bool
     reason: str
 
     student_id: str

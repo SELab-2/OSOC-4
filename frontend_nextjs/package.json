@@ -6,7 +6,9 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test_watch": "jest --watchAll --verbose"
   },
   "dependencies": {
     "axios": "^0.26.1",
@@ -14,7 +16,7 @@
     "cheeseburger-menu": "^0.0.13",
     "js-cookie": "^3.0.1",
     "next": "^12.1.0",
-    "next-auth": "^4.3.1",
+    "next-auth": "^4.3.2",
     "next.js": "^1.0.3",
     "nextjs": "^0.0.3",
     "react": "17.0.2",
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "eslint": "8.11.0",
-    "eslint-config-next": "12.1.0"
+    "eslint-config-next": "12.1.0",
+    "jest": "^27.5.1"
   }
 }

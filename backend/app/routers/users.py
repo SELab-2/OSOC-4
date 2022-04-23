@@ -4,13 +4,16 @@ from app.crud import read_all_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
-from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
+from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
+                                            PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
-                                            UserNotFoundException, InvalidEmailOrPasswordException)
+                                            UserNotFoundException)
+from app.models.edition import Edition
 from app.models.passwordreset import PasswordResetInput
-from app.models.user import (User, UserCreate, UserOut,
-                             UserOutSimple, UserRole, ChangeUser, ChangePassword, UserMe, ChangeUserMe)
+from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
+                             UserCreate, UserMe, UserOut, UserOutSimple,
+                             UserRole)
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
@@ -19,6 +22,8 @@ from app.utils.response import response
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlmodel import select
 
 router = APIRouter(prefix="/users")
 
@@ -172,6 +177,32 @@ async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession 
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
+@router.delete("/{user_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)):
+    """delete_user this deletes a user (soft delete, disables the user & resets password related things)
+
+    :param user_id: the user id
+    :type user_id: str
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    user = await read_where(User, User.id == int(user_id), session=session)
+
+    if user is None:
+        raise UserNotFoundException()
+
+    user.disabled = True
+    user.active = False
+    user.approved = False
+    user.password = ""
+
+    user = await update(user, session=session)
+
+    return response(UserOut.parse_raw(user.json()), "User deleted successfully")
+
+
 @router.patch("/{user_id}/password", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def update_password(user_id: str, passwords: ChangePassword, session: AsyncSession = Depends(get_session)):
     """"update_password this changes the password of given user if previous password is given
@@ -215,6 +246,20 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
         raise UserNotFoundException()
     elif user.active:
         raise UserAlreadyActiveException()
+
+    # if the user was disabled, we need to re-enable him
+    if user.disabled:
+        user.disabled = False
+        await update(user, session=session)
+        # todo add user to latest edition, else it is useless that we invite him
+
+        # get the latest edition
+        stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())
+        editionres = await session.execute(stat)
+        (edition,) = editionres.first()
+        edition.coaches.append(user)
+
+        await update(edition, session=session)
 
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key()
