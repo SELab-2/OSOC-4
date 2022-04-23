@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import QuestionTag from "./QuestionTag";
 import {api, Url} from "../../utils/ApiClient";
-import { Form, Button } from 'react-bootstrap';
+import {Form, Button, Table} from 'react-bootstrap';
+import StudentTableRow from "../email-students/StudentTableRow";
 
 /**
  * This component displays a settings-screen where you can manage the question tags for an edition
@@ -10,6 +11,8 @@ import { Form, Button } from 'react-bootstrap';
 export default function QuestionTags() {
     const [questionTags, setQuestionTags] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const [edited, setEdited] = useState(undefined);
 
     const [newTag, setNewTag] = useState("");
 
@@ -48,18 +51,34 @@ export default function QuestionTags() {
     }
 
     return (
-        <div>
-            {questionTags.map(url =>
-                    <QuestionTag key={url} url={url} deleteTag={deleteTag} renameTag={renameTag} />
-            )}
-            <Form onSubmit={submitNewTag}>
-                <Form.Control name="newtag" type="text" placeholder="New tag" value={newTag} onChange={handleNewTagChange} />
-                <Button variant="primary" type="submit">
-                    Create
-                </Button>
+      <div>
+          <Table>
+              <thead>
+              <tr className="table-head">
+                  <th>
+                      <p>Name</p>
+                  </th>
+                  <th>
+                      <p>Question</p>
+                  </th>
+                  <th>
+                      <p>Show in student list</p>
+                  </th>
+                  <th>
+                      <p>Delete</p>
+                  </th>
+              </tr>
+              </thead>
+              <tbody className="email-students-cell">
+              {questionTags.map(url => <QuestionTag key={url} url={url} deleteTag={deleteTag} renameTag={renameTag}
+                                                    setEdited={setEdited} edited={edited === url}/>)}
+              </tbody>
+          </Table>
 
-            </Form>
-        </div>
+          <Button variant="primary">
+              New question tag
+          </Button>
+      </div>
     )
 
 }

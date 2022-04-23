@@ -64,39 +64,31 @@ export default function QuestionTag(props) {
     }
 
     return (
-        <div>
-            <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    {questionTag["mandatory"] ? (
-                        <Form.Control name="tag" type="text" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} disabled />
-                    ) : (
-                        <Form.Control name="tag" type="text" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} />
-                    )
-                    }
-                    <Form.Control name="question" type="text" placeholder="Question" value={questionTag["question"]} onChange={handleChange} />
+      <tr key={props.url}>
+          <td>
+              {(questionTag["mandatory"] || ! props.edited)? (
+                <p>{questionTag["tag"]}</p>
+              ) : (
+                <input placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} />
+              )
+              }
+          </td>
+          <td>
+              {(props.edited)? <input placeholder="Question" value={questionTag["question"]} onChange={handleChange} />:
+              <p>{questionTag["question"]}</p>}
 
-                    {!questionTag["mandatory"] &&
-                        <div>
-                            <Form.Check
-                                name="showInList"
-                                type="checkbox"
-                                checked={questionTag["showInList"]}
-                                label={"show in studentlist"}
-                                onChange={handleCheckboxChange}
-                            />
-                            <button onClick={deleteTag}>
-                                <Image src={deleteIcon} className="delete-icon" />
-                            </button>
-                        </div>
-                    }
-
-                </Form.Group>
-                {JSON.stringify(questionTag) !== JSON.stringify(previousTag) &&
-                    <Button variant="primary" type="submit">
-                        Save
-                    </Button>
-                }
-            </Form>
-        </div>
+          </td>
+          <td>
+              {(!questionTag["mandatory"]) &&
+                <input type="checkbox" checked={questionTag["showInList"]} onChange={handleCheckboxChange} />
+              }
+          </td>
+          <td>
+              {(!questionTag["mandatory"]) && <button onClick={deleteTag}>
+                  <Image src={deleteIcon} className="delete-icon" />
+              </button>
+              }
+          </td>
+      </tr>
     )
 }
