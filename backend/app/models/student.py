@@ -24,6 +24,7 @@ class Student(SQLModel, table=True):
     edition: Optional[Edition] = Relationship(back_populates="students")
 
     decision: Optional[DecisionOption] = DecisionOption.UNDECIDED
+    email_sent: bool = False
 
     suggestions: List[Suggestion] = Relationship(back_populates="student")
     participations: List[Participation] = Relationship(back_populates="student")
@@ -38,3 +39,8 @@ class StudentOutSimple(BaseModel):
     def __init__(self, **data):
         data["id"] = config.api_url + "students/" + str(data["id"])
         super().__init__(**data)
+
+
+class StudentUpdate(BaseModel):
+    decision: DecisionOption
+    email_sent: bool = False

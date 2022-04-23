@@ -1,10 +1,10 @@
 import {
   Accordion,
   Button,
-  Col, Dropdown,
+  Col,
   Row
 } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
@@ -17,15 +17,11 @@ import { useRouter } from "next/router";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import { api, Url } from "../../utils/ApiClient";
+import { Url, api } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
-import AccordionBody from "react-bootstrap/AccordionBody";
-import SettingCards from "../settings/SettingCards";
-import ChangePassword from "../settings/ChangePassword";
-import ChangeEmail from "../settings/ChangeEmail";
-import ChangeName from "../settings/ChangeName";
-import AccordionItem from "react-bootstrap/AccordionItem";
+import LoadingPage from "../LoadingPage"
+import { WebsocketContext } from "../Auth"
 
 /**
  * This component returns the details of a student
@@ -38,8 +34,7 @@ export default function StudentDetails(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   // These constants contain info about the student
-  const [student, setStudent] = useState({});
-  const [studentId, setStudentId] = useState(undefined);
+  const [student, setStudent] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
   const [decision, setDecision] = useState(-1);
   const [questionAnswers, setQuestionAnswers] = useState([])
@@ -53,57 +48,74 @@ export default function StudentDetails(props) {
   // These constants contain the value of the decide field and which suggestion window should be shown
   const [suggestion, setSuggestion] = useState(0);
   const [decideField, setDecideField] = useState(-1);
+  const [detailLoading, setDetailLoading] = useState(true);
 
+  const ws = useContext(WebsocketContext)
   const { data: session, status } = useSession()
+  const [prevStudentid, setPrevStudentid] = useState(undefined)
+
+  useEffect(() => {
+
+    if (ws) {
+      ws.addEventListener("message", updateFromWebsocket)
+
+      return () => {
+        ws.removeEventListener('message', updateFromWebsocket)
+      }
+    }
+
+  }, [ws, student])
 
   /**
    * This function is called when studentId or props.student_id is changed
    */
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
-    if (studentId !== props.student_id && props.student_id) {
-      setStudentId(props.student_id);
-      if (!props.student) {
-        Url.fromName(api.students).extend(`/${props.student_id}`).get().then(res => {
-          if (res.success) {
-            res = res.data;
-            Object.values(res["suggestions"]).forEach((item, index) => {
-              if (item["suggested_by_id"] === session["userid"]) {
-                res["own_suggestion"] = item;
-              }
-            });
 
-            setStudent(res);
-
-            // Fill in the suggestions field, this contains all the suggestions which are not definitive
-            setSuggestions(res["suggestions"]);
-
-            // Fill in the decisions field, this contains the decision for the student if there is one,
-            setDecision(res["decision"])
-
-            // Fill in the questionAnswers
-            Url.fromUrl(res["question-answers"]).get().then(res => {
-              if (res.success) { setQuestionAnswers(res.data); }
-            })
-          }
-        });
-      }
-
-      else {
-        setStudent(props.student);
-        setDecision(props.student["decision"])
-        setSuggestions(props.student["suggestions"]);
-
-
+    if (!student || prevStudentid !== router.query.studentId) {
+      setPrevStudentid(router.query.studentId)
+      setDetailLoading(true)
+      Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(retrieved_student => {
+        console.log(retrieved_student.data)
+        setStudent(retrieved_student.data);
+        setDecision(retrieved_student.data["decision"])
+        setDecideField(retrieved_student.data["decision"])
+        setSuggestions(retrieved_student.data["suggestions"]);
         // Fill in the questionAnswers
-        Url.fromUrl(props.student["question-answers"]).get().then(res => {
+        Url.fromUrl(retrieved_student.data["question-answers"]).get().then(res => {
           if (res.success) {
-            setQuestionAnswers(res.data);
+            setQuestionAnswers(res["data"]);
           }
         })
+        setDetailLoading(false)
+      })
+    }
+
+
+  }, [router.query.studentId]);
+
+  const updateFromWebsocket = (event) => {
+    let data = JSON.parse(event.data)
+    if ("suggestion" in data) {
+      if (student && student["id"] == data["suggestion"]["student_id"]) {
+        let new_student = student
+        new_student["suggestions"][data["id"]] = data["suggestion"];
+        if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
+          new_student["own_suggestion"] = data["suggestion"];
+        }
+        setStudent({ ...new_student })
+      }
+
+    } else if ("decision" in data) {
+      if (student && student["id"] === data["id"]) {
+        let new_student = student
+        new_student["decision"] = data["decision"]["decision"];
+        setStudent({ ...new_student })
+        setDecision(data["decision"]["decision"])
+        setDecideField(data["decision"]["decision"])
       }
     }
-  }, [studentId, props.student_id, props.student, session]);
+  }
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   /**
@@ -131,8 +143,8 @@ export default function StudentDetails(props) {
       let suggestion = Object.values(suggestions)[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
       result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}
-                              classNamesText={(suggestion["suggested_by_id"] === session["userid"])?
-                                "bold_text": "null"}/>)
+        classNamesText={(suggestion["suggested_by_id"] === session["userid"]) ?
+          "bold_text" : "null"} />)
     }
 
     if (result.length > 0) {
@@ -184,12 +196,15 @@ export default function StudentDetails(props) {
     }));
   }
 
-  /**
-   * returns the html for student details
-   */
-  return (
-    <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)", visibility: props.visibility }} >
+  if (detailLoading) {
+    return (
+      <Col className="student-details-window" style={{ "position": "relative", "height": "calc(100vh - 75px)" }} >
+        <LoadingPage />
+      </Col>)
+  }
 
+  return (
+    <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)" }} >
       {student["mandatory"] &&
         <div>
           <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
@@ -215,7 +230,7 @@ export default function StudentDetails(props) {
           <Row className="nomargin">
             <ul className="nomargin nopadding">
               {(student["skills"]) && student["skills"].map((skill, index) =>
-              <li className="skill" style={{ display: "inline-block" }} key={index}>{skill["name"].toUpperCase()}</li>)}
+                <li className="skill" style={{ display: "inline-block" }} key={index}>{skill["name"].toUpperCase()}</li>)}
             </ul>
           </Row>
         </Col>
@@ -233,7 +248,7 @@ export default function StudentDetails(props) {
             </Col>
             <Col xs="auto" className="close-button">
               <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
-                     src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
+                src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
             </Col>
           </Row>
           <Row>
@@ -247,7 +262,7 @@ export default function StudentDetails(props) {
               </select>
             </Col>
             <Col md="auto">
-              <Button className="suggest-confirm-button" disabled={decideField < 0} onClick={() => setDecisionPopUpShow(true)}>
+              <Button className="suggest-confirm-button" disabled={decideField == decision} onClick={() => setDecisionPopUpShow(true)}>
                 Confirm
               </Button>
             </Col>
@@ -268,7 +283,7 @@ export default function StudentDetails(props) {
           <Row md="auto" className="h2-titles student-details-suggestions-line nomargin">
             <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
             <SuggestionsCount suggestionsYes={getSuggestionsCount(2)} suggestionsMaybe={getSuggestionsCount(1)}
-                              suggestionsNo={getSuggestionsCount(0)} />
+              suggestionsNo={getSuggestionsCount(0)} />
           </Row>
           {getSuggestions()}
 
