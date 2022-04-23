@@ -60,6 +60,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
         self.session: AsyncSession = AsyncSession(engine)
+        await clear_data(self.session)
 
         user_generator = UserGenerator(self.session)
         self.users = {user.name: user for user in user_generator.data}
@@ -145,7 +146,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                               json_body=body, access_token="wrong token")
 
     async def _access_test_request(
-            self, request_type: Request, path, allowed_users: Set[str], body: Dict = None
+            self, request_type: Request, path, allowed_users: Set[str], body: Dict = None, unauthorized_status: int = Status.FORBIDDEN
     ) -> Dict[str, Response]:
         responses: Dict[str, Response] = {}
         # Allowed users
@@ -155,12 +156,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         for user_name in set(self.users.keys()).difference(allowed_users):
             user = self.users[user_name]
             if user.active and user.approved and not user.disabled:
-                await self.do_request(request_type, path, user_name, Status.FORBIDDEN, json_body=body)
+                await self.do_request(request_type, path, user_name, unauthorized_status, json_body=body)
 
         return responses
 
     async def auth_access_request_test(self, request_type: Request, path: str, allowed_users: Set[str],
-                                       body: Dict = None) -> Dict[str, Response]:
+                                       body: Dict = None, unauthorized_status: int = Status.FORBIDDEN) -> Dict[str, Response]:
         """
         Assert for all users whether only allowed_users are allowed request access to the given path.
 
@@ -173,7 +174,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         # Check bad access tokens
         await self._auth_test_request(request_type, path, body)
         # Check all users with their access tokens:
-        return await self._access_test_request(request_type, path, allowed_users, body)
+        return await self._access_test_request(request_type, path, allowed_users, body, unauthorized_status)
 
     async def auth_access_request_test_per_user(
             self, request_type: Request,
