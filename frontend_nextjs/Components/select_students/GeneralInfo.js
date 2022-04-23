@@ -61,16 +61,19 @@ export default function GeneralInfo(props) {
         })
       }
 
-      // add the decision of the student to the general info
-      rows.push(
-        <Row key={"Project"} className="question-answer-row">
-          <Col md="auto" className="info-titles">{"Project"}</Col>
-          <Col md="auto" className="info-answers">
-            {(! projects || projects.length === 0)? "None": projects.join(", ")}
-          </Col>
-        </Row>
-      )
+      // add the project of the student to the general info
+      if (! props.listelement || ! props.studentsTab) {
+        rows.push(
+          <Row key={"Project"} className="question-answer-row">
+            <Col md="auto" className="info-titles">{"Project"}</Col>
+            <Col md="auto" className="info-answers">
+              {(! projects || projects.length === 0)? "None": projects.join(", ")}
+            </Col>
+          </Row>
+        )
+      }
 
+      // add the decision of the student to the general info
       rows.push(
         <Row key={"Decision"} className="question-answer-row">
           <Col md="auto" className="info-titles">{"Decision"}</Col>
