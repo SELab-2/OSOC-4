@@ -171,8 +171,8 @@ export default function StudentDetails(props) {
   function getQuestionAnswers() {
     return questionAnswers.map((questionAnswer, i) =>
       [
-        <Row key={"question" + i} className="student-details-question">{questionAnswer["question"]}</Row>,
-        <Row key={"answer" + i} className="student-details-answer">{questionAnswer["answer"]}</Row>
+        <Row key={"question" + i} className="student-details-question nomargin">{questionAnswer["question"]}</Row>,
+        <Row key={"answer" + i} className="student-details-answer nomargin">{questionAnswer["answer"]}</Row>
       ]
     )
   }
@@ -262,29 +262,15 @@ export default function StudentDetails(props) {
             </Button>
           </Row>
 
-          <Accordion className="margins-accordion">
-            <AccordionItem eventKey="0">
-              <Accordion.Header>
-                <Row md="auto" className="student-details-suggestions-line nomargin">
-                  <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
-                  <SuggestionsCount suggestionsYes={getSuggestionsCount(2)} suggestionsMaybe={getSuggestionsCount(1)}
-                                    suggestionsNo={getSuggestionsCount(0)} />
-                </Row>
-              </Accordion.Header>
-              <AccordionBody>
-                {getSuggestions()}
-              </AccordionBody>
-            </AccordionItem>
+          <Row md="auto" className="h2-titles student-details-suggestions-line nomargin">
+            <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
+            <SuggestionsCount suggestionsYes={getSuggestionsCount(2)} suggestionsMaybe={getSuggestionsCount(1)}
+                              suggestionsNo={getSuggestionsCount(0)} />
+          </Row>
+          {getSuggestions()}
 
-            <AccordionItem eventKey="1">
-              <Accordion.Header>
-                <h2>Questions</h2>
-              </Accordion.Header>
-              <AccordionBody>
-                {getQuestionAnswers()}
-              </AccordionBody>
-            </AccordionItem>
-          </Accordion>
+          <h2 className="h2-titles">Questions</h2>
+          {getQuestionAnswers()}
         </Col>
       </Row>
 
