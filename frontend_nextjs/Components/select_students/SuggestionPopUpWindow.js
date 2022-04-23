@@ -1,11 +1,17 @@
 import { Button, Modal, ModalHeader, ModalTitle } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
-import {Url, api} from "../../utils/ApiClient";
+import { Url, api } from "../../utils/ApiClient";
 
-// This view shows the pop up window when making a suggestion about a student.
-export default function PopUpWindow(props) {
+/**
+ * This component renders the pop-up window when making a suggestion about a student.
+ * @param props props has the fields popUpShow, setPopUpShow, decision and student. popUpShow decided the visibility of
+ * the pop up window. setPopUpShow is used to change popUpShow. decision is the decision ("yes", "maybe" or "no") of the
+ * suggestion we want to make for the student. student is the student we want to make a suggestion for.
+ * @returns {JSX.Element} A component that renders the pop-up window when making a suggestion about a student
+ */
+export default function SuggestionPopUpWindow(props) {
 
-  // defines wheater or not the pop up window must be shown
+  // defines whether the pop-up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
   const [suggestion, setSuggestion] = useState({ "reason": "" });
@@ -23,7 +29,10 @@ export default function PopUpWindow(props) {
 
   }, [props.popUpShow])
 
-  // returns the string for suggestion for the student
+  /**
+   * get the string for the suggestion you want to make for the student
+   * @returns {string} The string for the suggestion you want to make for the student
+   */
   function getSuggestion() {
     if (props.decision === -1) {
       return "undecided" // this can only be shown untill the suggested value is adjusted
@@ -32,7 +41,9 @@ export default function PopUpWindow(props) {
     return decisions[props.decision];
   }
 
-  // called when the pop up window is closed
+  /**
+   * called when the pop-up window is closed
+   */
   function onHide() {
     setPopUpShow(false);
   }
@@ -46,18 +57,25 @@ export default function PopUpWindow(props) {
     }));
   }
 
-  // called on submitting the suggestion
+  /**
+   * called on submitting the suggestion
+   */
   async function submitSuggestion() {
 
-    await Url.fromUrl(api.baseUrl).extend("/suggestions/create").setBody({
+    Url.fromUrl(api.baseUrl).extend("/suggestions/create").setBody({
       ...suggestion,
       ["student_id"]: props.student["id_int"]
-    }).post();
-    props.updateSuggestion(suggestion)
-    setPopUpShow(false);
+    }).post().then(res => {
+      if (res.success === true) {
+        props.updateSuggestion(suggestion)
+        setPopUpShow(false);
+      }
+    });
   }
 
-  // returns the html representation for the pop up window
+  /**
+   * returns the html representation for the pop-up window
+   */
   return (
     <Modal
       show={popUpShow}

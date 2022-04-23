@@ -16,14 +16,19 @@ import { useRouter } from "next/router";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import {api, Url} from "../../utils/ApiClient";
+import { api, Url } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 
-// This function returns the details of a student
+/**
+ * This component returns the details of a student
+ * @param props props has the field studentId. The studentId holds the url of the student
+ * @returns {JSX.Element} The component that renders the student details
+ */
 export default function StudentDetails(props) {
 
   const router = useRouter();
+
   // These constants are initialized empty, the data will be inserted in useEffect
   // These constants contain info about the student
   const [student, setStudent] = useState({});
@@ -44,7 +49,9 @@ export default function StudentDetails(props) {
 
   const { data: session, status } = useSession()
 
-  // This function inserts the data in the variables
+  /**
+   * This function is called when studentId or props.student_id is changed
+   */
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
     if (studentId !== props.student_id && props.student_id) {
@@ -52,43 +59,34 @@ export default function StudentDetails(props) {
       if (!props.student) {
         Url.fromName(api.students).extend(`/${props.student_id}`).get().then(res => {
           if (res.success) {
-                res = res.data;
-                Object.values(res["suggestions"]).forEach((item, index) => {
-                  if (item["suggested_by_id"] === session["userid"]) {
-                    res["own_suggestion"] = item;
-                  }
-                });
-
-                setStudent(res);
-
-                // Fill in the suggestions field, this contains all the suggestions which are not definitive
-                setSuggestions(res["suggestions"]);
-
-                // Fill in the decisions field, this contains the decision for the student if there is one,
-                // this decision is stored as a suggestion which is definitive
-                let decisions = Object.values(res["suggestions"]).filter(suggestion => suggestion["definitive"]);
-                if (decisions.length !== 0) {
-                  setDecision(decisions[0]["decision"]);
-                } else {
-                  setDecision(-1);
-                }
-
-                // Fill in the questionAnswers
-                Url.fromUrl(res["question-answers"]).get().then(res => {
-                  if (res.success) {setQuestionAnswers(res.data);}
-                })
+            res = res.data;
+            Object.values(res["suggestions"]).forEach((item, index) => {
+              if (item["suggested_by_id"] === session["userid"]) {
+                res["own_suggestion"] = item;
               }
-            }
-        );
-      } else {
+            });
+
+            setStudent(res);
+
+            // Fill in the suggestions field, this contains all the suggestions which are not definitive
+            setSuggestions(res["suggestions"]);
+
+            // Fill in the decisions field, this contains the decision for the student if there is one,
+            setDecision(res["decision"])
+
+            // Fill in the questionAnswers
+            Url.fromUrl(res["question-answers"]).get().then(res => {
+              if (res.success) { setQuestionAnswers(res.data); }
+            })
+          }
+        });
+      }
+
+      else {
         setStudent(props.student);
+        setDecision(props.student["decision"])
         setSuggestions(props.student["suggestions"]);
-        let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"]);
-        if (decisions.length !== 0) {
-          setDecision(decisions[0]["decision"]);
-        } else {
-          setDecision(-1);
-        }
+
 
         // Fill in the questionAnswers
         Url.fromUrl(props.student["question-answers"]).get().then(res => {
@@ -98,15 +96,26 @@ export default function StudentDetails(props) {
         })
       }
     }
-    }, [studentId, props.student_id, props.student, session])
+  }, [studentId, props.student_id, props.student, session]);
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
+  /**
+   * This function counts the amount of suggestions for a certain value: "yes", "maybe", or "no".
+   * @param decision De type of suggestions that need to be counted ("yes", "maybe", or "no").
+   * @returns {number} The amount of suggestions of the given type for the student.
+   */
   function getSuggestionsCount(decision) {
     return Object.values(suggestions).filter(suggestion => suggestion["decision"] === decision).length;
   }
 
   // returns a list of html suggestions, with the correct css classes.
   // If there are no suggestions: this returns "No suggestions"
+  /**
+   * This function generates a list of html suggestions, with the correct css classes.
+   * If there ar no suggestions this function returns "No suggestions".
+   * @returns {JSX.Element|*[]} A list of html suggestions, with the correct css classes.
+   * If there ar no suggestions this function returns "No suggestions".
+   */
   function getSuggestions() {
     let result = [];
     const classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
@@ -114,7 +123,9 @@ export default function StudentDetails(props) {
     for (let i = 0; i < Object.values(suggestions).length; i++) {
       let suggestion = Object.values(suggestions)[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
-      result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames} />)
+      result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}
+                              classNamesText={(suggestion["suggested_by_id"] === session["userid"])?
+                                "bold_text": "null"}/>)
     }
 
     if (result.length > 0) {
@@ -123,14 +134,20 @@ export default function StudentDetails(props) {
     return <Row>No suggestions</Row>
   }
 
-  // called when you click on 'suggest yes', 'suggest maybe' or 'suggest no', it will show the correct pop-up window
+  /**
+   * This function is called when you click on 'suggest yes', 'suggest maybe' or 'suggest no', it will show the correct
+   * pop-up window.
+   * @param suggestion "yes", "maybe" or "no", depending on which button is clicked.
+   */
   function suggest(suggestion) {
     setSuggestion(suggestion);
     setSuggestionPopUpShow(true);
   }
 
-  // this function is called when the student details are closed, it will go back to the student list with filters,
-  // without reloading the page
+  /**
+   * This function is called when the student details are closed, it will go back to the studetn list with filters,
+   * without reloading the page
+   */
   function hideStudentDetails() {
     let newQuery = router.query;
     delete newQuery["studentId"];
@@ -140,6 +157,10 @@ export default function StudentDetails(props) {
     }, undefined, { shallow: true })
   }
 
+  /**
+   * This function renders the (question, answer) pairs from the tally form that don't have a questionTag.
+   * @returns {JSX.Element[][]} A list of (question, answer) pairs from the tally form that don't have a questionTag.
+   */
   function getQuestionAnswers() {
     return questionAnswers.map((questionAnswer, i) =>
       [
@@ -156,9 +177,11 @@ export default function StudentDetails(props) {
     }));
   }
 
-  // returns the html for student details
+  /**
+   * returns the html for student details
+   */
   return (
-    <Col className="fill_height student-details-window" style={{ visibility: props.visibility }} >
+    <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)", visibility: props.visibility }} >
 
       {student["mandatory"] &&
         <div>
@@ -173,7 +196,7 @@ export default function StudentDetails(props) {
       <Row className="details-upper-layer">
         <Col md="auto">
           <Row>
-            <Col md="auto" className="name_big">
+            <Col xs="auto" className="name_big">
               {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
             </Col>
             <Col>
@@ -187,33 +210,34 @@ export default function StudentDetails(props) {
           </Row>
         </Col>
         <Col />
-        <Col md="auto">
+        <Col xs="auto" className="buttongroup-paddingtop">
           <Row>
-            <Col md="auto"><button className={`suggest-yes-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 2 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(2)}>
-              Suggest yes</button>
+            <Col xs="auto" className="nopadding">
+              <button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>Yes</button>
             </Col>
-            <Col md="auto"><button className={`suggest-maybe-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 1 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(1)}>
-              Suggest maybe</button>
+            <Col xs="auto" className="nopadding">
+              <button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>Maybe</button>
             </Col>
-            <Col md="auto"><button className={`suggest-no-button suggest-button ${(student["own_suggestion"]) ? (student["own_suggestion"]["decision"] === 0 ? "suggest-button-selected" : "") : ""}`} onClick={() => suggest(0)}>
-              Suggest no</button>
+            <Col xs="auto" className="nopadding">
+              <button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>No</button>
             </Col>
-            <Col md="auto" className="close-button">
-              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top" src={closeIcon} alt="close-icon" width="44px" height="44px" objectFit={'contain'} />
+            <Col xs="auto" className="close-button">
+              <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
+                     src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
             </Col>
           </Row>
           <Row>
             <Col>
               <select className="dropdown-decision" id="dropdown-decision"
-                onChange={(ev) => setDecideField(ev.target.value)}>
-                <option value="-1">Undecided</option>
-                <option value="2">Yes</option>
-                <option value="1">Maybe</option>
-                <option value="0">No</option>
+                onChange={(ev) => setDecideField(ev.target.value)} value={decision}>
+                <option value={-1}>Undecided</option>
+                <option value={0}>No</option>
+                <option value={1}>Maybe</option>
+                <option value={2}>Yes</option>
               </select>
             </Col>
             <Col md="auto">
-              <Button className="suggest-confirm-button" disabled={decideField === -1} onClick={() => setDecisionPopUpShow(true)}>
+              <Button className="suggest-confirm-button" disabled={decideField < 0} onClick={() => setDecisionPopUpShow(true)}>
                 Confirm
               </Button>
             </Col>

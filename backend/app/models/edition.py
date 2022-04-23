@@ -15,6 +15,7 @@ class Edition(SQLModel, table=True):
     name: str
     description: Optional[str] = None
     form_id: Optional[str] = None
+    read_only: bool = False
     coaches: List["User"] = Relationship(back_populates="editions", link_model=EditionCoach)
     students: List["Student"] = Relationship(back_populates="edition")
 

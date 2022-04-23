@@ -2,9 +2,9 @@
     border-width: 1px;
     border-style: solid;
     border-color: lightgray;
-    margin: 10px;
     border-radius: 7px;
-    padding: 8px 20px;
+    margin: 7px 0 7px 0;
+    padding: 10px 12px 10px 10px;
 }
 
 .name {
@@ -43,14 +43,16 @@
     width: 25px;
     height: 25px;
     text-align: center;
-    padding-left: 0; padding-right: 0;
+    padding-left: 0;
+    padding-right: 0;
     background-color: var(--yes_green_65);
 }
 
 .suggestionsMaybe {
     width: 25px;
     height: 25px;
-    padding-left: 0; padding-right: 0;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
     background-color: var(--maybe_yellow_65);
 }
@@ -58,7 +60,8 @@
 .suggestionsNo {
     width: 25px;
     height: 25px;
-    padding-left: 0; padding-right: 0;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
     background-color: var(--no_red_65);
 }
