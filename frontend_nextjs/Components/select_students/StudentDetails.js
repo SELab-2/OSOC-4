@@ -54,11 +54,15 @@ export default function StudentDetails(props) {
   const [prevStudentid, setPrevStudentid] = useState(undefined)
 
   useEffect(() => {
-    console.log(student)
-    console.log("updated details")
-    if (student && ws) {
+
+    if (ws) {
       ws.addEventListener("message", updateFromWebsocket)
+
+      return () => {
+        ws.removeEventListener('message', updateFromWebsocket)
+      }
     }
+
   }, [ws, student])
 
   /**
@@ -90,8 +94,6 @@ export default function StudentDetails(props) {
 
   const updateFromWebsocket = (event) => {
     let data = JSON.parse(event.data)
-    console.log(data)
-    console.log("details")
     if ("suggestion" in data) {
       if (student && student["id"] == data["suggestion"]["student_id"]) {
         let new_student = student
@@ -103,9 +105,7 @@ export default function StudentDetails(props) {
       }
 
     } else if ("decision" in data) {
-      console.log(student["id_int"])
-      console.log(data["id"])
-      if (student && student["id_int"] === data["id"]) {
+      if (student && student["id"] === data["id"]) {
         let new_student = student
         new_student["decision"] = data["decision"]["decision"];
         setStudent({ ...new_student })

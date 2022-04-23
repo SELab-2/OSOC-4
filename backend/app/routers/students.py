@@ -100,7 +100,7 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
             setattr(student, key, value)
         await update(student, session)
 
-        await websocketManager.broadcast({"id": student_id, "decision": jsonable_encoder(StudentUpdate.parse_raw(student.json()))})
+        await websocketManager.broadcast({"id": config.api_url + "students/" + str(student_id), "decision": jsonable_encoder(StudentUpdate.parse_raw(student.json()))})
 
         return response(None, "Student updated succesfully")
 

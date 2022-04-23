@@ -5,7 +5,7 @@ import HamburgerMenu from "react-hamburger-menu";
 import SearchSortBar from "./SearchSortBar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StudentListelement from "./StudentListelement";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import useWindowDimensions from "../../utils/WindowDimensions";
 import { api, Url } from "../../utils/ApiClient";
 import { useSession } from "next-auth/react";
@@ -18,10 +18,8 @@ export default function StudentListAndFilters(props) {
   const router = useRouter();
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [studentUrls, setStudentUrls] = useState([]);
+  const [studentUrls, setStudentUrls, studentUrlsRef] = useState([]);
   const [students, setStudents] = useState([]);
-
-  const [student, setStudent] = useState(undefined);
 
   // These variables are used to notice if search or filters have changed, they will have the values of search,
   // sortby and filters that we filtered for most recently.
@@ -44,24 +42,18 @@ export default function StudentListAndFilters(props) {
 
   const ws = useContext(WebsocketContext)
 
-  // useEffect(() => {
-  //   if (session && router.query.studentId) {
-
-  //     if ((student && student["id_int"] !== router.query.studentId) || !student) {
-
-  //     }
-  //   } else {
-  //     setStudent(undefined);
-  //   }
-  // }, [router.query.studentId])
 
   useEffect(() => {
-    if (students && ws) {
-      console.log("updated list")
-      ws.addEventListener("message", updateFromWebsocket)
+
+    if (ws) {
+      ws.addEventListener("message", updateDetailsFromWebsocket)
+
+      return () => {
+        ws.removeEventListener('message', updateDetailsFromWebsocket)
+      }
     }
 
-  }, [ws, students])
+  }, [ws, students, studentUrls, router.query, decisions])
 
   useEffect(() => {
     if (session) {
@@ -95,10 +87,8 @@ export default function StudentListAndFilters(props) {
   }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
 
 
-  const updateFromWebsocket = (event) => {
+  const updateDetailsFromWebsocket = (event) => {
     let data = JSON.parse(event.data)
-    console.log(data)
-    console.log("list")
     if ("suggestion" in data) {
       students.find((o, i) => {
         if (o["id"] === data["suggestion"]["student_id"]) {
@@ -113,14 +103,80 @@ export default function StudentListAndFilters(props) {
       });
 
     } else if ("decision" in data) {
-      students.find((o, i) => {
-        if (o["id_int"] === data["id"]) {
-          let new_students = [...students]
-          new_students[i]["decision"] = data["decision"]["decision"];
-          setStudents(new_students);
-          return true; // stop searching
+      let found = students.find((o, i) => {
+        if (o["id"] === data["id"]) {
+
+          // if filtered on decisions
+          if (decisions && !decisions.includes(["no", "maybe", "yes", "undecided"][data["decision"]["decision"]])) {
+            // remove the student
+            let students_copy = [...students];
+            students_copy.splice(i, 1);
+            setStudents(students_copy)
+          } else {
+            let new_students = [...students]
+            new_students[i]["decision"] = data["decision"]["decision"];
+            setStudents(new_students);
+          }
+          return true;
         }
-      });
+
+      })
+      if (found) {
+        return true;
+      }
+      // get last shown user and index of the user as fallback
+      if (students) {
+        const laststudent = students.at(-1);
+        const lastindex = students.length - 1;
+
+        console.log("getting new urls")
+        // get the new studenturls
+        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+          if (res.success) {
+            // find the index of the laststudent in the new url list
+            let foundstudent = res.data.indexOf(laststudent.id)
+            if (foundstudent === -1) {
+              foundstudent = lastindex;
+            }
+            if (foundstudent < 10) {
+              foundstudent = 10;
+            }
+            let p1 = res.data.slice(0, foundstudent);
+            let p2 = res.data.slice(foundstudent);
+            setStudentUrls(p2);
+            Promise.all(p1.map(studentUrl => {
+              // get the student from the cache + update the decision (needed when cache updated later than studentlis)
+              let student = cache.getStudent(studentUrl, session["userid"])
+              student["decision"] = data["decision"]["decision"];
+              return student;
+            }
+            )).then(newstudents => {
+              setStudents([...newstudents]);
+            })
+          }
+        });
+      } else {
+        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+          if (res.success) {
+            let p1 = res.data.slice(0, 10);
+            let p2 = res.data.slice(10);
+            setStudentUrls(p2);
+            Promise.all(p1.map(studentUrl => {
+              // get the student from the cache + update the decision (needed when cache updated later than studentlis)
+              let student = cache.getStudent(studentUrl, session["userid"])
+              student["decision"] = data["decision"]["decision"];
+              return student;
+            }
+
+            )).then(newstudents => {
+              setStudents([...newstudents]);
+            })
+          }
+        });
+      }
+
+
+
     }
 
   }
@@ -192,7 +248,7 @@ export default function StudentListAndFilters(props) {
         >
           {students.map((i, index) => (
 
-            <StudentListelement key={index} student={i} />
+            <StudentListelement key={i.id} student={i} />
 
           ))}
         </InfiniteScroll>

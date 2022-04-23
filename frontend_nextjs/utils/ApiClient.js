@@ -298,6 +298,30 @@ class Cache {
         return undefined;
     }
 
+    async updateCache(newdata, userid) {
+        const data = JSON.parse(newdata)
+
+        if ("suggestion" in data) {
+            let student = cache[data["suggestion"]["student_id"]]
+            if (student) {
+                let new_student = student
+                new_student["suggestions"][data["id"]] = data["suggestion"];
+                if (data["suggestion"]["suggested_by_id"] === userid) {
+                    new_student["own_suggestion"] = data["suggestion"];
+                }
+                cache[data["suggestion"]["student_id"]] = new_student;
+            }
+
+        } else if ("decision" in data) {
+            let student = cache[data["id"]]
+            if (student) {
+                let new_student = student
+                new_student["decision"] = data["decision"]["decision"];
+                cache[data["id"]] = new_student
+            }
+        }
+    }
+
 }
 
 export const cache = new Cache();

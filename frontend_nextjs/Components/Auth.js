@@ -4,6 +4,7 @@ import React, { useEffect, useContext, useState } from "react";
 import LoadingPage from "../Components/LoadingPage"
 import NavHeader from "../Components/NavHeader"
 import { Container } from "react-bootstrap";
+import { cache } from "../utils/ApiClient";
 
 
 export const WebsocketContext = React.createContext(undefined)
@@ -18,19 +19,20 @@ export default function RouteGuard(props) {
 
     useEffect(() => {
         if (status === 'loading') return // Do nothing while loading
-        if (props.auth && !isUser) router.push('/login') //Redirect to login
-
-        // make a websocket connection    
-        if (isUser && props.auth && !ws && !creatingConnection) {
-            console.log(webconn)
-            console.log("Creating new websocketconnection")
+        if (props.auth && !isUser) {
+            router.push('/login') //Redirect to login
+        } else if (isUser && props.auth && !ws && !creatingConnection) {
+            // make a websocket connection    
             setCreatingConnection(true)
             let newwebconn = new WebSocket("ws://192.168.3.45:8000/ws")
+            newwebconn.addEventListener("message", (event) => {
+                cache.updateCache(event.data, session["userid"])
+            })
             newwebconn.onopen = (event) => {
-                console.log("opened connection")
                 setCreatingConnection(false)
                 setWebconn(newwebconn);
             }
+
         }
 
     }, [isUser, status, props.auth, router])
