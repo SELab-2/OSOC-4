@@ -1,60 +1,111 @@
 import json
-import unittest
-from typing import Dict
-
+from typing import Dict, Set
+import uuid
 from httpx import Response
-
-from app.crud import read_where
-from app.database import db
+from app.crud import read_where, update, update_all
 from app.models.project import Project
-from app.tests.test_base import TestBase, Request
+from app.tests.test_base import Status, TestBase, Request
+from app.models.user import User, UserRole
+from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
+from app.config import config
 
 
 class TestProjects(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @unittest.skip("Fault in test data")
     async def test_post_add_project_data(self):
-        # This test needs to be reworked when multiple users are allowed,
-        # otherwise the same user will be created multiple times thus not every user will create a new user
+
+        edition_generator = EditionGenerator(self.session)
+        edition = edition_generator.generate_edition(2022)
+        await update(edition, self.session)
 
         path = "/projects/create"
-        allowed_users = {"user_admin"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        projectName = str(uuid.uuid1())
         body = {
-            "name": "added project",
+            "name": projectName,
             "description": "an added project",
             "goals": "doing a test",
-            "partner": "",  # Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
-            "required_skills": [],
-            "users": [],
-            "edition": 2022,
+            "partner_name": "Testing inc.",
+            "partner_description": "Testing inc. is focused on being dummy data.",
+            "edition": edition.year,
         }
 
-        # Test authorization & access-control
+        # Post create project request
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
-        # Test again to create a duplicate project
-        responses2: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
 
+        # Get project id from the response url
+        projectId = ""
         for user_title in allowed_users:
-            self.assertEquals(json.loads(responses1.get(user_title).content)["data"],
-                              json.loads(responses2.get(user_title).content)["data"],
-                              "The returned project was different for it's creation and it's duplicate creation")
+            projectId = json.loads(responses1.get(user_title).content)["data"]["id"].split("/")[-1]
 
         # Test whether created project is in the database
-        project = await db.engine.find_one(Project, Project.name == body["name"])
-        self.assertIsNotNone(project, f"'{body['name']}' was not found in the database.")
+        projectInDb = await read_where(Project, Project.name == projectName, session=self.session)
+        self.assertIsNotNone(projectInDb, f"'{projectName}' was not found in the database.")
 
-    @unittest.skip("Fault in test data, test_base can't create project with approved_coach")
-    async def test_get_projects_id(self):
-        project = await read_where(Project, Project.name == "project_test", session=self.session)
+        # Project id in the database should be same as it in the response url
+        self.assertEqual(str(projectInDb.id), projectId, f"Project id of '{projectName}' in the response url is not same as it in the database.")
+
+        # compare every field in the database with the test value
+        db_project_dict = projectInDb.dict()
+        for key, value in body.items():
+            self.assertEqual(db_project_dict[key], value,
+                             (f"{key} of project '{projectName}' did not match.\n"
+                              f"Expected: {value}\n"
+                              f"Got: {db_project_dict[key]}"))
+
+    async def test_get_projects_id_with_admin_user(self):
+        url = f"{config.api_url}projects/"
+        edition_generator = EditionGenerator(self.session)
+        edition = edition_generator.generate_edition(2022)
+        project = Project(
+            name="Student Volunteer Project",
+            goals="Free\nReal\nEstate",
+            description="Free real estate",
+            partner_name="UGent",
+            partner_description="De C in UGent staat voor communicatie",
+            coaches=[],
+            edition=edition.year)
+        await update_all([edition, project], self.session)
+
         path = "/projects/" + str(project.id)
-        allowed_users = {"user_admin", "user_approved_coach"}
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
 
         # Test authorization & access-control
-        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users, unauthorized_status=Status.BAD_REQUEST)
 
+        # Test responses
         for user_title, response in responses.items():
-            gotten_project = json.loads(response.content)["data"]
-            self.assertEqual(str(project.id), gotten_project["id"].split("/")[-1],
+            gotten_project = json.loads(response.content)
+            self.assertEqual(f"{url}{project.id}", gotten_project["id"],
+                             f"The project gotten by {user_title} did not match the expected project.")
+
+    async def test_get_projects_id_with_coach_user(self):
+        url = f"{config.api_url}projects/"
+        coach = await read_where(User, User.role == UserRole.COACH, session=self.session)
+
+        edition_generator = EditionGenerator(self.session)
+        edition = edition_generator.generate_edition(2022)
+        project = Project(
+            name="Student Volunteer Project",
+            goals="Free\nReal\nEstate",
+            description="Free real estate",
+            partner_name="UGent",
+            partner_description="De C in UGent staat voor communicatie",
+            coaches=[coach],
+            edition=edition.year)
+        await update_all([edition, project], self.session)
+
+        path = "/projects/" + str(project.id)
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        allowed_users.add(coach.name)
+
+        # Test authorization & access-control
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users, unauthorized_status=Status.BAD_REQUEST)
+
+        # Test responses
+        for user_title, response in responses.items():
+            gotten_project = json.loads(response.content)
+            self.assertEqual(f"{url}{project.id}", gotten_project["id"],
                              f"The project gotten by {user_title} did not match the expected project.")
