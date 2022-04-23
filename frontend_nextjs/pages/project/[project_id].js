@@ -99,7 +99,7 @@ const Project = () => {
                             <div className={"project-details-title"}>Assigned staff</div>
                             {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
                         </div>
-
+                        <br/>
                         <Row>
                             <Col>
                                 <div>
