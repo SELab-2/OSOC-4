@@ -10,7 +10,7 @@ import {api, Url} from "../../utils/ApiClient";
  * - email
  * - role (Admin or Coach) or approve button (or not yet active)
  * - revoke access button, which soft deletes a user
- *      (he won't have acces anymore,
+ *      (he won't have access anymore,
  *      but all action he did (like a suggestion)
  *      will still be visible that he did that action)
  *
