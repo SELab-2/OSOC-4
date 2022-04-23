@@ -92,9 +92,9 @@ export class Url {
      * @private
      */
     async _setupRequest(context = null) {
-        if (!this._name && !this._url) {throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`);}
+        if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`); }
         this._headers = await api._headers(context, this._useAuth);
-        if (!this._url) {this._url = await api.getUrl(this._name, context);}
+        if (!this._url) { this._url = await api.getUrl(this._name, context); }
         this._url += this._extension;
     }
 
@@ -103,13 +103,21 @@ export class Url {
      * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
      * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
      */
-    async get(context = null) {
+    async get(context = null, student = false) {
         try {
             await this._setupRequest(context);
             log(`API: GET ${this._url}`)
+            if (student) {
+
+                const session = await api._session(context);
+                const res = await cache.getStudent(this._url, session["userid"])
+
+                return { success: true, data: res }
+            }
             const resp = await axios.get(this._url, { "headers": this._headers, "params": this._params });
             return { success: true, data: resp.data };
         } catch (e) {
+            console.log(e)
             return { success: false, error: e };
         }
     }
@@ -331,3 +339,59 @@ class API {
 }
 
 export const api = new API();
+
+class Cache {
+    cache = {};
+
+    async getStudent(url, userid) {
+        let student = cache[url];
+        if (student) {
+            return student
+        }
+
+        student = Url.fromUrl(url).get().then(res => {
+            if (res.success) {
+                console.log(res)
+                res = res.data;
+                Object.values(res["suggestions"]).forEach((item, index) => {
+                    if (item["suggested_by_id"] == userid) {
+                        res["own_suggestion"] = item;
+                    }
+                });
+                cache[url] = res;
+                return res;
+            }
+        })
+        if (student) {
+            return student
+        }
+        return undefined;
+    }
+
+    async updateCache(newdata, userid) {
+        const data = JSON.parse(newdata)
+
+        if ("suggestion" in data) {
+            let student = cache[data["suggestion"]["student_id"]]
+            if (student) {
+                let new_student = student
+                new_student["suggestions"][data["id"]] = data["suggestion"];
+                if (data["suggestion"]["suggested_by_id"] === userid) {
+                    new_student["own_suggestion"] = data["suggestion"];
+                }
+                cache[data["suggestion"]["student_id"]] = new_student;
+            }
+
+        } else if ("decision" in data) {
+            let student = cache[data["id"]]
+            if (student) {
+                let new_student = student
+                new_student["decision"] = data["decision"]["decision"];
+                cache[data["id"]] = new_student
+            }
+        }
+    }
+
+}
+
+export const cache = new Cache();

@@ -1,20 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import { Col, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
+import { useSession } from "next-auth/react";
 
-// This function filters the list of students, it is also used in email-students
-export function filterStudents(filterFunctions, students, localFilters, filters, setLocalFilters, setVisibleStudents) {
-    let filteredStudents = students
-    let newLocalFilters = localFilters;
-    for (let i = 0; i < localFilters.length; i++) {
-        newLocalFilters[i] = filters[i].length;
-        filteredStudents = filterFunctions[i](filteredStudents);
-    }
-    setLocalFilters(newLocalFilters);
-    setVisibleStudents(filteredStudents);
-}
 
 /**
  * The page corresponding with the 'select students' tab.
@@ -23,39 +13,16 @@ export function filterStudents(filterFunctions, students, localFilters, filters,
 export default function SelectStudents() {
     const router = useRouter();
 
-    // These constants are initialized empty, the data will be inserted in useEffect
-    const [students, setStudents] = useState([]);
-    const [validStudentId, setValidStudentId] = useState(false);
-
-    const studentId = router.query.studentId
-
-    useEffect(() => {
-        setValidStudentId(students.some(student => student["id_int"] === parseInt(studentId)));
-    }, [students, studentId])
-
-
-    function getStudentById() {
-        if (students) {
-            return students.find((o, i) => {
-                if (o["id_int"] === studentId) {
-                    return o;
-                }
-            });
-        }
-        return undefined;
-    }
-
-
-    /**
-     * The html that displays the overview of students
-     */
     return (
         <Row>
-            <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={true} studentId={studentId} />
-            { (validStudentId) && <Col>
-                <StudentDetails student={getStudentById()} student_id={studentId} />
-            </Col>}
-        </Row>
+            <StudentListAndFilters studentsTab={true} studentId={router.query.studentId} />
+            {
+                (router.query.studentId) &&
+                (<Col>
+                    <StudentDetails />
+                </Col>)
+            }
+        </Row >
     )
 
 }
