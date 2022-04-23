@@ -119,6 +119,8 @@ Use the following URL to access the Swagger API docs. Change the port if needed.
 
 ### Testing
 
+#### Backend
+
 Tests are run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
 ```
@@ -128,3 +130,8 @@ docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unitte
 # docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest app.tests.test_routers.test_users.TestUsers.test_get_users_me
 docker-compose down
 ```
+
+
+#### Frontend
+
+Tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or `yarn test --watch-all --verbose`.
