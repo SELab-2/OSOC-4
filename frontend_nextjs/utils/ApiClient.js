@@ -103,13 +103,21 @@ export class Url {
      * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
      * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
      */
-    async get(context = null) {
+    async get(context = null, student = false) {
         try {
             await this._setupRequest(context);
             log(`API: GET ${this._url}`)
+            if (student) {
+
+                const session = await api._session(context);
+                const res = await cache.getStudent(this._url, session["userid"])
+
+                return { success: true, data: res }
+            }
             const resp = await axios.get(this._url, { "headers": this._headers, "params": this._params });
             return { success: true, data: resp.data };
         } catch (e) {
+            console.log(e)
             return { success: false, error: e };
         }
     }
@@ -343,6 +351,7 @@ class Cache {
 
         student = Url.fromUrl(url).get().then(res => {
             if (res.success) {
+                console.log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
                     if (item["suggested_by_id"] == userid) {
