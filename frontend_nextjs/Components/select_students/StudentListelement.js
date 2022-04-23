@@ -28,9 +28,8 @@ export default function StudentListelement(props) {
    * @returns {unknown[]} The list of the skills of the student in HTML format
    */
   function getSkills() {
-    let skills = [];
-    return skills.map((skill, index) =>
-      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill.toUpperCase()}</li>
+    return props.student["skills"].map((skill, index) =>
+      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill["name"].toUpperCase()}</li>
     )
   }
 
@@ -109,9 +108,10 @@ export default function StudentListelement(props) {
       </Row>
 
       <Row id="info" className="info">
-        <GeneralInfo listelement={true} student={props.student} decision={getDecisionString(props.student.decision)} />
+        <GeneralInfo listelement={true} studentsTab={props.studentsTab} student={props.student} decision={getDecisionString(props.student.decision)} />
+        <Col />
         <Col id="skills" align="right" className="skills" sm="auto">
-          <ul>
+          <ul className="nomargin">
             {getSkills()}
           </ul>
         </Col>

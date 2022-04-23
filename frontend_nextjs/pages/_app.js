@@ -13,6 +13,7 @@ import "../styles/navheader.css"
 import "../styles/studentDetails.css"
 import "../styles/emailStudents.css"
 import "../styles/projects.css"
+import "../styles/projectDetails.css"
 
 import { ThemeProvider } from "react-bootstrap";
 import { SessionProvider } from 'next-auth/react';

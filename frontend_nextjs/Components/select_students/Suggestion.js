@@ -33,7 +33,7 @@ export default function Suggestion(props) {
    * returns the html representation of a suggestion
    */
   return (
-    <Row>
+    <Row className="nomargin suggestion">
       <Col md="auto" className={props.classNames}/>
       <Col className={props.classNamesText}>{suggestedBy + ": " + props.suggestion["reason"]}</Col>
     </Row>

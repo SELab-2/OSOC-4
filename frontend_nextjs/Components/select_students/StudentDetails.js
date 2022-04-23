@@ -1,4 +1,5 @@
 import {
+  Accordion,
   Button,
   Col,
   Row
@@ -181,8 +182,8 @@ export default function StudentDetails(props) {
   function getQuestionAnswers() {
     return questionAnswers.map((questionAnswer, i) =>
       [
-        <Row key={"question" + i} className="student-details-question">{questionAnswer["question"]}</Row>,
-        <Row key={"answer" + i} className="student-details-answer">{questionAnswer["answer"]}</Row>
+        <Row key={"question" + i} className="student-details-question nomargin">{questionAnswer["question"]}</Row>,
+        <Row key={"answer" + i} className="student-details-answer nomargin">{questionAnswer["answer"]}</Row>
       ]
     )
   }
@@ -202,7 +203,7 @@ export default function StudentDetails(props) {
   }
 
   return (
-    <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)", visibility: props.visibility }} >
+    <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)" }} >
       {student["mandatory"] &&
         <div>
           <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow} updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
@@ -213,9 +214,9 @@ export default function StudentDetails(props) {
       }
 
 
-      <Row className="details-upper-layer">
+      <Row className="details-upper-layer nomargin">
         <Col md="auto">
-          <Row>
+          <Row className="nomargin">
             <Col xs="auto" className="name_big">
               {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
             </Col>
@@ -225,8 +226,11 @@ export default function StudentDetails(props) {
               </button>
             </Col>
           </Row>
-          <Row>
-            <Col md="auto" className="skill">VIDEO EDITOR</Col>
+          <Row className="nomargin">
+            <ul className="nomargin nopadding">
+              {(student["skills"]) && student["skills"].map((skill, index) =>
+                <li className="skill" style={{ display: "inline-block" }} key={index}>{skill["name"].toUpperCase()}</li>)}
+            </ul>
           </Row>
         </Col>
         <Col />
@@ -265,24 +269,24 @@ export default function StudentDetails(props) {
         </Col>
       </Row >
       <Row className="remaining-height-details" md="auto" style={{}}>
-        <Col md="auto" className="fill_height scroll-overflow student-details">
-          <Row md="auto" className="decision">
+        <Col className="fill_height scroll-overflow">
+          <Row md="auto" className="decision nomargin">
             <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
           </Row>
-          <Row md="auto">
+          <Row md="auto" className="nomargin">
             <Button className="send-email-button" disabled={decision === -1} onClick={() => setEmailPopUpShow(true)}>
               Send email
             </Button>
           </Row>
-          <Row md="auto" className="student-details-suggestions-line h2-titles">
+
+          <Row md="auto" className="h2-titles student-details-suggestions-line nomargin">
             <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
             <SuggestionsCount suggestionsYes={getSuggestionsCount(2)} suggestionsMaybe={getSuggestionsCount(1)}
               suggestionsNo={getSuggestionsCount(0)} />
           </Row>
           {getSuggestions()}
-          <Row md="auto" className="h2-titles">
-            <Col md="auto"><h2>Questions</h2></Col>
-          </Row>
+
+          <h2 className="h2-titles">Questions</h2>
           {getQuestionAnswers()}
         </Col>
       </Row>

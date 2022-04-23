@@ -29,6 +29,8 @@
     --gray2: #222;
     --gray3: #333;
     --gray4: #444;
+    --selection-gray: rgb(150, 150, 150);
+    --not-selected-gray: rgb(200, 200, 200);
     --background-gray: #E5E9F2;
 }
 

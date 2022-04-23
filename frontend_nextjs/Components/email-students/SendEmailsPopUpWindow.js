@@ -1,5 +1,5 @@
 import {Button, Col, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
-import StudentsFilter from "../select_students/StudentFilter";
+import StudentFilter from "../select_students/StudentFilter";
 import {useState} from "react";
 
 /***
@@ -51,10 +51,10 @@ export default function SendEmailsPopUpWindow(props) {
         <Row>
           <h5 className="content-title">Content</h5>
         </Row>
-        <StudentsFilter filter_id="default-email" filter_text="Use default emails" value={defaultEmail}
-                        onChange={ev => setDefaultEmail(true)}/>
-        <StudentsFilter filter_id="own-email" filter_text="Type your email here:" value={! defaultEmail}
-                        onChange={ev => setDefaultEmail(false)}/>
+        <StudentFilter filter_id="default-email" filter_text="Use default emails" value={defaultEmail}
+                       onChange={ev => setDefaultEmail(true)}/>
+        <StudentFilter filter_id="own-email" filter_text="Type your email here:" value={! defaultEmail}
+                       onChange={ev => setDefaultEmail(false)}/>
         <Row>
           <Col/>
           <Col md="auto" className={"email-help-text " + ((defaultEmail)? "disabled-text": null)}>

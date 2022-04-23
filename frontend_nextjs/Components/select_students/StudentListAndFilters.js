@@ -12,13 +12,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
 import { WebsocketContext } from "../Auth"
+import LoadingPage from "../LoadingPage"
 
 export default function StudentListAndFilters(props) {
 
   const router = useRouter();
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [studentUrls, setStudentUrls, studentUrlsRef] = useState([]);
+  const [studentUrls, setStudentUrls] = useState([]);
   const [students, setStudents] = useState([]);
 
   // These variables are used to notice if search or filters have changed, they will have the values of search,
@@ -174,9 +175,6 @@ export default function StudentListAndFilters(props) {
           }
         });
       }
-
-
-
     }
 
   }
@@ -235,11 +233,12 @@ export default function StudentListAndFilters(props) {
         <InfiniteScroll
           style={{
             "height": "calc(100vh - 146px)",
+            "position": "relative"
           }}
           dataLength={students.length} //This is important field to render the next data
           next={fetchData}
           hasMore={studentUrls.length > 0}
-          loader={<h4>Loading...</h4>}
+          loader={<LoadingPage />}
           endMessage={
             <p style={{ textAlign: 'center' }}>
               <b>Yay! You have seen it all</b>
@@ -248,7 +247,7 @@ export default function StudentListAndFilters(props) {
         >
           {students.map((i, index) => (
 
-            <StudentListelement key={i.id} student={i} />
+            <StudentListelement key={index} student={i} studentsTab={props.studentsTab} />
 
           ))}
         </InfiniteScroll>

@@ -17,22 +17,30 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import edition from "/public/assets/edition.png"
 import QuestionTags from "../Components/settings/QuestionTags";
+import LoadingPage from "../Components/LoadingPage";
 
+/**
+ * The page corresponding with the 'settings' tab.
+ * @returns {JSX.Element} A component corresponding with the 'settings' tab.
+ */
 export default function Settings(props) {
     const [user, setUser] = useState(undefined);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState(0);
+    const [currentVersion, setCurrentVersion] = useState(undefined)
     const [loading, setLoading] = useState(false)
     const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
 
 
+    // fetch the current user & current edition
     useEffect(() => {
-        if ((user === undefined || name === "" || email === "") && !loading) {
-            setLoading(true)
-            Url.fromName(api.me).get().then(res => {
+        async function fetch() {
+            if ((user === undefined || name === "" || email === "") && !loading) {
+                setLoading(true)
+                let res = await Url.fromName(api.me).get();
                 if (res.success) {
                     res = res.data.data;
                     setUser(res);
@@ -40,23 +48,34 @@ export default function Settings(props) {
                     setEmail(res.email);
                     setRole(res.role);
                 }
-            }).then(() => setLoading(false))
+                res = await Url.fromName(api.current_edition).get();
+                if (res.success) {
+                    setCurrentVersion(res.data);
+                }
+                setLoading(false);
+            }
         }
+        fetch();
     }, [loading, user, name, email]);
 
     //TODO make this actually change the theme
+    /**
+     * Changes the theme of the website
+     * @param event
+     */
     const changeTheme = (event) => {
         event.preventDefault()
         setDarkTheme(!darkTheme)
     }
 
-    function clickAdminSettings() {
-        setInitializeUsers(true);
+    if (loading) {
+        return (<LoadingPage/>);
     }
 
     return (
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
+
                 <AccordionItem eventKey="0">
                     <Accordion.Header>
                         <h3>Personal settings</h3>
@@ -75,45 +94,58 @@ export default function Settings(props) {
                         </div>
                     </AccordionBody>
                 </AccordionItem>
+
                 <AccordionItem eventKey="1">
-                    <AccordionHeader>
-                        <h3>Question Tags</h3>
-                    </AccordionHeader>
-                    <AccordionBody>
-                        <div className="personal-settings">
-                            <QuestionTags />
-                        </div>
-                    </AccordionBody>
-                </AccordionItem>
-                <AccordionItem eventKey="2">
                     <AccordionHeader>
                         <h3>Website settings</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                        <div className="personal-settings">
+                        <div className="website-settings">
                             <SettingCards image={dark_theme} title={"Dark theme"} subtitle={"Customize the layout of the website to reduce the glow and calm your eyes"}>
                                 <ChangeTheme />
                             </SettingCards>
-                            {(role === 2) ?
-                                <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
-                                    <EditionDropdownButton />
-                                </SettingCards>
-                                : null}
                         </div>
                     </AccordionBody>
                 </AccordionItem>
+
                 {(role === 2) ? (
-                    <AccordionItem eventKey={2} onClick={clickAdminSettings}>
+                    <AccordionItem eventKey="2">
                         <AccordionHeader>
-                            <h3>Admin settings</h3>
+                            <h3>Select edition</h3>
                         </AccordionHeader>
                         <AccordionBody>
-                            <div className="admin-settings">
+                            <div className="edition-settings">
+                                <SettingCards image={edition} title={currentVersion.name} subtitle={"Select another edition (applies to the whole website)"}>
+                                    <EditionDropdownButton currentVersion={currentVersion} setCurrentVersion={setCurrentVersion} />
+                                </SettingCards>
+                            </div>
+                        </AccordionBody>
+                    </AccordionItem>) : null }
+
+                {(role === 2) ? (
+                    <AccordionItem eventKey="3" onClick={() => setInitializeUsers(true)}>
+                        <AccordionHeader>
+                            <h3>Manage users</h3>
+                        </AccordionHeader>
+                        <AccordionBody>
+                            <div className="manage-users-settings">
                                 <ManageUsers me={user} initialize={initializeUsers} />
                             </div>
                         </AccordionBody>
-                    </AccordionItem>
-                ) : null}
+                    </AccordionItem>) : null}
+
+
+                <AccordionItem eventKey="4">
+                    <AccordionHeader>
+                        <h3>Question Tags</h3>
+                    </AccordionHeader>
+                    <AccordionBody>
+                        <div className="question-tags-settings">
+                            <QuestionTags />
+                        </div>
+                    </AccordionBody>
+                </AccordionItem>
+
             </Accordion>
 
 

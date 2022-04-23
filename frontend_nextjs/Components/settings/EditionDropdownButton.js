@@ -1,15 +1,21 @@
 import {Dropdown} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {log} from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
-export default function EditionDropdownButton() {
+/**
+ * This component displays a settings-screen to change the current edition,
+ *      a link to the current edition will also be visible.
+ * @returns {JSX.Element}
+ */
+export default function EditionDropdownButton(props) {
     const [editionList, setEditionList] = useState([]);
-    const [currentVersion, setCurrentVersion] = useState(undefined)
+    const currentVersion = props.currentVersion;
+    const setCurrentVersion = props.setCurrentVersion;
 
     const [loadingCurrentVersion, setLoadingCurrentVersion] = useState(false)
     const [loadingEditionList, setLoadingEditionList] = useState(false)
 
+    // fetch the current edition and all the other editions
     useEffect(() => {
         if(currentVersion === undefined && ! loadingCurrentVersion){
             setLoadingCurrentVersion(true);
@@ -27,11 +33,7 @@ export default function EditionDropdownButton() {
             setLoadingEditionList(true)
             Url.fromName(api.editions).get().then(async res => {
                 if (res.success) {
-                    log("load all editions")
-                    log(res)
                     for(let e of res.data) {
-                        log("load specific edition")
-                        log(e)
                         Url.fromUrl(e).get().then(async res2 => {
                             if (res2.success) {
                                 const edition = res2.data;
@@ -45,17 +47,18 @@ export default function EditionDropdownButton() {
 
                         }).then(async () => {
                             setLoadingEditionList(false)
-
                         })
                     }
                 }
             })
         }
-    }, [currentVersion, loadingEditionList, editionList.length, loadingCurrentVersion])
+    }, [currentVersion, loadingEditionList, editionList.length, loadingCurrentVersion, setCurrentVersion])
 
-    const ChangeSelectedVersion = async (edition) => {
-        log("change edition dropdown")
-        log(edition)
+    /**
+     * Changes the current edition
+     * @param edition the edition (dictionary with at least the name and the year) to change to
+     */
+    async function changeSelectedVersion(edition) {
         await api.setCurrentEdition(edition.year)
         await setCurrentVersion({"year": edition.year, "name": edition.name});
     }
@@ -72,7 +75,7 @@ export default function EditionDropdownButton() {
                 <Dropdown.Menu>
                     {(editionList.length) ? (editionList.map((item, index) => (
                         //TODO show selected version in menu and make onClick clean or use other method
-                        <Dropdown.Item  onClick={() => ChangeSelectedVersion(item)} key={index} value={item.uri}>{item.name}</Dropdown.Item>
+                        <Dropdown.Item onClick={() => changeSelectedVersion(item)} key={index} value={item.uri}>{item.name}</Dropdown.Item>
                     ))) : null}
                 </Dropdown.Menu>
             </Dropdown>

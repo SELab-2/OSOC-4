@@ -3,6 +3,10 @@ import {Button, Form} from "react-bootstrap";
 import {log} from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
+/**
+ * This component displays a settings-screen to change a user's name.
+ * @returns {JSX.Element}
+ */
 export default function ChangeName(props) {
 
     const [savedSuccess, setSavedSuccess] = useState(false)
@@ -14,6 +18,10 @@ export default function ChangeName(props) {
         setChangeName(event.target.value)
     }
 
+    /**
+     * This function makes a patch request to the api with the new name of the user
+     * @param event
+     */
     async function handleSubmitChange(event) {
         log("handle submit change name");
         event.preventDefault();
