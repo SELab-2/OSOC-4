@@ -15,6 +15,5 @@ export default function Projects() {
         <ProjectsList/>
       </Col>
     </Row>
-    // Url.fromName(api.edition_projects)
   )
 }

@@ -26,7 +26,7 @@ export default function ParticipationCard(props){
     }
 
     return(
-        <div className={"participation-div"}>
+        <div className={"participation-div"} key={props.participation}>
             <Row>
                 <Col className={"participation-info"}>
                     <div className={"participation-name"}>

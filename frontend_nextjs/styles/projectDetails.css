@@ -50,6 +50,7 @@
 }
 
 .project-details-project-title{
+    text-align: center;
     font-weight: bold;
     font-size: 30px;
 }
@@ -58,3 +59,6 @@
 
 }
 
+.project-details-page{
+    margin-left: 10px;
+}

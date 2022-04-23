@@ -5,6 +5,7 @@ import {useRouter} from "next/router";
 import {api, Url} from "../../utils/ApiClient";
 import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function ProjectsList() {
     const [allProjects, setAllProjects] = useState([])
@@ -36,7 +37,7 @@ export default function ProjectsList() {
                 }
             })
         }
-    })
+    }, [])
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
@@ -57,32 +58,32 @@ export default function ProjectsList() {
     }
 
     return(
-        <Container>
-                <Row>
-                    <Col>
-                        <Form onSubmit={handleSearchSubmit}>
-                            <Form.Group controlId="searchProjects">
-                                <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
-                            </Form.Group>
-                        </Form>
-                    </Col>
-                    <Col>
-                        <Form>
-                            <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                        </Form>
-                    </Col>
-                    <Col md="auto"  className={"center-component"}>
-                        <ConflictCard/>
-                    </Col>
-                    <Col md="auto"  className={"center-component"}>
-                        <Button className={"center"} onClick={handleNewProject}>New project</Button>
-                    </Col>
-                </Row>
-                <Row>
+        <div className={"project-top-bar"}>
+            <Row className="nomargin">
+                <Col>
+                    <Form onSubmit={handleSearchSubmit}>
+                        <Form.Group controlId="searchProjects">
+                            <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
+                        </Form.Group>
+                    </Form>
+                </Col>
+                <Col xs="auto" className={"project-people-needed"}>
+                    <Form>
+                        <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
+                    </Form>
+                </Col >
+                <Col xs="auto" >
+                    <ConflictCard/>
+                </Col>
+                <Col xs="auto" >
+                    <Button className={"center"} onClick={handleNewProject}>New project</Button>
+                </Col>
+            </Row>
+            <Row>
                     {
                         visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
                     }
-                </Row>
-        </Container>
+            </Row>
+        </div>
     )
 }

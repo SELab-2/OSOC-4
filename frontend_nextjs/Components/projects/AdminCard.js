@@ -1,7 +1,5 @@
-import {Card} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {Url} from "../../utils/ApiClient";
-import {log} from "../../utils/logger";
 
 
 export default function AdminCard(props){
@@ -24,14 +22,12 @@ export default function AdminCard(props){
 
     function getCssClass(){
         if(Object.keys(user).length && user.role > 0){
-            log(user.role)
-            log(cssClasses[user.role - 1])
             return cssClasses[user.role - 1]
         }
     }
 
     return (
-        <div className={getCssClass()}>
+        <div key={props.user} className={getCssClass()}>
             {user.name}
         </div>
     )

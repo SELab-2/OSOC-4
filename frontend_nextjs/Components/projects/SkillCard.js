@@ -4,7 +4,7 @@ import {Card, Col, Row} from "react-bootstrap";
 export default function SkillCard(props){
 
     return (
-        <div className={"skills-card"}>
+        <div className={"skills-card"} key={`${props.amount}${props.name}`}>
             {(props.amount > 0) ? `${props.amount}X` : null} {props.name}
         </div>
     )

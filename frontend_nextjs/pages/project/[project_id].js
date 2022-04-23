@@ -5,6 +5,10 @@ import {api, Url} from "../../utils/ApiClient";
 import AdminCard from "../../Components/projects/AdminCard";
 import SkillCard from "../../Components/projects/SkillCard";
 import ParticipationCard from "../../Components/projects/ParticipationCard";
+import Image from 'next/image'
+import back from "/public/assets/back.svg"
+import edit from "/public/assets/edit.svg"
+import delete_image from "/public/assets/delete.svg"
 
 const Project = () => {
     const router = useRouter()
@@ -13,6 +17,7 @@ const Project = () => {
     const [project, setProject] = useState(undefined)
     const [showDelete, setShowDelete] = useState(false);
     const [skills, setSkills] = useState([])
+    const [showEdit, setShowEdit] = useState(false)
 
     useEffect(() => {
         if (! loaded) {
@@ -38,7 +43,7 @@ const Project = () => {
                 }
             });
         }
-    })
+    }, [])
 
     //TODO make this delete project
     async function deleteProject(){
@@ -46,38 +51,39 @@ const Project = () => {
     }
 
     return (
-        <div>
+        <div className="remaining_height fill_width">
             { loaded ? (
-                <div>
-                    <Row>
-                        <Col>
-                            <Button onClick={() => router.back()}>Go back</Button>
+                <div className={"project-details-page"}>
+                    <Row className={"project-top-bar"}>
+                        <Col xs="auto" >
+                            <Image alt={"back button"} onClick={() => router.back()} src={back} width={100} height={33}/>
                         </Col>
                         <Col>
                             <div className={"project-details-project-title"}>{project.name}</div>
                         </Col>
-                        <Col>
+                        <Col xs="auto" >
+                            <Image alt={"edit button"} onClick={() => setShowEdit(prevState => ! prevState)} src={edit} width={33} height={33}/>
                             {/*TODO make this actually turn edit on*/}
-                            <Button>Edit</Button>
                         </Col>
-                        <Col>
-                            <Button onClick={() => setShowDelete(true)}>Delete</Button>
+                        <Col xs="auto" >
+                            <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)}/>
                             <Modal show={showDelete} onHide={() => setShowDelete(false)}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Delete project?</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>Are you sure you want to delete this project? Doing so will not be reversible. </Modal.Body>
                                 <Modal.Footer>
-                                    <Button variant="secondary" onClick={() => {
+                                    <Button variant="secondary" onClick={() => setShowDelete(false)}>
+                                        Keep project
+                                    </Button>
+                                    <Button variant="primary" onClick={() => {
                                         setShowDelete(false)
                                         deleteProject()
                                         router.push("/projects")
                                     }}>
                                         Delete project
                                     </Button>
-                                    <Button variant="primary" onClick={() => setShowDelete(false)}>
-                                        Keep project
-                                    </Button>
+
                                 </Modal.Footer>
                             </Modal>
                         </Col>
@@ -89,26 +95,29 @@ const Project = () => {
                     <div className={"project-details-title"}>About the project</div>
                     <div className={"project-details-subtitle"}>{project.description}</div>
 
-                    <div className={"project-details-staff-div"}>
+                    <div>
                         <div className={"project-details-title"}>Assigned staff</div>
                         {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
                     </div>
 
                     <Row>
                         <Col>
-                            <div className={"project-details-title"}>Still needed skills:</div>
-                            { (skills.length) ? (skills.map(skill =>
-                                (<SkillCard key={name} name={skill.name} amount={skill.amount} />))): null}
+                            <div className={"project-title-list"}>
+                                <div className={"project-card-title"}>Skills</div>
+                                { (skills.length) ? (skills.map(skill =>
+                                    (<SkillCard key={`${skill.amount}${skill.name}`} name={skill.name} amount={skill.amount} />))): null}
+                            </div>
                         </Col>
                         <Col>
-                            <div className={"project-card-title"}>Assigned students</div>
-                            {(project.participations.length) ?
-                                project.participations.map(participation => (<ParticipationCard key={participation} participation={participation}/>)) :
-                                null
-                            }
+                            <div className={"project-title-list"}>
+                                <div className={"project-card-title"}>Assigned students</div>
+                                {(project.participations.length) ?
+                                    project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
+                                    null
+                                }
+                            </div>
                         </Col>
                     </Row>
-                    {/*TODO nog iets met user?*/}
                 </div>) : null}
         </div>
 
