@@ -5,12 +5,13 @@ import HamburgerMenu from "react-hamburger-menu";
 import SearchSortBar from "./SearchSortBar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StudentListelement from "./StudentListelement";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import useWindowDimensions from "../../utils/WindowDimensions";
 import { api, Url } from "../../utils/ApiClient";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
+import { WebsocketContext } from "../Auth"
 
 export default function StudentListAndFilters(props) {
 
@@ -21,7 +22,6 @@ export default function StudentListAndFilters(props) {
   const [students, setStudents] = useState([]);
 
   const [student, setStudent] = useState(undefined);
-  const [detailLoading, setDetailLoading] = useState(false);
 
   // These variables are used to notice if search or filters have changed, they will have the values of search,
   // sortby and filters that we filtered for most recently.
@@ -42,18 +42,26 @@ export default function StudentListAndFilters(props) {
 
   const [showFilter, setShowFilter] = useState(false);
 
+  const ws = useContext(WebsocketContext)
 
+  // useEffect(() => {
+  //   if (session && router.query.studentId) {
+
+  //     if ((student && student["id_int"] !== router.query.studentId) || !student) {
+
+  //     }
+  //   } else {
+  //     setStudent(undefined);
+  //   }
+  // }, [router.query.studentId])
 
   useEffect(() => {
-    if (session && router.query.studentId) {
-
-      if ((student && student["id_int"] !== router.query.studentId) || !student) {
-
-      }
-    } else {
-      setStudent(undefined);
+    if (students && ws) {
+      console.log("updated list")
+      ws.addEventListener("message", updateFromWebsocket)
     }
-  }, [router.query.studentId])
+
+  }, [ws, students])
 
   useEffect(() => {
     if (session) {
@@ -89,6 +97,8 @@ export default function StudentListAndFilters(props) {
 
   const updateFromWebsocket = (event) => {
     let data = JSON.parse(event.data)
+    console.log(data)
+    console.log("list")
     if ("suggestion" in data) {
       students.find((o, i) => {
         if (o["id"] === data["suggestion"]["student_id"]) {
@@ -101,14 +111,6 @@ export default function StudentListAndFilters(props) {
           return true; // stop searching
         }
       });
-      if (student && student["id"] == data["suggestion"]["student_id"]) {
-        let new_student = student
-        new_student["suggestions"][data["id"]] = data["suggestion"];
-        if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
-          new_student["own_suggestion"] = data["suggestion"];
-        }
-        setStudent({ ...new_student })
-      }
 
     } else if ("decision" in data) {
       students.find((o, i) => {
@@ -119,11 +121,6 @@ export default function StudentListAndFilters(props) {
           return true; // stop searching
         }
       });
-      if (student && student["id_int"] === data["id"]) {
-        let new_student = student
-        new_student["decision"] = data["decision"]["decision"];
-        setStudent({ ...new_student })
-      }
     }
 
   }

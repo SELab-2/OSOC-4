@@ -30,11 +30,6 @@ export default function SelectStudents() {
     (router.query.skills) ? router.query.skills.split(",") : [],
     (router.query.decision) ? router.query.decision.split(",") : []]
 
-
-    const [ws, setWs] = useState(undefined);
-
-    const { data: session, status } = useSession()
-
     /**
  * This function is called when students, router.query.sortby, router.query.search or filters is changed
  */

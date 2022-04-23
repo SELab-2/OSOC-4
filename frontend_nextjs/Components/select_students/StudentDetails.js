@@ -3,7 +3,7 @@ import {
   Col,
   Row
 } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
@@ -20,6 +20,7 @@ import { Url, api } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 import LoadingPage from "../LoadingPage"
+import { WebsocketContext } from "../Auth"
 
 /**
  * This component returns the details of a student
@@ -32,7 +33,7 @@ export default function StudentDetails(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
   // These constants contain info about the student
-  const [student, setStudent] = useState({});
+  const [student, setStudent] = useState(undefined);
   const [suggestions, setSuggestions] = useState([]);
   const [decision, setDecision] = useState(-1);
   const [questionAnswers, setQuestionAnswers] = useState([])
@@ -48,8 +49,17 @@ export default function StudentDetails(props) {
   const [decideField, setDecideField] = useState(-1);
   const [detailLoading, setDetailLoading] = useState(true);
 
-
+  const ws = useContext(WebsocketContext)
   const { data: session, status } = useSession()
+  const [prevStudentid, setPrevStudentid] = useState(undefined)
+
+  useEffect(() => {
+    console.log(student)
+    console.log("updated details")
+    if (student && ws) {
+      ws.addEventListener("message", updateFromWebsocket)
+    }
+  }, [ws, student])
 
   /**
    * This function is called when studentId or props.student_id is changed
@@ -57,23 +67,53 @@ export default function StudentDetails(props) {
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
 
-    setDetailLoading(true)
-    Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(retrieved_student => {
-      const student = retrieved_student.data
-      setStudent(student);
-      setDecision(student["decision"])
-      setDecideField(student["decision"])
-      setSuggestions(student["suggestions"]);
-      // Fill in the questionAnswers
-      Url.fromUrl(student["question-answers"]).get().then(res => {
-        if (res.success) {
-          setQuestionAnswers(res["data"]);
-        }
+    if (!student || prevStudentid !== router.query.studentId) {
+      setPrevStudentid(router.query.studentId)
+      setDetailLoading(true)
+      Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(retrieved_student => {
+        setStudent(retrieved_student.data);
+        setDecision(retrieved_student.data["decision"])
+        setDecideField(retrieved_student.data["decision"])
+        setSuggestions(retrieved_student.data["suggestions"]);
+        // Fill in the questionAnswers
+        Url.fromUrl(retrieved_student.data["question-answers"]).get().then(res => {
+          if (res.success) {
+            setQuestionAnswers(res["data"]);
+          }
+        })
+        setDetailLoading(false)
       })
-      setDetailLoading(false)
-    })
+    }
+
 
   }, [router.query.studentId]);
+
+  const updateFromWebsocket = (event) => {
+    let data = JSON.parse(event.data)
+    console.log(data)
+    console.log("details")
+    if ("suggestion" in data) {
+      if (student && student["id"] == data["suggestion"]["student_id"]) {
+        let new_student = student
+        new_student["suggestions"][data["id"]] = data["suggestion"];
+        if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
+          new_student["own_suggestion"] = data["suggestion"];
+        }
+        setStudent({ ...new_student })
+      }
+
+    } else if ("decision" in data) {
+      console.log(student["id_int"])
+      console.log(data["id"])
+      if (student && student["id_int"] === data["id"]) {
+        let new_student = student
+        new_student["decision"] = data["decision"]["decision"];
+        setStudent({ ...new_student })
+        setDecision(data["decision"]["decision"])
+        setDecideField(data["decision"]["decision"])
+      }
+    }
+  }
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   /**
