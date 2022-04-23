@@ -1,6 +1,7 @@
 import {Col, Row} from "react-bootstrap";
 
 // Represents one line of a filter, with checkbox and label
+
 /**
  * This component represents one line of a filter, with checkbox and label
  * @param props props had the fields filter_id, onChange, value and filter_text. filter_id is an id to identify the

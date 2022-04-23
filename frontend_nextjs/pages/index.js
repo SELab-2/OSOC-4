@@ -17,11 +17,12 @@ function Home({ current_edition, students_length, projects_length }) {
               <h3 className={"index-header"}>Welcome back</h3>
             </Card.Header>
 
+            {(current_edition)?
             <Carousel >
 
               <Carousel.Item interval={INTERVAL}>
                 <Card.Body>
-                  <Card.Title className={"index-card-title"}><h1>{current_edition.name}</h1></Card.Title>
+                  <Card.Title className={"index-card-title"}><h1>{current_edition}</h1></Card.Title>
                 </Card.Body>
               </Carousel.Item>
 
@@ -38,6 +39,8 @@ function Home({ current_edition, students_length, projects_length }) {
               </Carousel.Item>
 
             </Carousel>
+                :null}
+
           </Card>
 
     </>
@@ -57,7 +60,7 @@ export async function getServerSideProps(context) {
 
   const current_edition =  await Url.fromName(api.current_edition).get(context)
   if (current_edition.success) {
-    props_out["current_edition"] = current_edition.data;
+    props_out["current_edition"] = current_edition.data.name;
   }
 
   const students = await Url.fromName(api.editions_students).get(context)
