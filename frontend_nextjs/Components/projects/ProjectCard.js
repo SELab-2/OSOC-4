@@ -5,6 +5,9 @@ import SkillCard from "./SkillCard";
 import AdminCard from "./AdminCard";
 import {useEffect, useState} from "react";
 import ParticipationCard from "./ParticipationCard";
+import Image from 'next/image'
+import details from "/public/assets/details.svg"
+
 
 export default function ProjectCard(props) {
 
@@ -40,18 +43,26 @@ export default function ProjectCard(props) {
 
     return(
         <div className="project-card-div">
-            <Card className="card">
+            <Card className="project-card">
                 <Card.Body classname={"card-body"}>
-                    <div className={"project-title"} onClick={handleProjectClick}> {props.project.name}</div>
-                    {/*TODO give clickable css thing*/}
+                    <Row>
+                        <Col>
+                            <div className={"project-title"}> {props.project.name}</div>
+                        </Col>
+                        <Col xs={"auto"}>
+                            <div className={"project-show-detail"}>
+                                <Image src={details} height={25} width={25} onClick={handleProjectClick}/>
+                            </div>
+                        </Col>
+                    </Row>
                     <div className={"partner-title"} >{props.project.partner_name}</div>
                     {/*todo make this clickable with link to partner?*/}
-
+                    <br/>
 
                     <Row>
                         {(props.project.users.length) ? props.project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
                     </Row>
-
+                    <br/>
                     <Row>
                         <Col>
                             <div className={"project-title-list"}>

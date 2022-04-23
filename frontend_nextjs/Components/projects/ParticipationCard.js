@@ -26,18 +26,23 @@ export default function ParticipationCard(props){
     }
 
     return(
-        <div className={"participation-div"} key={props.participation}>
-            <Row>
-                <Col className={"participation-info"}>
-                    <div className={"participation-name"}>
-                        {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null }
-                    </div>
-                    <SkillCard amount={0} name={props.participation.skill}/>
-                </Col>
-                <Col className={"participation-remove-student"}>
-                   <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={50} height={50}/>
-                </Col>
-            </Row>
-        </div>
+        <Card className={"participation-card"} key={props.participation}>
+            <div className={"participation-div"}>
+                <Row>
+                    <Col className={"participation-info"}>
+                        <div className={"participation-name"}>
+                            {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null }
+                        </div>
+                        <SkillCard amount={0} name={props.participation.skill}/>
+                    </Col>
+                    <Col xs={"auto"} className={"participation-remove-student"}>
+                        <div className={"participation-delete"}>
+                            <Image  alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25}/>
+                        </div>
+                    </Col>
+                </Row>
+            </div>
+
+        </Card>
     )
 }

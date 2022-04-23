@@ -4,6 +4,9 @@
     font-weight: bold;
 }
 
+.project-card{
+}
+
 .project-card-div{
     margin-top: 15px;
 }
@@ -13,15 +16,9 @@
     align-self: center;
 }
 
-/*.right-div{*/
-/*    position:absolute;*/
-/*    right: 0;*/
-/*}*/
-
 .project-title{
     font-weight: bold;
     font-size: 30px;
-    cursor: pointer;
 }
 
 .partner-title{
@@ -57,4 +54,8 @@
 
 .project-empty-list{
     margin-left: 15px;
+}
+
+.project-show-detail{
+    cursor: pointer;
 }
