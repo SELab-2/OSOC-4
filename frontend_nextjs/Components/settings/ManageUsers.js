@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import {Button, Col, Form, Row, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
 
@@ -45,23 +45,45 @@ export default function ManageUsers(props) {
     async function handleSubmitInvite(event) {
         event.preventDefault();
         const emails = toInvite.trim().split("\n").map(a => a.trim());
-        let user_url = await api.getUrl(api.users);
-        emails.forEach(email => {
-            // post to create
-            Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(resp => {
-                if (resp.success) {
-                    resp = resp.data
-                    if (resp.data.id) {
-                        Url.fromUrl(resp.data.id).extend("/invite").post();
-                    }
+        await Promise.all(emails.map(email =>
+            Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(async resp => {
+                if (resp.success && resp.data.data.id) {
+                    await Url.fromUrl(resp.data.data.id).extend("/invite").post();
                 }
-            })
-        })
+            }))
+        );
+        alert("Invites have been sent.");
     }
 
     async function handleSearchSubmit(event) {
         event.preventDefault();
-        setShownUsers(users.filter(user => user.name.includes(search)))
+        setShownUsers(users.filter(user => user.name.toLowerCase().includes(search.toLowerCase())))
+    }
+
+    const [filters, setFilters] = useState({
+        "show-all-users": true,
+        "show-approved": false,
+        "show-unapproved": false,
+        "show-inactive": false
+    });
+
+    function updateFilters(ev) {
+        const temp = {
+            "show-all-users": false,
+            "show-approved": false,
+            "show-unapproved": false,
+            "show-inactive": false
+        }
+        temp[ev.target.id] = true
+        setFilters(temp);
+
+        setShownUsers([...users.filter(user => {
+            if (!user.name.toLowerCase().includes(search.toLowerCase())) {return false;}
+            if (ev.target.id === "show-all-users") {return true;}
+            if (ev.target.id === "show-approved") {return user.approved;}
+            if (ev.target.id === "show-unapproved") {return user.active && !user.approved;}
+            if (ev.target.id === "show-inactive") {return !user.active;}
+        })]);
     }
 
     return (
@@ -70,16 +92,53 @@ export default function ManageUsers(props) {
 
             <Form id="invite-users" onSubmit={handleSubmitInvite}>
                 <Form.Group controlId="inviteUserTextarea">
-                    <Form.Label>List of e-mailadres(ess) of users you want to invite </Form.Label>
+                    <Form.Label>List of email-address(es) of the users you want to invite </Form.Label>
                     <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
                 </Form.Group>
                 <br />
                 <Button variant={"outline-secondary"} type="submit"> Invite users</Button>
             </Form>
             <br />
+
             <h4>Manage users</h4>
             <Table className={"table-manage-users"}>
                 <thead>
+                    <tr>
+                        <div key={`inline-radio`} className="mb-3">
+                            <Form.Check
+                                label="All users"
+                                name="group-users"
+                                type="radio"
+                                id="show-all-users"
+                                checked={filters["show-all-users"]}
+                                onClick={updateFilters}
+                            />
+                            <Form.Check
+                                label="Approved users"
+                                name="group-users"
+                                type="radio"
+                                id="show-approved"
+                                checked={filters["show-approved"]}
+                                onClick={updateFilters}
+                            />
+                            <Form.Check
+                                label="Not yet approved users"
+                                name="group-users"
+                                type="radio"
+                                id="show-unapproved"
+                                checked={filters["show-unapproved"]}
+                                onClick={updateFilters}
+                            />
+                            <Form.Check
+                                label="Not yet active users"
+                                name="group-users"
+                                type="radio"
+                                id="show-inactive"
+                                checked={filters["show-inactive"]}
+                                onClick={updateFilters}
+                            />
+                        </div>
+                    </tr>
                     <tr>
                         <th>
                             <Form onSubmit={handleSearchSubmit}>

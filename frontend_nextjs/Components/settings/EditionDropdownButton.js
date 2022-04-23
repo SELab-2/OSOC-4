@@ -3,9 +3,10 @@ import React, {useEffect, useState} from "react";
 import {log} from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
-export default function EditionDropdownButton() {
+export default function EditionDropdownButton(props) {
     const [editionList, setEditionList] = useState([]);
-    const [currentVersion, setCurrentVersion] = useState(undefined)
+    const currentVersion = props.currentVersion;
+    const setCurrentVersion = props.setCurrentVersion;
 
     const [loadingCurrentVersion, setLoadingCurrentVersion] = useState(false)
     const [loadingEditionList, setLoadingEditionList] = useState(false)
@@ -54,8 +55,6 @@ export default function EditionDropdownButton() {
     }, [currentVersion, loadingEditionList, editionList.length, loadingCurrentVersion])
 
     const ChangeSelectedVersion = async (edition) => {
-        log("change edition dropdown")
-        log(edition)
         await api.setCurrentEdition(edition.year)
         await setCurrentVersion({"year": edition.year, "name": edition.name});
     }

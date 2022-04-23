@@ -1,17 +1,27 @@
 import {Button, Modal, ModalHeader, ModalTitle} from "react-bootstrap";
 
-// This view shows the pop up window when making a decision about a student.
+/**
+ * This element shows the pop up window when deleting a student.
+ * @param props props has the fields popUpShow, setPopUpShow and student. popUpShow decided the visibility of
+ * the pop up window. setPopUpShow is used to change popUpShow. student is the student we want to delete.
+ * @returns {JSX.Element} An element that renders the pop-up window when deleting a student.
+ * @constructor
+ */
 export default function DeletePopUpWindow(props) {
 
   // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
-  // called when the pop up window is closed
+  /**
+   * This function is called when the pop up window is closed.
+   */
   function onHide() {
     setPopUpShow(false);
   }
 
-  // called on submitting the delete
+  /**
+   * This function is called on submitting the deletion.
+   */
   function submitDelete() {
     setPopUpShow(false);
   }

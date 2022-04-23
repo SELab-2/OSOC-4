@@ -66,6 +66,7 @@ class UserOut(BaseModel):
     id: str
     active: bool
     approved: bool
+    disabled: bool
 
 
 class UserData(BaseModel):
