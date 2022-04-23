@@ -256,15 +256,10 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
         # get the latest edition
         stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())
         editionres = await session.execute(stat)
-        try:
-            edition = editionres.first()
-            edition.coaches.append(user)
-            
-            session.add(edition)
-            session.commit()
+        (edition,) = editionres.first()
+        edition.coaches.append(user)
 
-        except Exception:
-            pass
+        await update(edition, session=session)
 
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key()
