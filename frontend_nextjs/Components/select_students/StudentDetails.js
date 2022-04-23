@@ -1,6 +1,6 @@
 import {
   Button,
-  Col, Dropdown,
+  Col,
   Row
 } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import { Url } from "../../utils/ApiClient";
+import { Url, api } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 import LoadingPage from "../LoadingPage"
@@ -46,6 +46,7 @@ export default function StudentDetails(props) {
   // These constants contain the value of the decide field and which suggestion window should be shown
   const [suggestion, setSuggestion] = useState(0);
   const [decideField, setDecideField] = useState(-1);
+  const [detailLoading, setDetailLoading] = useState(true);
 
 
   const { data: session, status } = useSession()
@@ -55,20 +56,24 @@ export default function StudentDetails(props) {
    */
   useEffect(() => {
     // Only fetch the data if the wrong student is loaded
-    if (props.student) {
-      setStudent(props.student);
-      setDecision(props.student["decision"])
-      setDecideField(props.student["decision"])
-      setSuggestions(props.student["suggestions"]);
+
+    setDetailLoading(true)
+    Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(retrieved_student => {
+      const student = retrieved_student.data
+      setStudent(student);
+      setDecision(student["decision"])
+      setDecideField(student["decision"])
+      setSuggestions(student["suggestions"]);
       // Fill in the questionAnswers
-      Url.fromUrl(props.student["question-answers"]).get().then(res => {
+      Url.fromUrl(student["question-answers"]).get().then(res => {
         if (res.success) {
           setQuestionAnswers(res["data"]);
         }
       })
-    }
+      setDetailLoading(false)
+    })
 
-  }, [props.student]);
+  }, [router.query.studentId]);
 
   // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
   /**
@@ -149,7 +154,7 @@ export default function StudentDetails(props) {
     }));
   }
 
-  if (props.loading) {
+  if (detailLoading) {
     return (
       <Col className="student-details-window" style={{ "position": "relative", "height": "calc(100vh - 75px)" }} >
         <LoadingPage />

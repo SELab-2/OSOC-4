@@ -1,33 +1,27 @@
-import {Col, Row} from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import StudentsFilters from "./StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
 import HamburgerMenu from "react-hamburger-menu";
 import SearchSortBar from "./SearchSortBar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StudentListelement from "./StudentListelement";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import useWindowDimensions from "../../utils/WindowDimensions";
-import {api, Url} from "../../utils/ApiClient";
-import {useSession} from "next-auth/react";
-import {useRouter} from "next/router";
-
+import { api, Url } from "../../utils/ApiClient";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { cache } from "../../utils/ApiClient"
 
 export default function StudentListAndFilters(props) {
 
   const router = useRouter();
 
-  const { height, width } = useWindowDimensions();
-
-  const [showFilter, setShowFilter] = useState(false);
-
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
   const [students, setStudents] = useState([]);
 
-  // These constants represent the filters
-  const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
-    (router.query.skills) ? router.query.skills.split(",") : [],
-    (router.query.decision) ? router.query.decision.split(",") : []]
+  const [student, setStudent] = useState(undefined);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   // These variables are used to notice if search or filters have changed, they will have the values of search,
   // sortby and filters that we filtered for most recently.
@@ -36,27 +30,30 @@ export default function StudentListAndFilters(props) {
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
 
-  const [localFilters, setLocalFilters] = [props.student, props.setStudents];
+  const [localFilters, setLocalFilters] = useState([0, 0, 0]);
 
-
-  const [ws, setWs] = useState(undefined);
+  // These constants represent the filters
+  const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
+  (router.query.skills) ? router.query.skills.split(",") : [],
+  (router.query.decision) ? router.query.decision.split(",") : []]
 
   const { data: session, status } = useSession()
+  const { height, width } = useWindowDimensions();
 
-  /**
-   * This function is called when students, router.query.sortby, router.query.search or filters is changed
-   */
+  const [showFilter, setShowFilter] = useState(false);
+
+
+
   useEffect(() => {
-    if (ws) {
-      ws.onmessage = (event) => updateFromWebsocket(event);
+    if (session && router.query.studentId) {
+
+      if ((student && student["id_int"] !== router.query.studentId) || !student) {
+
+      }
     } else {
-      const new_ws = new WebSocket("ws://localhost:8000/ws")
-      new_ws.onmessage = (event) => updateFromWebsocket(event);
-      setWs(new_ws);
-
+      setStudent(undefined);
     }
-
-  }, [students, updateFromWebsocket, ws])
+  }, [router.query.studentId])
 
   useEffect(() => {
     if (session) {
@@ -78,19 +75,8 @@ export default function StudentListAndFilters(props) {
             let p2 = res.data.slice(10);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl =>
-              Url.fromUrl(studentUrl).get().then(res => {
-                if (res.success) {
-                  res = res.data;
-                  Object.values(res["suggestions"]).forEach((item, index) => {
-                    if (item["suggested_by_id"] === session["userid"]) {
-                      res["own_suggestion"] = item;
-                    }
-                  });
-                  return res;
-                }
-              })
+              cache.getStudent(studentUrl, session["userid"])
             )).then(newstudents => {
-              console.log(newstudents);
               setStudents([...newstudents]);
               setLocalFilters([0, 0, 0]);
             })
@@ -100,34 +86,46 @@ export default function StudentListAndFilters(props) {
     }
   }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
 
+
   const updateFromWebsocket = (event) => {
     let data = JSON.parse(event.data)
-    students.find((o, i) => {
-      if (o["id"] === data["suggestion"]["student_id"]) {
-        let new_students = [...students]
-        new_students[i]["suggestions"][data["id"]] = data["suggestion"];
-        setStudents(new_students);
-        return true; // stop searching
+    if ("suggestion" in data) {
+      students.find((o, i) => {
+        if (o["id"] === data["suggestion"]["student_id"]) {
+          let new_students = [...students]
+          new_students[i]["suggestions"][data["id"]] = data["suggestion"];
+          if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
+            new_students[i]["own_suggestion"] = data["suggestion"];
+          }
+          setStudents(new_students);
+          return true; // stop searching
+        }
+      });
+      if (student && student["id"] == data["suggestion"]["student_id"]) {
+        let new_student = student
+        new_student["suggestions"][data["id"]] = data["suggestion"];
+        if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
+          new_student["own_suggestion"] = data["suggestion"];
+        }
+        setStudent({ ...new_student })
       }
-    });
-  }
 
-  /**
-   * This function filters the students for the general filters (the filters in filters[0]).
-   * @param filteredStudents The list of students that need to be filtered.
-   * @returns {*} The list of students that are allowed by the general filters.
-   */
-  function filterStudentsFilters(filteredStudents) {
-    return filteredStudents;
-  }
+    } else if ("decision" in data) {
+      students.find((o, i) => {
+        if (o["id_int"] === data["id"]) {
+          let new_students = [...students]
+          new_students[i]["decision"] = data["decision"]["decision"];
+          setStudents(new_students);
+          return true; // stop searching
+        }
+      });
+      if (student && student["id_int"] === data["id"]) {
+        let new_student = student
+        new_student["decision"] = data["decision"]["decision"];
+        setStudent({ ...new_student })
+      }
+    }
 
-  /**
-   * This function filters the students for the skills filters (the filters in filters[1]).
-   * @param filteredStudents The list of students that need to be filtered.
-   * @returns {*} The list of students that are allowed by the skills filters.
-   */
-  function filterStudentsSkills(filteredStudents) {
-    return filteredStudents;
   }
 
   const fetchData = () => {
@@ -136,17 +134,7 @@ export default function StudentListAndFilters(props) {
     let p2 = studentUrls.slice(10);
 
     Promise.all(p1.map(studentUrl =>
-      Url.fromUrl(studentUrl).get().then(res => {
-        if (res.success) {
-          res = res.data;
-          Object.values(res["suggestions"]).forEach((item, index) => {
-            if (item["suggested_by_id"] === session["userid"]) {
-              res["own_suggestion"] = item;
-            }
-          });
-          return res;
-        }
-      })
+      cache.getStudent(studentUrl, session["userid"])
     )).then(newstudents => {
       setStudents([...students, ...newstudents]);
       setStudentUrls(p2);
@@ -166,9 +154,9 @@ export default function StudentListAndFilters(props) {
 
     (width > 800 || (!props.studentId && props.studentsTab)) &&
 
-    <div className={(props.studentsTab)? "col nomargin student-list-positioning":
+    <div className={(props.studentsTab) ? "col nomargin student-list-positioning" :
       ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
-        "col-4 nomargin student-list-positioning": "col-5 nomargin student-list-positioning"} key="studentList" >
+        "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
       <Row className="nomargin">
         {!((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) &&
           <Col md="auto">
