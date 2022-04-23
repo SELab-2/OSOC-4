@@ -57,6 +57,8 @@ class TestProjects(TestBase):
 
     async def test_get_projects_id_with_admin_user(self):
         url = f"{config.api_url}projects/"
+
+        # Set up edition and project object
         edition_generator = EditionGenerator(self.session)
         edition = edition_generator.generate_edition(2022)
         project = Project(
@@ -72,10 +74,11 @@ class TestProjects(TestBase):
         path = "/projects/" + str(project.id)
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
 
-        # Test authorization & access-control
+        # Send get project by id request
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users, unauthorized_status=Status.BAD_REQUEST)
 
-        # Test responses
+        # Test response message
+        # Project url in the response message should be same as the expected value.
         for user_title, response in responses.items():
             gotten_project = json.loads(response.content)
             self.assertEqual(f"{url}{project.id}", gotten_project["id"],
@@ -83,6 +86,8 @@ class TestProjects(TestBase):
 
     async def test_get_projects_id_with_coach_user(self):
         url = f"{config.api_url}projects/"
+
+        # Set up coach, edition and project object
         coach = await read_where(User, User.role == UserRole.COACH, session=self.session)
 
         edition_generator = EditionGenerator(self.session)
@@ -99,12 +104,15 @@ class TestProjects(TestBase):
 
         path = "/projects/" + str(project.id)
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+
+        # Add coach to allowed users
         allowed_users.add(coach.name)
 
-        # Test authorization & access-control
+        # Send get project by id request
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users, unauthorized_status=Status.BAD_REQUEST)
 
-        # Test responses
+        # Test response message
+        # Project url in the response message should be same as the expected value.
         for user_title, response in responses.items():
             gotten_project = json.loads(response.content)
             self.assertEqual(f"{url}{project.id}", gotten_project["id"],
