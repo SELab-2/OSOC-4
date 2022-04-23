@@ -19,6 +19,10 @@ import edition from "/public/assets/edition.png"
 import QuestionTags from "../Components/settings/QuestionTags";
 import LoadingPage from "../Components/LoadingPage";
 
+/**
+ * The page corresponding with the 'settings' tab.
+ * @returns {JSX.Element} A component corresponding with the 'settings' tab.
+ */
 export default function Settings(props) {
     const [user, setUser] = useState(undefined);
     const [name, setName] = useState("");
@@ -31,6 +35,7 @@ export default function Settings(props) {
     const [darkTheme, setDarkTheme] = useState(false);
 
 
+    // fetch the current user & current edition
     useEffect(() => {
         async function fetch() {
             if ((user === undefined || name === "" || email === "") && !loading) {
@@ -56,13 +61,13 @@ export default function Settings(props) {
     }, [loading, user, name, email]);
 
     //TODO make this actually change the theme
+    /**
+     * Changes the theme of the website
+     * @param event
+     */
     const changeTheme = (event) => {
         event.preventDefault()
         setDarkTheme(!darkTheme)
-    }
-
-    function clickManageUsers() {
-        setInitializeUsers(true);
     }
 
     if (loading) {
@@ -120,7 +125,7 @@ export default function Settings(props) {
                     </AccordionItem>) : null }
 
                 {(role === 2) ? (
-                    <AccordionItem eventKey="3" onClick={clickManageUsers}>
+                    <AccordionItem eventKey="3" onClick={() => setInitializeUsers(true)}>
                         <AccordionHeader>
                             <h3>Manage users</h3>
                         </AccordionHeader>
