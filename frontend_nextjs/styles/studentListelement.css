@@ -1,10 +1,14 @@
 .list-element {
     border-width: 1px;
     border-style: solid;
-    border-color: lightgray;
+    border-color: var(--not-selected-gray);
     border-radius: 7px;
     margin: 7px 0 7px 0;
     padding: 10px 12px 10px 10px;
+}
+
+.list-element:hover {
+    border-color: var(--selection-gray);
 }
 
 .name {
@@ -70,7 +74,7 @@
     padding-left: 15px;
     padding-right: 15px;
     background-color: var(--background-gray);
-    margin: 2px 0 2px 5px;
+    margin: 2px 5px 2px 0;
     font-size: 12px;
 }
 
@@ -80,9 +84,7 @@
 }
 
 .question-answer-row {
-    margin-left: 0;
-    margin-top: 7px;
-    margin-bottom: 7px;
+    margin: 7px 0;
 }
 
 .info {

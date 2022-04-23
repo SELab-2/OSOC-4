@@ -10,6 +10,7 @@ import useWindowDimensions from "../../utils/WindowDimensions";
 import {api, Url} from "../../utils/ApiClient";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/router";
+import LoadingPage from "../LoadingPage";
 
 
 export default function StudentListAndFilters(props) {
@@ -194,11 +195,12 @@ export default function StudentListAndFilters(props) {
         <InfiniteScroll
           style={{
             "height": "calc(100vh - 146px)",
+            "position": "relative"
           }}
           dataLength={students.length} //This is important field to render the next data
           next={fetchData}
           hasMore={studentUrls.length > 0}
-          loader={<h4>Loading...</h4>}
+          loader={<LoadingPage />}
           endMessage={
             <p style={{ textAlign: 'center' }}>
               <b>Yay! You have seen it all</b>
