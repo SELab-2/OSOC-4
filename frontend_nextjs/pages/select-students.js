@@ -45,15 +45,15 @@ export default function SelectStudents() {
      * The html that displays the overview of students
      */
     return (
-      <Row>
-          <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={true} studentId={studentId}/>
-          {
-            (studentId) &&
-            <Col>
-                <StudentDetails student={getStudentById()} student_id={studentId} />
-            </Col>
-          }
-      </Row >
+        <Row>
+            <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={true} studentId={studentId} />
+            {
+                (studentId) &&
+                <Col>
+                    <StudentDetails student={getStudentById()} student_id={studentId} />
+                </Col>
+            }
+        </Row >
     )
 
 }
