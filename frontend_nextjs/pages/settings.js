@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
-import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
 import ChangeName from "../Components/settings/ChangeName";
 import ChangeEmail from "../Components/settings/ChangeEmail";
 import SettingCards from "../Components/settings/SettingCards";
-import { Accordion } from "react-bootstrap";
+import { Accordion, Card } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -17,7 +16,9 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import edition from "/public/assets/edition.png"
 import QuestionTags from "../Components/settings/QuestionTags";
+import CurrentEdition from "../Components/settings/CurrentEdition";
 import LoadingPage from "../Components/LoadingPage";
+import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
 
 /**
  * The page corresponding with the 'settings' tab.
@@ -72,14 +73,18 @@ export default function Settings(props) {
         return (<LoadingPage/>);
     }
 
+    function getCurrentEditionUrl() {
+        return `/editions/${api.year}`
+    }
+
     return (
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
 
                 <AccordionItem eventKey="0">
-                    <Accordion.Header>
+                    <AccordionHeader>
                         <h3>Personal settings</h3>
-                    </Accordion.Header>
+                    </AccordionHeader>
                     <AccordionBody>
                         <div className="personal-settings">
                             <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
@@ -94,6 +99,7 @@ export default function Settings(props) {
                         </div>
                     </AccordionBody>
                 </AccordionItem>
+
 
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
@@ -111,19 +117,19 @@ export default function Settings(props) {
                 {(role === 2) ? (
                     <AccordionItem eventKey="2">
                         <AccordionHeader>
-                            <h3>Select edition</h3>
+                            <h3>Edition settings</h3>
                         </AccordionHeader>
                         <AccordionBody>
-                            <div className="edition-settings">
-                                <SettingCards image={edition} title={currentVersion.name} subtitle={"Select another edition (applies to the whole website)"}>
-                                    <EditionDropdownButton currentVersion={currentVersion} setCurrentVersion={setCurrentVersion} />
-                                </SettingCards>
+                            <div className="align-content-center">
+                                <Card className="card">
+                                    <CurrentEdition/>
+                                </Card>
                             </div>
                         </AccordionBody>
-                    </AccordionItem>) : null }
+                    </AccordionItem>) : null}
 
                 {(role === 2) ? (
-                    <AccordionItem eventKey="3" onClick={() => setInitializeUsers(true)}>
+                    <AccordionItem eventKey="4" onClick={() => setInitializeUsers(true)}>
                         <AccordionHeader>
                             <h3>Manage users</h3>
                         </AccordionHeader>
@@ -134,17 +140,6 @@ export default function Settings(props) {
                         </AccordionBody>
                     </AccordionItem>) : null}
 
-
-                <AccordionItem eventKey="4">
-                    <AccordionHeader>
-                        <h3>Question Tags</h3>
-                    </AccordionHeader>
-                    <AccordionBody>
-                        <div className="question-tags-settings">
-                            <QuestionTags />
-                        </div>
-                    </AccordionBody>
-                </AccordionItem>
 
             </Accordion>
 

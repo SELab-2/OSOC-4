@@ -333,7 +333,7 @@ class API {
      * @returns {Promise<void>}
      */
     async setCurrentEdition(year = null) {
-        this._year = year;
+        this.year = year;
         this.invalidate();
     }
 }
