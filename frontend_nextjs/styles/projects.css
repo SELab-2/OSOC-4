@@ -8,7 +8,8 @@
 }
 
 .project-card-selected{
-    --color-background: var(--yellow);
+    border: 2px solid var(--yes_green_45);
+    margin: -1px;
 }
 
 .project-card-div{

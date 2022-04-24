@@ -41,14 +41,13 @@ export default function ProjectCard(props) {
         let temp_list = []
         Object.keys(temp_dict).map(name => {
             temp_list.push({"amount": temp_dict[name], "name": name})
-            // setSkills(prevState => [...prevState, {"amount": temp_dict[name], "name": name}])
         })
         setSkills(temp_list)
     }, [])
 
     return(
         <div className={"project-card-div"}>
-            <Card className={"project-card"}>
+            <Card className={"project-card" + ((props.project === props.selectedProject) ? "-selected" : "")}>
                 <Card.Body classname={"card-body"}>
                     <Row>
                         <Col>
