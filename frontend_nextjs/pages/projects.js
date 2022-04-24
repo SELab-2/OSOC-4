@@ -13,7 +13,7 @@ export default function Projects() {
       <>
           <Row className="remaining_height fill_width">
               <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={false} studentId={undefined}/>
-              <Col md="auto" style={{ marginLeft: "0" }}>
+              <Col md="auto" className="nomargin">
                   <div style={{paddingTop: "40vh"}} className="fill_height">
                       <div className="button-match-student-project">
                           <Image src={matchIcon} alt="match student to project" width={80}/>

@@ -81,7 +81,7 @@ export default function ProjectsList() {
                         <Button className={"center"} onClick={handleNewProject}>New project</Button>
                     </Col>
                 </Row>
-                <Row>
+                <Row className="nomargin">
                         {
                             visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
                         }
