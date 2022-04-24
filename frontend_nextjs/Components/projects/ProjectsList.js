@@ -58,32 +58,35 @@ export default function ProjectsList() {
     }
 
     return(
-        <div className={"project-top-bar"}>
-            <Row className="nomargin">
-                <Col>
-                    <Form onSubmit={handleSearchSubmit}>
-                        <Form.Group controlId="searchProjects">
-                            <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
-                        </Form.Group>
-                    </Form>
-                </Col>
-                <Col xs="auto" className={"project-people-needed"}>
-                    <Form>
-                        <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                    </Form>
-                </Col >
-                <Col xs="auto" >
-                    <ConflictCard/>
-                </Col>
-                <Col xs="auto" >
-                    <Button className={"center"} onClick={handleNewProject}>New project</Button>
-                </Col>
-            </Row>
-            <Row>
-                    {
-                        visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
-                    }
-            </Row>
-        </div>
+        <Col className="fill_height scroll-overflow fill_width">
+
+            <div className={"project-top-bar"}>
+                <Row className="nomargin">
+                    <Col>
+                        <Form onSubmit={handleSearchSubmit}>
+                            <Form.Group controlId="searchProjects">
+                                <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
+                            </Form.Group>
+                        </Form>
+                    </Col>
+                    <Col xs="auto" className={"project-people-needed"}>
+                        <Form>
+                            <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
+                        </Form>
+                    </Col >
+                    <Col xs="auto" >
+                        <ConflictCard/>
+                    </Col>
+                    <Col xs="auto" >
+                        <Button className={"center"} onClick={handleNewProject}>New project</Button>
+                    </Col>
+                </Row>
+                <Row>
+                        {
+                            visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
+                        }
+                </Row>
+            </div>
+        </Col>
     )
 }
