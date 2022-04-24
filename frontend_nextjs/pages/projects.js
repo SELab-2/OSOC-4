@@ -25,5 +25,3 @@ export default function Projects() {
       </>
   )
 }
-//                           <Image src={matchIcon} alt="match student to project" width={60}/>
-//                          <h4 style={{color: "green", fontWeight: "bold"}}>Match</h4>
