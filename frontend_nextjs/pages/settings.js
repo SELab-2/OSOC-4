@@ -16,6 +16,7 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import QuestionTags from "../Components/settings/QuestionTags";
 import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
+import CreateEdition from "../Components/settings/CreateEdition";
 
 /**
  * The page corresponding with the 'settings' tab.
@@ -86,7 +87,6 @@ function Settings({ me, current_edition }) {
                                 <h1>{edition.name}</h1>
                                 <p>{(edition.description) ? edition.description : "No description available"}</p>
                                 <Accordion>
-
                                     <AccordionItem eventKey="0">
                                         <AccordionHeader>
                                             <h3>Change edition</h3>
@@ -95,7 +95,6 @@ function Settings({ me, current_edition }) {
                                             <EditionDropdownButton currentVersion={edition} setCurrentVersion={setEdition} />
                                         </AccordionBody>
                                     </AccordionItem>
-
                                     <AccordionItem eventKey="1">
                                         <AccordionHeader>
                                             <h3>Question Tags</h3>
@@ -104,6 +103,14 @@ function Settings({ me, current_edition }) {
                                             <div className="questiontags">
                                                 <QuestionTags />
                                             </div>
+                                        </AccordionBody>
+                                    </AccordionItem>
+                                    <AccordionItem eventKey="2">
+                                        <AccordionHeader>
+                                            <h3>Create new edition</h3>
+                                        </AccordionHeader>
+                                        <AccordionBody>
+                                            <CreateEdition/>
                                         </AccordionBody>
                                     </AccordionItem>
 
