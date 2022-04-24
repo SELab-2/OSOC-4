@@ -11,7 +11,7 @@ import { api, Url } from "../../utils/ApiClient";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
-import { WebsocketContext } from "../Auth"
+import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
 
 export default function StudentListAndFilters(props) {
@@ -41,20 +41,20 @@ export default function StudentListAndFilters(props) {
 
   const [showFilter, setShowFilter] = useState(false);
 
-  const ws = useContext(WebsocketContext)
+  const { websocketConn } = useWebsocketContext();
 
 
   useEffect(() => {
 
-    if (ws) {
-      ws.addEventListener("message", updateDetailsFromWebsocket)
+    if (websocketConn) {
+      websocketConn.addEventListener("message", updateDetailsFromWebsocket)
 
       return () => {
-        ws.removeEventListener('message', updateDetailsFromWebsocket)
+        websocketConn.removeEventListener('message', updateDetailsFromWebsocket)
       }
     }
 
-  }, [ws, students, studentUrls, router.query, decisions])
+  }, [websocketConn, students, studentUrls, router.query, decisions])
 
   useEffect(() => {
     if (session) {
