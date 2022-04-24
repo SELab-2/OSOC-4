@@ -1,7 +1,5 @@
 import json
-from multiprocessing import set_forkserver_preload
 from typing import Dict, Set
-from typing_extensions import Self
 import uuid
 from httpx import Response
 from app.crud import read_all_where, read_where, update, update_all
@@ -10,6 +8,7 @@ from app.tests.test_base import Status, TestBase, Request
 from app.models.user import User, UserRole
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.config import config
+from backend import app
 from backend.app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 
 
@@ -67,8 +66,6 @@ class TestProjects(TestBase):
         edition_generator = EditionGenerator(self.session)
         edition = edition_generator.generate_edition(2022)
         await update(edition, self.session)
-        # TODO: after skill_generator.add_to_db() is called, edition becomes none.
-        edition_year = edition.year
 
         skill_generator = SkillGenerator(self.session)
         skills = skill_generator.generate_skills()
@@ -89,7 +86,7 @@ class TestProjects(TestBase):
             "partner_description": "Testing inc. is focused on being dummy data.",
             "required_skills":project_skills,
             "users":[project_coach.id],
-            "edition": edition_year,
+            "edition": edition.year,
         }
 
         # Post create project request
@@ -132,6 +129,7 @@ class TestProjects(TestBase):
 
 
     async def test_get_projects_id_with_admin_user(self):
+
         url = f"{config.api_url}projects/"
 
         # Set up edition and project object
@@ -161,6 +159,7 @@ class TestProjects(TestBase):
                              f"The project gotten by {user_title} did not match the expected project.")
 
     async def test_get_projects_id_with_coach_user(self):
+
         url = f"{config.api_url}projects/"
 
         # Set up coach, edition and project object
@@ -198,12 +197,9 @@ class TestProjects(TestBase):
 
         # Set up coach, edition and project object
         coaches = await read_all_where(User, User.role == UserRole.COACH, session=self.session)
-        coach1_id = coaches[0].id
-        coach2_id = coaches[1].id
 
         edition_generator = EditionGenerator(self.session)
         edition = edition_generator.generate_edition(2022)
-        edition_year = edition.year
 
         project_name = str(uuid.uuid1())
         project = Project(
@@ -213,7 +209,7 @@ class TestProjects(TestBase):
             partner_name="UGent",
             partner_description="De C in UGent staat voor communicatie",
             coaches=[coaches[0]],
-            edition=edition_year)
+            edition=edition.year)
         await update_all([edition, project], self.session)
 
         project_id = project.id
@@ -222,13 +218,11 @@ class TestProjects(TestBase):
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
 
         # prepare data for update
-        # TODO:
-        # cause crash Instance <User at 0x7ff86f5bbdc0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/14/bhk3)
-        # skill_generator = SkillGenerator(self.session)
-        # skills = skill_generator.generate_skills()
-        # await skill_generator.add_to_db()
+        skill_generator = SkillGenerator(self.session)
+        skills = skill_generator.generate_skills()
+        await skill_generator.add_to_db()
 
-        # project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
+        project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
 
         project_updated = Project(
             name=str(uuid.uuid1()),
@@ -237,11 +231,11 @@ class TestProjects(TestBase):
             partner_name=str(uuid.uuid1()),
             partner_description=str(uuid.uuid1()),
             coaches=[],
-            edition=edition_year)
+            edition=edition.year)
 
         body = project_updated.dict()
-        body["required_skills"] = []
-        body["users"] =[coach2_id]
+        body["required_skills"] = project_skills
+        body["users"] =[coaches[1].id]
 
         # Send patch project request
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users, body)
@@ -260,3 +254,16 @@ class TestProjects(TestBase):
                              (f"{key} of project '{project_name}' did not match.\n"
                               f"Expected: {value}\n"
                               f"Got: {db_project_dict[key]}"))
+
+         # test project user
+        project_coaches_in_db = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(project_id), session=self.session)
+        self.assertIsNotNone(project_coaches_in_db, f"User has not been added for project {project_name} ")
+
+        project_skills_in_db = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(project_id), session=self.session)
+        self.assertGreater(len(project_coaches_in_db), 0, f"Skill has not been added for project {project_name}")
+
+        # test project required skills
+        self.assertEqual(len(project_skills_in_db), len(skills), f"Not all skills have not been added for project {project_name}")
+        project_skill_names = [skill.skill_name for skill in project_skills_in_db]
+        for skill in skills:
+            self.assertTrue(skill.name in project_skill_names, f"Skill {skill.name} not found for project {project_name}")
