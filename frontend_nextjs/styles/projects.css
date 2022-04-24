@@ -63,5 +63,6 @@
 }
 
 .button-match-student-project {
+     cursor: pointer;
     border: none;
 }
