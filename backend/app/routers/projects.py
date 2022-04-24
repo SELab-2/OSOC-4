@@ -1,5 +1,5 @@
 from app.config import config
-from app.crud import read_where, update
+from app.crud import read_where, update, update_all
 from app.database import get_session
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
@@ -27,7 +27,20 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
     :rtype: dict
     """
 
-    new_project = await update(Project.parse_obj(project), session=session)
+    project_data = project.dict()
+    required_skills = project_data.pop("required_skills", [])
+    user_ids = project_data.pop("users", [])
+
+    new_project = await update(Project.parse_obj(project_data), session=session)
+
+    skills = [ProjectRequiredSkill(project=new_project,
+                                   skill_name=required_skill["skill_name"],
+                                   number=required_skill["number"])
+              for required_skill in required_skills]
+    users = [ProjectCoach(project_id=new_project.id, coach_id=user_id) for user_id in user_ids]
+
+    await update_all(skills, session=session)
+    await update_all(users, session=session)
     return response(ProjectOutSimple.parse_raw(new_project.json()), "Project added successfully.")
 
 
