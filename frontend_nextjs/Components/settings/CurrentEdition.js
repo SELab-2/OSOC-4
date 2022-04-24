@@ -1,47 +1,46 @@
-import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
-import { useState } from 'react';
-import LoadingPage from "../../Components/LoadingPage"
+import React, { useEffect, useState} from 'react'
 import {api, Url} from "../../utils/ApiClient";
 import {Accordion, Table } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
 import QuestionTags from "../../Components/settings/QuestionTags";
+import EditionDropdownButton from "./EditionDropdownButton";
 
-const Edition = () => {
-    const router = useRouter()
-    const [loading, setLoading] = useState(true);
+
+export default function CurrentEdition(props) {
+    const [loadingEditon, setLoadingEdition] = useState(false);
     const [edition, setEdition] = useState(true);
-    const { year } = router.query
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        Url.fromName(api.editions).extend(`/${year}`).get().then(res => {
-            if (res.success) {
-                setEdition(res.data);
-                Url.fromUrl(res.data.users).get().then(async res2 => {
-                    if (res2.success){
-                        Promise.all(res2.data.map(u => { Url.fromUrl(u).get().then(async res3 => {
-                                    if (res3.success) {
-                                        const user = res3.data;
-                                        if (user && user.data.role === 0) {
-                                            setUsers(prevState => [...prevState, user.data]);
+        if (edition === true && ! loadingEditon){
+            setLoadingEdition(true);
+            console.log("api.current_edition");
+            console.log(api.current_edition);
+            Url.fromName(api.current_edition).get().then(res => {
+                console.log("res:");
+                console.log(res);
+                if (res.success) {
+                    setEdition(res.data);
+                    Url.fromUrl(res.data.users).get().then(async res2 => {
+                        if (res2.success){
+                            Promise.all(res2.data.map(u => { Url.fromUrl(u).get().then(async res3 => {
+                                        if (res3.success) {
+                                            const user = res3.data;
+                                            if (user && user.data.role === 0) {
+                                                setUsers(prevState => [...prevState, user.data]);
+                                            }
                                         }
-                                    }
+                                    })
                                 })
-                            })
-                        )
-                    }
-                })
-            }
-            setLoading(false);
-        });
-    }, [year]);
-
-    if (loading) {
-        return <LoadingPage />
-    }
+                            )
+                        }
+                    })
+                }
+            });
+        }
+    });
 
     console.log("The current edition:");
     console.log(edition);
@@ -80,15 +79,20 @@ const Edition = () => {
                         <h3>Question Tags</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                        <div className="personal-settings">
+                        <div className="questiontags">
                             <QuestionTags />
                         </div>
+                    </AccordionBody>
+                </AccordionItem>
+                <AccordionItem eventKey="2"> 
+                    <AccordionHeader>
+                        <h3>Change edition</h3>
+                    </AccordionHeader>
+                    <AccordionBody>
+                        <EditionDropdownButton />
                     </AccordionBody>
                 </AccordionItem>
             </Accordion>
         </div>
     )
 }
-
-export default Edition;
-

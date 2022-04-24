@@ -5,7 +5,7 @@ import EditionDropdownButton from "../Components/settings/EditionDropdownButton"
 import ChangeName from "../Components/settings/ChangeName";
 import ChangeEmail from "../Components/settings/ChangeEmail";
 import SettingCards from "../Components/settings/SettingCards";
-import { Accordion } from "react-bootstrap";
+import { Accordion, Card } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -19,6 +19,7 @@ import dark_theme from "/public/assets/dark_theme.png"
 import edition from "/public/assets/edition.png"
 import QuestionTags from "../Components/settings/QuestionTags";
 import Link from 'next/link'
+import CurrentEdition from "../Components/settings/CurrentEdition";
 
 
 export default function Settings(props) {
@@ -84,22 +85,18 @@ export default function Settings(props) {
                 </AccordionItem>
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
-                        <h3>Website settings</h3>
+                        <h3>Edition</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                        <div className="personal-settings">
-                            <SettingCards image={dark_theme} title={"Dark theme"} subtitle={"Customize the layout of the website to reduce the glow and calm your eyes"}>
-                                <ChangeTheme />
-                            </SettingCards>
-                            <SettingCards image={edition} title={"Edition selector"} subtitle={"Change the selected version, this will apply to the whole website"}>
-                                <EditionDropdownButton />
-                                <Link href={`/editions/${api.year}`}>View Edition</Link>
-                            </SettingCards>
+                        <div className="align-content-center"> 
+                            <Card className="card">
+                                <CurrentEdition/>
+                            </Card>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
                 {(role === 2) ? (
-                    <AccordionItem eventKey={2} onClick={clickAdminSettings}>
+                    <AccordionItem eventKey={3} onClick={clickAdminSettings}>
                         <AccordionHeader>
                             <h3>Admin settings</h3>
                         </AccordionHeader>
