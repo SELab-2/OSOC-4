@@ -13,20 +13,12 @@ import {Url} from "../../utils/ApiClient";
 export default function QuestionTag(props) {
     const [previousTag, setPreviousTag] = useState({});
     const [questionTag, setQuestionTag] = useState({});
-    const [loading, setLoading] = useState(false);
 
     // fetch the question tag (the url is provided in the props)
     useEffect(() => {
-        setLoading(true)
-        Url.fromUrl(props.url).get()
-            .then(res => {
-                if(res.success) {
-                    setPreviousTag(res.data);
-                    setQuestionTag(res.data);
-                }
-            })
-            .then(() => setLoading(false))
-    }, [props.url]);
+        setQuestionTag(props.questionTag);
+        setPreviousTag(props.questionTag);
+    }, []);
 
     const handleChange = (event) => {
         event.preventDefault()
@@ -42,7 +34,7 @@ export default function QuestionTag(props) {
 
         let newQuestionTag = {...previousTag};
         newQuestionTag[name] = checked;
-        Url.fromUrl(props.url).setBody(newQuestionTag).patch().then(res => {
+        Url.fromUrl(questionTag["url"]).setBody(newQuestionTag).patch().then(res => {
           setPreviousTag(newQuestionTag);
         })
 
@@ -52,31 +44,34 @@ export default function QuestionTag(props) {
     }
 
     const deleteTag = (event) => {
-        event.preventDefault()
-        Url.fromUrl(props.url).delete().then(res => {
+        event.preventDefault();
+        Url.fromUrl(questionTag["url"]).delete().then(res => {
             if (res.success) {
-                props.deleteTag(props.url)
+                props.deleteTag(questionTag["url"])
             }
         })
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        Url.fromUrl(props.url).setBody(questionTag).patch().then(res => {
+        if (questionTag["tag"].length > 0) {
+          Url.fromUrl(questionTag["url"]).setBody(questionTag).patch().then(res => {
             if (previousTag["tag"] !== questionTag["tag"]) {
-                props.renameTag(props.url, res["data"])
+              props.renameTag(questionTag["url"], res["data"])
             }
             setPreviousTag(questionTag);
-        })
+          })
+        }
+        props.setEdited(undefined);
     }
 
     return (
-      <tr key={props.url}>
+      <tr key={props.questionTag["url"]}>
           <td>
               {(questionTag["mandatory"] || ! props.edited)? (
                 <p>{previousTag["tag"]}</p>
               ) : (
-                <input name="tag" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} />
+                <input name="tag" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange}/>
               )
               }
           </td>
@@ -93,7 +88,9 @@ export default function QuestionTag(props) {
           <td>
               {(!questionTag["mandatory"]) &&
                 ((! props.edited)?
-                <button className="table-button" onClick={(ev) => props.setEdited(props.url)}>
+                <button className="table-button" onClick={(ev) => {
+                    props.setNewQuestionTag(undefined);
+                    props.setEdited(previousTag["url"])}}>
                   <Image src={editIcon} height="30px"/>
                 </button>
                 :
