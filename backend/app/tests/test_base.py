@@ -12,6 +12,7 @@ from app.crud import read_where, clear_data, read_all_where
 from app.database import engine
 from app.models.user import User, UserRole
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
+from sqlalchemy.orm import sessionmaker
 
 
 class Request(Enum):
@@ -59,7 +60,9 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.client: AsyncClient = AsyncClient(app=app, base_url="http://test")
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
-        self.session: AsyncSession = AsyncSession(engine)
+        self.session: AsyncSession = sessionmaker(
+            engine, expire_on_commit=False, class_=AsyncSession
+        )()
         await clear_data(self.session)
 
         user_generator = UserGenerator(self.session)
