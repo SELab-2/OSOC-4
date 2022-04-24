@@ -6,6 +6,7 @@ import SuggestionsCount from "./SuggestionsCount";
 import Image from "next/image";
 import selected from "../../public/assets/selected.svg";
 import not_selected from "../../public/assets/not_selected.svg";
+import {log} from "../../utils/logger";
 
 // get the decision for the student (yes, maybe, no or undecided)
 export function getDecisionString(value) {
@@ -93,6 +94,7 @@ export default function StudentListelement(props) {
    */
   function selectStudent(){
     // if the selected student is this student then unselect the student
+    log(props.student)
     props.setSelectedStudent(props.selectedStudent === props.student ? undefined :props.student)
   }
 

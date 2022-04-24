@@ -13,7 +13,7 @@ export default function Projects() {
     <Row className="remaining_height fill_width">
       <StudentListAndFilters setSelectedStudent={setSelectedStudent} selectedStudent={selectedStudent} students={students} setStudents={setStudents} studentsTab={false} studentId={undefined}/>
       <Col className="fill_height fill_width">
-        <ProjectsList setSelectedProject={setSelectedProject} selectedProject={selectedProject}/>
+        <ProjectsList selectedStudent={selectedStudent} setSelectedProject={setSelectedProject} selectedProject={selectedProject}/>
       </Col>
     </Row>
   )

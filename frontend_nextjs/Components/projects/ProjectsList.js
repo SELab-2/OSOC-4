@@ -6,13 +6,15 @@ import {api, Url} from "../../utils/ApiClient";
 import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import InfiniteScroll from "react-infinite-scroll-component";
+import AddStudentModal from "./AddStudentModal";
 
 export default function ProjectsList(props) {
-    const [allProjects, setAllProjects] = useState([])
-    const [loaded, setLoaded] = useState(false)
-    const [search, handleSearch] = useState("")
-    const [peopleNeeded, setPeopleNeeded] = useState(false)
-    const [visibleProjects, setVisibleProjects] = useState([])
+    const [allProjects, setAllProjects] = useState([]);
+    const [loaded, setLoaded] = useState(false);
+    const [search, handleSearch] = useState("");
+    const [peopleNeeded, setPeopleNeeded] = useState(false);
+    const [visibleProjects, setVisibleProjects] = useState([]);
+    const [showAddStudent, setShowAddStudent] = useState(false);
     const router = useRouter()
 
     useEffect(() => {
@@ -42,7 +44,6 @@ export default function ProjectsList(props) {
     async function handleSearchSubmit(event) {
         event.preventDefault();
         setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
-        log("SUBMIT")
     }
 
     async function changePeopleNeeded(event){
@@ -61,7 +62,9 @@ export default function ProjectsList(props) {
         <div className={"project-top-bar"}>
             <Row className="nomargin">
                 <Col>
-                    <Button> Add student to project</Button>
+                    {/*todo error als er geen selected student en of project is of als de student geen skills heeft*/}
+                    <Button onClick={() => setShowAddStudent(true)}> Add student to project</Button>
+                    <AddStudentModal selectedProject={props.selectedProject} selectedStudent={props.selectedStudent} setShowAddStudent={setShowAddStudent} showAddStudent={showAddStudent} />
                 </Col>
                 <Col xs="auto" >
                     <ConflictCard/>

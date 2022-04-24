@@ -1,0 +1,82 @@
+import {Button, Modal} from "react-bootstrap";
+import React, {useEffect, useState} from "react";
+import {log} from "../../utils/logger";
+import SkillSelector from "./SkillSelector";
+import SelectSearch, {fuzzySearch} from "react-select-search";
+import * as url from "url";
+
+
+export default function AddStudentModal(props){
+
+    const [selectedSkill, setSelectedSkill] = useState(undefined)
+
+    const [skills, setSkills] = useState([])
+
+    useEffect(() => {
+        if(props.selectedStudent !== undefined && props.selectedProject !== undefined){
+            let temp_dict = {}
+            props.selectedProject.required_skills.map(skill => {
+                temp_dict[skill.skill_name] = skill.number
+            })
+
+            props.selectedProject.participations.map(participation => {
+                temp_dict[participation.skill] = temp_dict[participation.skill] - 1 ;
+            })
+
+            // first map the skill names in an array
+            let skill_name_array = Object.keys(temp_dict)
+
+            // check if the name of a students skill is in the needed skill list of a project
+            log("GETSKILLS")
+            log(props.selectedStudent.skills.filter(s => skill_name_array.includes(s.name)))
+            let valid_skills =  props.selectedStudent.skills.filter(s => skill_name_array.includes(s.name))
+
+            setSkills(valid_skills.map(s => ({"value": s.name, "name": s.name})))
+        }
+    }, [props.selectedStudent, props.selectedProject])
+
+    async function AddStudentToProject() {
+        if (props.selectedStudent !== undefined && props.selectedProject !== undefined) {
+            Url.fromName(par)
+        }
+    }
+
+    return(<div>
+        {(props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div>
+                        For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?
+                    </div>
+                    <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill} skills={skills}/>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => props.setShowAddStudent(false)}>
+                        Dont add student to project
+                    </Button>
+                    <Button variant="primary" onClick={async () => {
+                        await AddStudentToProject()
+                        props.setShowAddStudent(false)
+                    }}>
+                        Add student to project
+                    </Button>
+
+                </Modal.Footer>
+            </Modal>: <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>No selected {props.selectedStudent === undefined ? "student" : "project"}{(props.selectedStudent === undefined && props.selectedProject === undefined) ? " or project" : ""}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>To add a student to a project you must both select a student and project. You can do this by clicking on a student and clicking on the checkmark of a project.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={() => props.setShowAddStudent(false)}>
+                        Go back to the project tab
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        }
+
+    </div>)
+}

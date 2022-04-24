@@ -217,7 +217,8 @@ class API {
         editions_students: null,
         editions_projects: null,
         editions_questiontags: null,
-        skills: null
+        skills: null,
+        participation: null
     }
     _ready = false;
 
