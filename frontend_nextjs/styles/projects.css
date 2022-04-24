@@ -61,3 +61,7 @@
 .project-show-detail{
     cursor: pointer;
 }
+
+.button-match-student-project {
+    border: none;
+}

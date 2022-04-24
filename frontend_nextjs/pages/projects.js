@@ -15,9 +15,9 @@ export default function Projects() {
               <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={false} studentId={undefined}/>
               <Col md="auto" style={{ marginLeft: "0" }}>
                   <div style={{paddingTop: "40vh"}} className="fill_height">
-                      <Button style={{backgroundColor: "white", border: "none" }}>
+                      <div className="button-match-student-project">
                           <Image src={matchIcon} alt="match student to project" width={80}/>
-                      </Button>
+                      </div>
                   </div>
               </Col>
               <ProjectsList/>
