@@ -117,10 +117,10 @@ class TestProjects(TestBase):
                               f"Expected: {value}\n"
                               f"Got: {db_project_dict[key]}"))
 
+        # test project user
         project_coaches_in_db = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(project_id), session=self.session)
         self.assertIsNotNone(project_coaches_in_db, f"User has not been added for project {project_name} ")
 
-        # test project user
         project_skills_in_db = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(project_id), session=self.session)
         self.assertGreater(len(project_coaches_in_db), 0, f"Skill has not been added for project {project_name}")
 
@@ -193,3 +193,70 @@ class TestProjects(TestBase):
             gotten_project = json.loads(response.content)
             self.assertEqual(f"{url}{project.id}", gotten_project["id"],
                              f"The project gotten by {user_title} did not match the expected project.")
+
+    async def test_patch_projects_with_id(self):
+
+        # Set up coach, edition and project object
+        coaches = await read_all_where(User, User.role == UserRole.COACH, session=self.session)
+        coach1_id = coaches[0].id
+        coach2_id = coaches[1].id
+
+        edition_generator = EditionGenerator(self.session)
+        edition = edition_generator.generate_edition(2022)
+        edition_year = edition.year
+
+        project_name = str(uuid.uuid1())
+        project = Project(
+            name=project_name,
+            goals="Free\nReal\nEstate",
+            description="Free real estate",
+            partner_name="UGent",
+            partner_description="De C in UGent staat voor communicatie",
+            coaches=[coaches[0]],
+            edition=edition_year)
+        await update_all([edition, project], self.session)
+
+        project_id = project.id
+
+        path = "/projects/" + str(project_id)
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+
+        # prepare data for update
+        # TODO:
+        # cause crash Instance <User at 0x7ff86f5bbdc0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: https://sqlalche.me/e/14/bhk3)
+        # skill_generator = SkillGenerator(self.session)
+        # skills = skill_generator.generate_skills()
+        # await skill_generator.add_to_db()
+
+        # project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
+
+        project_updated = Project(
+            name=str(uuid.uuid1()),
+            goals=str(uuid.uuid1()),
+            description=str(uuid.uuid1()),
+            partner_name=str(uuid.uuid1()),
+            partner_description=str(uuid.uuid1()),
+            coaches=[],
+            edition=edition_year)
+
+        body = project_updated.dict()
+        body["required_skills"] = []
+        body["users"] =[coach2_id]
+
+        # Send patch project request
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users, body)
+
+        self.assertEqual(len(responses), 1)
+
+        # check values in db after update
+        project_in_db = await read_where(Project, Project.id == project.id, session=self.session)
+
+        db_project_dict = project_in_db.dict()
+        body.pop("id")
+        body.pop("required_skills")
+        body.pop("users")
+        for key, value in body.items():
+            self.assertEqual(db_project_dict[key], value,
+                             (f"{key} of project '{project_name}' did not match.\n"
+                              f"Expected: {value}\n"
+                              f"Got: {db_project_dict[key]}"))
