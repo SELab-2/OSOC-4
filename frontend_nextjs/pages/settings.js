@@ -14,16 +14,13 @@ import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
-import QuestionTags from "../Components/settings/QuestionTags";
-import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
-import CreateEdition from "../Components/settings/CreateEdition";
+import EditionSettings from "../Components/settings/EditionSettings";
 
 /**
  * The page corresponding with the 'settings' tab.
  * @returns {JSX.Element} A component corresponding with the 'settings' tab.
  */
-function Settings({ me, current_edition }) {
-    const [edition, setEdition] = useState(current_edition)
+function Settings({ me }) {
     const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
@@ -83,42 +80,9 @@ function Settings({ me, current_edition }) {
                             <h3>Edition settings</h3>
                         </AccordionHeader>
                         <AccordionBody>
-                            <div className="body-editiondetail">
-                                <h1>{edition.name}</h1>
-                                <p>{(edition.description) ? edition.description : "No description available"}</p>
-                                <Accordion>
-                                    <AccordionItem eventKey="0">
-                                        <AccordionHeader>
-                                            <h3>Change edition</h3>
-                                        </AccordionHeader>
-                                        <AccordionBody>
-                                            <EditionDropdownButton currentVersion={edition} setCurrentVersion={setEdition} />
-                                        </AccordionBody>
-                                    </AccordionItem>
-                                    <AccordionItem eventKey="1">
-                                        <AccordionHeader>
-                                            <h3>Question Tags</h3>
-                                        </AccordionHeader>
-                                        <AccordionBody>
-                                            <div className="questiontags">
-                                                <QuestionTags />
-                                            </div>
-                                        </AccordionBody>
-                                    </AccordionItem>
-                                    <AccordionItem eventKey="2">
-                                        <AccordionHeader>
-                                            <h3>Create new edition</h3>
-                                        </AccordionHeader>
-                                        <AccordionBody>
-                                            <CreateEdition/>
-                                        </AccordionBody>
-                                    </AccordionItem>
-
-                                </Accordion>
-                            </div>
+                            <EditionSettings/>
                         </AccordionBody>
                     </AccordionItem>) : null}
-
 
                 {(me.role === 2) ? (
                     <AccordionItem eventKey="4" onClick={() => setInitializeUsers(true)}>
@@ -135,8 +99,6 @@ function Settings({ me, current_edition }) {
 
             </Accordion>
 
-
-
         </div>
 
     )
@@ -148,11 +110,6 @@ export async function getServerSideProps(context) {
     let me = await Url.fromName(api.me).get(context);
     if (me.success) {
         props_out["me"] = me.data.data;
-    }
-
-    let edition = await Url.fromName(api.current_edition).get(context);
-    if (edition.success) {
-        props_out["current_edition"] = edition.data;
     }
 
     return {
