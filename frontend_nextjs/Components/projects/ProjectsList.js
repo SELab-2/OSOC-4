@@ -6,15 +6,13 @@ import {api, Url} from "../../utils/ApiClient";
 import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import InfiniteScroll from "react-infinite-scroll-component";
-import AddStudentModal from "./AddStudentModal";
 
-export default function ProjectsList(props) {
-    const [allProjects, setAllProjects] = useState([]);
-    const [loaded, setLoaded] = useState(false);
-    const [search, handleSearch] = useState("");
-    const [peopleNeeded, setPeopleNeeded] = useState(false);
-    const [visibleProjects, setVisibleProjects] = useState([]);
-    const [showAddStudent, setShowAddStudent] = useState(false);
+export default function ProjectsList() {
+    const [allProjects, setAllProjects] = useState([])
+    const [loaded, setLoaded] = useState(false)
+    const [search, handleSearch] = useState("")
+    const [peopleNeeded, setPeopleNeeded] = useState(false)
+    const [visibleProjects, setVisibleProjects] = useState([])
     const router = useRouter()
 
     useEffect(() => {
@@ -59,40 +57,34 @@ export default function ProjectsList(props) {
     }
 
     return(
-        <div className={"project-top-bar"}>
-            <Row className="nomargin">
-                <Col>
-                    {/*todo error als er geen selected student en of project is of als de student geen skills heeft*/}
-                    <Button onClick={() => setShowAddStudent(true)}> Add student to project</Button>
-                    <AddStudentModal selectedProject={props.selectedProject} selectedStudent={props.selectedStudent} setShowAddStudent={setShowAddStudent} showAddStudent={showAddStudent} />
-                </Col>
-                <Col xs="auto" >
-                    <ConflictCard/>
-                </Col>
-                <Col xs="auto" >
-                    <Button className={"center"} onClick={handleNewProject}>New project</Button>
-                </Col>
-            </Row>
-            <br/>
-            <Row className="nomargin">
-                <Col>
-                    <Form onSubmit={handleSearchSubmit}>
-                        <Form.Group controlId="searchProjects">
-                            <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
-                        </Form.Group>
-                    </Form>
-                </Col>
-                <Col xs="auto" className={"project-people-needed"}>
-                    <Form>
-                        <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                    </Form>
-                </Col >
-            </Row>
-            <Row>
-                    {
-                        visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} key={index} project={project}/>))) : null
-                    }
-            </Row>
-        </div>
+        <Col className="fill_height scroll-overflow fill_width">
+            <div className={"project-top-bar"}>
+                    <Row className="nomargin">
+                        <Col>
+                            <Form onSubmit={handleSearchSubmit}>
+                                <Form.Group controlId="searchProjects">
+                                    <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
+                                </Form.Group>
+                            </Form>
+                        </Col>
+                        <Col xs="auto" className={"project-people-needed"}>
+                            <Form>
+                                <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
+                            </Form>
+                        </Col >
+                        <Col xs="auto" >
+                            <ConflictCard/>
+                        </Col>
+                        <Col xs="auto" >
+                            <Button className={"center"} onClick={handleNewProject}>New project</Button>
+                        </Col>
+                    </Row>
+                    <Row>
+                            {
+                                visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
+                            }
+                    </Row>
+                </div>
+        </Col>
     )
 }
