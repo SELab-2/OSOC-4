@@ -1,4 +1,4 @@
-import {Button, Card, Col, Row} from "react-bootstrap";
+import {Card, Col, Row} from "react-bootstrap";
 import SkillCard from "./SkillCard";
 import {useEffect, useState} from "react";
 import Image from 'next/image'

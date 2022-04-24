@@ -1,9 +1,7 @@
 import {Button, Modal} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import {log} from "../../utils/logger";
 import SkillSelector from "./SkillSelector";
-import SelectSearch, {fuzzySearch} from "react-select-search";
-import * as url from "url";
+import {api, Url} from "../../utils/ApiClient";
 
 
 export default function AddStudentModal(props){
@@ -26,9 +24,7 @@ export default function AddStudentModal(props){
             // first map the skill names in an array
             let skill_name_array = Object.keys(temp_dict)
 
-            // check if the name of a students skill is in the needed skill list of a project
-            log("GETSKILLS")
-            log(props.selectedStudent.skills.filter(s => skill_name_array.includes(s.name)))
+            // check if the name of a students skill is in the needed skill list of a projectlog(props.selectedStudent.skills.filter(s => skill_name_array.includes(s.name)))
             let valid_skills =  props.selectedStudent.skills.filter(s => skill_name_array.includes(s.name))
 
             setSkills(valid_skills.map(s => ({"value": s.name, "name": s.name})))
@@ -36,8 +32,15 @@ export default function AddStudentModal(props){
     }, [props.selectedStudent, props.selectedProject])
 
     async function AddStudentToProject() {
-        if (props.selectedStudent !== undefined && props.selectedProject !== undefined) {
-            Url.fromName(par)
+        if (props.selectedStudent !== undefined && props.selectedProject !== undefined && selectedSkill !== undefined) {
+
+            let response = await Url.fromName(api.participations)
+                .extend("/create")
+                .setBody({
+                    "student_id": props.selectedStudent.id.split("/").pop(),
+                    "project_id": props.selectedProject.id.split("/").pop(),
+                    "skill_name": selectedSkill})
+                .post()
         }
     }
 
