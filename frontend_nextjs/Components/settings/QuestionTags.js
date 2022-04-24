@@ -3,6 +3,10 @@ import QuestionTag from "./QuestionTag";
 import {api, Url} from "../../utils/ApiClient";
 import {Form, Button, Table} from 'react-bootstrap';
 import StudentTableRow from "../email-students/StudentTableRow";
+import Image from "next/image";
+import editIcon from "../../public/assets/edit.svg";
+import saveIcon from "../../public/assets/save.svg";
+import deleteIcon from "../../public/assets/delete.svg";
 
 /**
  * This component displays a settings-screen where you can manage the question tags for an edition
@@ -13,8 +17,7 @@ export default function QuestionTags() {
     const [loading, setLoading] = useState(false);
 
     const [edited, setEdited] = useState(undefined);
-
-    const [newTag, setNewTag] = useState("");
+    const [newQuestionTag, setNewQuestionTag] = useState(undefined);
 
     useEffect(() => {
         setLoading(true)
@@ -24,25 +27,27 @@ export default function QuestionTags() {
             }}).then(() => setLoading(false))
     }, []);
 
-    const handleNewTagChange = (event) => {
-        setNewTag(event.target.value);
+    function handleNewTagChange(ev) {
+        let newQuestionTagAdj = {...newQuestionTag};
+        newQuestionTagAdj[ev.target.name] = ev.target.value;
+        setNewQuestionTag(newQuestionTagAdj);
     }
 
     async function submitNewTag(event) {
         event.preventDefault()
-        Url.fromName(api.editions_questiontags).setBody({"tag": newTag}).post().then(resp => {
+        Url.fromName(api.editions_questiontags).setBody(newQuestionTag).post().then(resp => {
             setQuestionTags([...questionTags, resp["data"]])
-            setNewTag("");
+            setNewQuestionTag(undefined);
         })
 
     }
 
-    const deleteTag = (url) => {
+    function deleteTag(url) {
         const newArr = questionTags.filter(item => item !== url);
         setQuestionTags(newArr);
     }
 
-    const renameTag = (url, newurl) => {
+    function renameTag(url, newurl) {
         let index = questionTags.indexOf(url);
         if (index !== -1) {
             questionTags[index] = newurl;
@@ -64,18 +69,37 @@ export default function QuestionTags() {
                   <th>
                       <p>Show in student list</p>
                   </th>
-                  <th>
-                      <p>Delete</p>
-                  </th>
+
               </tr>
               </thead>
               <tbody className="email-students-cell">
-              {questionTags.map(url => <QuestionTag key={url} url={url} deleteTag={deleteTag} renameTag={renameTag}
+                  {questionTags.map(url => <QuestionTag key={url} url={url} deleteTag={deleteTag} renameTag={renameTag}
                                                     setEdited={setEdited} edited={edited === url}/>)}
+                  {(newQuestionTag) &&
+                    <tr key="newQuestionTag">
+                      <td>
+                            <input name="tag" placeholder="Tag" value={newQuestionTag["tag"]}
+                                   onChange={handleNewTagChange} />
+                      </td>
+                      <td>
+                          <input name="question" placeholder="Question" value={newQuestionTag["question"]}
+                                 onChange={handleNewTagChange} />
+                      </td>
+                      <td><p /></td>
+                      <td>
+                          <button className="table-button" onClick={submitNewTag}>
+                            <Image src={saveIcon} height="30px"/>
+                          </button>
+                          <button onClick={(ev) => setNewQuestionTag(undefined)} className="table-button">
+                            <Image src={deleteIcon} height="30px"/>
+                          </button>
+                      </td>
+                    </tr>
+                  }
               </tbody>
           </Table>
 
-          <Button variant="primary">
+          <Button variant="primary" onClick={(ev) => setNewQuestionTag({})}>
               New question tag
           </Button>
       </div>

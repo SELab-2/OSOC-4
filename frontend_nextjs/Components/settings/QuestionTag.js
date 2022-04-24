@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button } from 'react-bootstrap';
 import deleteIcon from '../../public/assets/delete.svg';
+import editIcon from '../../public/assets/edit.svg';
+import saveIcon from '../../public/assets/save.svg';
 import Image from "next/image";
 import {Url} from "../../utils/ApiClient";
 
@@ -38,10 +39,16 @@ export default function QuestionTag(props) {
 
     const handleCheckboxChange = (event) => {
         const { name, checked } = event.target;
-        setQuestionTag(prevState => ({
-            ...prevState,
-            [name]: checked
-        }));
+
+        let newQuestionTag = {...previousTag};
+        newQuestionTag[name] = checked;
+        Url.fromUrl(props.url).setBody(newQuestionTag).patch().then(res => {
+          setPreviousTag(newQuestionTag);
+        })
+
+        newQuestionTag = {...questionTag};
+        newQuestionTag[name] = checked;
+        setQuestionTag(newQuestionTag);
     }
 
     const deleteTag = (event) => {
@@ -67,26 +74,37 @@ export default function QuestionTag(props) {
       <tr key={props.url}>
           <td>
               {(questionTag["mandatory"] || ! props.edited)? (
-                <p>{questionTag["tag"]}</p>
+                <p>{previousTag["tag"]}</p>
               ) : (
-                <input placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} />
+                <input name="tag" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} />
               )
               }
           </td>
           <td>
-              {(props.edited)? <input placeholder="Question" value={questionTag["question"]} onChange={handleChange} />:
-              <p>{questionTag["question"]}</p>}
+              {(props.edited)? <input name="question" placeholder="Question" value={questionTag["question"]} onChange={handleChange} />:
+              <p>{previousTag["question"]}</p>}
 
           </td>
           <td>
               {(!questionTag["mandatory"]) &&
-                <input type="checkbox" checked={questionTag["showInList"]} onChange={handleCheckboxChange} />
+                <input name="showInList" type="checkbox" checked={questionTag["showInList"]} onChange={handleCheckboxChange} />
               }
           </td>
           <td>
-              {(!questionTag["mandatory"]) && <button onClick={deleteTag}>
-                  <Image src={deleteIcon} className="delete-icon" />
-              </button>
+              {(!questionTag["mandatory"]) &&
+                ((! props.edited)?
+                <button className="table-button" onClick={(ev) => props.setEdited(props.url)}>
+                  <Image src={editIcon} height="30px"/>
+                </button>
+                :
+                <button className="table-button" onClick={handleSubmit}>
+                  <Image src={saveIcon} height="30px"/>
+                </button>)
+              }
+              {(!questionTag["mandatory"]) &&
+                <button onClick={deleteTag} className="table-button">
+                  <Image src={deleteIcon} height="30px"/>
+                </button>
               }
           </td>
       </tr>
