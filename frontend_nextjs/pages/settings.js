@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
 import ChangeName from "../Components/settings/ChangeName";
 import ChangeEmail from "../Components/settings/ChangeEmail";
 import SettingCards from "../Components/settings/SettingCards";
-import { Accordion, Card } from "react-bootstrap";
+import { Accordion } from "react-bootstrap";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionBody from "react-bootstrap/AccordionBody";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -23,12 +23,7 @@ import EditionDropdownButton from "../Components/settings/EditionDropdownButton"
  * @returns {JSX.Element} A component corresponding with the 'settings' tab.
  */
 function Settings({ me, current_edition }) {
-    const [user, setUser] = useState(me);
-    const [name, setName] = useState(me.name);
-    const [email, setEmail] = useState(me.email);
-    const [role, setRole] = useState(me.role);
     const [edition, setEdition] = useState(current_edition)
-    const [loading, setLoading] = useState(false)
     const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
@@ -45,14 +40,6 @@ function Settings({ me, current_edition }) {
         setDarkTheme(!darkTheme)
     }
 
-    if (loading) {
-        return (<LoadingPage/>);
-    }
-
-    function getCurrentEditionUrl() {
-        return `/editions/${api.year}`
-    }
-
     return (
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
@@ -67,10 +54,10 @@ function Settings({ me, current_edition }) {
                                 <ChangePassword />
                             </SettingCards>
                             <SettingCards image={change_email_image} title={"Change email"} subtitle={"Change to a different email-adress"}>
-                                <ChangeEmail email={email} />
+                                <ChangeEmail user={me} />
                             </SettingCards>
                             <SettingCards image={change_name_image} title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
-                                <ChangeName user={user} />
+                                <ChangeName user={me} />
                             </SettingCards>
                         </div>
                     </AccordionBody>
@@ -90,7 +77,7 @@ function Settings({ me, current_edition }) {
                     </AccordionBody>
                 </AccordionItem>
 
-                {(role === 2) ? (
+                {(me.role === 2) ? (
                     <AccordionItem eventKey="2">
                         <AccordionHeader>
                             <h3>Edition settings</h3>
@@ -126,14 +113,15 @@ function Settings({ me, current_edition }) {
                         </AccordionBody>
                     </AccordionItem>) : null}
 
-                {(role === 2) ? (
+
+                {(me.role === 2) ? (
                     <AccordionItem eventKey="4" onClick={() => setInitializeUsers(true)}>
                         <AccordionHeader>
                             <h3>Manage users</h3>
                         </AccordionHeader>
                         <AccordionBody>
                             <div className="manage-users-settings">
-                                <ManageUsers me={user} initialize={initializeUsers} />
+                                <ManageUsers me={me} initialize={initializeUsers} />
                             </div>
                         </AccordionBody>
                     </AccordionItem>) : null}
@@ -160,10 +148,6 @@ export async function getServerSideProps(context) {
     if (edition.success) {
         props_out["current_edition"] = edition.data;
     }
-
-    console.log("SETTINGS")
-    console.log(props_out)
-    console.log("SETTINGS")
 
     return {
         props: props_out
