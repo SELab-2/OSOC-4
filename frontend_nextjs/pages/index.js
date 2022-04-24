@@ -90,7 +90,6 @@ function Home({ current_edition, students_length, projects_length, messages }) {
   return <LoadingPage />
 }
 
-export default Home
 
 export async function getServerSideProps(context) {
   let props_out = {}
@@ -121,3 +120,5 @@ export async function getServerSideProps(context) {
     props: props_out
   }
 }
+
+export default Home
