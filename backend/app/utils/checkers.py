@@ -37,8 +37,9 @@ class RoleChecker:
 
 
 class EditionChecker:
-    def __init__(self, always_allowed: List[UserRole] = [UserRole.ADMIN]):
+    def __init__(self, always_allowed: List[UserRole] = [UserRole.ADMIN], update: bool = False):
         self.always_allowed = always_allowed
+        self.update = update
 
     async def __call__(self, year: str, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
 
@@ -51,9 +52,8 @@ class EditionChecker:
         res = await session.execute(stat)
         (edition,) = res.one()
 
-        if user.role not in self.always_allowed:
-            if user not in edition.coaches:
-                raise NotPermittedException()
+        if (self.update and edition.read_only) or (user.role not in self.always_allowed and user not in edition.coaches):
+            raise NotPermittedException()
 
         if not edition:
             raise EditionNotFound()

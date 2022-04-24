@@ -14,6 +14,12 @@ class Participation(SQLModel, table=True):
     skill: "Skill" = Relationship(back_populates="participations")
 
 
+class ParticipationCreate(BaseModel):
+    student_id: int
+    project_id: int
+    skill_name: str
+
+
 class ParticipationOutStudent(BaseModel):
     project: str
     skill: str

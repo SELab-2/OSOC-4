@@ -3,6 +3,8 @@ import { signOut } from 'next-auth/react';
 import Image from 'next/image'
 import osocEmblem from '../public/assets/osoc-emblem.svg';
 import Link from 'next/link'
+import {useEffect, useState} from "react";
+import {api, Url} from "../utils/ApiClient";
 
 export default function NavHeader(props) {
 
@@ -10,6 +12,20 @@ export default function NavHeader(props) {
         event.preventDefault();
         await signOut()
     }
+
+    const [role, setRole] = useState(0)
+
+
+    useEffect(() => {
+        if (role === 0 ) {
+            Url.fromName(api.me).get().then(res => {
+                if (res.success) {
+                    res = res.data.data;
+                    setRole(res.role);
+                }
+            })
+        }
+    }, [role]);
 
     return (
       <Row className="navheader">
@@ -22,9 +38,11 @@ export default function NavHeader(props) {
             <Nav className="me-auto">
               <Link href="/select-students">Select Students</Link>
             </Nav>
-            <Nav className="me-auto">
-              <Link href="/email-students">Email Students</Link>
-            </Nav>
+              {(role === 2)?
+                  <Nav className="me-auto">
+                      <Link href="/email-students">Email Students</Link>
+                  </Nav>
+                  : null }
             <Nav className="me-auto">
               <Link href="/projects">Projects</Link>
             </Nav>

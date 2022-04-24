@@ -1,25 +1,28 @@
-from app.models.student import Student
+import random
+from random import sample
+
+from app.models.student import DecisionOption, Student
 from app.tests.utils_for_tests.DataGenerator import DataGenerator
-from app.tests.utils_for_tests.QuestionAnswerGenerator import QuestionAnswerGenerator
+from app.tests.utils_for_tests.QuestionAnswerGenerator import \
+    QuestionAnswerGenerator
 
 
 class StudentGenerator(DataGenerator):
-    edition_years = []
-
-    def __init__(self, session, edition):
+    def __init__(self, session, edition, skills=[]):
         super().__init__(session)
         self.edition = edition
         self.question_answer_generator = QuestionAnswerGenerator(session, edition)
+        self.skills = skills
 
-    def generate_data(self):
-        if self.edition.year not in self.edition_years:
-            self.edition_years.append(self.edition.year)
-            self.question_answer_generator.generate_question_tags()
-        student = Student(edition=self.edition)
+    def generate_student(self):
+        student = Student(edition=self.edition, decision=random.choice(list(DecisionOption)), skills=sample(self.skills, k=2))
         self.data.append(student)
         self.question_answer_generator.generate_question_answers(student)
         return student
 
-    async def add_to_session(self):
-        await super().add_to_session()
-        await self.question_answer_generator.add_to_session()
+    def generate_students(self, number: int):
+        return [self.generate_student() for _ in range(number)]
+
+    async def add_to_db(self):
+        await super().add_to_db()
+        await self.question_answer_generator.add_to_db()

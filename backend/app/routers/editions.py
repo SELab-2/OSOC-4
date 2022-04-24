@@ -7,18 +7,20 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
                                                EditionYearModifyException,
                                                YearAlreadyOverException)
+from app.exceptions.permissions import NotPermittedException
 from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
     QuestionTagNotFoundException)
 from app.models.answer import Answer
-from app.models.edition import Edition, EditionCoach, EditionOutExtended, EditionOutSimple
+from app.models.edition import (Edition, EditionCoach, EditionOutExtended,
+                                EditionOutSimple)
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
-from app.models.student import Student
-from app.models.suggestion import SuggestionOption
+from app.models.skill import StudentSkill
+from app.models.student import DecisionOption, Student
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
@@ -36,15 +38,19 @@ def get_sorting(sortstr: str):
     return {t[0]: False if t[1] == "asc" else True for t in sorting}
 
 
-@router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Editions retrieved")
-async def get_editions(session: AsyncSession = Depends(get_session)):
+@router.get("", response_description="Editions retrieved")
+async def get_editions(session: AsyncSession = Depends(get_session), role: RoleChecker(UserRole.COACH) = Depends()):
     """get_editions get all the Edition instances from the database
 
     :return: list of editions
     :rtype: dict
     """
     results = await read_all_where(Edition, session=session)
-    return [r.uri for r in [EditionOutSimple.parse_raw(r.json()) for r in results]]
+    results = [EditionOutSimple.parse_raw(r.json()) for r in sorted(results, key=lambda x: x.year, reverse=True)]
+    if role == UserRole.ADMIN:
+        return [r.uri for r in results]
+    if role == UserRole.COACH:
+        return [results[0].uri] if results else []
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
@@ -77,8 +83,8 @@ async def get_edition(year: int, edition: EditionChecker() = Depends(), session:
     return EditionOutExtended.parse_raw(edition.json())
 
 
-@router.patch("/{year}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="updated edition")
-async def update_edition(year: int, edition: Edition = Body(...), session: AsyncSession = Depends(get_session)):
+@router.patch("/{year}", response_description="updated edition")
+async def update_edition(year: int, edition: Edition = Body(...), role: RoleChecker(UserRole.COACH) = Depends(), Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """update_edition update the Edition instance with given year
 
     :return: the updated edition
@@ -90,6 +96,13 @@ async def update_edition(year: int, edition: Edition = Body(...), session: Async
     result = await read_where(Edition, Edition.year == edition.year, session=session)
     if not result:
         raise EditionNotFound()
+
+    # check that the coach has access to that edition
+    if not role != UserRole.ADMIN:
+        edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
+        user_ids = [coach.coach_id for coach in edition_coaches]
+        if not Authorize.get_jwt_subject() in user_ids:
+            raise NotPermittedException()
 
     new_edition_data = edition.dict(exclude_unset=True)
     for key, value in new_edition_data.items():
@@ -115,19 +128,24 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
-    student_query = select(Student).where(Student.edition_year == year).subquery()
-    if search:
-        student_query = select(Student).where(Student.edition_year == year).join(QuestionAnswer).join(Answer)
-        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
-        student_query = student_query.distinct().subquery()
 
-    ua = aliased(Student, student_query)
+    student_query = select(Student).where(Student.edition_year == year)
+
+    if decision:
+        student_query = student_query.where(Student.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
+    if search:
+        student_query = student_query.join(QuestionAnswer).join(Answer)
+        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
+    if skills:
+        student_query = student_query.join(StudentSkill).where(StudentSkill.skill_name.in_(skills.split(",")))
+
+    ua = aliased(Student, student_query.distinct().subquery())
     res = await session.execute(select(ua.id))
     res = res.all()
 
@@ -135,20 +153,19 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
     if orderby:
         sorting = get_sorting(orderby).items()
-        studentobjects = {}
+        studentobjects = {i: {"id": i} for i in students}
         for key, val in sorting:
+            if key == "id":
+                continue
             res = await session.execute(select(ua.id, QuestionTag.tag, Answer.answer).join(QuestionAnswer, ua.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == key).join(Answer).order_by(ua.id))
             res = res.all()
 
             for (id, _, r) in res:
-                if id not in studentobjects:
-                    studentobjects[id] = {"id": id}
                 studentobjects[id][key] = r
 
         sorted_students = studentobjects.values()
         for k, val in reversed(sorting):
             sorted_students = sorted(sorted_students, key=lambda d: d[k], reverse=val)
-
         students = [str(student["id"]) for student in sorted_students]
     return [config.api_url + "students/" + str(id) for id in students]
 
@@ -173,20 +190,20 @@ async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = De
 
 @router.get("/{year}/resolving_conflicts", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
 async def get_conflicting_students(year: int, session: AsyncSession = Depends(get_session)):
-    """get_conflicting_students gets all students with conflicts in their confirmed suggestions
+    """get_conflicting_students gets all students with conflicts in their participations
     within an edition
 
     :param year: year of the edition
     :type year: int
-    :return: list of student_ids with conflicting suggestions
+    :return: list of student_ids with conflicts
     :rtype: list
     """
 
     student_ids = await session.execute(
-        f"""
+        """
         SELECT student.id
-        FROM student, suggestion
-        WHERE student.id = suggestion.student_id AND suggestion.definitive = 't' AND suggestion.decision = {SuggestionOption.YES}
+        FROM student, participation
+        WHERE student.id = participation.student_id
         GROUP BY student.id
         HAVING COUNT (*) > 1;
         """
@@ -229,7 +246,7 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
     return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, showInList=qtag.showInList, question=q)
 
 
-@router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker())], response_description="Tags retrieved")
+@router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker(update=True))], response_description="Tags retrieved")
 async def get_showinlist_question_tags(year: int, session: AsyncSession = Depends(get_session)):
     """get_showinlist_question_tags return list of qusetiontags that must be shown in the listview
 
@@ -245,7 +262,7 @@ async def get_showinlist_question_tags(year: int, session: AsyncSession = Depend
     return [tag.tag for (tag,) in tags]
 
 
-@router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Added question tag")
+@router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))], response_description="Added question tag")
 async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSession = Depends(get_session)):
     """add_question_tag Create new questiontag
 
@@ -267,7 +284,7 @@ async def add_question_tag(year: int, tag: QuestionTagCreate, session: AsyncSess
     return f"{config.api_url}editions/{str(year)}/questiontags/{tag.tag}"
 
 
-@router.delete("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.delete("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
 async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
     """delete_question_tag delete the questiontag
 
@@ -301,7 +318,7 @@ async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depen
     await session.commit()
 
 
-@router.patch("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.patch("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
 async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate, session: AsyncSession = Depends(get_session)):
     """modify_question_tag Modify a question tag to link a question
 
@@ -355,5 +372,4 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
             questiontag.question_id = newquestion.id
 
     await update(questiontag, session=session)
-    print(questiontag)
     return f"{config.api_url}editions/{str(year)}/questiontags/{questiontag.tag}"

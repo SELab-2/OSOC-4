@@ -20,5 +20,5 @@ jobs:
       - name: Clean up
         if: always()
         run: |
-          docker-compose -f test-docker-compose.yml down
-          docker-compose -f test-docker-compose.yml rm -sf
+          docker-compose -f test-docker-compose.yml down --rmi all
+          docker-compose -f test-docker-compose.yml rm -sfv

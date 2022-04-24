@@ -1,9 +1,17 @@
-import {useState } from "react";
+import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import StudentsFilter from "./StudentFilter";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
+import { api, Url } from "../../utils/ApiClient";
 
-// this function adds or removes a skill from the filters, this function is also used in EmailStudentsFilters
+/**
+   * this function adds or removes a filter from the filters, the changes are made in the url.
+   * @param query The old query of the url.
+   * @param filter The name of the filter category from which the filter must be added/removed.
+   * @param startItems The current filters in the filter chosen filter category.
+   * @param itemName The name of the filter that must be added or removed.
+   * @param value True if the filter must be added, False if it must be removed.
+   */
 export function addFilterGlobal(query, filter, startItems, itemName, value) {
   let newQuery = query;
   let newItems = startItems;
@@ -27,12 +35,30 @@ export default function StudentsFilters(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [extendedRoleList, setExtendedRoleList] = useState(false);
   const [allSkills, setAllSkills] = useState([]);
+  const [filteredSkills, setFilteredSkills] = useState([]);
 
+  // These variables represent the filters of the different categories
   const filters = props.filters[0];
   const chosenSkills = props.filters[1];
   const decision = props.filters[2];
 
-  // called when pressed on "reset filters"
+  useEffect(() => {
+    Url.fromName(api.skills).get().then(async res => {
+      if (res.success) {
+        res = res.data;
+        if (res) {
+          // scuffed way to get unique skills (should be fixed in backend soon)
+          setAllSkills(res);
+          setFilteredSkills(res);
+        }
+      }
+    })
+  }, [])
+
+  /**
+   * This function is called when pressed on "reset filters", it resets the filters to their original values.
+   * The changes are made to the url.
+   */
   function resetFilters() {
     let newQuery = router.query;
     delete newQuery["filters"];
@@ -41,56 +67,85 @@ export default function StudentsFilters(props) {
     router.push({
       pathname: router.pathname,
       query: newQuery
-    }, undefined, {shallow: true})
+    }, undefined, { shallow: true })
   }
 
-  // this function makes all the roles visible
+  /**
+   * this function makes all the skills visible
+   */
   const showMore = () => {
     setExtendedRoleList(true);
   }
 
-  // this function makes only 5 roles visible
+  /**
+   * this function makes only 5 skills visible
+   */
   const showLess = () => {
     setExtendedRoleList(false);
   }
 
-  // returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
-  // list depending on extendedRoleList
+  /**
+   * returns a list of html StudentFilters, which represents the skills of students, only 5 elements or the whole
+   * list are rendered depending on extendedRoleList.
+   * @returns {unknown[]|null} A list of html StudentFilters, which represents the skills of students, only 5 elements
+   * or the whole list are returned depending on extendedRoleList.
+   */
   function getSkills() {
-    if (allSkills) {
-      let shownSkills = allSkills;
+    if (filteredSkills) {
+      let shownSkills = filteredSkills;
 
       if (!extendedRoleList) {
-        shownSkills = allSkills.slice(0, 5);
+        shownSkills = filteredSkills.slice(0, 5);
       }
 
       return shownSkills.map((skill, index) =>
-        <StudentsFilter filter_id={skill.id} filter_text={skill.name}
-                        value={chosenSkills.includes(skill.name)}
-                        onChange={(ev) => addFilter("skills", chosenSkills, skill.name, ev.target.checked)}/>
+        <StudentsFilter filter_id={skill} filter_text={skill}
+          value={chosenSkills.includes(skill)}
+          onChange={(ev) => addFilter("skills", chosenSkills, skill, ev.target.checked)} />
       );
     }
     return null;
   }
 
-  // returns the html representation for the 'more or less' button, the button to show more or less skills
+  /**
+   * get the html representation for the 'more or less' button, the button to show more or less skills.
+   * @returns {JSX.Element} The html representation for the 'more or less' button, the button to show more or less
+   * skills.
+   */
   function moreOrLessButton() {
-    if (extendedRoleList) {
-      return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
+    if (filteredSkills.length > 5) {
+      if (extendedRoleList) {
+        return <button className="more-or-less-button" id="less-skills-button" onClick={showLess}>Less</button>
+      }
+      return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
     }
-    return <button className="more-or-less-button" id="more-skills-button" onClick={showMore}>More</button>
   }
 
-  // this function adds or removes a skill from the filters
+  /**
+   * this function adds or removes a filter from the filters, the changes are made in the url.
+   * @param filter The name of the filter category from which the filter must be added/removed.
+   * @param startItems The current filters in the filter chosen filter category.
+   * @param itemName The name of the filter that must be added or removed.
+   * @param value True if the filter must be added, False if it must be removed.
+   */
   function addFilter(filter, startItems, itemName, value) {
     let newQuery = addFilterGlobal(router.query, filter, startItems, itemName, value)
     router.push({
       pathname: router.pathname,
       query: newQuery
-    }, undefined, {shallow: true})
+    }, undefined, { shallow: true })
   }
 
-  // The HTML representation of the filters in the 'Select students' tab
+  function searchSkills(value) {
+    let searchedString = value.toLowerCase();
+    setFilteredSkills(allSkills.filter(skill =>
+      skill.toLowerCase().startsWith(searchedString) ||
+      skill.split(" ").some(partSkill => partSkill.toLowerCase().startsWith(searchedString))));
+  }
+
+  /**
+   * The HTML representation of the filters in the 'Select students' tab
+   */
   return (
     <Col md="auto" className="filters fill_height scroll-overflow">
       <Row className="title-row-filters">
@@ -106,26 +161,27 @@ export default function StudentsFilters(props) {
       </Row>
 
       <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni" value={filters.includes("alumn")}
-                      onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)}/>
+        onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)} />
       <StudentsFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers"
-                      value={filters.includes("student-coach")}
-                      onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)}/>
+        value={filters.includes("student-coach")}
+        onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)} />
       <StudentsFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for"
-                      value={filters.includes("not-suggested")}
-                      onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)}/>
+        value={filters.includes("not-suggested")}
+        onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)} />
       <StudentsFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
-                      value={filters.includes("unmatched")}
-                      onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)}/>
+        value={filters.includes("unmatched")}
+        onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)} />
       <StudentsFilter filter_id="practical-problems-checkbox" filter_text="Only students without practical problems"
-                      value={filters.includes("practical-problems")}
-                      onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)}/>
+        value={filters.includes("practical-problems")}
+        onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)} />
 
       <Row className="filter-title">
         <Col><h3>Skills</h3></Col>
       </Row>
       <Row className="skills-search-filters">
         <Col>
-          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills" />
+          <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"
+                 onChange={(ev) => searchSkills(ev.target.value)}/>
         </Col>
       </Row>
       {getSkills()}
@@ -138,13 +194,13 @@ export default function StudentsFilters(props) {
       </Row>
 
       <StudentsFilter filter_id="yes-checkbox" filter_text="Yes" value={decision.includes("yes")}
-                      onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)}/>
+        onChange={(ev) => addFilter("decision", decision, "yes", ev.target.checked)} />
       <StudentsFilter filter_id="maybe-checkbox" filter_text="Maybe" value={decision.includes("maybe")}
-                      onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
+        onChange={(ev) => addFilter("decision", decision, "maybe", ev.target.checked)} />
       <StudentsFilter filter_id="no-checkbox" filter_text="No" value={decision.includes("no")}
-                      onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
+        onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
       <StudentsFilter filter_id="undecided-checkbox" filter_text="Undecided" value={decision.includes("undecided")}
-                      onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
+        onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
 
     </Col>
   )

@@ -35,12 +35,7 @@
 
 .close-button {
     margin-top: 3px;
-}
-
-.searchbar-row {
-    margin-top: 12px;
-    margin-left: 18px;
-    margin-right: 19px;
+    padding: 0;
 }
 
 .remaining-height-searchbar {
@@ -69,23 +64,30 @@
 }
 
 .student-list-positioning {
-    position: absolute;
-    top: 60px;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    margin-left: 25px;
+    margin-right: 10px;
+    margin-top: 20px;
 }
 
 .search-button {
     align-self: center;
-    background-color: rgba(0,0,0,0);
+    background-color: rgba(0, 0, 0, 0);
     border-width: 0;
     margin: 7px;
 }
 
 .reset-search-button {
     align-self: center;
-    background-color: rgba(0,0,0,0);
+    background-color: rgba(0, 0, 0, 0);
     border-width: 0;
     padding: 9px;
+}
+
+.hamburger {
+    margin-right: 20px;
+    margin-top: 10px
+}
+
+.infinite-scroll {
+    margin-right: 0;
 }

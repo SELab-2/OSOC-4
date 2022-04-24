@@ -1,92 +1,27 @@
-import React, {useEffect, useState} from "react";
-import {log} from "../utils/logger";
-import ProjectCard from "../Components/ProjectCard";
-import {Button, Card, Col, Form, Row} from "react-bootstrap";
-import {useRouter} from "next/router";
-import {api, Url} from "../utils/ApiClient";
+import React, {useState} from "react";
+import {Button, Col, Row} from "react-bootstrap";
+import Image from 'next/image'
+import ProjectsList from "../Components/projects/ProjectsList";
+import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
+import matchIcon from "/public/assets/arrow-right-svgrepo-com.svg"
 
-export default function Projects(props) {
-    const [allProjects, setAllProjects] = useState([])
-    const [loaded, setLoaded] = useState(false)
-    const [search, handleSearch] = useState("")
-    const [peopleNeeded, setPeopleNeeded] = useState(false)
-    const [visibleProjects, setVisibleProjects] = useState([])
+export default function Projects() {
 
-    const router = useRouter()
+  const [students, setStudents] = useState([])
 
-    useEffect(() => {
-        if (! allProjects.length && ! loaded) {
-            Url.fromName(api.projects).get().then(res => {
-                if (res.success) {
-                    const projects = res.data;
-                    log("load project");
-                    log(projects);
-                    for (let p of projects) {
-                        log(p)
-                        Url.fromUrl(p).get().then(async project => {
-                            if (project.success) {
-                                project = project.data;
-                                log(project)
-                                if (project) {
-                                    await setAllProjects(prevState => [...prevState, project]);
-                                    // TODO clean this up (currently only works if updated here
-                                    await setVisibleProjects(prevState => [...prevState, project]);
-                                }
-                            }
-                        });
-                    }
-                    setLoaded(true);
-                }
-            })
-        }
-    })
-
-    async function handleSearchSubmit(event) {
-        event.preventDefault();
-        setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
-        log("SUBMIT")
-    }
-
-    async function changePeopleNeeded(event){
-        event.preventDefault()
-        log(peopleNeeded)
-        setPeopleNeeded(event.target.checked)
-    }
-
-    const handleNewProject = () => {
-        log("navigate to new project")
-        router.push("/new-project")
-    }
-
-    return(
-        <div>
-            <Row>
-                <Col>
-                    <Form onSubmit={handleSearchSubmit}>
-                        <Form.Group controlId="searchProjects">
-                            <Form.Control type="text" value={search} placeholder={"Search project by name"} onChange={e => handleSearch(e.target.value)} />
-                        </Form.Group>
-                    </Form>
-                </Col>
-                <Col>
-                    <Card>
-                        2 conflicts
-                    </Card>
-                </Col>
-                <Col>
-                    <Button onClick={handleNewProject}>New project</Button>
-                </Col>
-                <Col>
-                    <Form>
-                        <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                    </Form>
-                </Col>
-            </Row>
-            <div>
-                {
-                    visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
-                }
-            </div>
-        </div>
-    )
+  return(
+      <>
+          <Row className="remaining_height fill_width">
+              <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={false} studentId={undefined}/>
+              <Col md="auto" style={{ marginLeft: "0" }}>
+                  <div style={{paddingTop: "40vh"}} className="fill_height">
+                      <div className="button-match-student-project">
+                          <Image src={matchIcon} alt="match student to project" width={80}/>
+                      </div>
+                  </div>
+              </Col>
+              <ProjectsList/>
+          </Row>
+      </>
+  )
 }

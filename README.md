@@ -65,7 +65,9 @@ backend-api: https://sel2-4.ugent.be/{branchname}/api
 
 ### Config
 
-While developing you can use your own environment variables by using a .env file in the backend directory of the application.
+While developing you can use your own environment variables by using .env files.
+
+An example .env file for the backend directory of the application. IP-addresses may need to be changed.
 
 ```
 # Postgres
@@ -99,6 +101,16 @@ FRONTEND_URL=https://localhost:3000
 
 ```
 
+An example .env file for the frontend directory of the application.
+
+```
+NEXT_BASE_PATH=""
+NEXTAUTH_URL="http://127.0.0.1:3000/api/auth"
+NEXT_API_URL="http://127.0.0.1:8000"
+NEXT_INTERNAL_API_URL="http://127.0.0.1:8000"
+NODE_ENV="development"  # or production
+```
+
 ### Accessing API docs
 
 Use the following URL to access the Swagger API docs. Change the port if needed.
@@ -107,10 +119,19 @@ Use the following URL to access the Swagger API docs. Change the port if needed.
 
 ### Testing
 
+#### Backend
+
 Tests are run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
 ```
 docker-compose -f test-docker-compose.yml up --build -d # this starts the test database and test redis server
-docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover # This executes the python -m ... command in the backend container
+docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover # This executes all tests in the backend container
+# To run an individual test specify the name of the test function or class. For example app.tests.test_routers.test_users.TestUsers.test_get_users_me:
+# docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest app.tests.test_routers.test_users.TestUsers.test_get_users_me
 docker-compose down
 ```
+
+
+#### Frontend
+
+Tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or `yarn test --watch-all --verbose`.

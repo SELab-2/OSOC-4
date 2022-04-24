@@ -1,19 +1,18 @@
 from random import choice, randrange, sample
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.crud import update, clear_data
+from app.crud import clear_data, update
 from app.database import get_session
 from app.models.participation import Participation
 from app.models.project import Project, ProjectRequiredSkill
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
-from app.tests.utils_for_tests.SkillsGenerator import SkillGenerator
+from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
 from app.utils.response import response
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/ddd")
 
@@ -27,8 +26,7 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
         student=student,
         suggested_by=choice(coaches),
         project=project,
-        skill=choice(student_skills),
-        definitive=False) for _ in range(unconfirmed)]
+        skill=choice(student_skills)) for _ in range(unconfirmed)]
 
     if confirmed_suggestion is not None and admin is not None:
         suggestions.append(Suggestion(
@@ -38,8 +36,7 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
             student=student,
             suggested_by=admin,
             project=project,
-            skill=choice(student_skills),
-            definitive=True))
+            skill=choice(student_skills)))
 
     return suggestions
 
@@ -54,27 +51,29 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     user_generator = UserGenerator(session)
 
-    user_generator.generate_data(role=UserRole.COACH, active=False, approved=False, disabled=False),
-    user_generator.generate_data(role=UserRole.COACH, active=True, approved=False, disabled=False),
-    user_generator.generate_data(role=UserRole.COACH, active=True, approved=True, disabled=False),
-    user_generator.generate_data(role=UserRole.COACH, active=True, approved=True, disabled=True)
+    user_generator.generate_user(role=UserRole.COACH, active=False, approved=False, disabled=False),
+    user_generator.generate_user(role=UserRole.COACH, active=True, approved=False, disabled=False),
+    user_generator.generate_user(role=UserRole.COACH, active=True, approved=True, disabled=False),
+    user_generator.generate_user(role=UserRole.COACH, active=True, approved=True, disabled=True)
 
-    admins = user_generator.generate_n_of_data(2, role=UserRole.ADMIN)
-    coaches = user_generator.generate_n_of_data(5, role=UserRole.COACH)
+    admins = user_generator.generate_users(2, role=UserRole.ADMIN)
+    coaches = [user for user in user_generator.data
+               if user.role == UserRole.COACH and user.active and user.approved and not user.disabled]
+    coaches.extend(user_generator.generate_users(5, role=UserRole.COACH))
 
     ##########
     # skills #
     ##########
 
     skill_generator = SkillGenerator(session)
-    skills = skill_generator.generate_n_of_data(-1)
+    skills = skill_generator.generate_skills()
 
     ############
     # Editions #
     ############
 
-    edition_generator = EditionGenerator(session, coaches)
-    edition = edition_generator.generate_data(2022)
+    edition_generator = EditionGenerator(session)
+    edition = edition_generator.generate_edition(2022, coaches)
 
     project = Project(
         name="Student Volunteer Project",
@@ -82,7 +81,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Free real estate",
         partner_name="UGent",
         partner_description="De C in UGent staat voor communicatie",
-        coaches=sample(edition.coaches, 2),
+        coaches=coaches[:2],
         edition=edition.year)
 
     project1_skills = [ProjectRequiredSkill(
@@ -97,7 +96,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Hackers & Cyborgs",
         partner_name="HoGent",
         partner_description="Like UGent but worse",
-        coaches=sample(edition.coaches, 2),
+        coaches=coaches[2:],
         edition=edition.year)
     await update(project, session)
 
@@ -107,10 +106,9 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         skill=skill)
         for skill in sample(skills, k=randrange(3, len(skills)))]
 
-    student_generator = StudentGenerator(session, edition)
+    student_generator = StudentGenerator(session, edition, skills)
     # generate students without suggestions
-    for _ in range(3):
-        student_generator.generate_data()
+    student_generator.generate_students(3)
 
     suggestions = []
     participations = []
@@ -118,7 +116,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     # generate students with conflicts in suggestions
     for s in SuggestionOption:
         for i in range(2):
-            student = student_generator.generate_data()
+            student = student_generator.generate_student()
             suggestions += generate_suggestions(student, skills, project, coaches[:2], 5, s, choice(admins))
             suggestions += generate_suggestions(student, skills, project2, coaches[2:], 5, s, choice(admins))
             suggestions += generate_suggestions(student, skills, project2, coaches[2:], 5, s, choice(admins))
@@ -126,7 +124,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     # generate students that participate in a project
     for required_skill in project1_skills:
         for _ in range(randrange(required_skill.number)):
-            student = student_generator.generate_data()
+            student = student_generator.generate_student()
             participations.append(Participation(student=student, project=project,
                                                 skill=required_skill.skill))
 
@@ -138,17 +136,15 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     for skill in project2_skills:
         session.add(skill)
 
-    await user_generator.add_to_session()
-    await edition_generator.add_to_session()
-    await student_generator.add_to_session()
+    await user_generator.add_to_db()
+    await edition_generator.add_to_db()
+    await student_generator.add_to_db()
 
     for suggestion in suggestions:
         session.add(suggestion)
 
     for participation in participations:
         session.add(participation)
-
-    await session.commit()
 
     return response(None, "Dummy data inserted")
 

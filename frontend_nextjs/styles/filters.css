@@ -34,13 +34,13 @@
 }
 
 .filters {
-    margin-left: 30px;
+    margin-left: 10px;
     padding-top: 20px;
-    padding-right: 40px;
+    padding-right: 35px;
     padding-left: 30px;
     border-right-width: 1px;
+    border-right-color: var(--background-gray);
     border-right-style: solid;
-    border-right-color: lightgray;
 }
 
 .reset-filters-button {

@@ -13,46 +13,43 @@ export function getDecisionString(value) {
   return possibleDecisions[value];
 }
 
-// represents one list element card in the student list
+/**
+ * This component represents one element in the list of students in the 'select students' tab.
+ * @param props props has the field student, which is the student the element is rendered for.
+ * @returns {JSX.Element} A component that renders one element in the list of students in the 'select students' tab.
+ */
 export default function StudentListelement(props) {
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [decision, setDecision] = useState(-1);
-  let prevDecision = -2;
-
   const router = useRouter()
-
-  // This function inserts the data in the variables
-  useEffect(() => {
-    if (props.student["suggestions"] && (decision === -2 || prevDecision !== decision)) {
-      // a decision is a suggestion which is definitive
-      let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"])
-      if (decisions) {
-        (decisions.length === 0) ? setDecision(-1) : setDecision(decisions[0]["decision"]);
-        (decisions.length === 0) ? prevDecision = -1 : prevDecision = decisions[0]["decision"];
-      }
-    }
-  });
-
-  // get a list of the skills of the student in HTML format
+  
+  /**
+   * get the list of the skills of the student in HTML format
+   * @returns {unknown[]} The list of the skills of the student in HTML format
+   */
   function getSkills() {
-    let skills = [];
-    return skills.map((skill, index) =>
-      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill.toUpperCase()}</li>
+    return props.student["skills"].map((skill, index) =>
+      <li className="skill" style={{ display: "inline-block" }} key={index}>{skill["name"].toUpperCase()}</li>
     )
   }
 
 
-  // get the background color of the student, based on the decision
+  /**
+   * get the background color of the student, based on the decision
+   * @returns {string} the background color of the student, based on the decision
+   */
   function getBackground() {
-    if (decision === -1) {
+    if (props.student.decision === -1) {
       return "white";
     }
     let colors = ["var(--no_red_20)", "var(--maybe_yellow_20)", "var(--yes_green_20)"];
-    return colors[decision];
+    return colors[props.student.decision];
   }
 
-  // get the background color of practical problems
+  /**
+   * get the background color of practical problems
+   * @returns {string} the background color of practical problems
+   */
   function getProblemsColor() {
     let practicalProblems = 0;
     if (practicalProblems === 0) {
@@ -61,7 +58,9 @@ export default function StudentListelement(props) {
     return "var(--no_red_65)"
   }
 
-  // a function to open the details of a student
+  /**
+   * a function to open the details of a student, it changes the studentId in the url.
+   */
   function studentDetails() {
     let i = props.student.id.lastIndexOf('/');
     let id = props.student.id.substring(i + 1);
@@ -76,7 +75,11 @@ export default function StudentListelement(props) {
     }, undefined, { shallow: true })
   }
 
-  // get the suggestion count for a certain decision ("yes", "maybe" or "no")
+  /**
+   * get the suggestion count for a certain decision ("yes", "maybe" or "no").
+   * @param decision the decision for what the suggestions must be counted.
+   * @returns {number|*} the amount of suggestions with the given decision.
+   */
   function getSuggestions(decision) {
     if (!props.student["suggestions"]) {
       return 0;
@@ -84,28 +87,31 @@ export default function StudentListelement(props) {
     return Object.values(props.student["suggestions"]).filter(suggestion => suggestion["decision"] === decision).length
   }
 
-  // The html representation of a list-element
+  /**
+   * The html representation of a list-element
+   */
   return (
-    <Container fluid id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
+    <Container id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
       onClick={() => studentDetails()}>
       <Row className="upper-layer">
-        <Col id="name" className="name" md="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
-        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" md="auto">
+        <Col id="name" className="name" xs="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
+        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
           No practical problems
         </Col>
         <Col />
-        <Col md="auto">
-          <Row md="auto" className="nomargin">
-            <Col className="suggestions" md="auto">Suggestions:</Col>
+        <Col xs="auto" className="nopadding">
+          <Row xs="auto" className="nomargin">
+            <Col className="suggestions" xs="auto">Suggestions:</Col>
             <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
         </Col>
       </Row>
 
       <Row id="info" className="info">
-        <GeneralInfo listelement={true} student={props.student} decision={getDecisionString(decision)} />
-        <Col id="skills" align="right" className="skills" md="auto">
-          <ul>
+        <GeneralInfo listelement={true} studentsTab={props.studentsTab} student={props.student} decision={getDecisionString(props.student.decision)} />
+        <Col />
+        <Col id="skills" align="right" className="skills" sm="auto">
+          <ul className="nomargin">
             {getSkills()}
           </ul>
         </Col>

@@ -12,13 +12,14 @@ from app.config import config
 from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
 from app.routers import (auth, ddd, editions, projects, reset_password, skills,
-                         students, suggestions, tally, user_invites, users)
+                         students, suggestions, participations, tally, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
 
 origins = [
     "*",
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,13 +43,13 @@ app.include_router(ddd.router)
 # app.include_router(answers.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
-# app.include_router(participation.router)
 app.include_router(projects.router)
 # app.include_router(question_answers.router)
 # app.include_router(questions.router)
 app.include_router(skills.router)
 app.include_router(students.router)
 app.include_router(suggestions.router)
+app.include_router(participations.router)
 app.include_router(tally.router)
 # app.include_router(user_invites.router)
 app.include_router(user_invites.router)

@@ -1,10 +1,14 @@
 .list-element {
     border-width: 1px;
     border-style: solid;
-    border-color: lightgray;
-    margin: 10px;
+    border-color: var(--not-selected-gray);
     border-radius: 7px;
-    padding: 8px 20px;
+    margin: 7px 0 7px 0;
+    padding: 10px 12px 10px 10px;
+}
+
+.list-element:hover {
+    border-color: var(--selection-gray);
 }
 
 .name {
@@ -43,14 +47,16 @@
     width: 25px;
     height: 25px;
     text-align: center;
-    padding-left: 0; padding-right: 0;
+    padding-left: 0;
+    padding-right: 0;
     background-color: var(--yes_green_65);
 }
 
 .suggestionsMaybe {
     width: 25px;
     height: 25px;
-    padding-left: 0; padding-right: 0;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
     background-color: var(--maybe_yellow_65);
 }
@@ -58,7 +64,8 @@
 .suggestionsNo {
     width: 25px;
     height: 25px;
-    padding-left: 0; padding-right: 0;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
     background-color: var(--no_red_65);
 }
@@ -67,19 +74,19 @@
     padding-left: 15px;
     padding-right: 15px;
     background-color: var(--background-gray);
-    margin: 2px 0 2px 5px;
+    margin: 2px 5px 2px 0;
     font-size: 12px;
 }
 
 .skills {
     margin-top: 10px;
+    margin-right: 7px;
     padding: 0;
+    align-self: end;
 }
 
 .question-answer-row {
-    margin-left: 0;
-    margin-top: 7px;
-    margin-bottom: 7px;
+    margin: 7px 0;
 }
 
 .info {
