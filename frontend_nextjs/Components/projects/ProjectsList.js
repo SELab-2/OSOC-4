@@ -7,7 +7,7 @@ import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-export default function ProjectsList() {
+export default function ProjectsList(props) {
     const [allProjects, setAllProjects] = useState([])
     const [loaded, setLoaded] = useState(false)
     const [search, handleSearch] = useState("")
@@ -81,7 +81,7 @@ export default function ProjectsList() {
                     </Row>
                     <Row>
                             {
-                                visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project}/>))) : null
+                                visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject}/>))) : null
                             }
                     </Row>
                 </div>
