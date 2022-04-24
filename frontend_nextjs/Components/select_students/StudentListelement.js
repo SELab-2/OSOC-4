@@ -128,9 +128,6 @@ export default function StudentListelement(props) {
             <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
         </Col>
-        {/*<Col>*/}
-        {/*  <Image src={props.student === props.selectedStudent ? selected : not_selected} height={25} width={25}/>*/}
-        {/*</Col>*/}
       </Row>
 
       <Row id="info" className="info">
