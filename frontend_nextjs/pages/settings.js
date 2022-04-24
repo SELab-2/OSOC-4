@@ -15,7 +15,6 @@ import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import QuestionTags from "../Components/settings/QuestionTags";
-import LoadingPage from "../Components/LoadingPage";
 import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
 
 /**
