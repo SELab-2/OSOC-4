@@ -14,9 +14,7 @@ import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
-import edition from "/public/assets/edition.png"
 import QuestionTags from "../Components/settings/QuestionTags";
-import CurrentEdition from "../Components/settings/CurrentEdition";
 import LoadingPage from "../Components/LoadingPage";
 import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
 
@@ -29,7 +27,7 @@ export default function Settings(props) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState(0);
-    const [currentVersion, setCurrentVersion] = useState(undefined)
+    const [edition, setEdition] = useState(undefined)
     const [loading, setLoading] = useState(false)
     const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
@@ -51,7 +49,7 @@ export default function Settings(props) {
                 }
                 res = await Url.fromName(api.current_edition).get();
                 if (res.success) {
-                    setCurrentVersion(res.data);
+                    setEdition(res.data);
                 }
                 setLoading(false);
             }
@@ -120,10 +118,32 @@ export default function Settings(props) {
                             <h3>Edition settings</h3>
                         </AccordionHeader>
                         <AccordionBody>
-                            <div className="align-content-center">
-                                <Card className="card">
-                                    <CurrentEdition/>
-                                </Card>
+                            <div className="body-editiondetail">
+                                <h1>{edition.name}</h1>
+                                <p>{(edition.description) ? edition.description : "No description available"}</p>
+                                <Accordion>
+
+                                    <AccordionItem eventKey="0">
+                                        <AccordionHeader>
+                                            <h3>Change edition</h3>
+                                        </AccordionHeader>
+                                        <AccordionBody>
+                                            <EditionDropdownButton currentVersion={edition} setCurrentVersion={setEdition} />
+                                        </AccordionBody>
+                                    </AccordionItem>
+
+                                    <AccordionItem eventKey="1">
+                                        <AccordionHeader>
+                                            <h3>Question Tags</h3>
+                                        </AccordionHeader>
+                                        <AccordionBody>
+                                            <div className="questiontags">
+                                                <QuestionTags />
+                                            </div>
+                                        </AccordionBody>
+                                    </AccordionItem>
+
+                                </Accordion>
                             </div>
                         </AccordionBody>
                     </AccordionItem>) : null}

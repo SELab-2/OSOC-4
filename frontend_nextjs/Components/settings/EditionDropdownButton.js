@@ -9,20 +9,20 @@ import {api, Url} from "../../utils/ApiClient";
  */
 export default function EditionDropdownButton(props) {
     const [editionList, setEditionList] = useState([]);
-    const currentVersion = props.currentVersion;
-    const setCurrentVersion = props.setCurrentVersion;
+    const currentEdition = props.currentVersion;
+    const setCurrentEdition = props.setCurrentVersion;
 
     const [loadingCurrentVersion, setLoadingCurrentVersion] = useState(false)
     const [loadingEditionList, setLoadingEditionList] = useState(false)
 
     // fetch the current edition and all the other editions
     useEffect(() => {
-        if(currentVersion === undefined && ! loadingCurrentVersion){
+        if(currentEdition === undefined && ! loadingCurrentVersion){
             setLoadingCurrentVersion(true);
             Url.fromName(api.current_edition).get().then(res => {
                 if (res.success) {
                     const edition = res.data;
-                    setCurrentVersion({"year": edition.year, "name": edition.name})
+                    setCurrentEdition({"year": edition.year, "name": edition.name})
                     setLoadingCurrentVersion(false)
                 }
 
@@ -52,7 +52,7 @@ export default function EditionDropdownButton(props) {
                 }
             })
         }
-    }, [currentVersion, loadingEditionList, editionList.length, loadingCurrentVersion, setCurrentVersion])
+    }, [currentEdition, loadingEditionList, editionList.length, loadingCurrentVersion, setCurrentEdition])
 
     /**
      * Changes the current edition
@@ -60,17 +60,16 @@ export default function EditionDropdownButton(props) {
      */
     async function changeSelectedVersion(edition) {
         await api.setCurrentEdition(edition.year)
-        await setCurrentVersion({"year": edition.year, "name": edition.name});
+        await setCurrentEdition({"year": edition.year, "name": edition.name});
     }
 
     return (
         <div>
-            <p className="details-text">Changing this will affect the whole site. <br/>
-                On every page where it has effect it will use the edition you select here. This only list the editions that you have access to.
+            <p className="details-text">Changing this will affect the whole site.
             </p>
             <Dropdown>
                 <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                    {(currentVersion) ? currentVersion.name : null}
+                    {(currentEdition) ? currentEdition.name : null}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     {(editionList.length) ? (editionList.map((item, index) => (
