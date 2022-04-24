@@ -198,6 +198,7 @@ class API {
     edition_projects = "editions_projects";
     editions_questiontags = "editions_questiontags";
     skills = "skills";
+    participations = "participations";
 
     // the paths, the key should be the value of the api.[name]
     //            the value should be the url
@@ -218,7 +219,7 @@ class API {
         editions_projects: null,
         editions_questiontags: null,
         skills: null,
-        participation: null
+        participations: null
     }
     _ready = false;
 
@@ -308,6 +309,7 @@ class API {
             this._paths.editions = res.data[this.editions];
             this._paths.users = res.data[this.users];
             this._paths.skills = res.data[this.skills];
+            this._paths.participations = res.data[this.participations];
             if (this._year) {
                 this._paths.current_edition = this._paths.editions + "/" + this._year;
             } else { // get the latest edition if any
