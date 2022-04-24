@@ -22,40 +22,18 @@ import EditionDropdownButton from "../Components/settings/EditionDropdownButton"
  * The page corresponding with the 'settings' tab.
  * @returns {JSX.Element} A component corresponding with the 'settings' tab.
  */
-export default function Settings(props) {
-    const [user, setUser] = useState(undefined);
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [role, setRole] = useState(0);
-    const [edition, setEdition] = useState(undefined)
+function Settings({ me, current_edition }) {
+    const [user, setUser] = useState(me);
+    const [name, setName] = useState(me.name);
+    const [email, setEmail] = useState(me.email);
+    const [role, setRole] = useState(me.role);
+    const [edition, setEdition] = useState(current_edition)
     const [loading, setLoading] = useState(false)
     const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
 
 
-    // fetch the current user & current edition
-    useEffect(() => {
-        async function fetch() {
-            if ((user === undefined || name === "" || email === "") && !loading) {
-                setLoading(true)
-                let res = await Url.fromName(api.me).get();
-                if (res.success) {
-                    res = res.data.data;
-                    setUser(res);
-                    setName(res.name);
-                    setEmail(res.email);
-                    setRole(res.role);
-                }
-                res = await Url.fromName(api.current_edition).get();
-                if (res.success) {
-                    setEdition(res.data);
-                }
-                setLoading(false);
-            }
-        }
-        fetch();
-    }, [loading, user, name, email]);
 
     //TODO make this actually change the theme
     /**
@@ -169,3 +147,27 @@ export default function Settings(props) {
 
     )
 }
+
+
+export async function getServerSideProps(context) {
+    let props_out = {}
+    let me = await Url.fromName(api.me).get(context);
+    if (me.success) {
+        props_out["me"] = me.data.data;
+    }
+
+    let edition = await Url.fromName(api.current_edition).get(context);
+    if (edition.success) {
+        props_out["current_edition"] = edition.data;
+    }
+
+    console.log("SETTINGS")
+    console.log(props_out)
+    console.log("SETTINGS")
+
+    return {
+        props: props_out
+    }
+}
+
+export default Settings
