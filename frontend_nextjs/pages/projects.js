@@ -6,11 +6,12 @@ import StudentListAndFilters from "../Components/select_students/StudentListAndF
 export default function Projects() {
 
   const [students, setStudents] = useState([]);
-  const [selectedProject, setSelectedProject] = useState(undefined)
+  const [selectedProject, setSelectedProject] = useState(undefined);
+  const [selectedStudent, setSelectedStudent] = useState(undefined)
 
   return(
     <Row className="remaining_height fill_width">
-      <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={false} studentId={undefined}/>
+      <StudentListAndFilters setSelectedStudent={setSelectedStudent} selectedStudent={selectedStudent} students={students} setStudents={setStudents} studentsTab={false} studentId={undefined}/>
       <Col className="fill_height fill_width">
         <ProjectsList setSelectedProject={setSelectedProject} selectedProject={selectedProject}/>
       </Col>

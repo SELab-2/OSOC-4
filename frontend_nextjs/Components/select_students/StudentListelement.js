@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import SuggestionsCount from "./SuggestionsCount";
+import Image from "next/image";
+import selected from "../../public/assets/selected.svg";
+import not_selected from "../../public/assets/not_selected.svg";
 
 // get the decision for the student (yes, maybe, no or undecided)
 export function getDecisionString(value) {
@@ -46,6 +49,16 @@ export default function StudentListelement(props) {
     return colors[props.student.decision];
   }
 
+
+  function getBorder(){
+    if(props.student !== props.selectedStudent){ return "var(--not-selected-gray)"}
+    if (props.student.decision === -1) {
+      return "grey";
+    }
+    let colors = ["var(--no_red_45)", "var(--maybe_yellow_45)", "var(--yes_green_45)"];
+    return colors[props.student.decision];
+  }
+
   /**
    * get the background color of practical problems
    * @returns {string} the background color of practical problems
@@ -76,6 +89,14 @@ export default function StudentListelement(props) {
   }
 
   /**
+   * a function to change the selected student
+   */
+  function selectStudent(){
+    // if the selected student is this student then unselect the student
+    props.setSelectedStudent(props.selectedStudent === props.student ? undefined :props.student)
+  }
+
+  /**
    * get the suggestion count for a certain decision ("yes", "maybe" or "no").
    * @param decision the decision for what the suggestions must be counted.
    * @returns {number|*} the amount of suggestions with the given decision.
@@ -91,8 +112,10 @@ export default function StudentListelement(props) {
    * The html representation of a list-element
    */
   return (
-    <Container id="list-element" className="list-element" style={{ backgroundColor: getBackground() }}
-      onClick={() => studentDetails()}>
+    <Container id="list-element"
+               className={"list-element" + (props.student === props.selectedStudent ? "-selected" : "")}
+               style={{ backgroundColor: getBackground(), borderColor: getBorder()}}
+               onClick={() => props.studentsTab ? studentDetails() : selectStudent()}>
       <Row className="upper-layer">
         <Col id="name" className="name" xs="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
         <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
@@ -105,6 +128,9 @@ export default function StudentListelement(props) {
             <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
         </Col>
+        {/*<Col>*/}
+        {/*  <Image src={props.student === props.selectedStudent ? selected : not_selected} height={25} width={25}/>*/}
+        {/*</Col>*/}
       </Row>
 
       <Row id="info" className="info">

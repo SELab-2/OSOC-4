@@ -247,7 +247,7 @@ export default function StudentListAndFilters(props) {
         >
           {students.map((i, index) => (
 
-            <StudentListelement key={index} student={i} studentsTab={props.studentsTab} />
+            <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={index} student={i} studentsTab={props.studentsTab} />
 
           ))}
         </InfiniteScroll>
