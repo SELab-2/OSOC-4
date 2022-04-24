@@ -1,15 +1,19 @@
 from app.config import config
-from app.database import get_session
+from app.crud import read_where, update
+from app.database import get_session, websocketManager
+from app.exceptions.edition_exceptions import StudentNotFoundException
 from app.models.answer import Answer
 from app.models.participation import Participation, ParticipationOutStudent
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
-from app.models.student import Student
+from app.models.student import Student, StudentUpdate
 from app.models.suggestion import Suggestion, SuggestionExtended
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
+from app.utils.response import response
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -84,3 +88,20 @@ async def get_student_questionanswers(student_id, session: AsyncSession = Depend
     info = [{"question": x[0], "answer":x[1]} for x in info if x[2] is None]
 
     return info
+
+
+@router.patch("/{student_id}")
+async def update_student(student_id: int, student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
+
+    student = await read_where(Student, Student.id == student_id, session=session)
+    if student:
+        student_update_data = student_update.dict(exclude_unset=True)
+        for key, value in student_update_data.items():
+            setattr(student, key, value)
+        await update(student, session)
+
+        await websocketManager.broadcast({"id": config.api_url + "students/" + str(student_id), "decision": jsonable_encoder(StudentUpdate.parse_raw(student.json()))})
+
+        return response(None, "Student updated succesfully")
+
+    raise StudentNotFoundException()

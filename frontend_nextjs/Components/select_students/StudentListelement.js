@@ -108,7 +108,7 @@ export default function StudentListelement(props) {
       </Row>
 
       <Row id="info" className="info">
-        <GeneralInfo listelement={true} student={props.student} decision={getDecisionString(props.student.decision)} />
+        <GeneralInfo listelement={true} studentsTab={props.studentsTab} student={props.student} decision={getDecisionString(props.student.decision)} />
         <Col />
         <Col id="skills" align="right" className="skills" sm="auto">
           <ul className="nomargin">
