@@ -14,9 +14,11 @@ import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
+import edition from "/public/assets/edition.png"
 import QuestionTags from "../Components/settings/QuestionTags";
 import CurrentEdition from "../Components/settings/CurrentEdition";
 import LoadingPage from "../Components/LoadingPage";
+import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
 
 /**
  * The page corresponding with the 'settings' tab.
@@ -98,19 +100,8 @@ export default function Settings(props) {
                     </AccordionBody>
                 </AccordionItem>
 
+
                 <AccordionItem eventKey="1">
-                    <AccordionHeader>
-                        <h3>Edition</h3>
-                    </AccordionHeader>
-                    <AccordionBody>
-                        <div className="align-content-center"> 
-                            <Card className="card">
-                                <CurrentEdition/>
-                            </Card>
-                        </div>
-                    </AccordionBody>
-                </AccordionItem>
-                <AccordionItem eventKey="2">
                     <AccordionHeader>
                         <h3>Website settings</h3>
                     </AccordionHeader>
@@ -126,19 +117,19 @@ export default function Settings(props) {
                 {(role === 2) ? (
                     <AccordionItem eventKey="2">
                         <AccordionHeader>
-                            <h3>Select edition</h3>
+                            <h3>Edition settings</h3>
                         </AccordionHeader>
                         <AccordionBody>
-                            <div className="edition-settings">
-                                <SettingCards image={edition} title={currentVersion.name} subtitle={"Select another edition (applies to the whole website)"}>
-                                    <EditionDropdownButton currentVersion={currentVersion} setCurrentVersion={setCurrentVersion} />
-                                </SettingCards>
+                            <div className="align-content-center">
+                                <Card className="card">
+                                    <CurrentEdition/>
+                                </Card>
                             </div>
                         </AccordionBody>
-                    </AccordionItem>) : null }
+                    </AccordionItem>) : null}
 
                 {(role === 2) ? (
-                    <AccordionItem eventKey="3" onClick={() => setInitializeUsers(true)}>
+                    <AccordionItem eventKey="4" onClick={() => setInitializeUsers(true)}>
                         <AccordionHeader>
                             <h3>Manage users</h3>
                         </AccordionHeader>
@@ -149,17 +140,6 @@ export default function Settings(props) {
                         </AccordionBody>
                     </AccordionItem>) : null}
 
-
-                <AccordionItem eventKey="4">
-                    <AccordionHeader>
-                        <h3>Question Tags</h3>
-                    </AccordionHeader>
-                    <AccordionBody>
-                        <div className="question-tags-settings">
-                            <QuestionTags />
-                        </div>
-                    </AccordionBody>
-                </AccordionItem>
 
             </Accordion>
 
