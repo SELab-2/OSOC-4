@@ -175,6 +175,8 @@ for user invites, password resets and revokable tokens. PostgreSQL is used for
 everything else. This way the frontend doesn't have direct access to the
 database, all operations on the database are defined and controlled by the backend.
 
+Something noticable is that the frontend can send back to the reverse proxy (which will only go to the backend) but it can also send requests straight to the backend. This is because of Next.js. Next.js offers multiple ways to render pages, one is just normal client side rendering and the other we use is server side rendering. With client side rendering the requests will need to go through the proxy (Traefik). But when server side rendering is used for a page (there aren't many pages that use this since almost everything needs to update at real time), the request goes straight from the frontend to the backend, thereby skipping the proxy.
+
 
 
 ## 7. Description of the main product elements
