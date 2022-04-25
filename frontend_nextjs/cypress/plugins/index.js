@@ -20,6 +20,6 @@ require('dotenv').config() // Can't get from process without this unlike other c
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-    config.baseUrl = process.env.BASE_URL
-    return config
+    config.baseUrl = process.env.BASE_URL;
+    return config;
 }
