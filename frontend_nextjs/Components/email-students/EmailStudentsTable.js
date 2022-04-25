@@ -16,10 +16,10 @@ export default function EmailStudentsTable(props) {
 
   // returns the html representation for the student list
   return (
-    <Col className="fill_height scroll-overflow fill_width">
+    <Col className="nomargin">
       <InfiniteScroll
         style={{
-          "height": "calc(100vh - 146px)",
+          "height": "calc(100vh - 230px)",
           "position": "relative"
         }}
         dataLength={props.students.length} //This is important field to render the next data

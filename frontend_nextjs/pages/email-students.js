@@ -148,10 +148,10 @@ export default function EmailStudents() {
       <SendEmailsPopUpWindow popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow} students={receivers} />
 
       <Col className="fill_height">
-        <Row className="fill_height">
+        <Row className="fill_height nomargin">
           <EmailStudentsFilters students={students} filters={filters} />
           <Col className="fill_height students-list-paddingtop">
-            <Row className="nomargin">
+            <Row className="nomargin searchbar-margin">
               <Col><SearchSortBar /></Col>
               <Col md="auto" className="change-emails-positioning">
                 <Button className="btn-secondary change-emails-button"
