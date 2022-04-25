@@ -51,7 +51,7 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 
 
 ### 4.1. Domain model
-![Domain model](https://github.com/SELab-2/OSOC-4/blob/user_man/info/domain_model/domain_model.svg)
+![Domain model](domain_model/domain_model.svg)
 
 Now folows a description of each element in the domain model.
 
@@ -232,14 +232,14 @@ an easily reproducible deployment. We have a seperate container for the
 frontend, the backend, MongoDB and Redis. This allows us to develop and scale
 each part of our application separately.
 
-![Architecture](https://github.com/SELab-2/OSOC-4/blob/development/info/architecture.svg)
+![Architecture](architecture.svg)
 
 The design of our application is a very standard client-server architecture. A frontend is
 used to access a backend, both of which are deployed on a server (as shown above). This server is
 accessed through a reverse proxy. This is provided through Traefik. Traefik also
 provides a dashboard that allows us to monitor all the services.
 
-![Design](https://github.com/SELab-2/OSOC-4/blob/user_man/info/deployment/deployment.svg)
+![Design](deployment/deployment.svg)
 
 The backend can then access data, which is stored using MongoDB and Redis.
 Redis has built in features to let data automaticaly expire and is thus used
@@ -252,7 +252,7 @@ database, everything is controlled by the backend.
 
 ### 5.1. Login screen
 
-![Login screen](https://github.com/SELab-2/OSOC-4/blob/user_man/info/screenshots/login_screen.png)
+![Login screen](screenshots/login_screen.png)
 
 Before logging in, your profile must be approved by an admin.
 1. A field to write your email address that is linked to your profile.
