@@ -10,6 +10,7 @@ services:
         NEXT_INTERNAL_API_URL: http://${PATHPREFIX}-osoc-backend:8000
         NEXT_API_URL: https://sel2-4.ugent.be/${PATHPREFIX}/api
         NEXTAUTH_URL: https://sel2-4.ugent.be/${PATHPREFIX}/frontend/api/auth
+        NODE_ENV: production
     ports:
       - 3000
     environment:
