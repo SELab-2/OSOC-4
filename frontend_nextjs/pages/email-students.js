@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Button, Col, Row} from "react-bootstrap";
 
 import {useSession} from "next-auth/react";
-import {api, Url} from "../utils/ApiClient";
+import {api, cache, Url} from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import SearchSortBar from "../Components/select_students/SearchSortBar";
 import EmailStudentsFilters from "../Components/email-students/EmailStudentsFilters";
@@ -37,8 +37,8 @@ export default function EmailStudents() {
   const [sendEmailsPopUpShow, setSendEmailsPopUpShow] = useState(false);
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [students, setStudents] = useState(undefined);
-  const [visibleStudents, setVisibleStudents] = useState(undefined);
+  const [students, setStudents] = useState([]);
+  const [studentUrls, setStudentUrls] = useState([]);
   const [receivers, setReceivers] = useState(undefined);
 
   // These variables are used to notice if search or filters have changed
@@ -65,73 +65,33 @@ export default function EmailStudents() {
         setSortby(router.query.sortby);
 
         // the urlManager returns the url for the list of students
-        Url.fromName(api.editions_students).setParams({ search: router.query.search || "", orderby: router.query.sortby || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams(
+          { decision: router.query.decision || "",
+            search: router.query.search || "", orderby: router.query.sortby || "" }
+        ).get().then(res => {
+          setLocalFilters([0, 0, 0]);
+          let p1 = res.data.slice(0, 10);
+          let p2 = res.data.slice(10);
+          setStudentUrls(p2);
           if (res.success) {
-            Promise.all(res.data.map(studentUrl =>
-                Url.fromUrl(studentUrl).get().then(res => res.data)
-            )).then(students => {
-              setStudents(students);
-              setLocalFilters([-1, -1]);
+            setLocalFilters([0, 0, 0]);
+            let p1 = res.data.slice(0, 10);
+            let p2 = res.data.slice(10);
+            setStudentUrls(p2);
+            Promise.all(p1.map(studentUrl =>
+              cache.getStudent(studentUrl, session["userid"])
+            )).then(newstudents => {
+              setStudents([...newstudents]);
+              setLocalFilters([0, 0, 0]);
             })
-          }});
-      }
-
-      // Check if the real filters have changed from the local filters. If so, update the localfilters and
-      // filter the students.
-      if (students &&
-        (localFilters.some((filter, index) => filter !== filters[index].length ))) {
-        let filterFunctions = [filterStudentsFilters, filterStudentsDecision];
-        let filteredStudents = filterUndecided();
-        filterStudents(filterFunctions, filteredStudents, localFilters, filters, setLocalFilters, setVisibleStudents);
+          }
+          });
       }
     }
   })
 
   if (role !== 2) {
     return (<h1>Unauthorized</h1>)
-  }
-
-  /**
-   * The email students tab does not show students with the decision 'Undecided',
-   * This function filters them out of the list of students.
-   * @returns {*} The list of students without students with the decision 'Undecided'.
-   */
-  function filterUndecided() {
-    return students.filter(
-      student => Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]).length !== 0
-    );
-  }
-
-  /**
-   * This function filters the students for the general filters (the filters in filters[0]).
-   * @param filteredStudents The list of students that need to be filtered.
-   * @returns {*} The list of students that are allowed by the general filters.
-   */
-  function filterStudentsFilters(filteredStudents) {
-    let newFilteredStudents = filteredStudents;
-
-    // if filters[0] contains "no-correct-email", we filter the list so that only students who did not get the
-    // correct email are in the resulting list
-    if (filters[0].includes("no-correct-email")) {
-      newFilteredStudents =  newFilteredStudents.filter(student =>
-        ! student["suggestions"].filter(suggestion => suggestion["definitive"])[0]["mail_sent"]
-      )
-    }
-    return newFilteredStudents;
-  }
-
-  /**
-   * This function filters the studnets for the decision filters (the filters in filters[1]).
-   * @param filteredStudents The list of students that need to be filtered.
-   * @returns {*} The list of students that are allowed by the decision filters.
-   */
-  function filterStudentsDecision(filteredStudents) {
-    let decisionNumbers = filters[1].map(studentDecision => ["no", "maybe", "yes"].indexOf(studentDecision))
-
-    return filteredStudents.filter(student => {
-      let decisions = Object.values(student["suggestions"]).filter(suggestion => suggestion["definitive"]);
-      return decisionNumbers.length === 0 || decisionNumbers.includes(decisions[0]["decision"]);
-    });
   }
 
   /**
@@ -156,13 +116,27 @@ export default function EmailStudents() {
    * If the list is empty, we show 'No students found'. If it is not loaded, we show a loading animation.
    */
   function getEmailStudentsTable() {
-    if (visibleStudents === undefined) {
+    if (students === undefined) {
       return <LoadingPage />
     }
-    if (visibleStudents.length === 0) {
+    if (students.length === 0) {
       return "No students found"
     }
-    return <EmailStudentsTable addToReceivers={addToReceivers} students={visibleStudents} />
+    return <EmailStudentsTable studentUrls={studentUrls} fetchData={fetchData} addToReceivers={addToReceivers}
+                               students={students} />
+  }
+
+  const fetchData = () => {
+
+    let p1 = studentUrls.slice(0, 10);
+    let p2 = studentUrls.slice(10);
+
+    Promise.all(p1.map(studentUrl =>
+      cache.getStudent(studentUrl, session["userid"])
+    )).then(newstudents => {
+      setStudents([...students, ...newstudents]);
+      setStudentUrls(p2);
+    })
   }
 
   /**

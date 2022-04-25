@@ -11,7 +11,7 @@ import { api, Url } from "../../utils/ApiClient";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
-import { WebsocketContext } from "../Auth"
+import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
 
 export default function StudentListAndFilters(props) {
@@ -41,20 +41,20 @@ export default function StudentListAndFilters(props) {
 
   const [showFilter, setShowFilter] = useState(false);
 
-  const ws = useContext(WebsocketContext)
+  const { websocketConn } = useWebsocketContext();
 
 
   useEffect(() => {
 
-    if (ws) {
-      ws.addEventListener("message", updateDetailsFromWebsocket)
+    if (websocketConn) {
+      websocketConn.addEventListener("message", updateDetailsFromWebsocket)
 
       return () => {
-        ws.removeEventListener('message', updateDetailsFromWebsocket)
+        websocketConn.removeEventListener('message', updateDetailsFromWebsocket)
       }
     }
 
-  }, [ws, students, studentUrls, router.query, decisions])
+  }, [websocketConn, students, studentUrls, router.query, decisions])
 
   useEffect(() => {
     if (session) {
@@ -69,7 +69,10 @@ export default function StudentListAndFilters(props) {
         setSkills(router.query.skills);
 
         // the urlManager returns the url for the list of students
-        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams(
+          { decision: router.query.decision || "",
+          search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }
+        ).get().then(res => {
           if (res.success) {
             setLocalFilters([0, 0, 0]);
             let p1 = res.data.slice(0, 10);

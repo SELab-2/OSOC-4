@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
-import EditionDropdownButton from "../Components/settings/EditionDropdownButton";
 import ChangeName from "../Components/settings/ChangeName";
 import ChangeEmail from "../Components/settings/ChangeEmail";
 import SettingCards from "../Components/settings/SettingCards";
@@ -15,48 +14,19 @@ import change_email_image from "/public/assets/change_email.png"
 import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
-import edition from "/public/assets/edition.png"
-import QuestionTags from "../Components/settings/QuestionTags";
-import LoadingPage from "../Components/LoadingPage";
+import EditionSettings from "../Components/settings/EditionSettings";
+
 
 /**
  * The page corresponding with the 'settings' tab.
  * @returns {JSX.Element} A component corresponding with the 'settings' tab.
  */
-export default function Settings(props) {
-    const [user, setUser] = useState(undefined);
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [role, setRole] = useState(0);
-    const [currentVersion, setCurrentVersion] = useState(undefined)
-    const [loading, setLoading] = useState(false)
+function Settings({ me }) {
     const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
 
 
-    // fetch the current user & current edition
-    useEffect(() => {
-        async function fetch() {
-            if ((user === undefined || name === "" || email === "") && !loading) {
-                setLoading(true)
-                let res = await Url.fromName(api.me).get();
-                if (res.success) {
-                    res = res.data.data;
-                    setUser(res);
-                    setName(res.name);
-                    setEmail(res.email);
-                    setRole(res.role);
-                }
-                res = await Url.fromName(api.current_edition).get();
-                if (res.success) {
-                    setCurrentVersion(res.data);
-                }
-                setLoading(false);
-            }
-        }
-        fetch();
-    }, [loading, user, name, email]);
 
     //TODO make this actually change the theme
     /**
@@ -68,32 +38,29 @@ export default function Settings(props) {
         setDarkTheme(!darkTheme)
     }
 
-    if (loading) {
-        return (<LoadingPage/>);
-    }
-
     return (
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
 
                 <AccordionItem eventKey="0">
-                    <Accordion.Header>
+                    <AccordionHeader>
                         <h3>Personal settings</h3>
-                    </Accordion.Header>
+                    </AccordionHeader>
                     <AccordionBody>
                         <div className="personal-settings">
                             <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
                                 <ChangePassword />
                             </SettingCards>
                             <SettingCards image={change_email_image} title={"Change email"} subtitle={"Change to a different email-adress"}>
-                                <ChangeEmail email={email} />
+                                <ChangeEmail user={me} />
                             </SettingCards>
                             <SettingCards image={change_name_image} title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
-                                <ChangeName user={user} />
+                                <ChangeName user={me} />
                             </SettingCards>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
+
 
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
@@ -108,49 +75,45 @@ export default function Settings(props) {
                     </AccordionBody>
                 </AccordionItem>
 
-                {(role === 2) ? (
+                {(me.role === 2) ? (
                     <AccordionItem eventKey="2">
                         <AccordionHeader>
-                            <h3>Select edition</h3>
+                            <h3>Edition settings</h3>
                         </AccordionHeader>
                         <AccordionBody>
-                            <div className="edition-settings">
-                                <SettingCards image={edition} title={currentVersion.name} subtitle={"Select another edition (applies to the whole website)"}>
-                                    <EditionDropdownButton currentVersion={currentVersion} setCurrentVersion={setCurrentVersion} />
-                                </SettingCards>
-                            </div>
+                            <EditionSettings/>
                         </AccordionBody>
-                    </AccordionItem>) : null }
-
-                {(role === 2) ? (
-                    <AccordionItem eventKey="3" onClick={() => setInitializeUsers(true)}>
+                    </AccordionItem>) : null}
+                {(me.role === 2) ? (
+                    <AccordionItem eventKey="4" onClick={() => setInitializeUsers(true)}>
                         <AccordionHeader>
                             <h3>Manage users</h3>
                         </AccordionHeader>
                         <AccordionBody>
                             <div className="manage-users-settings">
-                                <ManageUsers me={user} initialize={initializeUsers} />
+                                <ManageUsers me={me} initialize={initializeUsers} />
                             </div>
                         </AccordionBody>
                     </AccordionItem>) : null}
 
-
-                <AccordionItem eventKey="4">
-                    <AccordionHeader>
-                        <h3>Question Tags</h3>
-                    </AccordionHeader>
-                    <AccordionBody>
-                        <div className="question-tags-settings">
-                            <QuestionTags />
-                        </div>
-                    </AccordionBody>
-                </AccordionItem>
-
             </Accordion>
-
-
 
         </div>
 
     )
 }
+
+
+export async function getServerSideProps(context) {
+    let props_out = {}
+    let me = await Url.fromName(api.me).get(context);
+    if (me.success) {
+        props_out["me"] = me.data.data;
+    }
+
+    return {
+        props: props_out
+    }
+}
+
+export default Settings

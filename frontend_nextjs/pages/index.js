@@ -5,6 +5,15 @@ import { Button, Card, Carousel, Table } from "react-bootstrap";
 import Message from "../Components/dashboard/Message";
 import React, { useState } from "react";
 
+/**
+ * The page corresponding with the 'index' (dashboard) of the application,
+ *  the params are filled in by nextjs from the function defined below (getServerSideProps)
+ * @param current_edition: on login, this will be the latest edition, later on it is the edition you selected to view
+ * @param students_length: the length of the list of students
+ * @param projects_length: the length of the list of projects
+ * @param messages: dict with (message-type, list-of-messages) key-value pairs
+ * @returns {JSX.Element}
+ */
 function Home({ current_edition, students_length, projects_length, messages }) {
   const { data: session } = useSession({ required: true })
   const isUser = session?.user
@@ -13,6 +22,10 @@ function Home({ current_edition, students_length, projects_length, messages }) {
 
   const INTERVAL = 3000;
 
+  /**
+   * returns a list of Elements which are the messages rendered
+   * @returns {unknown[]}
+   */
   function showMessages() {
     if (newUsers.length) {
       return [(<h1 key="newly-joined-users-title">Newly joined users:</h1>), ...newUsers.map((user) => {
@@ -37,7 +50,6 @@ function Home({ current_edition, students_length, projects_length, messages }) {
           <Button className="user-button-unapproved" onClick={approveUser}>Approve user</Button>
           <Button className="user-button-remove" onClick={deleteUser}>Revoke access</Button>
         </Message>)
-        // <Table><tbody><UserTr isMe={false} key={msg.data.id} user={msg.data} /></tbody></Table>
       })]
     }
   }
@@ -90,7 +102,6 @@ function Home({ current_edition, students_length, projects_length, messages }) {
   return <LoadingPage />
 }
 
-export default Home
 
 export async function getServerSideProps(context) {
   let props_out = {}
@@ -121,3 +132,5 @@ export async function getServerSideProps(context) {
     props: props_out
   }
 }
+
+export default Home

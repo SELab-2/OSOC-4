@@ -310,7 +310,7 @@ class API {
             this._paths.users = res.data[this.users];
             this._paths.skills = res.data[this.skills];
             this._paths.participations = res.data[this.participations];
-            if (this._year) {
+            if (this.year) {
                 this._paths.current_edition = this._paths.editions + "/" + this._year;
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
@@ -318,14 +318,14 @@ class API {
             }
             if (this._paths.current_edition) {
                 let editionData = await axios.get(this._paths.current_edition, config);
-                this._year = editionData.data["year"];
+                this.year = editionData.data["year"];
                 this._paths.editions_students = editionData.data[this.students];
                 this._paths.editions_projects = editionData.data[this.projects];
                 this._paths.editions_questiontags = editionData.data["questiontags"];
             }
         } catch (e) {
-            log(e)
             log("API: setup failed")
+            log(e)
         }
 
     }
@@ -333,10 +333,10 @@ class API {
     /**
      * Set the current edition to another year
      * @param year: the year of the edition to make requests to
-     * @returns {Promise<void>}
      */
-    async setCurrentEdition(year = null) {
-        this._year = year;
+    setCurrentEdition(year = null) {
+        log("API: changing edition to: " + year)
+        this.year = year;
         this.invalidate();
     }
 }
