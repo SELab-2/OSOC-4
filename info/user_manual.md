@@ -9,7 +9,7 @@
 [4.3. Local installation](#43-local-installation) \
 [4.4. Automatic deployment](#44-automatic-deployment)
 
-#### [5. Further development & Testing](#5-further-development--testing-1)
+#### [5. How to further develop & test](#5-howt-to-further-development--test-1)
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
@@ -139,7 +139,7 @@ backend-api: https://sel2-4.ugent.be/{branchname}/api
 
 
 
-## 5. Further development & Testing
+## 5. How to further develop & test
 Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
 ```
