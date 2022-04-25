@@ -2,7 +2,7 @@
 
 ## Table of contents
 
-- [User manual](info/user_manual/user_manual.md)
+- [User manual](info/user_manual.md)
 - [Domain model](info/domain_model/domain_model.svg)
 - [Deployment scheme](info/deployment/deployment.svg)
 - [How to deploy](#deployment)
