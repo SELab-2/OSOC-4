@@ -311,7 +311,7 @@ class API {
             this._paths.skills = res.data[this.skills];
             this._paths.participations = res.data[this.participations];
             if (this.year) {
-                this._paths.current_edition = this._paths.editions + "/" + this._year;
+                this._paths.current_edition = this._paths.editions + "/" + this.year;
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
                 this._paths.current_edition = (res.data.length) ? res.data[0] : null;
