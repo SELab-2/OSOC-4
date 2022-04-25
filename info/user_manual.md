@@ -18,19 +18,20 @@
 [7.1. Domain Model](#71-domain-model) \
 [7.1.1. Edition](#711-edition) \
 [7.1.2. User](#712-user) \
-[7.1.3. Student](#713-student) \
-[7.1.4. QuestionAnswer](#714-questionanswer) \
-[7.1.5. Answer](#715-answer) \
-[7.1.6. Question](#716-question) \
-[7.1.7. QuestionTag](#717-questiontag) \
-[7.1.8. Skill](#718-skill) \
-[7.1.9. StudentSkill](#719-studentskill) \
-[7.1.10. Project](#7110-project) \
-[7.1.11. ProjectRequiredSkill](#7111-projectrequiredskill) \
-[7.1.12. ProjectCoach](#7112-projectcoach) \
-[7.1.13. Suggestion](#7113-suggestion) \
-[7.1.14. Participation](#7114-participation) \
-[7.1.15. DefaultEmail](#7115-defaultemail)
+[7.1.3. EditionCoach](#713-editioncoach) \
+[7.1.4. Student](#714-student) \
+[7.1.5. QuestionAnswer](#715-questionanswer) \
+[7.1.6. Answer](#716-answer) \
+[7.1.7. Question](#717-question) \
+[7.1.8. QuestionTag](#718-questiontag) \
+[7.1.9. Skill](#719-skill) \
+[7.1.10. StudentSkill](#7110-studentskill) \
+[7.1.11. Project](#7111-project) \
+[7.1.12. ProjectRequiredSkill](#7112-projectrequiredskill) \
+[7.1.13. ProjectCoach](#7113-projectcoach) \
+[7.1.14. Suggestion](#7114-suggestion) \
+[7.1.15. Participation](#7115-participation) \
+[7.1.16. DefaultEmail](#7116-defaultemail)
 
 #### [8. Description of the user interface and common use cases](#8-description-of-the-user-interface-and-common-use-cases-1)
 
@@ -236,7 +237,16 @@ _attributes:_ \
 **status: approved**: the user was active, and an admin has approved the user (the user now has acces to the tool) \
 **status: disabled**: the user has been deleted from the tool, this is a soft delete so that we can still see actions the user made in the (previous) edition.
 
-#### 7.1.3 Student
+#### 7.1.3. EditionCoach
+A coach (user) that belongs to an edition.
+
+Now follows an in depth description of the attributes of an EditionCoach.
+
+_attributes:_ \
+**edition_year**: the year of the edition, primary key, foreign key \
+**coach_id**: the id of the coach, primary key, foreign key \
+
+#### 7.1.4 Student
 A student, a representation of the tally form a student filled out with the info about them. 
 
 Now follows an in depth description of the attributes of a Student.
@@ -247,7 +257,7 @@ _attributes:_ \
 **email_sent**: whether an email has been send \
 **edition_year (FK)**: the year of the edition when the student filled in the form
 
-#### 7.1.4. QuestionAnswer
+#### 7.1.5. QuestionAnswer
 A combination of a question and an answer that a student made.
 
 Now follows an in depth description of the attributes of a QuestionAnswer.
@@ -257,7 +267,7 @@ _attributes:_ \
 **question_id**: the id of the question, primary key, foreign key \
 **answer_id**: the id of the answer, primary key, foreign key
 
-#### 7.1.5. Answer
+#### 7.1.6. Answer
 An anwser to a question of the tally form.
 
 Now follows an in depth description of the attributes of an Answer.
@@ -266,7 +276,7 @@ _attributes:_ \
 **id**: the id of the answer, primary key \
 **answer**: the answer itself
 
-#### 7.1.6. Question
+#### 7.1.7. Question
 A question from the tally form.
 
 Now follows an in depth description of the attributes of a Question.
@@ -277,7 +287,7 @@ _attributes:_ \
 **question**: the question itself \
 **edition_year (FK)**: the edition year in which the question was asked.
 
-#### 7.1.7. QuestionTag
+#### 7.1.8. QuestionTag
 A tag for a question from the tally form. The tag gives a meaning to the question, for example the question "What is your first name?" can be linked to the tag "first name", this way the tool knows that the answer to that question is the first name of the student.
 
 Now follows an in depth description of the attributes of a QuestionTag.
@@ -290,7 +300,7 @@ _attributes:_ \
 **edition_year**: the year of the edition the tag belongs to
 
 
-#### 7.1.8. Skill
+#### 7.1.9. Skill
 A skill like ux-designer, backend-developper, communications-manager
 
 Now follows an in depth description of the attributes of a Skill
@@ -298,7 +308,7 @@ Now follows an in depth description of the attributes of a Skill
 _attributes:_ \
 **name**: the name of the skill, primary key (like ux-designer, backend developer, ...)
 
-#### 7.1.9. StudentSkill
+#### 7.1.10. StudentSkill
 A student that has a specific skill.
 
 Now follows an in depth description of the attributes of a StudentSkill
@@ -307,7 +317,7 @@ _attributes:_ \
 **student_id**: the id of the student who has the skill, primary key, foreign key
 **skill_name**: the name of the skill, primary key, foreign key
 
-#### 7.1.10. Project
+#### 7.1.11. Project
 Represents a project that will be made by OSOC students for a partner. A project will also contain the the information of that partner.
 
 Now follows an in depth description of the attributes of a Project.
@@ -320,7 +330,7 @@ _attributes:_ \
 **partner_description**: additional information about the partner \
 **edition_year (FK)**: the year of the edition the project belongs to
 
-#### 7.1.11. ProjectRequiredSkill
+#### 7.1.12. ProjectRequiredSkill
 A skill that a project needs, and how many times it needs a student that has that skill.
 
 Now follows an in depth description of the attributes of a Suggestion.
@@ -330,7 +340,7 @@ _attributes:_ \
 **skill_name**: the name of the skill that is required, primary key, foreign key \
 **amount**: the amount of students with that skill that are required
 
-#### 7.1.12. ProjectCoach
+#### 7.1.13. ProjectCoach
 A coach that coaches for a project.
 
 Now follows an in depth description of the attributes of a ProjectCoach.
@@ -339,7 +349,7 @@ _attributes:_ \
 **project_id**: the id of the project, primary key, foreign key \
 **coach_id**: the id of the coach (user), primary key, foreign key
 
-#### 7.1.13. Suggestion
+#### 7.1.14. Suggestion
 A suggestion that a coach makes about a student, or a decision from an administrator.
 
 Now follows an in depth description of the attributes of a Suggestion.
@@ -353,7 +363,7 @@ _attributes:_ \
 **project_id**: the id of the project for which is suggested, optional attribute \
 **skill_name**: the name of the skill which is suggested, optional attribute
 
-#### 7.1.14. Participation
+#### 7.1.15. Participation
 Which student will take on what role in what project.
 
 Now follows an in depth description of the attributes of a Participation.
@@ -363,7 +373,7 @@ _attributes defining a relationship:_ \
 **project_id**: the id of the project in which the student will participate \
 **skill_name**: the name of the skill (thus the skill the student has and will use) the student will take on in the project \
 
-#### 7.1.15. DefaultEmail
+#### 7.1.16. DefaultEmail
 Default emails are stored in the database.
 
 Now follows an in depth description of the attributes of a DefaultEmail.
