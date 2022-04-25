@@ -157,23 +157,23 @@ Now we're going to describe the architecture and design of the OSOC selection to
 
 In order to deploy everything, we use Docker. Using containers allows us to have
 an easily reproducible deployment. We have a seperate container for the
-frontend, the backend, MongoDB and Redis. This allows us to develop and scale
+database (PostgreSQL), the Redis, the backend (FastAPI) and the frontend (Next.js). This allows us to develop and scale
 each part of our application separately.
 
-![Architecture](architecture.svg)
+![Architecture](architecture_and_design/conatainers.svg)
 
 The design of our application is a very standard client-server architecture. A frontend is
-used to access a backend, both of which are deployed on a server (as shown above). This server is
+used to access a backend, both of which are deployed on a server (as shown above). The frontend is
 accessed through a reverse proxy. This is provided through Traefik. Traefik also
 provides a dashboard that allows us to monitor all the services.
 
-![Design](deployment/deployment.svg)
+![Design](architecture_and_design/design.svg)
 
-The backend can then access data, which is stored using MongoDB and Redis.
+The backend can then access data, which is stored using PostgreSQL and Redis.
 Redis has built in features to let data automaticaly expire and is thus used
-for user invites, password resets and revokable tokens. MongoDB is used for
-everything else. This way the frontend doesn't have direct acces to the
-database, everything is controlled by the backend.
+for user invites, password resets and revokable tokens. PostgreSQL is used for
+everything else. This way the frontend doesn't have direct access to the
+database, all operations on the database are defined and controlled by the backend.
 
 
 
