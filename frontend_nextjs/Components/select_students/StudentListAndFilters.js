@@ -69,7 +69,10 @@ export default function StudentListAndFilters(props) {
         setSkills(router.query.skills);
 
         // the urlManager returns the url for the list of students
-        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams(
+          { decision: router.query.decision || "",
+          search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }
+        ).get().then(res => {
           if (res.success) {
             setLocalFilters([0, 0, 0]);
             let p1 = res.data.slice(0, 10);
