@@ -13,30 +13,15 @@ import Image from "next/image";
  */
 export default function StudentTableRow(props) {
 
-  const [decisionSuggestion, setDecisionSuggesion] = useState(undefined);
-
-  /**
-   * This function inserts the data in the variable decisionSuggestion, which is the decision about the student.
-   */
-  useEffect(() => {
-    if (props.student["suggestions"]) {
-      // a decision is a suggestion which is definitive
-      let decisions = Object.values(props.student["suggestions"]).filter(suggestion => suggestion["definitive"])
-      if (decisions.length !== 0) {
-        setDecisionSuggesion(decisions[0]);
-      }
-    }
-  }, [props.student]);
-
   /**
    * This function uses the 'decisionSuggestion' to return a string that corresponds with the decision of a student
    * @returns {string} a string that corresponds with the decision of a student
    */
   function getDecisionString() {
-    if (! decisionSuggestion) {
+    if (props.student["decision"] < 0) {
       return "Undecided"
     }
-    return ["No", "Maybe", "Yes"][decisionSuggestion["decision"]]
+    return ["No", "Maybe", "Yes"][props.student["decision"]]
   }
 
   /**
@@ -45,7 +30,7 @@ export default function StudentTableRow(props) {
    * the correct email
    */
   function getEmailSent() {
-    if (decisionSuggestion && decisionSuggestion["mail_sent"]) {
+    if (props.student["decision"] >= 0 && ! props.student["email_sent"]) {
       return <Image src={correctIcon} height="30px"/>;
     }
     return <Image src={wrongIcon} height="30px"/>;
@@ -63,7 +48,7 @@ export default function StudentTableRow(props) {
         {props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}
       </td>
       <td>
-        Email address
+        {props.student["mandatory"]["email"]}
       </td>
       <td>
         {getDecisionString()}

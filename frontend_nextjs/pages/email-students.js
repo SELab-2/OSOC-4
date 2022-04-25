@@ -43,7 +43,8 @@ export default function EmailStudents() {
 
   // These variables are used to notice if search or filters have changed
   const [search, setSearch] = useState("");
-  let [sortby, setSortby] = useState("");
+  const [decisions, setDecisions] = useState("");
+  const [sortby, setSortby] = useState("");
   const [localFilters, setLocalFilters] = useState([-1, -1]);
 
   // This represents the filters, filters[0] contains the general filters and filters[1] contains the decision filters
@@ -60,7 +61,8 @@ export default function EmailStudents() {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will provoke
       // the second part of useEffect to filter the students again.
-      if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby)) {
+      if ((!students) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions)) {
+        setDecisions(router.query.decision)
         setSearch(router.query.search);
         setSortby(router.query.sortby);
 
@@ -70,13 +72,13 @@ export default function EmailStudents() {
             search: router.query.search || "", orderby: router.query.sortby || "" }
         ).get().then(res => {
           setLocalFilters([0, 0, 0]);
-          let p1 = res.data.slice(0, 10);
-          let p2 = res.data.slice(10);
+          let p1 = res.data.slice(0, 20);
+          let p2 = res.data.slice(20);
           setStudentUrls(p2);
           if (res.success) {
             setLocalFilters([0, 0, 0]);
-            let p1 = res.data.slice(0, 10);
-            let p2 = res.data.slice(10);
+            let p1 = res.data.slice(0, 20);
+            let p2 = res.data.slice(20);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl =>
               cache.getStudent(studentUrl, session["userid"])
@@ -128,8 +130,8 @@ export default function EmailStudents() {
 
   const fetchData = () => {
 
-    let p1 = studentUrls.slice(0, 10);
-    let p2 = studentUrls.slice(10);
+    let p1 = studentUrls.slice(0, 20);
+    let p2 = studentUrls.slice(20);
 
     Promise.all(p1.map(studentUrl =>
       cache.getStudent(studentUrl, session["userid"])
