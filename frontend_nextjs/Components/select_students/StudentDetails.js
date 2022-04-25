@@ -21,7 +21,7 @@ import { Url, api } from "../../utils/ApiClient";
 import { getDecisionString } from "./StudentListelement";
 import { useSession } from "next-auth/react";
 import LoadingPage from "../LoadingPage"
-import { WebsocketContext } from "../Auth"
+import { useWebsocketContext } from "../WebsocketProvider"
 
 /**
  * This component returns the details of a student
@@ -50,21 +50,21 @@ export default function StudentDetails(props) {
   const [decideField, setDecideField] = useState(-1);
   const [detailLoading, setDetailLoading] = useState(true);
 
-  const ws = useContext(WebsocketContext)
+  const { websocketConn } = useWebsocketContext();
   const { data: session, status } = useSession()
   const [prevStudentid, setPrevStudentid] = useState(undefined)
 
   useEffect(() => {
 
-    if (ws) {
-      ws.addEventListener("message", updateFromWebsocket)
+    if (websocketConn) {
+      websocketConn.addEventListener("message", updateFromWebsocket)
 
       return () => {
-        ws.removeEventListener('message', updateFromWebsocket)
+        websocketConn.removeEventListener('message', updateFromWebsocket)
       }
     }
 
-  }, [ws, student])
+  }, [websocketConn, student])
 
   /**
    * This function is called when studentId or props.student_id is changed
