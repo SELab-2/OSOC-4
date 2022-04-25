@@ -46,7 +46,7 @@ import {api, Url} from "../../utils/ApiClient";
         }
 
         let response = await Url.fromName(api.editions).extend("/create").setBody(body).post();
-        if (response.success) { setChangedSuccess(true); }
+        if (response.success) { setChangedSuccess(true); props.addToEditionList(body)}
     }
 
     return(

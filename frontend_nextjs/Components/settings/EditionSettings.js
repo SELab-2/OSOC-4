@@ -37,12 +37,18 @@ export default function EditionSettings() {
         fetch();
     }, [])
 
+    async function addToEditionList(edition) {
+        console.log("create")
+        console.log((edition))
+        setEditionList([edition, ...editionList]);
+    }
 
     /**
      * Changes the current edition
      * @param edition the edition (dictionary with at least the name and the year) to change to
      */
     async function changeSelectedVersion(edition) {
+
         await api.setCurrentEdition(edition.year)
         await setEdition({"year": edition.year, "name": edition.name});
     }
@@ -92,7 +98,7 @@ export default function EditionSettings() {
                         <h3>Create new edition</h3>
                     </AccordionHeader>
                     <AccordionBody>
-                        <CreateEdition/>
+                        <CreateEdition addToEditionList={addToEditionList}/>
                     </AccordionBody>
                 </AccordionItem>
 
