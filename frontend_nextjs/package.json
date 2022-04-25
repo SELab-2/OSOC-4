@@ -34,9 +34,10 @@
     "swr": "^1.2.2"
   },
   "devDependencies": {
+    "cypress": "^9.5.4",
+    "dotenv": "^16.0.0",
     "eslint": "8.11.0",
     "eslint-config-next": "12.1.0",
-    "jest": "^27.5.1",
-    "cypress": "^9.5.4"
+    "jest": "^27.5.1"
   }
 }
