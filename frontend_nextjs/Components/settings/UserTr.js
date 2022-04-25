@@ -13,11 +13,14 @@ export default function UserTr(props) {
     const [approved, setApproved] = useState(props.user.approved);
     const [disabled, setDisabled] = useState(props.user.disabled);
 
+    /**
+     * Changes the role of a user, api does patch request
+     * @param role
+     */
     async function changeRole(role) {
         if(props.isMe){
             return
         }
-
         let json = props.user
         json.disabled = role === 0;
         json.role = role
@@ -25,6 +28,10 @@ export default function UserTr(props) {
         if (response.success){setRole(role)}
     }
 
+    /**
+     * Approves a user, makes a post request to users/id/approve
+     * @returns {Promise<void>}
+     */
     async function approveUser() {
         const res = await Url.fromName(api.users).extend("/" + props.user.id + "/approve").post()
         if (res.success) {
@@ -32,6 +39,10 @@ export default function UserTr(props) {
         }
     }
 
+    /**
+     * Deletes a user, makes a delete request to the user's url
+     * @returns {Promise<void>}
+     */
     async function deleteUser() {
         const res = await Url.fromName(api.users).extend("/" + props.user.id).delete();
         if (res.success) {
