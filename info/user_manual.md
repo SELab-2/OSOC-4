@@ -5,10 +5,9 @@
 #### [4. Installation guide](#4-installation-guide-1)
 
 [4.1. Configuration](#41-configuration)\
-[4.2. Local installation](#42-local-installation) \
-[4.3. Requirements](#421-requirements) \
-[4.4. Local installation](#422-local-installation) \
-[4.3. Automatic deployment](#43-automatic-deployment)
+[4.2. Requirements](#42-requirements) \
+[4.3. Local installation](#43-local-installation) \
+[4.4. Automatic deployment](#44-automatic-deployment)
 
 #### [5. Further development & Testing](#7-further-development-&-testing-1)
 
@@ -84,7 +83,7 @@ INVITE_EXPIRE=4320 # in minutes
 PASSWORDRESET_EXPIRE=30 # in minutes
 ```
 
-## 4.2. Requirements
+### 4.2. Requirements
 - Docker (installation guide: https://docs.docker.com/get-docker/)
 - Docker Compose (installation guide: https://docs.docker.com/compose/install/)
 
