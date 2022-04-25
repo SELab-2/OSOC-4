@@ -211,8 +211,6 @@ Now folows a description of each element in the domain model.
 #### 7.1.1. Edition
 An edition of Open Summer Of Code
 
-Now follows an in depth description of the attributes of an edition.
-
 _attributes:_ \
 **year**: the year in which the edition took place, primary key \
 **name**: the name of the edition. (like "OSOC 2022 edition") \
@@ -222,8 +220,6 @@ _attributes:_ \
 
 #### 7.1.2. User
 A user is a person who has an account on the tool, or is in the progress of getting an account.
-
-Now follows an in depth description of the attributes of a User.
 
 _attributes:_ \
 **id**: the id of the user, primary key \
@@ -240,16 +236,12 @@ _attributes:_ \
 #### 7.1.3. EditionCoach
 A coach (user) that belongs to an edition.
 
-Now follows an in depth description of the attributes of an EditionCoach.
-
 _attributes:_ \
 **edition_year**: the year of the edition, primary key, foreign key \
 **coach_id**: the id of the coach, primary key, foreign key \
 
 #### 7.1.4 Student
 A student, a representation of the tally form a student filled out with the info about them. 
-
-Now follows an in depth description of the attributes of a Student.
 
 _attributes:_ \
 **id**: the id of the student, primary key \
@@ -260,8 +252,6 @@ _attributes:_ \
 #### 7.1.5. QuestionAnswer
 A combination of a question and an answer that a student made.
 
-Now follows an in depth description of the attributes of a QuestionAnswer.
-
 _attributes:_ \
 **student_id**: the id of the student, primary key, foreign key \
 **question_id**: the id of the question, primary key, foreign key \
@@ -270,16 +260,12 @@ _attributes:_ \
 #### 7.1.6. Answer
 An anwser to a question of the tally form.
 
-Now follows an in depth description of the attributes of an Answer.
-
 _attributes:_ \
 **id**: the id of the answer, primary key \
 **answer**: the answer itself
 
 #### 7.1.7. Question
 A question from the tally form.
-
-Now follows an in depth description of the attributes of a Question.
 
 _attributes:_ \
 **id**: the id of the question, only used internally and unique for each question \
@@ -290,8 +276,6 @@ _attributes:_ \
 #### 7.1.8. QuestionTag
 A tag for a question from the tally form. The tag gives a meaning to the question, for example the question "What is your first name?" can be linked to the tag "first name", this way the tool knows that the answer to that question is the first name of the student.
 
-Now follows an in depth description of the attributes of a QuestionTag.
-
 _attributes:_ \
 **tag**: the tag (the meaning) of the question, primary key \
 **question_id (FK)**: the id of the question for which the tag is \
@@ -299,11 +283,8 @@ _attributes:_ \
 **show_in_list**: whether the tag (and answer) should be visible in the list of students \
 **edition_year**: the year of the edition the tag belongs to
 
-
 #### 7.1.9. Skill
 A skill like ux-designer, backend-developper, communications-manager
-
-Now follows an in depth description of the attributes of a Skill
 
 _attributes:_ \
 **name**: the name of the skill, primary key (like ux-designer, backend developer, ...)
@@ -311,16 +292,12 @@ _attributes:_ \
 #### 7.1.10. StudentSkill
 A student that has a specific skill.
 
-Now follows an in depth description of the attributes of a StudentSkill
-
 _attributes:_ \
 **student_id**: the id of the student who has the skill, primary key, foreign key
 **skill_name**: the name of the skill, primary key, foreign key
 
 #### 7.1.11. Project
 Represents a project that will be made by OSOC students for a partner. A project will also contain the the information of that partner.
-
-Now follows an in depth description of the attributes of a Project.
 
 _attributes:_ \
 **id**: the id of the project, primary key \
@@ -333,8 +310,6 @@ _attributes:_ \
 #### 7.1.12. ProjectRequiredSkill
 A skill that a project needs, and how many times it needs a student that has that skill.
 
-Now follows an in depth description of the attributes of a Suggestion.
-
 _attributes:_ \
 **project_id**: the id of the project, primary key, foreign key \
 **skill_name**: the name of the skill that is required, primary key, foreign key \
@@ -343,16 +318,12 @@ _attributes:_ \
 #### 7.1.13. ProjectCoach
 A coach that coaches for a project.
 
-Now follows an in depth description of the attributes of a ProjectCoach.
-
 _attributes:_ \
 **project_id**: the id of the project, primary key, foreign key \
 **coach_id**: the id of the coach (user), primary key, foreign key
 
 #### 7.1.14. Suggestion
 A suggestion that a coach makes about a student, or a decision from an administrator.
-
-Now follows an in depth description of the attributes of a Suggestion.
 
 _attributes:_ \
 **id**: the id of a suggestion, only used internally and unique for each student \
@@ -366,8 +337,6 @@ _attributes:_ \
 #### 7.1.15. Participation
 Which student will take on what role in what project.
 
-Now follows an in depth description of the attributes of a Participation.
-
 _attributes defining a relationship:_ \
 **studen_id**: the id of the student who will participate \
 **project_id**: the id of the project in which the student will participate \
@@ -375,8 +344,6 @@ _attributes defining a relationship:_ \
 
 #### 7.1.16. DefaultEmail
 Default emails are stored in the database.
-
-Now follows an in depth description of the attributes of a DefaultEmail.
 
 _attributes:_ \
 **id**: the id of a default email, primary key \
