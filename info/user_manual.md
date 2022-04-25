@@ -205,7 +205,7 @@ Something noticable is that the frontend can send back to the reverse proxy (whi
 ## 7. Description of the main product elements
 
 ### 7.1. Domain model
-![Domain model](domain_model/domain_model.svg)
+![Domain model](domain_model.svg)
 
 Now folows a description of each element in the domain model.
 
