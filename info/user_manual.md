@@ -209,7 +209,7 @@ Now folows a description of each element in the domain model.
 
 
 #### 7.1.1. Edition
-An edition of Open Summer Of Code
+An edition of Open Summer Of Code.
 
 _attributes:_ \
 **year**: the year in which the edition took place, primary key \
@@ -228,17 +228,17 @@ _attributes:_ \
 **password**: the password of the user, this will be saved in the database, hashed and salted for security reasons \
 **role**: there are 2 types of roles: coaches and admins, admins can do anything any coach can do and more \
 **active, approved, disabled**: a user can either be active, approved, disabled or nothing \
-**satus: nothing** (all of the above are set to false): the user exists. \
-**status: active**: the user has set a name and password by using the invite link. \
+**satus: nothing** (all of the above are set to false): the user exists \
+**status: active**: the user has set a name and password by using the invite link \
 **status: approved**: the user was active, and an admin has approved the user (the user now has acces to the tool) \
-**status: disabled**: the user has been deleted from the tool, this is a soft delete so that we can still see actions the user made in the (previous) edition.
+**status: disabled**: the user has been deleted from the tool, this is a soft delete so that we can still see actions the user made in the (previous) edition
 
 #### 7.1.3. EditionCoach
 A coach (user) that belongs to an edition.
 
 _attributes:_ \
 **edition_year**: the year of the edition, primary key, foreign key \
-**coach_id**: the id of the coach, primary key, foreign key \
+**coach_id**: the id of the coach, primary key, foreign key
 
 #### 7.1.4 Student
 A student, a representation of the tally form a student filled out with the info about them. 
@@ -271,7 +271,7 @@ _attributes:_ \
 **id**: the id of the question, only used internally and unique for each question \
 **tally_id**: the id of the question assigned by tally \
 **question**: the question itself \
-**edition_year (FK)**: the edition year in which the question was asked.
+**edition_year (FK)**: the edition year in which the question was asked
 
 #### 7.1.8. QuestionTag
 A tag for a question from the tally form. The tag gives a meaning to the question, for example the question "What is your first name?" can be linked to the tag "first name", this way the tool knows that the answer to that question is the first name of the student.
@@ -284,7 +284,7 @@ _attributes:_ \
 **edition_year**: the year of the edition the tag belongs to
 
 #### 7.1.9. Skill
-A skill like ux-designer, backend-developper, communications-manager
+A skill like ux-designer, backend-developper, communications-manager.
 
 _attributes:_ \
 **name**: the name of the skill, primary key (like ux-designer, backend developer, ...)
@@ -293,7 +293,7 @@ _attributes:_ \
 A student that has a specific skill.
 
 _attributes:_ \
-**student_id**: the id of the student who has the skill, primary key, foreign key
+**student_id**: the id of the student who has the skill, primary key, foreign key \
 **skill_name**: the name of the skill, primary key, foreign key
 
 #### 7.1.11. Project
@@ -328,7 +328,7 @@ A suggestion that a coach makes about a student, or a decision from an administr
 _attributes:_ \
 **id**: the id of a suggestion, only used internally and unique for each student \
 **decision_option**: Yes / No / Maybe \
-**reason**: the reason that the coach/administrator gives with the suggestion
+**reason**: the reason that the coach/administrator gives with the suggestion \
 **student_id**: the id of the student for which the suggestion made \
 **suggested_by_id**: the id of the coach (user) who made the suggestion \
 **project_id**: the id of the project for which is suggested, optional attribute \
@@ -340,7 +340,7 @@ Which student will take on what role in what project.
 _attributes defining a relationship:_ \
 **studen_id**: the id of the student who will participate \
 **project_id**: the id of the project in which the student will participate \
-**skill_name**: the name of the skill (thus the skill the student has and will use) the student will take on in the project \
+**skill_name**: the name of the skill (thus the skill the student has and will use) the student will take on in the project
 
 #### 7.1.16. DefaultEmail
 Default emails are stored in the database.
