@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
 import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
+import EmailStudentListElement from "../email-students/EmailStudentListelement"
 
 export default function StudentListAndFilters(props) {
 
@@ -43,6 +44,11 @@ export default function StudentListAndFilters(props) {
 
   const { websocketConn } = useWebsocketContext();
 
+  useEffect(() => {
+    if (props.category === "emailstudents") {
+      props.setStudents([...students.map(student => student.id), ...studentUrls])
+    }
+  }, [students, studentUrls])
 
   useEffect(() => {
 
@@ -70,8 +76,10 @@ export default function StudentListAndFilters(props) {
 
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
-          { decision: router.query.decision || "",
-          search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }
+          {
+            decision: router.query.decision || "",
+            search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || ""
+          }
         ).get().then(res => {
           if (res.success) {
             setLocalFilters([0, 0, 0]);
@@ -235,7 +243,7 @@ export default function StudentListAndFilters(props) {
       <Row className="infinite-scroll">
         <InfiniteScroll
           style={{
-            "height": "calc(100vh - 146px)",
+            "height": props.category === "emailstudents" ? "calc(100vh - 200px)" : "calc(100vh - 146px)",
             "position": "relative"
           }}
           dataLength={students.length} //This is important field to render the next data
@@ -248,11 +256,15 @@ export default function StudentListAndFilters(props) {
             </p>
           }
         >
-          {students.map((i, index) => (
+          {students.map((i, index) => {
 
-            <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={index} student={i} studentsTab={props.studentsTab} />
+            if (props.category === "emailstudents") {
+              return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
+            } else {
+              return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
+            }
 
-          ))}
+          })}
         </InfiniteScroll>
       </Row>
     </div>
