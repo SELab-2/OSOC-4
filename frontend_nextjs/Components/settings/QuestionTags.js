@@ -95,10 +95,10 @@ export default function QuestionTags() {
               </thead>
               <tbody className="email-students-cell">
                   {questionTags.map(questionTag =>
-                    <QuestionTag key={questionTag["url"]} questionTag={questionTag}
+                    <QuestionTag key={questionTag["url"]} questionTag={questionTag} questionTags={questionTags}
                                  deleteTag={deleteTag} renameTag={renameTag}
                                  setEdited={setEdited} edited={edited === questionTag["url"]}
-                                 setNewQuestionTag={setNewQuestionTag}/>)}
+                                 setNewQuestionTag={setNewQuestionTag} setErrorMessage={setErrorMessage}/>)}
                   {(newQuestionTag) &&
                     <tr key="newQuestionTag">
                         <td>
@@ -124,7 +124,7 @@ export default function QuestionTags() {
                   }
                   {(errorMessage) &&
                     <tr key="error">
-                        <td>{errorMessage}</td>
+                        <td className="errormessage">{errorMessage}</td>
                     </tr>
                   }
               </tbody>

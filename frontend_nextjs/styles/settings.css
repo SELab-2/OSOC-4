@@ -9,3 +9,7 @@
     border-width: 0;
     margin-left: 10px;
 }
+
+.errormessage {
+    -webkit-text-fill-color: red;
+}

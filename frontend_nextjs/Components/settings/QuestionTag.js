@@ -54,15 +54,24 @@ export default function QuestionTag(props) {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        if (questionTag["tag"].length > 0) {
+      let requirements = [questionTag["tag"].length > 0,
+        props.questionTags.every(qt => qt["tag"] !== questionTag["tag"] || qt["url"] === questionTag["url"]),
+        questionTag["question"].length > 0,
+        props.questionTags.every(qt => qt["question"] !== questionTag["question"] || qt["url"] === questionTag["url"])];
+        if (requirements.every(req => req)) {
           Url.fromUrl(questionTag["url"]).setBody(questionTag).patch().then(res => {
             if (previousTag["tag"] !== questionTag["tag"]) {
               props.renameTag(questionTag["url"], res["data"])
             }
             setPreviousTag(questionTag);
           })
+          props.setErrorMessage("");
+          props.setEdited(undefined);
+        } else {
+          let messages = ["Tag name must not be empty", "Tag name must be unique",
+            "Question must not be empty", "Question must be unique"];
+          props.setErrorMessage(messages[requirements.indexOf(false)]);
         }
-        props.setEdited(undefined);
     }
 
     return (
