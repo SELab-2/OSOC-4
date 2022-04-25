@@ -8,19 +8,21 @@ import LoadingPage from "../LoadingPage";
  * This component displays a settings-screen where you can manage the question tags for an edition
  * @returns {JSX.Element}
  */
-export default function QuestionTags() {
+export default function QuestionTags(props) {
     const [questionTags, setQuestionTags] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const [newTag, setNewTag] = useState("");
 
     useEffect(() => {
-        setLoading(true)
-        Url.fromName(api.editions_questiontags).get().then(res => {
-            if (res.success) {
-                setQuestionTags(res.data);
-            }}).then(() => setLoading(false))
-    }, []);
+        if (props.reload) {
+            setLoading(true);
+            Url.fromName(api.editions_questiontags).get().then(res => {
+                if (res.success) {
+                    setQuestionTags(res.data);
+                }}).then(() => setLoading(false));
+        }
+    }, [props.reload]);
 
     const handleNewTagChange = (event) => {
         setNewTag(event.target.value);

@@ -16,6 +16,7 @@ export default function EditionSettings() {
     const [loading, setLoading] = useState(true);
     const [edition, setEdition] = useState(undefined);
     const [editionList, setEditionList] = useState(undefined);
+    const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
 
     // fetch the current edition and all the other editions
     useEffect(() => {
@@ -87,13 +88,13 @@ export default function EditionSettings() {
                         </div>
                     </AccordionBody>
                 </AccordionItem>
-                <AccordionItem eventKey="1">
+                <AccordionItem eventKey="1" onClick={() => setReloadQuestionTags(p => p + 1)}>
                     <AccordionHeader>
                         <h3>Question Tags</h3>
                     </AccordionHeader>
                     <AccordionBody>
                         <div className="questiontags">
-                            <QuestionTags/>
+                            <QuestionTags reload={reloadQuestionTags}/>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
