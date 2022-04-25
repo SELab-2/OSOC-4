@@ -16,6 +16,7 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import EditionSettings from "../Components/settings/EditionSettings";
 
+
 /**
  * The page corresponding with the 'settings' tab.
  * @returns {JSX.Element} A component corresponding with the 'settings' tab.
@@ -83,7 +84,6 @@ function Settings({ me }) {
                             <EditionSettings/>
                         </AccordionBody>
                     </AccordionItem>) : null}
-
                 {(me.role === 2) ? (
                     <AccordionItem eventKey="4" onClick={() => setInitializeUsers(true)}>
                         <AccordionHeader>
@@ -95,7 +95,6 @@ function Settings({ me }) {
                             </div>
                         </AccordionBody>
                     </AccordionItem>) : null}
-
 
             </Accordion>
 

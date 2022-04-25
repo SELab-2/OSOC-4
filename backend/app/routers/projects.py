@@ -1,5 +1,5 @@
 from app.config import config
-from app.crud import read_where, update
+from app.crud import read_where, read_all_where, update, update_all
 from app.database import get_session
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
@@ -27,7 +27,20 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
     :rtype: dict
     """
 
-    new_project = await update(Project.parse_obj(project), session=session)
+    project_data = project.dict()
+    required_skills = project_data.pop("required_skills", [])
+    user_ids = project_data.pop("users", [])
+
+    new_project = await update(Project.parse_obj(project_data), session=session)
+
+    skills = [ProjectRequiredSkill(project=new_project,
+                                   skill_name=required_skill["skill_name"],
+                                   number=required_skill["number"])
+              for required_skill in required_skills]
+    users = [ProjectCoach(project_id=new_project.id, coach_id=user_id) for user_id in user_ids]
+
+    await update_all(skills, session=session)
+    await update_all(users, session=session)
     return response(ProjectOutSimple.parse_raw(new_project.json()), "Project added successfully.")
 
 
@@ -72,11 +85,37 @@ async def update_project_with_id(id: int, updated_project: ProjectCreate, sessio
     """
 
     project = await read_where(Project, Project.id == id, session=session)
-    if project:
-        new_project_data = updated_project.dict(exclude_unset=True)
-        for key, value in new_project_data.items():
-            setattr(project, key, value)
-        await update(project, session)
-        return response(None, "Project updated succesfully")
+    if not project:
+        raise ProjectNotFoundException()
 
-    raise ProjectNotFoundException()
+    # update old data
+    new_project_data = updated_project.dict(exclude_unset=True)
+    required_skills = new_project_data.pop("required_skills", [])
+    user_ids = new_project_data.pop("users", [])
+
+    for key, value in new_project_data.items():
+        setattr(project, key, value)
+    await update(project, session)
+
+    # remove old skills and users
+    old_skills = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(id), session=session)
+    for skill in old_skills:
+        await session.delete(skill)
+
+    old_users = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(id), session=session)
+    for user in old_users:
+        await session.delete(user)
+
+    await session.commit()
+
+    # add new skills and users
+    skills = [ProjectRequiredSkill(project=project,
+                                   skill_name=required_skill["skill_name"],
+                                   number=required_skill["number"])
+              for required_skill in required_skills]
+    await update_all(skills, session=session)
+
+    users = [ProjectCoach(project_id=project.id, coach_id=user_id) for user_id in user_ids]
+    await update_all(users, session=session)
+
+    return response(None, "Project updated succesfully")
