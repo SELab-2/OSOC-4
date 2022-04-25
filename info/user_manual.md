@@ -9,28 +9,28 @@
 [4.3. Local installation](#43-local-installation) \
 [4.4. Automatic deployment](#44-automatic-deployment)
 
-#### [5. Further development & Testing](#7-further-development-&-testing-1)
+#### [5. Further development & Testing](#5-further-development-&-testing-1)
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
-#### [7. Description of the main product elements](#4-description-of-the-main-product-elements-1)
+#### [7. Description of the main product elements](#7-description-of-the-main-product-elements-1)
 
-[7.1. Domain Model](#41-domain-model) \
-[7.1.1. User](#411-user) \
-[7.1.2. Project](#412-project) \
-[7.1.3. Edition](#413-edition) \
-[7.1.4. Skill](#414-skill) \
-[7.1.5. Question](#415-question) \
-[7.1.6. Answer](#416-answer) \
-[7.1.7. QuestionAnswer](#417-questionanswer) \
-[7.1.8. Student](#418-student) \
-[7.1.9. Suggestion](#419-suggestion) \
-[7.1.10. Participation](#4110-participation) \
-[7.1.11. Default_email](#4111-default_email)
+[7.1. Domain Model](#71-domain-model) \
+[7.1.1. User](#711-user) \
+[7.1.2. Project](#712-project) \
+[7.1.3. Edition](#713-edition) \
+[7.1.4. Skill](#714-skill) \
+[7.1.5. Question](#715-question) \
+[7.1.6. Answer](#716-answer) \
+[7.1.7. QuestionAnswer](#717-questionanswer) \
+[7.1.8. Student](#718-student) \
+[7.1.9. Suggestion](#719-suggestion) \
+[7.1.10. Participation](#7110-participation) \
+[7.1.11. Default_email](#7111-default_email)
 
-#### [8. Description of the user interface and common use cases](#5-description-of-the-user-interface-and-common-use-cases-1)
+#### [8. Description of the user interface and common use cases](#8-description-of-the-user-interface-and-common-use-cases-1)
 
-[8.1. Login screen](#51-login-screen)
+[8.1. Login screen](#81-login-screen)
 
 
 
