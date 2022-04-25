@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import QuestionTag from "./QuestionTag";
 import {api, Url} from "../../utils/ApiClient";
 import { Form, Button } from 'react-bootstrap';
+import LoadingPage from "../LoadingPage";
 
 /**
  * This component displays a settings-screen where you can manage the question tags for an edition
@@ -45,6 +46,10 @@ export default function QuestionTags() {
             questionTags[index] = newurl;
         }
         setQuestionTags([...questionTags]);
+    }
+
+    if (loading) {
+        return (<LoadingPage/>)
     }
 
     return (

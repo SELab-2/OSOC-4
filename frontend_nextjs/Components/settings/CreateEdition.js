@@ -31,14 +31,11 @@ import {api, Url} from "../../utils/ApiClient";
     }
 
     /**
-     * This function makes a patch request to the api with the new password of the user
+     * This function makes a post request to the api to create a new edition
      * @param event
      */
     async function handleSubmitChange(event){
         event.preventDefault()
-        // console.log(editionYear);
-        // console.log(editionName);
-        // console.log(editionDescription);
         let body = {
             "year": editionYear,
             "name": editionName,
