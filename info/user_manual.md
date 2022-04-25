@@ -42,12 +42,12 @@
 
 
 ## 1. Introduction
-In this manual we'll explain everything there is to explain about the OSOC selection tool we've created. Going from installation and configuration, to usage of the version 1 selection tool. And we'll even go as far as showing you how to further develop this handy tool.
+In this manual we'll explain everything there is to explain about the OSOC selection tool we've created. Going from installation and configuration, to usage of the selection tool. And we'll even go as far as showing you how to further develop this tool.
 
 
 
 ## 2. Product information
-This manual concerns the Open Summer Of Code Selection tool, version 1.
+This manual concerns the Open Summer Of Code Selection tool, version 2.
 
 
 
@@ -92,6 +92,14 @@ If you want to run docker without sudo, we recommend you check here: https://doc
 ### 4.3. Local installation
 
 You first need to clone the repository that contains the code for the selection tool:
+
+_with SSH, recommended_
+```
+git clone git@github.com:SELab-2/OSOC-4.git OSOC-selection-tool
+cd OSOC-selection-tool
+```
+
+_with HTTPS_
 ```
 git clone https://github.com/SELab-2/OSOC-4.git OSOC-selection-tool
 cd OSOC-selection-tool
@@ -99,14 +107,8 @@ cd OSOC-selection-tool
 
 Now you need to start the application:
 ```
-docker-compose up -d
-```
-
-If you made some changes to the code, it is important that you rebuild, use the following command for that:
-```
 docker-compose up -d --build
 ```
-
 
 If you want to restart all services you can use:
 ```
