@@ -160,7 +160,7 @@ an easily reproducible deployment. We have a seperate container for the
 database (PostgreSQL), the Redis, the backend (FastAPI) and the frontend (Next.js). This allows us to develop and scale
 each part of our application separately.
 
-![Architecture](architecture_and_design/conatainers.svg)
+![Architecture](architecture_and_design/containers.svg)
 
 The design of our application is a very standard client-server architecture. A frontend is
 used to access a backend, both of which are deployed on a server (as shown above). The frontend is
