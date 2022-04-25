@@ -59,7 +59,9 @@ The tool is intended to be (and made to be) used by the selection-team of OSOC. 
 ## 4. Installation guide
 
 ### 4.1. Configuration
-While developing or before installing you can use your own environment variables by using a .env file in the backend directory of the application. It should look like this:
+While developing or before installing you can use your own environment variables by using a .env file in the backend and/or frontend directory of the application. 
+
+An example .env file for the backend directory of the application (IP-addresses may need to be changed):
 ```
 # Mongo
 MONGO_URL=192.168.0.102
@@ -82,6 +84,16 @@ SENDER_PASSWORD=Justapassword123!
 INVITE_EXPIRE=4320 # in minutes
 PASSWORDRESET_EXPIRE=30 # in minutes
 ```
+
+An example .env file for the frontend directory of the application:
+```
+NEXT_BASE_PATH=""
+NEXTAUTH_URL="http://127.0.0.1:3000/api/auth"
+NEXT_API_URL="http://127.0.0.1:8000"
+NEXT_INTERNAL_API_URL="http://127.0.0.1:8000"
+NODE_ENV="development"  # or production
+```
+
 
 ### 4.2. Requirements
 - Docker (installation guide: https://docs.docker.com/get-docker/)
@@ -142,13 +154,24 @@ backend-api: https://sel2-4.ugent.be/{branchname}/api
 
 
 ## 5. How to further develop & test
+
+## 5.1 Further development
+
+You can find the Swagger API docs on `http://localhost:8000/docs` (change the port if needed). These docs describe what requests you can make to the API (backend), and what type of body the request expects (if a body is needed for that request).
+
+## 5.2 Testing
+
 Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
+Run backend (API) tests:
 ```
 docker-compose -f test-docker-compose.yml up --build -d # this starts the test database and test redis server
 docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unittest discover # This executes the python -m ... command in the backend container
 docker-compose down  # this stops the container again
 ```
+
+Run frontend tests: \
+Tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or yarn `test --watch-all --verbose`.
 
 
 
