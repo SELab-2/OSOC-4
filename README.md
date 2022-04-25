@@ -135,4 +135,6 @@ docker-compose down
 
 #### Frontend
 
-Tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or `yarn test --watch-all --verbose`.
+Unit tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or `yarn test --watch-all --verbose`.
+
+Integration tests can be run using `yarn cypress:headless` or with `yarn cypress` if you want a gui with more details.
