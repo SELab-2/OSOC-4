@@ -3,7 +3,7 @@
 ## Table of contents
 
 - [User manual](info/user_manual.md)
-- [Domain model](info/domain_model/domain_model.svg)
+- [Domain model](info/user_manual.md#41-domain-model)
 - [Deployment scheme](info/deployment/deployment.svg)
 - [How to deploy](#deployment)
 - [How to further develop & test](#development--testing)
