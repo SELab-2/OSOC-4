@@ -264,7 +264,7 @@ _attributes:_ \
 **type**: the type of question
 
 
-#### 4.1.6. Answer
+#### 7.1.6. Answer
 An anwser from the tally form that a student filled in.
 
 Now follows an in depth description of the attributes of an answer.
