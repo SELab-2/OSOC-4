@@ -104,6 +104,7 @@ FRONTEND_URL=https://localhost:3000
 An example .env file for the frontend directory of the application.
 
 ```
+BASE_URL="http://127.0.0.1:3000"
 NEXT_BASE_PATH=""
 NEXTAUTH_URL="http://127.0.0.1:3000/api/auth"
 NEXT_API_URL="http://127.0.0.1:8000"

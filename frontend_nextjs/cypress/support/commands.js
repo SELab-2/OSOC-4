@@ -14,8 +14,10 @@
 //
 //
 // -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
+Cypress.Commands.add("notDisabledType", {prevSubject: 'element'}, (subject, text) => {
+    return cy.wrap(subject).focus().should("not.be.disabled").type(text).focus()
+})
+
 //
 // -- This is a dual command --
 // Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
