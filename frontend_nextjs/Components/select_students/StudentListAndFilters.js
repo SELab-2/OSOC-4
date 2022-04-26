@@ -19,6 +19,8 @@ export default function StudentList(props) {
 
   const router = useRouter();
 
+  const listheights = { "emailstudents": "245px", "students": "175px", "projects": "146px" }
+
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
   const [students, setStudents] = useState([]);
@@ -230,8 +232,9 @@ export default function StudentList(props) {
       <Row className="infinite-scroll">
         <InfiniteScroll
           style={{
-            "height": props.category === "emailstudents" ? "calc(100vh - 200px)" : "calc(100vh - 146px)",
-            "position": "relative"
+            "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 146px)",
+            "position": "relative",
+            "transition": "height 0.6s"
           }}
           dataLength={students.length} //This is important field to render the next data
           next={fetchData}
@@ -247,7 +250,6 @@ export default function StudentList(props) {
 
             if (props.category === "emailstudents") {
               return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
-
             } else {
               return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
             }
