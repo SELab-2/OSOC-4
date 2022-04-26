@@ -9,7 +9,10 @@
 [4.3. Local installation](#43-local-installation) \
 [4.4. Automatic deployment](#44-automatic-deployment)
 
-#### [5. How to further develop & test](#5-howt-to-further-develop--test-1)
+#### [5. How to further develop & test](#5-how-to-further-develop--test-1)
+
+[5.1. Further development](#51-further-development)
+[5.2. Testing](#52-testing)
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
@@ -156,13 +159,13 @@ backend-api: https://sel2-4.ugent.be/{branchname}/api
 
 ## 5. How to further develop & test
 
-## 5.1 Further development
+## 5.1. Further development
 
 You can find the Swagger API docs on `http://localhost:8000/docs` (change the port if needed). These docs describe what requests you can make to the API (backend), and what type of body the request expects (if a body is needed for that request).
 
 If find yourself in doubt where to find something, take a look at the [directory structure](#62-directory-structure).
 
-## 5.2 Testing
+## 5.2. Testing
 
 Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
