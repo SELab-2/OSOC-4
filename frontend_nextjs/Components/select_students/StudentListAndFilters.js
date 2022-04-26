@@ -87,7 +87,7 @@ export default function StudentList(props) {
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, search, sortby])
 
 
   const updateDetailsFromWebsocket = (event) => {
