@@ -9,7 +9,7 @@
 [4.3. Local installation](#43-local-installation) \
 [4.4. Automatic deployment](#44-automatic-deployment)
 
-#### [5. How to further develop & test](#5-howt-to-further-development--test-1)
+#### [5. How to further develop & test](#5-howt-to-further-develop--test-1)
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
