@@ -11,7 +11,7 @@
 
 #### [5. How to further develop & test](#5-how-to-further-develop--test-1)
 
-[5.1. Further development](#51-further-development)
+[5.1. Further development](#51-further-development) \
 [5.2. Testing](#52-testing)
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
