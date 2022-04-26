@@ -13,8 +13,9 @@ import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
 import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
+import EmailStudentListElement from "../email-students/EmailStudentListelement"
 
-export default function StudentListAndFilters(props) {
+export default function StudentList(props) {
 
   const router = useRouter();
 
@@ -29,13 +30,6 @@ export default function StudentListAndFilters(props) {
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
 
-  const [localFilters, setLocalFilters] = useState([0, 0, 0]);
-
-  // These constants represent the filters
-  const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
-  (router.query.skills) ? router.query.skills.split(",") : [],
-  (router.query.decision) ? router.query.decision.split(",") : []]
-
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
 
@@ -43,6 +37,11 @@ export default function StudentListAndFilters(props) {
 
   const { websocketConn } = useWebsocketContext();
 
+  useEffect(() => {
+    if (props.category === "emailstudents") {
+      props.setStudents([...students.map(student => student.id), ...studentUrls])
+    }
+  }, [students, studentUrls])
 
   useEffect(() => {
 
@@ -70,11 +69,12 @@ export default function StudentListAndFilters(props) {
 
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
-          { decision: router.query.decision || "",
-          search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }
+          {
+            decision: router.query.decision || "",
+            search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || ""
+          }
         ).get().then(res => {
           if (res.success) {
-            setLocalFilters([0, 0, 0]);
             let p1 = res.data.slice(0, 10);
             let p2 = res.data.slice(10);
             setStudentUrls(p2);
@@ -82,13 +82,12 @@ export default function StudentListAndFilters(props) {
               cache.getStudent(studentUrl, session["userid"])
             )).then(newstudents => {
               setStudents([...newstudents]);
-              setLocalFilters([0, 0, 0]);
             })
           }
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, search, sortby])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -196,23 +195,19 @@ export default function StudentListAndFilters(props) {
   }
 
   return [
-    ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
-      <Col md="auto" key="studentFilters">
-        <StudentsFilters students={students} filters={filters} />
-      </Col>
-      :
-      <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
-        <StudentsFilters students={students} filters={filters} />
-      </CheeseburgerMenu>
+    !((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
+    <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
+      <StudentsFilters />
+    </CheeseburgerMenu>
     ,
 
-    (width > 800 || (!props.studentId && props.studentsTab)) &&
+    (width > 800 || (!router.query.studentId && props.studentsTab)) &&
 
     <div className={(props.studentsTab) ? "col nomargin student-list-positioning" :
-      ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
+      ((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) ?
         "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
       <Row className="nomargin">
-        {!((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) &&
+        {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
           <Col md="auto">
             <div className="hamburger">
               <HamburgerMenu
@@ -235,7 +230,7 @@ export default function StudentListAndFilters(props) {
       <Row className="infinite-scroll">
         <InfiniteScroll
           style={{
-            "height": "calc(100vh - 146px)",
+            "height": props.category === "emailstudents" ? "calc(100vh - 200px)" : "calc(100vh - 146px)",
             "position": "relative"
           }}
           dataLength={students.length} //This is important field to render the next data
@@ -248,11 +243,16 @@ export default function StudentListAndFilters(props) {
             </p>
           }
         >
-          {students.map((i, index) => (
+          {students.map((i, index) => {
 
-            <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={index} student={i} studentsTab={props.studentsTab} />
+            if (props.category === "emailstudents") {
+              return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
 
-          ))}
+            } else {
+              return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
+            }
+
+          })}
         </InfiniteScroll>
       </Row>
     </div>
