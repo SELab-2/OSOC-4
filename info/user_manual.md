@@ -241,7 +241,6 @@ OSOC-selection-tool/                   root of the repository
 │   └── redis                          Redis data
 ├── frontend_nextjs                    directory containing the frontend of the application (Next.js)
 │   ├── Dockerfile                     dockerfile for the frontend
-│   ├── DevDockerfile                  
 │   ├── Components                     directory containing all components used to build pages
 │   ├── pages                          directory containing all pages (if a page has the name "settings.js" then "/settings" will be a route
 │   ├── public                         
