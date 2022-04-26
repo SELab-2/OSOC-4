@@ -77,10 +77,10 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     project = Project(
         name="Student Volunteer Project",
-        goals="Free\nReal\nEstate",
+        goals="Teach students about creating open source projects",
         description="Free real estate",
         partner_name="UGent",
-        partner_description="De C in UGent staat voor communicatie",
+        partner_description="Universiteit Gent",
         coaches=coaches[:2],
         edition=edition.year)
 
@@ -95,7 +95,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         goals="Goal 1\nGoal 2",
         description="Hackers & Cyborgs",
         partner_name="HoGent",
-        partner_description="Like UGent but worse",
+        partner_description="Hogeschool Gent",
         coaches=coaches[2:],
         edition=edition.year)
     await update(project, session)
