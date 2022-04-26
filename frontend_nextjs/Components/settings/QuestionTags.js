@@ -20,29 +20,19 @@ export default function QuestionTags(props) {
 
     useEffect(() => {
         Url.fromName(api.editions_questiontags).get().then(res => {
-            if (res.success) {
-                Promise.all(res.data.map(url => Url.fromUrl(url).get())).then(
-                  resq => {
-                      let newQuestionTags = resq;
-                      for (let i = 0; i < newQuestionTags.length; i ++) {
-                          newQuestionTags[i] = newQuestionTags[i]["data"];
-                          newQuestionTags[i]["url"] = res.data[i];
-                      }
-                      setQuestionTags(newQuestionTags);
-                  }
-                )
-            }})
+          if (res.success) {
+            Promise.all(res.data.map(url => Url.fromUrl(url).get())).then(
+              resq => {
+                let newQuestionTags = resq;
+                for (let i = 0; i < newQuestionTags.length; i ++) {
+                  newQuestionTags[i] = newQuestionTags[i]["data"];
+                  newQuestionTags[i]["url"] = res.data[i];
+                }
+                setQuestionTags(newQuestionTags);
+              }
+            )
+          }});
     }, []);
-  
-  useEffect(() => {
-        if (props.reload) {
-            setLoading(true);
-            Url.fromName(api.editions_questiontags).get().then(res => {
-                if (res.success) {
-                    setQuestionTags(res.data);
-                }}).then(() => setLoading(false));
-        }
-    }, [props.reload]);
 
     function handleNewTagChange(ev) {
         let newQuestionTagAdj = {...newQuestionTag};
@@ -85,10 +75,6 @@ export default function QuestionTags(props) {
             newQuestionTags[index]["url"] = newUrl;
         }
         setQuestionTags(newQuestionTags);
-    }
-
-    if (loading) {
-        return (<LoadingPage/>)
     }
 
     return (

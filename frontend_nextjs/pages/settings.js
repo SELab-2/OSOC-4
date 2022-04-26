@@ -16,6 +16,7 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import EditionSettings from "../Components/settings/EditionSettings";
 import LoadingPage from "../Components/LoadingPage";
+import QuestionTags from "../Components/settings/QuestionTags";
 
 
 /**
@@ -110,6 +111,17 @@ function Settings() {
                             </div>
                         </AccordionBody>
                     </AccordionItem>) : null}
+
+                <AccordionItem eventKey="5">
+                    <AccordionHeader>
+                        <h3>Question Tags</h3>
+                    </AccordionHeader>
+                    <AccordionBody>
+                        <div className="question-tags-settings">
+                            <QuestionTags />
+                        </div>
+                    </AccordionBody>
+                </AccordionItem>
 
             </Accordion>
 
