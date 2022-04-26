@@ -13,7 +13,7 @@
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
-[6.1. Architecture and Design](#61-architecture-and-design)
+[6.1. Architecture and Design](#61-architecture-and-design) \
 [6.2. Directory structure](#62-directory-structure)
 
 #### [7. Description of the main product elements](#7-description-of-the-main-product-elements-1)
