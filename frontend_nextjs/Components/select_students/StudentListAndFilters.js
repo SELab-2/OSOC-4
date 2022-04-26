@@ -13,6 +13,8 @@ import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
 import { WebsocketContext } from "../Auth"
 import LoadingPage from "../LoadingPage"
+import EmailStudentsListAndFilters from "../email-students/EmailStudentsListAndFilters";
+
 
 export default function StudentListAndFilters(props) {
 
@@ -75,8 +77,8 @@ export default function StudentListAndFilters(props) {
         ).get().then(res => {
           if (res.success) {
             setLocalFilters([0, 0, 0]);
-            let p1 = res.data.slice(0, 10);
-            let p2 = res.data.slice(10);
+            let p1 = res.data.slice(0, 20);
+            let p2 = res.data.slice(20);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl =>
               cache.getStudent(studentUrl, session["userid"])
@@ -142,8 +144,8 @@ export default function StudentListAndFilters(props) {
             if (foundstudent === -1) {
               foundstudent = lastindex;
             }
-            if (foundstudent < 10) {
-              foundstudent = 10;
+            if (foundstudent < 20) {
+              foundstudent = 20;
             }
             let p1 = res.data.slice(0, foundstudent);
             let p2 = res.data.slice(foundstudent);
@@ -162,8 +164,8 @@ export default function StudentListAndFilters(props) {
       } else {
         Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
           if (res.success) {
-            let p1 = res.data.slice(0, 10);
-            let p2 = res.data.slice(10);
+            let p1 = res.data.slice(0, 20);
+            let p2 = res.data.slice(20);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl => {
               // get the student from the cache + update the decision (needed when cache updated later than studentlis)
@@ -184,8 +186,8 @@ export default function StudentListAndFilters(props) {
 
   const fetchData = () => {
 
-    let p1 = studentUrls.slice(0, 10);
-    let p2 = studentUrls.slice(10);
+    let p1 = studentUrls.slice(0, 20);
+    let p2 = studentUrls.slice(20);
 
     Promise.all(p1.map(studentUrl =>
       cache.getStudent(studentUrl, session["userid"])
@@ -195,11 +197,15 @@ export default function StudentListAndFilters(props) {
     })
   }
 
+  if (props.emailStudents) {
+    return (
+      <EmailStudentsListAndFilters students={students} studentUrls={studentUrls} fetchData={fetchData} filters={filters}/>
+    )
+  }
+
   return [
     ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
-      <Col md="auto" key="studentFilters">
-        <StudentsFilters students={students} filters={filters} />
-      </Col>
+      <StudentsFilters students={students} filters={filters} key="studentsFilters"/>
       :
       <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
         <StudentsFilters students={students} filters={filters} />

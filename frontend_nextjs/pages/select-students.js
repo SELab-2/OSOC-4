@@ -14,7 +14,7 @@ export default function SelectStudents() {
     const router = useRouter();
 
     return (
-        <Row>
+        <Row className="nomargin screen-content-row">
             <StudentListAndFilters studentsTab={true} studentId={router.query.studentId} />
             {
                 (router.query.studentId) &&

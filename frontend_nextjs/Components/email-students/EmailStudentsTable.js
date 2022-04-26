@@ -19,7 +19,7 @@ export default function EmailStudentsTable(props) {
     <Col className="nomargin">
       <InfiniteScroll
         style={{
-          "height": "calc(100vh - 240px)",
+          "height": "calc(100vh - 244px)",
           "position": "relative"
         }}
         dataLength={props.students.length} //This is important field to render the next data

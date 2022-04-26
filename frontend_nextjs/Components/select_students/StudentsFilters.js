@@ -99,7 +99,7 @@ export default function StudentsFilters(props) {
       }
 
       return shownSkills.map((skill, index) =>
-        <StudentsFilter filter_id={skill} filter_text={skill}
+        <StudentsFilter key={skill} filter_id={skill} filter_text={skill}
           value={chosenSkills.includes(skill)}
           onChange={(ev) => addFilter("skills", chosenSkills, skill, ev.target.checked)} />
       );
@@ -160,18 +160,18 @@ export default function StudentsFilters(props) {
         </Col>
       </Row>
 
-      <StudentsFilter filter_id="alumni_checkbox" filter_text="Only alumni" value={filters.includes("alumn")}
+      <StudentsFilter key="alumni" filter_id="alumni_checkbox" filter_text="Only alumni" value={filters.includes("alumn")}
         onChange={(ev) => addFilter("filters", filters, "alumn", ev.target.checked)} />
-      <StudentsFilter filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers"
+      <StudentsFilter key="student-coach" filter_id="student-coach-volunteers-checkbox" filter_text="Only student coach volunteers"
         value={filters.includes("student-coach")}
         onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)} />
-      <StudentsFilter filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for"
+      <StudentsFilter key="not suggested" filter_id="only-not-suggested-checkbox" filter_text="Only students you haven't suggested for"
         value={filters.includes("not-suggested")}
         onChange={(ev) => addFilter("filters", filters, "not-suggested", ev.target.checked)} />
-      <StudentsFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
+      <StudentsFilter key="unmatched-students" filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
         value={filters.includes("unmatched")}
         onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)} />
-      <StudentsFilter filter_id="practical-problems-checkbox" filter_text="Only students without practical problems"
+      <StudentsFilter key="practical-problems" filter_id="practical-problems-checkbox" filter_text="Only students without practical problems"
         value={filters.includes("practical-problems")}
         onChange={(ev) => addFilter("filters", filters, "practical-problems", ev.target.checked)} />
 
