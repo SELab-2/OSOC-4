@@ -9,15 +9,15 @@ import EmailStudentsFilters from "./EmailStudentsFilters";
 import SearchSortBar from "../select_students/SearchSortBar";
 import SendEmailsPopUpWindow from "./SendEmailsPopUpWindow";
 
-export default function EmailStudentsListAndFilters(props) {
+export default function StudentList(props) {
 
   const router = useRouter();
 
   // check if authorized
-  const [role, setRole] = useState(0);
+  const [role, setRole] = useState(undefined);
 
   useEffect(() => {
-    if (role === 0 ) {
+    if (! role ) {
       Url.fromName(api.me).get().then(res => {
         if (res.success) {
           res = res.data.data;
@@ -34,9 +34,11 @@ export default function EmailStudentsListAndFilters(props) {
   // These constants are initialized empty, the data will be inserted in useEffect
   const [receivers, setReceivers] = useState(undefined);
 
-
+  if (!role) {
+    return <LoadingPage />;
+  }
   if (role !== 2) {
-    return (<h1>Unauthorized</h1>)
+    return (<h1>Unauthorized</h1>);
   }
 
   /**
@@ -75,29 +77,15 @@ export default function EmailStudentsListAndFilters(props) {
     <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
                            students={receivers} />,
 
-    <EmailStudentsFilters key="EmailStudentsFilters" students={props.students} filters={props.filters} />,
-
-    <Col key="EmailStudentsList" className="fill_height students-list-paddingtop">
-      <Row className="nomargin searchbar-margin">
-        <Col><SearchSortBar /></Col>
-        <Col md="auto" className="change-emails-positioning">
-          <Button className="btn-secondary change-emails-button"
-                  onClick={() => router.push(getChangeDefaultEmailsPath())}>
-            Change default emails
-          </Button>
-        </Col>
-      </Row>
-      <Row className="email-list-positioning">
-        {getEmailStudentsTable()}
-      </Row>
-      <Row className="send-emails-positioning">
-        <Col/>
-        <Col md="auto">
-          <Button className="send-emails-button" disabled={! receivers || ! receivers.length}
-                  onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button>
-        </Col>
-      </Row>
-    </Col>
-
+    <Row className="email-list-positioning">
+      {getEmailStudentsTable()}
+    </Row>,
+    <Row className="send-emails-positioning">
+      <Col/>
+      <Col md="auto">
+        <Button className="send-emails-button" disabled={! receivers || ! receivers.length}
+                onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button>
+      </Col>
+    </Row>
   ]
 }

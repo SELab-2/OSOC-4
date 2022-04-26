@@ -1,22 +1,30 @@
-import { Col, Row } from "react-bootstrap";
-import StudentsFilters from "./StudentsFilters";
+import {Button, Col, Row} from "react-bootstrap";
+import StudentsFilters from "./select_students/StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
 import HamburgerMenu from "react-hamburger-menu";
-import SearchSortBar from "./SearchSortBar";
-import InfiniteScroll from "react-infinite-scroll-component";
-import StudentListelement from "./StudentListelement";
+import SearchSortBar from "./select_students/SearchSortBar";
 import React, { useEffect, useContext, useState } from "react";
-import useWindowDimensions from "../../utils/WindowDimensions";
-import { api, Url } from "../../utils/ApiClient";
+import useWindowDimensions from "../utils/WindowDimensions";
+import { api, Url } from "../utils/ApiClient";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { cache } from "../../utils/ApiClient"
-import { WebsocketContext } from "../Auth"
-import LoadingPage from "../LoadingPage"
-import EmailStudentsListAndFilters from "../email-students/EmailStudentsListAndFilters";
+import { cache } from "../utils/ApiClient"
+import { WebsocketContext } from "./Auth"
+import StudentsList from "./select_students/StudentList";
+import EmailStudentsList from "./email-students/EmailStudentsList"
+import EmailStudentsFilters from "./email-students/EmailStudentsFilters";
+import {getChangeDefaultEmailsPath} from "../routes";
+import * as PropTypes from "prop-types";
 
 
-export default function StudentListAndFilters(props) {
+
+EmailStudentsList.propTypes = {
+  fetchData: PropTypes.func,
+  students: PropTypes.arrayOf(PropTypes.any),
+  studentUrls: PropTypes.arrayOf(PropTypes.any),
+  filters: PropTypes.arrayOf(PropTypes.any)
+};
+export default function StudentListComponent(props) {
 
   const router = useRouter();
 
@@ -35,8 +43,8 @@ export default function StudentListAndFilters(props) {
 
   // These constants represent the filters
   const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
-  (router.query.skills) ? router.query.skills.split(",") : [],
-  (router.query.decision) ? router.query.decision.split(",") : []]
+    (router.query.skills) ? router.query.skills.split(",") : [],
+    (router.query.decision) ? router.query.decision.split(",") : []]
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
@@ -64,7 +72,8 @@ export default function StudentListAndFilters(props) {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will
       // provoke the second part of useEffect to filter the students again.
-      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills)) {
+      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) ||
+        (router.query.decision !== decisions) || (router.query.skills !== skills)) {
         setSearch(router.query.search);
         setSortby(router.query.sortby);
         setDecisions(router.query.decision);
@@ -73,7 +82,7 @@ export default function StudentListAndFilters(props) {
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
           { decision: router.query.decision || "",
-          search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }
+            search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }
         ).get().then(res => {
           if (res.success) {
             setLocalFilters([0, 0, 0]);
@@ -90,7 +99,8 @@ export default function StudentListAndFilters(props) {
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision,
+    search, sortby, localFilters, filters])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -137,7 +147,10 @@ export default function StudentListAndFilters(props) {
 
         console.log("getting new urls")
         // get the new studenturls
-        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams(
+          { decision: router.query.decision || "", search: router.query.search || "",
+            orderby: router.query.sortby || "", skills: router.query.skills || "" }
+        ).get().then(res => {
           if (res.success) {
             // find the index of the laststudent in the new url list
             let foundstudent = res.data.indexOf(laststudent.id)
@@ -151,28 +164,31 @@ export default function StudentListAndFilters(props) {
             let p2 = res.data.slice(foundstudent);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl => {
-              // get the student from the cache + update the decision (needed when cache updated later than studentlis)
-              let student = cache.getStudent(studentUrl, session["userid"])
-              student["decision"] = data["decision"]["decision"];
-              return student;
-            }
+                // get the student from the cache + update the decision (needed when cache updated later than studentlis)
+                let student = cache.getStudent(studentUrl, session["userid"])
+                student["decision"] = data["decision"]["decision"];
+                return student;
+              }
             )).then(newstudents => {
               setStudents([...newstudents]);
             })
           }
         });
       } else {
-        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams(
+          { decision: router.query.decision || "", search: router.query.search || "",
+            orderby: router.query.sortby || "", skills: router.query.skills || "" }
+        ).get().then(res => {
           if (res.success) {
             let p1 = res.data.slice(0, 20);
             let p2 = res.data.slice(20);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl => {
-              // get the student from the cache + update the decision (needed when cache updated later than studentlis)
-              let student = cache.getStudent(studentUrl, session["userid"])
-              student["decision"] = data["decision"]["decision"];
-              return student;
-            }
+                // get the student from the cache + update the decision (needed when cache updated later than studentlis)
+                let student = cache.getStudent(studentUrl, session["userid"])
+                student["decision"] = data["decision"]["decision"];
+                return student;
+              }
 
             )).then(newstudents => {
               setStudents([...newstudents]);
@@ -197,15 +213,11 @@ export default function StudentListAndFilters(props) {
     })
   }
 
-  if (props.emailStudents) {
-    return (
-      <EmailStudentsListAndFilters students={students} studentUrls={studentUrls} fetchData={fetchData} filters={filters}/>
-    )
-  }
-
   return [
     ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
-      <StudentsFilters students={students} filters={filters} key="studentsFilters"/>
+      (props.emailStudents)?
+        <EmailStudentsFilters key="EmailStudentsFilters" students={students} filters={filters} /> :
+        <StudentsFilters key="StudentsFilters" students={students} filters={filters} />
       :
       <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
         <StudentsFilters students={students} filters={filters} />
@@ -237,30 +249,22 @@ export default function StudentListAndFilters(props) {
 
         }
         <Col><SearchSortBar /></Col>
-      </Row>
-      <Row className="infinite-scroll">
-        <InfiniteScroll
-          style={{
-            "height": "calc(100vh - 146px)",
-            "position": "relative"
-          }}
-          dataLength={students.length} //This is important field to render the next data
-          next={fetchData}
-          hasMore={studentUrls.length > 0}
-          loader={<LoadingPage />}
-          endMessage={
-            <p style={{ textAlign: 'center' }}>
-              <b>Yay! You have seen it all</b>
-            </p>
-          }
-        >
-          {students.map((i, index) => (
+        {(props.emailStudents) &&
+          <Col md="auto" className="change-emails-positioning">
+            <Button className="btn-secondary change-emails-button"
+            onClick={() => router.push(getChangeDefaultEmailsPath())}>
+            Change default emails
+            </Button>
+          </Col>
+        }
 
-            <StudentListelement key={index} student={i} studentsTab={props.studentsTab} />
-
-          ))}
-        </InfiniteScroll>
       </Row>
+
+      {(props.emailStudents) ?
+        <EmailStudentsList students={students} studentUrls={studentUrls} fetchData={fetchData} filters={filters}/> :
+        <StudentsList students={students} studentUrls={studentUrls} fetchData={fetchData} filters={filters}/>
+      }
+
     </div>
 
   ]

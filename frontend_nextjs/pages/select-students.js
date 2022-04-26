@@ -2,8 +2,9 @@ import React from "react";
 import { Col, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
-import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
+import StudentList from "../Components/select_students/StudentList";
 import { useSession } from "next-auth/react";
+import StudentListComponent from "../Components/StudentListComponent";
 
 
 /**
@@ -15,7 +16,7 @@ export default function SelectStudents() {
 
     return (
         <Row className="nomargin screen-content-row">
-            <StudentListAndFilters studentsTab={true} studentId={router.query.studentId} />
+            <StudentListComponent emailStudents={false} studentsTab={true} studentId={router.query.studentId} />
             {
                 (router.query.studentId) &&
                 (<Col>

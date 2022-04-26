@@ -2,8 +2,9 @@ import React, {useState} from "react";
 import {Button, Col, Row} from "react-bootstrap";
 import Image from 'next/image'
 import ProjectsList from "../Components/projects/ProjectsList";
-import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
+import StudentList from "../Components/select_students/StudentList";
 import matchIcon from "/public/assets/arrow-right-svgrepo-com.svg"
+import StudentListComponent from "../Components/StudentListComponent";
 
 export default function Projects() {
 
@@ -12,7 +13,8 @@ export default function Projects() {
   return(
       <>
           <Row className="remaining_height fill_width">
-              <StudentListAndFilters students={students} setStudents={setStudents} studentsTab={false} studentId={undefined}/>
+              <StudentListComponent students={students} emailStudents={false} setStudents={setStudents}
+                                    studentsTab={false} studentId={undefined}/>
               <Col md="auto" className="nomargin">
                   <div style={{paddingTop: "40vh"}} className="fill_height">
                       <div className="button-match-student-project">

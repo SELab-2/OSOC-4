@@ -14,7 +14,7 @@ export default function EmailStudentsFilters(props) {
   const router = useRouter();
 
   const filters = props.filters[0];
-  const decision = props.filters[1];
+  const decision = props.filters[2];
 
   /***
    * This function is called when pressed on the 'reset filters' button, it resets the filters to their original value,
