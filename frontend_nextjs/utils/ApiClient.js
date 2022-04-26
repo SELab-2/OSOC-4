@@ -101,6 +101,7 @@ export class Url {
     /**
      * Makes a GET request to its url
      * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
+     * @param student: denotes whether a studentid is has to be gotten.
      * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
      */
     async get(context = null, student = false) {
@@ -357,7 +358,7 @@ class Cache {
                 console.log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
-                    if (item["suggested_by_id"] == userid) {
+                    if (item["suggested_by_id"] === userid) {
                         res["own_suggestion"] = item;
                     }
                 });
