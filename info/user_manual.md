@@ -13,6 +13,9 @@
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
+[6.1. Architecture and Design](#61-architecture-and-design)
+[6.2. Directory structure](#62-directory-structure)
+
 #### [7. Description of the main product elements](#7-description-of-the-main-product-elements-1)
 
 [7.1. Domain Model](#71-domain-model) \
@@ -174,6 +177,8 @@ Tests can be run once using the command `yarn test`. If you want to run tests in
 
 
 ## 6. Architecture and Design
+
+### 6.1 Architecture and Design
 Now we're going to describe the architecture and design of the OSOC selection tool.
 
 In order to deploy everything, we use Docker. Using containers allows us to have
@@ -198,6 +203,64 @@ database, all operations on the database are defined and controlled by the backe
 
 Something noticable is that the frontend can send back to the reverse proxy (which will only go to the backend) but it can also send requests straight to the backend. This is because of Next.js. Next.js offers multiple ways to render pages, one is just normal client side rendering and the other we use is server side rendering. With client side rendering the requests will need to go through the proxy (Traefik). But when server side rendering is used for a page (there aren't many pages that use this since almost everything needs to update at real time), the request goes straight from the frontend to the backend, thereby skipping the proxy.
 
+
+### 6.2. Directory structure
+```
+OSOC-selection-tool/
+├── LICENSE
+├── README.md
+├── docker-compose.yml
+├── deploy-docker-compose.yml
+├── test-docker-compose.yml
+├── backend
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   ├── app
+│   │   ├── api.py
+│   │   ├── config.py
+│   │   ├── crud.py
+│   │   ├── database.py
+│   │   ├── exceptions
+│   │   ├── models
+│   │   ├── routers
+│   │   ├── tests
+│   │   └── utils
+│   └── TestDockerfile
+├── data
+│   ├── postgres
+│   └── redis
+├── frontend_nextjs
+│   ├── Dockerfile
+│   ├── DevDockerfile
+│   ├── Components
+│   ├── pages
+│   ├── public
+│   │   ├── assets
+│   │   ├── favicon.ico
+│   │   └── vercel.svg
+│   ├── README.md
+│   ├── styles
+│   ├── tests
+│   └── utils
+│       ├── ApiClient.js
+│       ├── logger.js
+│       └── WindowDimensions.js
+└── info
+    ├── domain_model.svg
+    ├── architecture_and_design
+    │   ├── containers.drawio
+    │   ├── containers.svg
+    │   ├── design.drawio
+    │   └── design.svg
+    ├── use-cases
+    │   └── use-cases.md
+    ├── interaction_diagrams
+    │   └── login_diagram.svg
+    ├── screenshots
+    │   └── login_screen.png
+    └── user_manual.md
+
+```
 
 
 ## 7. Description of the main product elements
