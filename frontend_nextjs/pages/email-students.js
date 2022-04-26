@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import useWindowDimensions from "../utils/WindowDimensions";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 
@@ -16,7 +16,12 @@ export default function EmailStudents() {
 
   const selectAll = (event) => {
     console.log("clicked")
-    setSelectedStudents([...students])
+    if (students.length === selectedStudents.length) {
+      setSelectedStudents([])
+    } else {
+      setSelectedStudents([...students])
+    }
+
   }
 
   /**
@@ -32,9 +37,11 @@ export default function EmailStudents() {
         <Col>
           <StudentListAndFilters students={students} setStudents={setStudents} setSelectedStudents={setSelectedStudents} selectedStudents={selectedStudents} studentsTab={false} category="emailstudents" studentId={undefined} />
           <Row style={{ "background-color": "lightgray", "height": "55px" }}>
-            <Col>{selectedStudents.length}/{students.length}</Col>
-            <Col><button onClick={selectAll}>SELECT ALL</button></Col>
-            <Col><button>SEND EMAILS</button></Col>
+            <Col>{selectedStudents.length} / {students.length}</Col>
+            <Col><Button className="send-emails-button"
+              onClick={selectAll}>{selectedStudents.length === students.length ? "Deselect All" : "Select All"}</Button></Col>
+            <Col><Button className="send-emails-button" disabled={!selectedStudents.length}
+              onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button></Col>
           </Row>
         </Col>
       </Row>
