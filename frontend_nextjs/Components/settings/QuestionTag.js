@@ -6,9 +6,14 @@ import Image from "next/image";
 import {Url} from "../../utils/ApiClient";
 
 /**
- * This component displays a settings-screen where you can manage a question tag
- * @param props
- * @returns {JSX.Element}
+ * This component represents a row in the table of question tags. It represents one question tag.
+ * @param props props contains questionTag, questionTags, deleteTag, renameTag, setEdited, edited, setNewQuestionTag,
+ * setErrorMessage. QuestionTag is the object that represents the row's queston tag. questionTags is the list of all
+ * the rendered question tags. deleteTag is a function that needs to be called when deleting the quesion tag. renameTag
+ * is a function that needs to be called when editing the tag name. edited is a state variable that represent the
+ * currently edited questiontag, setEdited edits the variable. setNewQuestionTag is to set the variable that represents
+ * the new question tag when clicking on 'new question tag'. setErrorMessage is used to show an error message.
+ * @returns {JSX.Element} A table row that represents a question tag.
  */
 export default function QuestionTag(props) {
     const [previousTag, setPreviousTag] = useState({});
@@ -20,7 +25,12 @@ export default function QuestionTag(props) {
         setPreviousTag(props.questionTag);
     }, []);
 
-    const handleChange = (event) => {
+  /**
+   * This function is called when the tag name or question are edited. It changes their value in the questionTag
+   * variable.
+   * @param event
+   */
+  const handleChange = (event) => {
         event.preventDefault()
         const { name, value } = event.target;
         setQuestionTag(prevState => ({
@@ -29,7 +39,12 @@ export default function QuestionTag(props) {
         }));
     }
 
-    const handleCheckboxChange = (event) => {
+  /**
+   * This function is called when you click the visibility checkbox. It makes the chosen questiontag
+   * visible/invisible in the select students tab.
+   * @param event The click event on the checkbox
+   */
+  const handleCheckboxChange = (event) => {
         const { name, checked } = event.target;
 
         let newQuestionTag = {...previousTag};
@@ -43,7 +58,11 @@ export default function QuestionTag(props) {
         setQuestionTag(newQuestionTag);
     }
 
-    const deleteTag = (event) => {
+  /**
+   * This function is called when you click the delete button of a question tag. It deletes the question tag.
+   * @param event The click event on the checkbox
+   */
+  const deleteTag = (event) => {
         event.preventDefault();
         Url.fromUrl(questionTag["url"]).delete().then(res => {
             if (res.success) {
@@ -52,7 +71,12 @@ export default function QuestionTag(props) {
         })
     }
 
-    const handleSubmit = (event) => {
+  /**
+   * This function is called when you click the save button of a question tag. First it checks or the tag and question
+   * are not empty en unique. If they are, The new questiontag is patched.
+   * @param event
+   */
+  const handleSubmit = (event) => {
         event.preventDefault();
       let requirements = [questionTag["tag"].length > 0,
         props.questionTags.every(qt => qt["tag"] !== questionTag["tag"] || qt["url"] === questionTag["url"]),
@@ -74,7 +98,10 @@ export default function QuestionTag(props) {
         }
     }
 
-    return (
+  /**
+   * return the html that renders a question tag in the question tags table.
+   */
+  return (
       <tr key={props.questionTag["url"]}>
           <td>
               {(questionTag["mandatory"] || ! props.edited)? (
