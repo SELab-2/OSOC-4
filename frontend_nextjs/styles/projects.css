@@ -7,7 +7,13 @@
 .project-card{
 }
 
+.project-card-selected{
+    border: 2px solid var(--yes_green_45);
+    margin: -1px;
+}
+
 .project-card-div{
+    padding: 0;
     margin-top: 15px;
 }
 
@@ -60,4 +66,9 @@
 
 .project-show-detail{
     cursor: pointer;
+}
+
+.button-match-student-project {
+     cursor: pointer;
+    border: none;
 }

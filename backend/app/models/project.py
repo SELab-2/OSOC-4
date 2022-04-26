@@ -53,10 +53,11 @@ class ProjectCreate(BaseModel):
     name: str
     description: str
     goals: str
-    # required_skills: List[RequiredSkills]
+    required_skills: List[RequiredSkillOut]
     partner_name: str
     partner_description: str
     edition: int
+    users: List[int]
 
 
 class ProjectOutSimple(BaseModel):

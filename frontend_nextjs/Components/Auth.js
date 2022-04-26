@@ -1,28 +1,25 @@
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import LoadingPage from "../Components/LoadingPage"
 import NavHeader from "../Components/NavHeader"
 import { Container } from "react-bootstrap";
 import { cache } from "../utils/ApiClient";
-
-
-export const WebsocketContext = React.createContext(undefined)
+import { useWebsocketContext } from './WebsocketProvider'
 
 export default function RouteGuard(props) {
     const router = useRouter()
     const { data: session, status, token } = useSession()
     const isUser = !!session?.user && session?.error !== "RefreshAccessTokenError"
-    const ws = useContext(WebsocketContext);
+    const { websocketConn, handleWebsocket } = useWebsocketContext();
     const [creatingConnection, setCreatingConnection] = useState(false)
-    const [webconn, setWebconn] = useState(undefined)
 
     useEffect(() => {
         if (status === 'loading') return // Do nothing while loading
         if (props.auth && !isUser) {
             router.push('/login') //Redirect to login
-        } else if (isUser && props.auth && !ws && !creatingConnection) {
-            // make a websocket connection    
+        } else if (isUser && props.auth && !websocketConn && !creatingConnection) {
+            // make a websocket connection
             setCreatingConnection(true)
             let newwebconn = new WebSocket((process.env.NEXT_API_URL + "/ws").replace("http", "ws").replace("https", "ws"))
             newwebconn.addEventListener("message", (event) => {
@@ -30,12 +27,12 @@ export default function RouteGuard(props) {
             })
             newwebconn.onopen = (event) => {
                 setCreatingConnection(false)
-                setWebconn(newwebconn);
+                handleWebsocket(newwebconn);
             }
 
         }
 
-    }, [isUser, status, props.auth, router])
+    }, [router, isUser, props.auth, status, websocketConn])
 
     if (isUser) {
         if (!props.auth) {
@@ -43,12 +40,10 @@ export default function RouteGuard(props) {
         } else {
 
             return (
-                <WebsocketContext.Provider value={webconn}>
-                    <Container fluid>
-                        <NavHeader key="Navbar" className="navheader" />
-                        {props.children}
-                    </Container>
-                </WebsocketContext.Provider>
+                <Container fluid>
+                    <NavHeader key="Navbar" className="navheader" />
+                    {props.children}
+                </Container>
             )
         }
     } else if (!props.auth && !isUser) {

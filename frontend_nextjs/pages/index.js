@@ -3,17 +3,60 @@ import LoadingPage from "../Components/LoadingPage"
 import { api, Url } from "../utils/ApiClient";
 import { Button, Card, Carousel, Table } from "react-bootstrap";
 import Message from "../Components/dashboard/Message";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 
-function Home({ current_edition, students_length, projects_length, messages }) {
+/**
+ * The page corresponding with the 'index' (dashboard) of the application,
+ *  the params are filled in by nextjs from the function defined below (getServerSideProps)
+ * @returns {JSX.Element}
+ */
+function Home() {
   const { data: session } = useSession({ required: true })
   const isUser = session?.user
-  const [newUsers, setNewUsers] = useState(messages.newUsers);
 
+  const [loading, setLoading] = useState(true);
+
+  const [currentEdition, setCurrentEdition] = useState(undefined);
+  const [studentsLength, setStudentsLength] = useState(undefined);
+  const [projectsLength, setProjectsLength] = useState(undefined);
+  const [newUsers, setNewUsers] = useState(undefined);
+
+  useEffect(() => {
+    async function fetch() {
+      await Url.fromName(api.current_edition).get().then(res => {
+        if (res.success) {
+          setCurrentEdition(res.data.name);
+        }
+      });
+      await Url.fromName(api.editions_students).get().then(res => {
+        if (res.success) {
+          setStudentsLength(res.data.length);
+        }
+      });
+      await Url.fromName(api.edition_projects).get().then(res => {
+        if (res.success) {
+          setProjectsLength(res.data.length);
+        }
+      });
+      const users = await Url.fromName(api.users).get();
+      if (users.success) {
+        let usersData = await Promise.all(users.data.map(userData => Url.fromUrl(userData.id).get()));
+        usersData = usersData.filter(resp => resp.success).map(d => d.data.data)
+            .filter(user => user.active && !user.approved);
+        setNewUsers(usersData);
+      }
+      setLoading(false);
+    }
+    fetch();
+  }, []);
 
   const INTERVAL = 3000;
 
-  function showMessages() {
+  /**
+   * returns a list of Elements which are the messages rendered
+   * @returns {unknown[]}
+   */
+  function showNewUsers() {
     if (newUsers.length) {
       return [(<h1 key="newly-joined-users-title">Newly joined users:</h1>), ...newUsers.map((user) => {
         async function approveUser() {
@@ -37,9 +80,12 @@ function Home({ current_edition, students_length, projects_length, messages }) {
           <Button className="user-button-unapproved" onClick={approveUser}>Approve user</Button>
           <Button className="user-button-remove" onClick={deleteUser}>Revoke access</Button>
         </Message>)
-        // <Table><tbody><UserTr isMe={false} key={msg.data.id} user={msg.data} /></tbody></Table>
-      })]
+      })];
     }
+  }
+
+  if (loading) {
+    return (<LoadingPage/>);
   }
 
   if (isUser) {
@@ -50,24 +96,24 @@ function Home({ current_edition, students_length, projects_length, messages }) {
             <h3 className={"index-header"}>Welcome back</h3>
           </Card.Header>
 
-          {(current_edition) ?
+          {(currentEdition) ?
             <Carousel >
 
               <Carousel.Item interval={INTERVAL}>
                 <Card.Body>
-                  <Card.Title className={"index-card-title"}><h1>{current_edition}</h1></Card.Title>
+                  <Card.Title className={"index-card-title"}><h1>{currentEdition}</h1></Card.Title>
                 </Card.Body>
               </Carousel.Item>
 
               <Carousel.Item interval={INTERVAL}>
                 <Card.Body>
-                  <Card.Title className={"index-card-title"}><h1>{projects_length} Projects</h1></Card.Title>
+                  <Card.Title className={"index-card-title"}><h1>{projectsLength} Projects</h1></Card.Title>
                 </Card.Body>
               </Carousel.Item>
 
               <Carousel.Item interval={INTERVAL}>
                 <Card.Body>
-                  <Card.Title className={"index-card-title"}><h1>{students_length} Students</h1></Card.Title>
+                  <Card.Title className={"index-card-title"}><h1>{studentsLength} Students</h1></Card.Title>
                 </Card.Body>
               </Carousel.Item>
 
@@ -78,7 +124,7 @@ function Home({ current_edition, students_length, projects_length, messages }) {
 
         <hr />
 
-        {showMessages()}
+        {showNewUsers()}
 
 
       </>
@@ -90,34 +136,5 @@ function Home({ current_edition, students_length, projects_length, messages }) {
   return <LoadingPage />
 }
 
+
 export default Home
-
-export async function getServerSideProps(context) {
-  let props_out = {}
-  const current_edition = await Url.fromName(api.current_edition).get(context);
-  if (current_edition.success) {
-    props_out["current_edition"] = current_edition.data.name;
-  }
-
-  const students = await Url.fromName(api.editions_students).get(context);
-  if (students.success) {
-    props_out["students_length"] = students.data.length;
-  }
-
-  const projects = await Url.fromName(api.edition_projects).get(context);
-  if (projects.success) {
-    props_out["projects_length"] = projects.data.length;
-  }
-
-  const users = await Url.fromName(api.users).get(context);
-  if (users.success) {
-    let usersData = await Promise.all(users.data.map(userData => Url.fromUrl(userData.id).get(context)));
-    usersData = usersData.filter(resp => resp.success).map(d => d.data.data)
-      .filter(user => user.active && !user.approved);
-    props_out["messages"] = { "newUsers": usersData };
-  }
-
-  return {
-    props: props_out
-  }
-}

@@ -139,11 +139,11 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
     if decision:
         student_query = student_query.where(Student.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
-    if search:
-        student_query = student_query.join(QuestionAnswer).join(Answer)
-        student_query = student_query.where(Answer.answer.ilike("%" + search + "%"))
     if skills:
         student_query = student_query.join(StudentSkill).where(StudentSkill.skill_name.in_(skills.split(",")))
+    if search:
+        student_query = student_query.join(QuestionAnswer).join(Answer)
+        student_query = student_query.where(Answer.answer.ilike("%" + search.replace(" ", "%") + "%"))
 
     ua = aliased(Student, student_query.distinct().subquery())
     res = await session.execute(select(ua.id))

@@ -5,12 +5,13 @@ import {Form, Button, Table} from 'react-bootstrap';
 import Image from "next/image";
 import saveIcon from "../../public/assets/save.svg";
 import deleteIcon from "../../public/assets/delete.svg";
+import LoadingPage from "../LoadingPage";
 
 /**
  * This component displays a settings-screen where you can manage the question tags for an edition
  * @returns {JSX.Element}
  */
-export default function QuestionTags() {
+export default function QuestionTags(props) {
     const [questionTags, setQuestionTags] = useState([]);
 
     const [edited, setEdited] = useState(undefined);
@@ -32,6 +33,16 @@ export default function QuestionTags() {
                 )
             }})
     }, []);
+  
+  useEffect(() => {
+        if (props.reload) {
+            setLoading(true);
+            Url.fromName(api.editions_questiontags).get().then(res => {
+                if (res.success) {
+                    setQuestionTags(res.data);
+                }}).then(() => setLoading(false));
+        }
+    }, [props.reload]);
 
     function handleNewTagChange(ev) {
         let newQuestionTagAdj = {...newQuestionTag};
@@ -74,6 +85,10 @@ export default function QuestionTags() {
             newQuestionTags[index]["url"] = newUrl;
         }
         setQuestionTags(newQuestionTags);
+    }
+
+    if (loading) {
+        return (<LoadingPage/>)
     }
 
     return (
