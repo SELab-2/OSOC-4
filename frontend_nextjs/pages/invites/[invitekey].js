@@ -4,8 +4,7 @@ import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
 import { Form, Button } from 'react-bootstrap';
 import {api, Url} from "../../utils/ApiClient";
-import {log} from "../../utils/logger";
-
+µ
 const Invite = () => {
     const router = useRouter()
     const { invitekey } = router.query
@@ -39,8 +38,9 @@ const Invite = () => {
             "name": name,
         }
         const resp = await Url.fromName(api.invite).extend(`/${invitekey}`).setBody(j).post();
-        if (resp) {
-            await router.push('/login')
+        if (resp.success) {
+            await router.push('/login');
+            alert("You must now wait until an admin allows you to access the application");
         }
     }
 
