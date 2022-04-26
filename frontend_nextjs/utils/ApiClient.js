@@ -101,7 +101,7 @@ export class Url {
     /**
      * Makes a GET request to its url
      * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
-     * @param student: denotes whether a studentid is has to be gotten.
+     * @param student: denotes whether the request was for a student or not.
      * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
      */
     async get(context = null, student = false) {
