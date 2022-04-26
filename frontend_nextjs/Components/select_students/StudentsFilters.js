@@ -38,9 +38,10 @@ export default function StudentsFilters(props) {
   const [filteredSkills, setFilteredSkills] = useState([]);
 
   // These variables represent the filters of the different categories
-  const filters = props.filters[0];
-  const chosenSkills = props.filters[1];
-  const decision = props.filters[2];
+
+  const filters = (router.query.filters) ? router.query.filters.split(",") : []
+  const chosenSkills = (router.query.skills) ? router.query.skills.split(",") : []
+  const decision = (router.query.decision) ? router.query.decision.split(",") : []
 
   useEffect(() => {
     Url.fromName(api.skills).get().then(async res => {
@@ -181,7 +182,7 @@ export default function StudentsFilters(props) {
       <Row className="skills-search-filters">
         <Col>
           <input type="text" id="search-skills-filters" className="search" placeholder="Search skills"
-                 onChange={(ev) => searchSkills(ev.target.value)}/>
+            onChange={(ev) => searchSkills(ev.target.value)} />
         </Col>
       </Row>
       {getSkills()}

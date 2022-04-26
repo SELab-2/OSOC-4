@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
 import { useSession } from "next-auth/react";
+import useWindowDimensions from "../utils/WindowDimensions";
+import StudentsFilters from "../Components/select_students/StudentsFilters";
 
 
 /**
@@ -12,10 +14,15 @@ import { useSession } from "next-auth/react";
  */
 export default function SelectStudents() {
     const router = useRouter();
+    const { height, width } = useWindowDimensions();
 
     return (
         <Row>
-            <StudentListAndFilters studentsTab={true} studentId={router.query.studentId} />
+            {
+                ((width > 1500) || (width > 1000 && !router.query.studentId)) &&
+                <StudentsFilters />
+            }
+            <StudentListAndFilters studentsTab={true} />
             {
                 (router.query.studentId) &&
                 (<Col>

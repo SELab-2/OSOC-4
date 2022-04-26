@@ -15,7 +15,7 @@ import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
 import EmailStudentListElement from "../email-students/EmailStudentListelement"
 
-export default function StudentListAndFilters(props) {
+export default function StudentList(props) {
 
   const router = useRouter();
 
@@ -29,13 +29,6 @@ export default function StudentListAndFilters(props) {
   let [sortby, setSortby] = useState("first name+asc,last name+asc");
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
-
-  const [localFilters, setLocalFilters] = useState([0, 0, 0]);
-
-  // These constants represent the filters
-  const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
-  (router.query.skills) ? router.query.skills.split(",") : [],
-  (router.query.decision) ? router.query.decision.split(",") : []]
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
@@ -82,7 +75,6 @@ export default function StudentListAndFilters(props) {
           }
         ).get().then(res => {
           if (res.success) {
-            setLocalFilters([0, 0, 0]);
             let p1 = res.data.slice(0, 10);
             let p2 = res.data.slice(10);
             setStudentUrls(p2);
@@ -90,13 +82,12 @@ export default function StudentListAndFilters(props) {
               cache.getStudent(studentUrl, session["userid"])
             )).then(newstudents => {
               setStudents([...newstudents]);
-              setLocalFilters([0, 0, 0]);
             })
           }
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -204,23 +195,19 @@ export default function StudentListAndFilters(props) {
   }
 
   return [
-    ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
-      <Col md="auto" key="studentFilters">
-        <StudentsFilters students={students} filters={filters} />
-      </Col>
-      :
-      <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
-        <StudentsFilters students={students} filters={filters} />
-      </CheeseburgerMenu>
+    !((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
+    <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
+      <StudentsFilters />
+    </CheeseburgerMenu>
     ,
 
-    (width > 800 || (!props.studentId && props.studentsTab)) &&
+    (width > 800 || (!router.query.studentId && props.studentsTab)) &&
 
     <div className={(props.studentsTab) ? "col nomargin student-list-positioning" :
-      ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
+      ((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) ?
         "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
       <Row className="nomargin">
-        {!((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) &&
+        {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
           <Col md="auto">
             <div className="hamburger">
               <HamburgerMenu
@@ -260,6 +247,7 @@ export default function StudentListAndFilters(props) {
 
             if (props.category === "emailstudents") {
               return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
+
             } else {
               return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
             }
