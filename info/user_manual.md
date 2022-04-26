@@ -298,8 +298,8 @@ _attributes:_ \
 A coach (user) that belongs to an edition.
 
 _attributes:_ \
-**edition_year**: the year of the edition, primary key, foreign key \
-**coach_id**: the id of the coach, primary key, foreign key
+**edition_year (FK)**: the year of the edition, primary key \
+**coach_id (FK)**: the id of the coach, primary key
 
 #### 7.1.4 Student
 A student, a representation of the tally form a student filled out with the info about them. 
@@ -314,9 +314,9 @@ _attributes:_ \
 A combination of a question and an answer that a student made.
 
 _attributes:_ \
-**student_id**: the id of the student, primary key, foreign key \
-**question_id**: the id of the question, primary key, foreign key \
-**answer_id**: the id of the answer, primary key, foreign key
+**student_id (FK)**: the id of the student, primary key \
+**question_id (FK)**: the id of the question, primary key \
+**answer_id (FK)**: the id of the answer, primary key
 
 #### 7.1.6. Answer
 An anwser to a question of the tally form.
@@ -342,7 +342,7 @@ _attributes:_ \
 **question_id (FK)**: the id of the question for which the tag is \
 **mandatory**: whether the tag is mandatory to be defined in every edition \
 **show_in_list**: whether the tag (and answer) should be visible in the list of students \
-**edition_year**: the year of the edition the tag belongs to
+**edition_year (FK)**: the year of the edition the tag belongs to
 
 #### 7.1.9. Skill
 A skill like ux-designer, backend-developper, communications-manager.
@@ -354,8 +354,8 @@ _attributes:_ \
 A student that has a specific skill.
 
 _attributes:_ \
-**student_id**: the id of the student who has the skill, primary key, foreign key \
-**skill_name**: the name of the skill, primary key, foreign key
+**student_id (FK)**: the id of the student who has the skill, primary key \
+**skill_name (FK)**: the name of the skill, primary key
 
 #### 7.1.11. Project
 Represents a project that will be made by OSOC students for a partner. A project will also contain the the information of that partner.
@@ -373,15 +373,15 @@ A skill that a project needs, and how many times it needs a student that has tha
 
 _attributes:_ \
 **project_id**: the id of the project, primary key, foreign key \
-**skill_name**: the name of the skill that is required, primary key, foreign key \
+**skill_name (FK)**: the name of the skill that is required, primary key \
 **amount**: the amount of students with that skill that are required
 
 #### 7.1.13. ProjectCoach
 A coach that coaches for a project.
 
 _attributes:_ \
-**project_id**: the id of the project, primary key, foreign key \
-**coach_id**: the id of the coach (user), primary key, foreign key
+**project_id (FK)**: the id of the project, primary key \
+**coach_id (FK)**: the id of the coach (user), primary key
 
 #### 7.1.14. Suggestion
 A suggestion that a coach makes about a student, or a decision from an administrator.
@@ -390,18 +390,18 @@ _attributes:_ \
 **id**: the id of a suggestion, only used internally and unique for each student \
 **decision_option**: Yes / No / Maybe \
 **reason**: the reason that the coach/administrator gives with the suggestion \
-**student_id**: the id of the student for which the suggestion made \
-**suggested_by_id**: the id of the coach (user) who made the suggestion \
-**project_id**: the id of the project for which is suggested, optional attribute \
-**skill_name**: the name of the skill which is suggested, optional attribute
+**student_id (FK)**: the id of the student for which the suggestion made \
+**suggested_by_id (FK)**: the id of the coach (user) who made the suggestion \
+**project_id (FK)**: the id of the project for which is suggested, optional attribute \
+**skill_name (FK)**: the name of the skill which is suggested, optional attribute
 
 #### 7.1.15. Participation
 Which student will take on what role in what project.
 
 _attributes defining a relationship:_ \
-**studen_id**: the id of the student who will participate \
-**project_id**: the id of the project in which the student will participate \
-**skill_name**: the name of the skill (thus the skill the student has and will use) the student will take on in the project
+**studen_id (FK)**: the id of the student who will participate \
+**project_id (FK)**: the id of the project in which the student will participate \
+**skill_name (FK)**: the name of the skill (thus the skill the student has and will use) the student will take on in the project
 
 #### 7.1.16. DefaultEmail
 Default emails are stored in the database.
