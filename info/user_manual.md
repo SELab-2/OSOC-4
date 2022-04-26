@@ -218,8 +218,8 @@ OSOC-selection-tool/                   root of the repository
 │   ├── Dockerfile                     dockerfile for the API (uses requirements.txt)
 |   ├── TestDockerfile                 dockerfile to run tests
 │   └── app                            directory with the code for the API
-│       ├── api.py
-│       ├── config.py
+│       ├── api.py                     starts up the API
+│       ├── config.py                  configures the urls
 │       ├── crud.py                    operations that the API makes to the database
 │       ├── database.py                code to start & connect to the database (PostgreSQL and Redis)
 │       ├── exceptions                 directory containing all exceptions that can be thrown
