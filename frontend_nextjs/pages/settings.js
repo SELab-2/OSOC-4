@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import ManageUsers from "../Components/settings/ManageUsers";
 import ChangePassword from "../Components/settings/ChangePassword";
 import ChangeName from "../Components/settings/ChangeName";
@@ -15,18 +15,30 @@ import change_name_image from "/public/assets/change_name.png"
 import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import EditionSettings from "../Components/settings/EditionSettings";
+import LoadingPage from "../Components/LoadingPage";
+import QuestionTags from "../Components/settings/QuestionTags";
 
 
 /**
  * The page corresponding with the 'settings' tab.
  * @returns {JSX.Element} A component corresponding with the 'settings' tab.
  */
-function Settings({ me }) {
+function Settings() {
     const [initializeUsers, setInitializeUsers] = useState("");
     //TODO save settings of user and load this from backend or from browser settings
     const [darkTheme, setDarkTheme] = useState(false);
+    const [me, setMe] = useState(undefined);
+    const [loading, setLoading] = useState(true)
 
 
+    useEffect(() => {
+            Url.fromName(api.me).get().then(res => {
+                if (res.success) {
+                    setMe(res.data.data);
+                    setLoading(false);
+                }
+            });
+    }, [])
 
     //TODO make this actually change the theme
     /**
@@ -36,6 +48,10 @@ function Settings({ me }) {
     const changeTheme = (event) => {
         event.preventDefault()
         setDarkTheme(!darkTheme)
+    }
+
+    if (loading) {
+        return (<LoadingPage/>);
     }
 
     return (
@@ -96,24 +112,12 @@ function Settings({ me }) {
                         </AccordionBody>
                     </AccordionItem>) : null}
 
+
             </Accordion>
 
         </div>
 
-    )
-}
-
-
-export async function getServerSideProps(context) {
-    let props_out = {}
-    let me = await Url.fromName(api.me).get(context);
-    if (me.success) {
-        props_out["me"] = me.data.data;
-    }
-
-    return {
-        props: props_out
-    }
+    );
 }
 
 export default Settings

@@ -20,8 +20,10 @@ export default function GeneralInfo(props) {
       for (let newProject of props.student["participations"]) {
         let newProjects = []
         Url.fromUrl(newProject["project"]).get().then(res => {
-          newProjects = newProjects.concat([res.data["name"]]);
-          setProjects(newProjects);
+          if (res.success && res.data) {
+            newProjects = newProjects.concat([res.data["name"]]);
+            setProjects(newProjects);
+          }
         })
       }
     }

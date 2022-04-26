@@ -7,7 +7,8 @@ import React, {useEffect, useState} from "react";
 import ParticipationCard from "./ParticipationCard";
 import Image from 'next/image'
 import details from "/public/assets/details.svg"
-
+import selected from "/public/assets/selected.svg"
+import not_selected from "/public/assets/not_selected.svg"
 
 export default function ProjectCard(props) {
 
@@ -15,13 +16,17 @@ export default function ProjectCard(props) {
 
     const [skills, setSkills] = useState([])
 
-    const handleProjectClick = () => {
+    const toProjectDetails = () => {
         log("navigate to new project")
         // currently hacky way to get id will be changed with updated api
         let list_id = props.project.id.split("/")
         let id = list_id[list_id.length - 1]
 
         router.push("/project/" + id)
+    }
+
+    const selectProject = () => {
+        props.setSelectedProject((props.project === props.selectedProject) ? undefined : props.project)
     }
 
     useEffect(() => {
@@ -36,14 +41,13 @@ export default function ProjectCard(props) {
         let temp_list = []
         Object.keys(temp_dict).map(name => {
             temp_list.push({"amount": temp_dict[name], "name": name})
-            // setSkills(prevState => [...prevState, {"amount": temp_dict[name], "name": name}])
         })
         setSkills(temp_list)
     }, [])
 
     return(
-        <div className="project-card-div">
-            <Card className="project-card">
+        <div className={"project-card-div"}>
+            <Card className={"project-card" + ((props.project === props.selectedProject) ? "-selected" : "")}>
                 <Card.Body classname={"card-body"}>
                     <Row>
                         <Col>
@@ -51,7 +55,12 @@ export default function ProjectCard(props) {
                         </Col>
                         <Col xs={"auto"}>
                             <div className={"project-show-detail"}>
-                                <Image src={details} height={25} width={25} onClick={handleProjectClick}/>
+                                <Image src={props.project === props.selectedProject ? selected : not_selected} height={25} width={25} onClick={selectProject}/>
+                            </div>
+                        </Col>
+                        <Col xs={"auto"}>
+                            <div className={"project-show-detail"}>
+                                <Image src={details} height={25} width={25} onClick={toProjectDetails}/>
                             </div>
                         </Col>
                     </Row>
