@@ -167,7 +167,7 @@ If find yourself in doubt where to find something, take a look at the [directory
 
 ### 5.2. Testing
 
-Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
+(Backend) Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
 
 #### 5.2.1 Backend tests
 
