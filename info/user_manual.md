@@ -159,15 +159,17 @@ backend-api: https://sel2-4.ugent.be/{branchname}/api
 
 ## 5. How to further develop & test
 
-## 5.1. Further development
+### 5.1. Further development
 
 You can find the Swagger API docs on `http://localhost:8000/docs` (change the port if needed). These docs describe what requests you can make to the API (backend), and what type of body the request expects (if a body is needed for that request).
 
 If find yourself in doubt where to find something, take a look at the [directory structure](#62-directory-structure).
 
-## 5.2. Testing
+### 5.2. Testing
 
 Tests will run automatically with github actions but can be run locally too. There is a seperate docker-compose file for the test containers so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine so they can't be accessed by the internet for security.
+
+#### 5.2.1 Backend tests
 
 Run backend (API) tests:
 ```
@@ -176,8 +178,11 @@ docker-compose -f test-docker-compose.yml run test-osoc-backend python -m unitte
 docker-compose down  # this stops the container again
 ```
 
-Run frontend tests: \
-Tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or yarn `test --watch-all --verbose`.
+#### 5.2.2 Frontend tests
+
+Unit tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or `yarn test --watch-all --verbose`.
+
+Integration tests can be run using `yarn cypress:headless` or with `yarn cypress` if you want a gui with more details.
 
 
 
