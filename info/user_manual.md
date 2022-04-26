@@ -205,27 +205,28 @@ Something noticable is that the frontend can send back to the reverse proxy (whi
 
 
 ### 6.2. Directory structure
+Now follows a description of the directory structure we use
 ```
-OSOC-selection-tool/
-├── LICENSE
-├── README.md
-├── docker-compose.yml
-├── deploy-docker-compose.yml
-├── test-docker-compose.yml
-├── backend
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   ├── app
-│   │   ├── api.py
-│   │   ├── config.py
-│   │   ├── crud.py
-│   │   ├── database.py
-│   │   ├── exceptions
-│   │   ├── models
-│   │   ├── routers
-│   │   ├── tests
-│   │   └── utils
-│   └── TestDockerfile
+OSOC-selection-tool/                   root of the repository   
+├── LICENSE                            license (MIT)
+├── README.md                          
+├── docker-compose.yml                 docker-compose file for local deployment with env variables
+├── deploy-docker-compose.yml          docker-compose file for deployment on our server
+├── test-docker-compose.yml            docker-compose file to run tests
+├── backend                            backend of the application (the API build with FastAPI)
+│   ├── requirements.txt               requirements (packages needed to install, the docker will install these)
+│   ├── Dockerfile                     dockerfile for the API (uses requirements.txt)
+|   ├── TestDockerfile                 dockerfile to run tests
+│   └── app                            directory with the code for the API
+│       ├── api.py
+│       ├── config.py
+│       ├── crud.py                    operations that the API makes to the database
+│       ├── database.py                code to start & connect to the database (PostgreSQL and Redis)
+│       ├── exceptions                 directory containing all exceptions that can be thrown
+│       ├── models                     directory containing the database models
+│       ├── routers                    directory containing all the routing functionality, this directory handles all API calls
+│       ├── tests                      directory containing the tests for the API
+│       └── utils                      directory containing the utils for the API
 ├── data
 │   ├── postgres
 │   └── redis
