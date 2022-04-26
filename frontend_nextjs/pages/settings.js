@@ -112,16 +112,6 @@ function Settings() {
                         </AccordionBody>
                     </AccordionItem>) : null}
 
-                <AccordionItem eventKey="5">
-                    <AccordionHeader>
-                        <h3>Question Tags</h3>
-                    </AccordionHeader>
-                    <AccordionBody>
-                        <div className="question-tags-settings">
-                            <QuestionTags />
-                        </div>
-                    </AccordionBody>
-                </AccordionItem>
 
             </Accordion>
 

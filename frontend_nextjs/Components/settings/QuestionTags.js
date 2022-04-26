@@ -30,20 +30,22 @@ export default function QuestionTags(props) {
      * Called when the component is build. It fetches all the question tags and inserts them the questionTags array
      */
     useEffect(() => {
-        Url.fromName(api.editions_questiontags).get().then(res => {
-          if (res.success) {
-            Promise.all(res.data.map(url => Url.fromUrl(url).get())).then(
-              resq => {
-                let newQuestionTags = resq;
-                for (let i = 0; i < newQuestionTags.length; i ++) {
-                  newQuestionTags[i] = newQuestionTags[i]["data"];
-                  newQuestionTags[i]["url"] = res.data[i];
-                }
-                setQuestionTags(newQuestionTags);
-              }
-            )
-          }});
-    }, []);
+        if(props.reload) {
+            Url.fromName(api.editions_questiontags).get().then(res => {
+                if (res.success) {
+                    Promise.all(res.data.map(url => Url.fromUrl(url).get())).then(
+                        resq => {
+                            let newQuestionTags = resq;
+                            for (let i = 0; i < newQuestionTags.length; i ++) {
+                                newQuestionTags[i] = newQuestionTags[i]["data"];
+                                newQuestionTags[i]["url"] = res.data[i];
+                            }
+                            setQuestionTags(newQuestionTags);
+                        }
+                    )
+                }});
+        }
+    }, [props.reload]);
 
     /**
      * This function is called when the tag name or question of the new question tag are edited.

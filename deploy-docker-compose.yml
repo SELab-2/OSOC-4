@@ -50,7 +50,7 @@ services:
       SMTP_SERVER: smtp.gmail.com
       SMTP_SSL_PORT: 465
       SENDER_EMAIL: osoc.groep4@gmail.com
-      SENDER_PASSWORD: Justapassword123!
+      SENDER_PASSWORD: abcPasswordOSOC-group4
       # Invite Settings
       INVITE_EXPIRE: 4320 #in minutes
       PASSWORDRESET_EXPIRE: 30 # in minutes

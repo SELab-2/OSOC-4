@@ -57,7 +57,7 @@ function Home() {
    * @returns {unknown[]}
    */
   function showNewUsers() {
-    if (newUsers.length) {
+    if (newUsers && newUsers.length) {
       return [(<h1 key="newly-joined-users-title">Newly joined users:</h1>), ...newUsers.map((user) => {
         async function approveUser() {
           const res = await Url.fromName(api.users).extend("/" + user.id + "/approve").post()
