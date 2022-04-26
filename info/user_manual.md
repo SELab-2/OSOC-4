@@ -209,11 +209,10 @@ Now follows a description of the directory structure we use
 ```
 OSOC-selection-tool/                   root of the repository   
 ├── LICENSE                            license (MIT)
-├── README.md                          
 ├── docker-compose.yml                 docker-compose file for local deployment with env variables
 ├── deploy-docker-compose.yml          docker-compose file for deployment on our server
 ├── test-docker-compose.yml            docker-compose file to run tests
-├── backend                            backend of the application (the API build with FastAPI)
+├── backend                            directory containing the backend of the application (the API build with FastAPI)
 │   ├── requirements.txt               requirements (packages needed to install, the docker will install these)
 │   ├── Dockerfile                     dockerfile for the API (uses requirements.txt)
 |   ├── TestDockerfile                 dockerfile to run tests
@@ -227,40 +226,36 @@ OSOC-selection-tool/                   root of the repository
 │       ├── routers                    directory containing all the routing functionality, this directory handles all API calls
 │       ├── tests                      directory containing the tests for the API
 │       └── utils                      directory containing the utils for the API
-├── data
-│   ├── postgres
-│   └── redis
-├── frontend_nextjs
-│   ├── Dockerfile
-│   ├── DevDockerfile
-│   ├── Components
-│   ├── pages
-│   ├── public
-│   │   ├── assets
-│   │   ├── favicon.ico
-│   │   └── vercel.svg
-│   ├── README.md
-│   ├── styles
-│   ├── tests
-│   └── utils
-│       ├── ApiClient.js
-│       ├── logger.js
+├── data                               directory where PostgreSQL and Redis store their data
+│   ├── postgres                       PostgreSQL data
+│   └── redis                          Redis data
+├── frontend_nextjs                    directory containing the frontend of the application (Next.js)
+│   ├── Dockerfile                     dockerfile for the frontend
+│   ├── DevDockerfile                  
+│   ├── Components                     directory containing all components used to build pages
+│   ├── pages                          directory containing all pages (if a page has the name "settings.js" then "/settings" will be a route
+│   ├── public                         
+│   │   └── assets                     directory containing all images used in the frontend
+│   ├── styles                         directory containing all css files for the frontend
+│   ├── tests                          directory containing the tests for the frontend
+│   └── utils                          directory containing the utils for the frontend
+│       ├── ApiClient.js               code that handles requests to the api
+│       ├── logger.js                  code that handles logs, logs will only be printed when NODE_ENV="development" has been set (environment variable)
 │       └── WindowDimensions.js
-└── info
-    ├── domain_model.svg
-    ├── architecture_and_design
-    │   ├── containers.drawio
-    │   ├── containers.svg
-    │   ├── design.drawio
-    │   └── design.svg
-    ├── use-cases
+└── info                               directory containing information about the project/application
+    ├── domain_model.svg               the domain model
+    ├── architecture_and_design        images about the architecture and the design of the application, 
+    │   ├── containers.drawio                       you can open the .drawio files in draw.io if you wish to edit them
+    │   ├── containers.svg             
+    │   ├── design.drawio              
+    │   └── design.svg                 
+    ├── use-cases                      the usecases of the application
     │   └── use-cases.md
-    ├── interaction_diagrams
+    ├── interaction_diagrams           diagrams explaining how certain interactions work 
     │   └── login_diagram.svg
-    ├── screenshots
+    ├── screenshots                    screenshot of the frontend, used in user manual to to explain how to to certain tasks
     │   └── login_screen.png
-    └── user_manual.md
-
+    └── user_manual.md                 the user manual
 ```
 
 
