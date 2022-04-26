@@ -104,6 +104,7 @@ FRONTEND_URL=https://localhost:3000
 An example .env file for the frontend directory of the application.
 
 ```
+BASE_URL="http://127.0.0.1:3000"
 NEXT_BASE_PATH=""
 NEXTAUTH_URL="http://127.0.0.1:3000/api/auth"
 NEXT_API_URL="http://127.0.0.1:8000"
@@ -134,4 +135,6 @@ docker-compose down
 
 #### Frontend
 
-Tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or `yarn test --watch-all --verbose`.
+Unit tests can be run once using the command `yarn test`. If you want to run tests in watch mode or want more detailed output use `yarn test_watch` or `yarn test --watch-all --verbose`.
+
+Integration tests can be run using `yarn cypress:headless` or with `yarn cypress` if you want a gui with more details.
