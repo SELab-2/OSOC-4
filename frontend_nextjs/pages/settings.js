@@ -16,6 +16,7 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import EditionSettings from "../Components/settings/EditionSettings";
 import LoadingPage from "../Components/LoadingPage";
+import DefaultEmails from "../Components/settings/DefaultEmails";
 
 
 /**
@@ -111,6 +112,17 @@ function Settings() {
                         </AccordionBody>
                     </AccordionItem>) : null}
 
+                {(me.role === 2) ? (
+                    <AccordionItem eventKey="5">
+                        <AccordionHeader>
+                            <h3>Default emails</h3>
+                        </AccordionHeader>
+                        <AccordionBody>
+                            <div className="manage-users-settings">
+                                <DefaultEmails />
+                            </div>
+                        </AccordionBody>
+                    </AccordionItem>) : null}
 
             </Accordion>
 
