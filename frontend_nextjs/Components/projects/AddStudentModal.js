@@ -59,12 +59,15 @@ export default function AddStudentModal(props){
                     <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill} skills={skills}/>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => props.setShowAddStudent(false)}>
+                    <Button variant="secondary" onClick={() => {
+                        props.setShowAddStudent(false)
+                        setSelectedSkill(undefined)}}>
                         Dont add student to project
                     </Button>
                     <Button variant="primary" onClick={async () => {
                         await AddStudentToProject()
                         props.setShowAddStudent(false)
+                        setSelectedSkill(undefined)
                     }}>
                         Add student to project
                     </Button>
