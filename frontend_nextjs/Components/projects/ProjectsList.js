@@ -28,27 +28,43 @@ export default function ProjectsList(props) {
                                     log(project.data.users)
                                     await setAllProjects(prevState => [...prevState, project.data]);
                                     // TODO clean this up (currently only works if updated here
-                                    await setVisibleProjects(prevState => [...prevState, project.data]);
+                                    await setVisibleProjects(prevState => [...prevState, project.data])
                                 }
                             }
                         });
                     }
+                    changeVisibleProjects()
                     setLoaded(true);
                 }
             })
+
+
         }
     }, [])
 
+    function changeVisibleProjects(){
+        log("change projects")
+        log(peopleNeeded)
+        setVisibleProjects(allProjects.filter(project => {
+            let sum = 0;
+            if(! peopleNeeded){
+                project.required_skills.forEach(skill => {
+                    log(skill);
+                    sum += skill.number});
+            }
+            return project.name.includes(search)
+                && ((peopleNeeded) || sum > project.participations.length);
+        }))
+    }
+
     async function handleSearchSubmit(event) {
         event.preventDefault();
-        setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
+        changeVisibleProjects()
     }
 
     async function changePeopleNeeded(event){
-        log(peopleNeeded)
         setPeopleNeeded(event.target.checked)
-        log(peopleNeeded)
-
+        changeVisibleProjects()
     }
 
     const handleNewProject = () => {
@@ -73,7 +89,7 @@ export default function ProjectsList(props) {
                             </Form>
                         </Col >
                         <Col xs="auto" >
-                            <ConflictCard/>
+                            <ConflictCard />
                         </Col>
                         <Col xs="auto" >
                             <Button className={"center"} onClick={handleNewProject}>New project</Button>
