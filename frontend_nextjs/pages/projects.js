@@ -7,6 +7,7 @@ import matchIcon from "/public/assets/arrow-right-svgrepo-com.svg"
 import AddStudentModal from "../Components/projects/AddStudentModal";
 import useWindowDimensions from "../utils/WindowDimensions";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
+import Hint from "../Components/Hint";
 
 export default function Projects() {
 
@@ -26,7 +27,9 @@ export default function Projects() {
                 <Col md="auto" style={{ marginLeft: "0" }}>
                     <div style={{ paddingTop: "40vh" }} className="fill_height">
                         <div className="button-match-student-project">
-                            <Image onClick={() => setShowAddStudent(true)} src={matchIcon} alt="match student to project" width={80} />
+                            <Hint message="Add the selected student(s) to the selected project" placement="top">
+                                <Image onClick={() => setShowAddStudent(true)} src={matchIcon} alt="match student to project" width={80} />
+                            </Hint>
                             <AddStudentModal selectedProject={selectedProject} selectedStudent={selectedStudent} setShowAddStudent={setShowAddStudent} showAddStudent={showAddStudent} />
                         </div>
                     </div>

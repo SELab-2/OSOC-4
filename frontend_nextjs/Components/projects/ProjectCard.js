@@ -9,6 +9,7 @@ import Image from 'next/image'
 import details from "/public/assets/details.svg"
 import selected from "/public/assets/selected.svg"
 import not_selected from "/public/assets/not_selected.svg"
+import Hint from "../Hint";
 
 export default function ProjectCard(props) {
 
@@ -55,12 +56,16 @@ export default function ProjectCard(props) {
                         </Col>
                         <Col xs={"auto"}>
                             <div className={"project-show-detail"}>
-                                <Image src={props.project === props.selectedProject ? selected : not_selected} height={25} width={25} onClick={selectProject}/>
+                                <Hint message="Select project" placement="top">
+                                    <Image src={props.project === props.selectedProject ? selected : not_selected} height={25} width={25} onClick={selectProject}/>
+                                </Hint>
                             </div>
                         </Col>
                         <Col xs={"auto"}>
                             <div className={"project-show-detail"}>
-                                <Image src={details} height={25} width={25} onClick={toProjectDetails}/>
+                                <Hint message="Show details" placement="top">
+                                    <Image src={details} height={25} width={25} onClick={toProjectDetails}/>
+                                </Hint>
                             </div>
                         </Col>
                     </Row>

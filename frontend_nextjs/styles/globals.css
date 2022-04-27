@@ -28,3 +28,13 @@ ul {
   max-width: 100%;
   padding: 0;
 }
+
+.image-button,
+.image-button:hover,
+.image-button:active,
+.image-button:after {
+  background-color: transparent;
+  border: none;
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+}
