@@ -1,13 +1,14 @@
 import json
 import unittest
-from typing import Dict
+from typing import Dict, Set, Tuple
 
-from odmantic import ObjectId
+from httpx import Response
 
-from app.crud import read_where
+from app.crud import read_where, read_all_where, update
 from app.database import db
 from app.models.user import User, UserRole
-from app.tests.test_base import Status, TestBase
+from app.tests.test_base import Status, TestBase, Request
+from app.utils.cryptography import verify_password
 from app.utils.keygenerators import generate_new_reset_password_key
 
 
@@ -15,305 +16,267 @@ class TestUsers(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    """
-    GET /users/me
-    """
-    async def test_get_user_me(self):
-        # Correct GET
-        for user_title in self.saved_objects["users"]:
-            user = self.objects[user_title]
-            response = await self.get_response("/users/me", user_title, Status.SUCCES)
-            response = json.loads(response.content)["data"]["id"].split("/")[-1]
+    async def test_get_users(self):
+        path = "/users"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
 
-            self.assertEqual(str(user.id), response)
+        # Test authorization & access-control
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
-    """
-    POST /create
-    """
-    async def test_create_user_as_admin(self):
-        body: Dict[str, str] = {"email": "added_user_as_admin@test.com"}
-        await self.post_response("/users/create", body, "user_admin", Status.SUCCES)
-        user = await db.engine.find_one(User, User.email == body["email"])
-        self.assertIsNotNone(user, f"{body['email']} was not found in the database")
-        await db.engine.delete(user)
+        # Test result
+        db_users = await read_all_where(User, session=self.session)  # collected from DataBase itself
+        db_users = sorted([str(user.id) for user in db_users])
 
-    async def test_create_user_as_forbidden(self):
-        body: Dict[str, str] = {"email": "added_as_unauthorized@test.com"}
-        for user_title in self.saved_objects["users"]:
-            if user_title != "user_admin":
-                await self.post_response("/users/create", body, user_title, Status.FORBIDDEN)
+        for response in responses.values():
+            ep_users = json.loads(response.content)  # collected from EndPoint
+            ep_users = sorted([user["id"].split("/")[-1] for user in ep_users])
 
-        # check that the user was not added to the database
-        user = await db.engine.find(User, User.email == body["email"])
-        self.assertIsNotNone(user, f"{user} was incorrectly added to the database")
+            self.assertTrue(db_users == ep_users,
+                            f"""Users in the database were not the same as the returned users.
+                            Expected: {db_users}
+                            Was: {ep_users}""")
 
-    async def test_create_existing_user_as_admin(self):
-        existing_user = self.objects["user_approved_coach"]
-        body: Dict[str, str] = {"email": existing_user.email}
-        response = await self.post_response("/users/create", body, "user_admin", Status.SUCCES)
-        gotten_user_id = json.loads(response.content)["data"]["id"].split('/')[-1]
-        self.assertEqual(str(existing_user.id), gotten_user_id)
+    async def test_get_users_me(self):
+        path = "/users/me"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
-    """
-    GET /users
-    """
-    async def test_get_users_roles(self):
-        # Test correct role (admin)
-        response = await self.get_response("/users", "user_admin", Status.SUCCES)
+        # Test authorization & access-control
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
-        ep_users = json.loads(response.content)["data"]
-        ep_users = sorted([user["id"].split("/")[-1] for user in ep_users])  # collected from EndPoint
+        # Test result
+        for user_title, response in responses.items():
+            user = await self.get_user_by_name(user_title)  # collected from test_base
+            ep_user = json.loads(response.content)["data"]  # collected from endpoint
+            self.assertSequenceEqual({"name": user.name, "email": user.email, "role": user.role}, ep_user)
 
-        db_users = await db.engine.find(User)
-        db_users = sorted([str(user.id) for user in db_users])  # collected from db itself
+    async def test_post_add_user_data(self):
+        # This test needs to be reworked when multiple users are allowed,
+        # otherwise the same user will be created multiple times thus not every user will create a new user
 
-        self.assertTrue(db_users == ep_users,
-                        f"""Users in the database were not the same as the returned users.
-                        Expected: {db_users}
-                        Was: {ep_users}""")
+        path = "/users/create"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        body = {"email": "added_user@test.com"}
 
-        # Test wrong roles
-        for user_title in self.saved_objects["users"]:
-            if user_title != "user_admin":
-                await self.get_response("/users", user_title, Status.FORBIDDEN)
+        # Test authorization & access-control
+        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
+        # Test again to create a duplicate user
+        responses2: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
 
-    """
-    POST /users/{id}/invite
-    """
-    @unittest.skip("Prevent email spam")
-    async def test_invite_user_as_approved_user(self):
-        to_invite = self.objects["user_unactivated_coach"]
-        active_user = self.objects["user_activated_coach"]
-        to_invite.email = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
-        bad_user_id = "00000a00a00aa00aa000aaaa"
+        for user_title in allowed_users:
+            self.assertEquals(json.loads(responses1.get(user_title).content)["data"],
+                              json.loads(responses2.get(user_title).content)["data"],
+                              "The returned user was different for it's creation and it's duplicate creation")
 
-        for user_title in self.saved_objects["users"]:
-            user = self.objects[user_title]
-            if user.approved and user.role == UserRole.ADMIN:
-                await self.post_response(f"/users/{to_invite.id}/invite", {}, user_title, Status.SUCCES)
-                await self.post_response(f"/users/{active_user.id}/invite", {}, user_title, Status.BAD_REQUEST)
-                await self.post_response(f"/users/{bad_user_id}/invite", {}, user_title, Status.NOT_FOUND)
+        # Test whether created user is in the database
+        user = await read_where(User, User.email == body["email"], session=self.session)
+        self.assertIsNotNone(user, f"'{body['email']}' was not found in the database.")
 
-    async def test_invite_user_as_forbidden(self):
-        to_invite = self.objects["user_unactivated_coach"]
-        active_user = self.objects["user_activated_coach"]
-        to_invite.email = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
-        bad_user_id = "00000a00a00aa00aa000aaaa"
+    async def test_post_forgot(self):
+        path: str = "/users/forgot/"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
+        allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
+        blocked_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
 
-        for user_title in self.saved_objects["users"]:
-            user = self.objects[user_title]
-            if user.active and user.role != UserRole.ADMIN:
-                await self.post_response(f"/users/{to_invite.id}/invite", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{active_user.id}/invite", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{bad_user_id}/invite", {}, user_title, Status.FORBIDDEN)
-
-    """
-    POST /users/invites
-    """
-    @unittest.skip("Prevent email spam")
-    async def test_invite_users_as_approved_user(self):
-        to_invite = [self.objects["user_unactivated_coach"]]
-        active_users = [self.objects["user_activated_coach"]]
-        test_mail = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-
-        def set_email(user: User, email: str) -> str:
-            user.email = email
-            return str(user.id)
-
-        to_invite = list(map(lambda user: set_email(user, test_mail), to_invite))
-        active_users = list(map(lambda user: set_email(user, test_mail), active_users))
-
-        for user_title in self.saved_objects["users"]:
-            user = self.objects[user_title]
-            if user.approved and user.role == UserRole.ADMIN:
-                await self.post_response("/users/invites", to_invite, user_title, Status.SUCCES)
-                await self.post_response("/users/invites", active_users, user_title, Status.BAD_REQUEST)
-                await self.post_response("/users/invites", [bad_user_id], user_title, Status.NOT_FOUND)
-
-    async def test_invite_users_as_forbidden(self):
-        to_invite = [self.objects["user_unactivated_coach"]]
-        test_mail = "Stef.VandenHaute@UGent.be"  # Todo: set in env variable
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-
-        def set_email(user: User, email: str) -> str:
-            user.email = email
-            return str(user.id)
-
-        to_invite = list(map(lambda user: set_email(user, test_mail), to_invite))
-
-        for user_title in self.saved_objects["users"]:
-            user = self.objects[user_title]
-            if user.active and user.role != UserRole.ADMIN:
-                await self.post_response("/users/invites", to_invite, user_title, Status.FORBIDDEN)
-                await self.post_response("/users/invites", [bad_user_id], user_title, Status.FORBIDDEN)
-
-    """
-    GET /users/{id}
-    """
-    async def test_get_user_as_approved_user(self):
-        expected = self.objects["user_admin"]
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-        for user_title in self.saved_objects["users"]:
-            user = self.objects[user_title]
-            if user.name != "user_admin":
-                if user.approved:
-                    response = await self.get_response(f"/users/{expected.id}", user_title, Status.SUCCES)
-                    gotten_user = json.loads(response.content)["data"]
-                    self.assertTrue(expected.email == gotten_user["email"],
-                                    f"""The incorrect user was fetched
-                                    Expected: {expected}
-                                    Was: {gotten_user}
-                                    """)
-
-                    await self.get_response(f"/users/{self.objects['user_activated_coach'].id}", user_title, Status.BAD_REQUEST)
-                    await self.get_response(f"/users/{bad_user_id}", user_title, Status.NOT_FOUND)
-
-    async def test_get_user_as_forbidden(self):
-        user_id: str = str(self.objects["user_approved_coach"].id)
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-
-        for user_title in self.saved_objects["users"]:
-            if user_title != "user_admin" and user_title != "user_approved_coach":
-                await self.get_response(f"/users/{user_id}", user_title, Status.FORBIDDEN)
-                await self.get_response(f"/users/{bad_user_id}", user_title, Status.FORBIDDEN)
-
-        # No authorization
-        await self.get_response(f"/users/{user_id}", "user_no_role", Status.UNAUTHORIZED, use_access_token=False)
-        # Wrong authorization
-        await self.get_response(f"/users/{user_id}", "user_no_role", Status.UNPROCESSABLE, access_token="wrong token")
-
-    """
-    POST /users/{id}
-    """
-    async def test_update_user_as_admin(self):
-        user_to_edit = self.objects["user_no_role"]
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-        body: Dict[str, str] = {"email": "new+email@new.me", "name": "Rocky"}
-        bad_body: Dict[str, str] = {"email": self.objects["user_admin"].email, "name": "Rocky"}
-
-        response = await self.post_response(f"/users/{user_to_edit.id}", body, "user_admin", Status.SUCCES)
-        user = await db.engine.find_one(User, {"email": json.loads(response.content)["data"]["email"]})
-        self.assertIsNotNone(user,
-                             f"""
-                             {body['email']} was not found in the database,
-                             the mail of the user was not modified correctly.
-                             """)
-        user = await db.engine.find_one(User, {"name": json.loads(response.content)["data"]["name"]})
-        self.assertIsNotNone(user,
-                             f"""
-                             {body['name']} was not found in the database,
-                             the name of the user was not modified correctly.
-                             """)
-
-        await self.post_response(f"/users/{user_to_edit.id}", bad_body, "user_admin", Status.BAD_REQUEST)
-        await self.post_response(f"/users/{bad_user_id}", body, "user_admin", Status.NOT_FOUND)
-
-    async def test_update_user_as_forbidden(self):
-        user_to_edit = self.objects["user_no_role"]
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-        new_name = "Rocky"
-        body: Dict[str, str] = {"email": "new+email@new.me", "name": new_name}
-        bad_body: Dict[str, str] = {"email": self.objects["user_admin"].email, "name": "Rocky"}
-
-        for user_title in self.saved_objects["users"]:
-            if user_title != "user_admin":
-                await self.post_response(f"/users/{user_to_edit.id}", body, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{user_to_edit.id}", bad_body, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{bad_user_id}", body, user_title, Status.FORBIDDEN)
-
-        # check that the user was not changed in the database
-        user = await read_where(User, User.id == ObjectId(user_to_edit.id))
-        self.assertNotEqual(user.name, new_name, f"{user_to_edit.name} was modified in the database")
-
-    """
-    POST /users/{id}/approve
-    """
-    async def test_approve_user_as_admin(self):
-        approved_user = self.objects["user_approved_coach"]
-        activated_user = self.objects["user_activated_coach"]
-        unactivated_user = self.objects["user_unactivated_coach"]
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-
-        await self.post_response(f"/users/{activated_user.id}/approve", {}, "user_admin", Status.SUCCES)
-        user = await read_where(User, User.id == ObjectId(activated_user.id))
-        self.assertTrue(user.approved)
-
-        await self.post_response(f"/users/{approved_user.id}/approve", {}, "user_admin", Status.BAD_REQUEST)
-        user = await read_where(User, User.id == ObjectId(approved_user.id))
-        self.assertTrue(user.approved)
-
-        await self.post_response(f"/users/{unactivated_user.id}/approve", {}, "user_admin", Status.BAD_REQUEST)
-        user = await read_where(User, User.id == ObjectId(unactivated_user.id))
-        self.assertFalse(user.approved)
-        self.assertFalse(user.active)
-
-        await self.post_response(f"/users/{bad_user_id}/approve", {}, "user_admin", Status.NOT_FOUND)
-
-    async def test_approve_user_as_forbidden(self):
-        approved_user = self.objects["user_approved_coach"]
-        activated_user = self.objects["user_activated_coach"]
-        unactivated_user = self.objects["user_unactivated_coach"]
-        bad_user_id = "00000a00a00aa00aa000aaaa"
-
-        for user_title in self.saved_objects["users"]:
-            if user_title != "user_admin":
-                await self.post_response(f"/users/{activated_user.id}/approve", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{approved_user.id}/approve", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{unactivated_user.id}/approve", {}, user_title, Status.FORBIDDEN)
-                await self.post_response(f"/users/{bad_user_id}/approve", {}, user_title, Status.FORBIDDEN)
-
-        # check that the user was not changed in the database
-        user = await read_where(User, User.id == ObjectId(activated_user.id))
-        self.assertFalse(user.approved)
-        self.assertTrue(user.active)
-        user = await read_where(User, User.id == ObjectId(approved_user.id))
-        self.assertTrue(user.approved)
-        self.assertTrue(user.active)
-        user = await read_where(User, User.id == ObjectId(unactivated_user.id))
-        self.assertFalse(user.approved)
-        self.assertFalse(user.active)
-
-    """
-    POST /users/forgot/{reset_key}
-    """  # These tests need to be seperated to avoid issues with encrypted passwords
-
-    async def test_change_password(self):
-        new_pass = "ValidPass?!123"
-        body = {
-            "password": new_pass,
-            "validate_password": new_pass
-        }
-        bad_body = {
-            "password": new_pass,
-            "validate_password": new_pass + "oeps"
-        }
-
-        for user_title in self.saved_objects["users"]:
-            user = self.objects[user_title]
-            key = generate_new_reset_password_key()
-            db.redis.setex(key[0], key[1], str(user.id))
-
-            # Request using different validate_password
-            await self.post_response(f"/users/forgot/{key[0]}", bad_body, user_title, Status.BAD_REQUEST)
-            self.assertEqual(user.password, self.saved_objects[user_title].password,
-                             f"The password of {user_title} was {user.password}. "
-                             f"Expected: {self.saved_objects[user_title].password}")
-
-            # Now the password is encrypted in self.objects
-            key = generate_new_reset_password_key()
-            db.redis.setex(key[0], key[1], str(user.id))
-
-            await self.post_response(f"/users/forgot/{key[0]}", body, user_title, Status.SUCCES)
-            # Since password is encrypted, we assert using a simple get with the new password
-            self.saved_objects["passwords"][user_title] = new_pass
-            await self.get_response("/users/me", user_title, Status.SUCCES)
-
-        # Request using invalid reset keys
-        await self.post_response("/users/forgot/Rohnonotsogood", body, "user_admin", Status.BAD_REQUEST)
-        await self.post_response("/users/forgot/Iohnoevenworse", body, "user_admin", Status.BAD_REQUEST)
+        new_pass: str = "ValidPass?!123"
 
         key = generate_new_reset_password_key()
-        db.redis.setex(key[0], key[1], str(self.objects["user_approved_coach"].id))
+        forgotten_user = await self.get_user_by_name("user_approved_coach")
+        db.redis.setex(key[0], key[1], int(forgotten_user.id))
 
-        await self.post_response(f"/users/forgot/{key[0]}", body, "user_admin", Status.FORBIDDEN)
+        # Test using a wrong validate password
+        await self.do_request(Request.POST, path + key[0], "user_admin",
+                              json_body={"password": new_pass, "validate_password": new_pass + "1"},
+                              expected_status=Status.BAD_REQUEST)
+
+        # Request using invalid reset keys
+        await self.do_request(Request.POST, "/users/forgot/" + "Rohnonotsogood", "user_admin",
+                              json_body={"password": new_pass, "validate_password": new_pass},
+                              expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.POST, "/users/forgot/" + "Iohnoevenworse", "user_admin",
+                              json_body={"password": new_pass, "validate_password": new_pass},
+                              expected_status=Status.BAD_REQUEST)
+
+        # Request using key from other user
+        key = generate_new_reset_password_key()
+        db.redis.setex(key[0], key[1], int(forgotten_user.id))
+
+        await self.do_request(Request.POST, f"/users/forgot/{key[0]}", "user_admin",
+                              json_body={"password": new_pass, "validate_password": new_pass},
+                              expected_status=Status.FORBIDDEN)
+
+        ##################################
+        # Check passwords aren't changed #
+        ##################################
+        for user_title in allowed_users:
+            user: User = await self.get_user_by_name(user_title)
+
+            self.assertTrue(verify_password(self.saved_objects["passwords"][user_title], user.password),
+                            "The password was changed after bad requests")
+
+        #######################################
+        # Test authorization & access-control #
+        #######################################
+        for user_title in self.users.keys():
+            key = generate_new_reset_password_key()
+            forgotten_user = await self.get_user_by_name(user_title)
+            db.redis.setex(key[0], key[1], int(forgotten_user.id))
+
+            body = {"password": new_pass, "validate_password": new_pass}
+
+            if user_title in allowed_users:
+                allowed_users_path_and_body[user_title] = path + key[0], body
+            else:
+                blocked_users_path_and_body[user_title] = path + key[0], body
+        # change to new passwords where allowed
+        await self.auth_access_request_test_per_user(Request.POST,
+                                                     allowed_users_path_and_body,
+                                                     blocked_users_path_and_body)
+        ###########################
+        # Check current passwords #
+        ###########################
+        for user_title in allowed_users:  # Check password was changed
+            user: User = await self.get_user_by_name(user_title)
+            self.assertTrue(verify_password(new_pass, user.password),
+                            "The password wasn't changed after successful requests")
+
+        for user_title in set(self.users.keys()).difference(allowed_users):  # Check password wasn't changed
+            user: User = await self.get_user_by_name(user_title)
+            self.assertFalse(verify_password(new_pass, user.password), "The password was changed after bad requests")
+
+    async def test_get_users_id(self):
+        expected_user = await self.get_user_by_name("user_admin")
+        path = "/users/" + str(expected_user.id)
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
+
+        bad_path = "/users/" + str(self.bad_id)
+
+        # Test authorization & access-control
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
+        # Test get user that doesn't exist
+        await self.do_request(Request.GET, bad_path, "user_admin", Status.NOT_FOUND)
+
+        # Test responses
+        for user_title, response in responses.items():
+            gotten_user = json.loads(response.content)["data"]
+            self.assertTrue(expected_user.email == gotten_user["email"],
+                            f"""The incorrect user was fetched by {user_title}
+                                 Expected: {expected_user}
+                                 Was: {gotten_user}""")
+
+    async def test_patch_update_user(self):
+        path: str = "/users/"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
+        blocked_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]] = {}
+
+        for user_title in self.users.keys():
+            # Make sure everyone has a unique user to edit
+            editable_user = User(
+                email=f"to_be_edited_by_{user_title}@test.be",
+                name=f"to_be_edited_by_{user_title}",
+                password="Test123!user_no_role",
+                role=UserRole.NO_ROLE,
+                active=False,
+                approved=False,
+                disabled=False)
+            await update(editable_user, session=self.session)
+            body = {
+                "name": f"edited_by_{user_title}",
+                "role": int(UserRole.NO_ROLE),
+                "active": True,
+                "approved": True,
+                "disabled": False
+            }
+            if user_title in allowed_users:
+                allowed_users_path_and_body[user_title] = path + str(editable_user.id), body
+            else:
+                blocked_users_path_and_body[user_title] = path + str(editable_user.id), body
+
+        # Test authorization & access-control with successful edits
+        await self.auth_access_request_test_per_user(Request.PATCH,
+                                                     allowed_users_path_and_body,
+                                                     blocked_users_path_and_body)
+
+        # Test failed requests
+        bad_path = f"/users/{self.bad_id}"
+        bad_body: Dict[str, str] = {"name": ""}
+        await self.do_request(Request.PATCH, allowed_users_path_and_body.get("user_admin")[0], "user_admin",
+                              json_body=bad_body, expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.PATCH, bad_path, "user_admin",
+                              json_body={"email": "bad_edited_by_user_admin@test.test",
+                                         "name": "bad_edited_by_user_admin",
+                                         "role": int(UserRole.NO_ROLE),
+                                         "active": True, "approved": True, "disabled": False},
+                              expected_status=Status.NOT_FOUND)
+
+        # assert edits
+        for user_title in self.users.keys():
+            if user_title in allowed_users:
+                user = await read_where(User, User.name == f"edited_by_{user_title}", session=self.session)
+                self.assertIsNotNone(user, f"""
+                                     edited_by_{user_title} was not found in the database,
+                                     the user was not modified correctly.""")
+            else:
+                user = await read_where(User, User.name == f"edited_by_{user_title}", session=self.session)
+                self.assertIsNone(user, f"""
+                                     edited_by_{user_title} was found in the database,
+                                     the user was wrongly modified.""")
+
+    @unittest.skip("Prevent email spam.")
+    async def test_post_invite_user(self):
+        unactivated_user = await self.get_user_by_name("user_unactivated_coach")
+
+        path = f"/users/{unactivated_user.id}/invite"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        body = {}
+
+        unactivated_user.email = "Stef.VandenHaute+SEL2TEST@UGent.be"  # TODO: set in env
+        await update(unactivated_user, session=self.session)
+
+        active_user = await self.get_user_by_name("user_activated_coach")
+        bad_user = self.bad_id
+
+        # Test authorization & access-control
+        await self.auth_access_request_test(Request.POST, path, allowed_users, body)
+
+        # Test other cases
+        await self.do_request(Request.POST, f"/users/{active_user.id}/invite", "user_admin",
+                              json_body={}, expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_admin",
+                              json_body={}, expected_status=Status.NOT_FOUND)
+
+        await self.do_request(Request.POST, f"/users/{active_user.id}/invite", "user_approved_coach",
+                              json_body={}, expected_status=Status.FORBIDDEN)
+        await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_approved_coach",
+                              json_body={}, expected_status=Status.FORBIDDEN)
+
+    async def test_post_approve_user(self):
+        activated_user: User = await self.get_user_by_name("user_activated_coach")
+        path: str = f"/users/{str(activated_user.id)}/approve"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        body: Dict[str, str] = {}
+
+        approved_user: User = await self.get_user_by_name("user_approved_coach")
+        unactivated_user: User = await self.get_user_by_name("user_unactivated_coach")
+        bad_user: str = str(self.bad_id)
+
+        # Do failed requests
+        await self.do_request(Request.POST, f"/users/{str(approved_user.id)}/approve", "user_admin",
+                              json_body=body, expected_status=Status.BAD_REQUEST)
+        user = await read_where(User, User.id == approved_user.id, session=self.session)
+        self.assertTrue(user.approved)
+
+        await self.do_request(Request.POST, f"/users/{str(unactivated_user.id)}/approve", "user_admin",
+                              json_body=body, expected_status=Status.BAD_REQUEST)
+        user = await read_where(User, User.id == unactivated_user.id, session=self.session)
+        self.assertFalse(user.approved)
+        self.assertFalse(user.active)
+
+        await self.do_request(Request.POST, f"/users/{bad_user}/approve", "user_admin",
+                              json_body=body, expected_status=Status.NOT_FOUND)
+
+        await self.auth_access_request_test(Request.POST, path, allowed_users, body)
+
+        # Test correct
+        user = await read_where(User, User.id == activated_user.id, session=self.session)
+        self.assertTrue(user.approved)

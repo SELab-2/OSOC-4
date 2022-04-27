@@ -1,7 +1,11 @@
 import {useState} from "react";
-import {Card} from "react-bootstrap";
-import { Button } from 'react-bootstrap';
+import {Card, Button} from "react-bootstrap";
+import Image from 'next/image'
 
+/**
+ * This component displays a card for a simple settings-screen
+ * @returns {JSX.Element}
+ */
 export default function SettingCards(props) {
     const [isOpen, setIsOpen] = useState(false)
     return(
@@ -12,7 +16,7 @@ export default function SettingCards(props) {
                         <tbody>
                         <tr className={"tr"}>
                             <td className="column-icon">
-                                <p>ICON</p>
+                                <Image src={props.image} width={100} height={100}/>
                             </td>
                             <td className="column-text">
                                 <span className="card-title">{props.title}</span>

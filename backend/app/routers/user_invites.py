@@ -1,5 +1,8 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.crud import read_where, update
-from app.database import db
+from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidInviteException
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
@@ -7,14 +10,35 @@ from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
 from app.models.user import User, UserInvite
 from app.utils.cryptography import get_password_hash
 from app.utils.response import response
-from fastapi import APIRouter
-from odmantic import ObjectId
 
 router = APIRouter(prefix="/invite")
 
 
+@router.get("/{invitekey}")
+async def valid_invitekey(invitekey: str, session: AsyncSession = Depends(get_session)):
+    if invitekey[0] != "I":
+        raise InvalidInviteException()
+
+    uid = db.redis.get(invitekey)
+
+    # Check whether the uid is valid
+    try:
+        uid = int(uid)
+    except ValueError:
+        raise InvalidInviteException()
+
+    if uid <= 0:
+        raise InvalidInviteException()
+
+    user = await read_where(User, User.id == uid, session=session)
+
+    if user is None:
+        raise InvalidInviteException()
+    return response(None, "Valid invitekey")
+
+
 @router.post("/{invitekey}")
-async def invited_user(invitekey: str, userinvite: UserInvite):
+async def invited_user(invitekey: str, userinvite: UserInvite, session: AsyncSession = Depends(get_session)):
     """invited_user this processes the passwords from the userinvite
 
     :param invitekey: key for the invite to identify the user
@@ -31,7 +55,7 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
     userid = db.redis.get(invitekey)  # check that the inv key exists
 
     if userid:
-        user: User = await read_where(User, User.id == ObjectId(userid))
+        user: User = await read_where(User, User.id == int(userid), session=session)
 
         if not user:
             raise NotPermittedException()
@@ -46,7 +70,7 @@ async def invited_user(invitekey: str, userinvite: UserInvite):
         user.password = get_password_hash(userinvite.password)
 
         user.active = True
-        await update(user)
+        await update(user, session=session)
         db.redis.delete(invitekey)
 
         return response(None, "User activated successfully")

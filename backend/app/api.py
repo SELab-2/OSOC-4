@@ -1,7 +1,7 @@
 import inspect
 import re
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
@@ -9,11 +9,10 @@ from fastapi.routing import APIRoute
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from app.config import config
-from app.database import connect_db, disconnect_db
+from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
-from app.routers import (answers, auth, ddd, editions, participation,
-                         projects, question_answers, questions, roles,
-                         student_forms, suggestions, user_invites, users)
+from app.routers import (auth, ddd, editions, projects, reset_password, skills,
+                         students, suggestions, participations, tally, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -33,27 +32,28 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
-    connect_db()
+    await init_db()
 
 
 @app.on_event("shutdown")
 async def shutdown():
-    disconnect_db()
-
+    await disconnect_db()
 
 app.include_router(ddd.router)
-app.include_router(answers.router)
+# app.include_router(answers.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
-app.include_router(participation.router)
 app.include_router(projects.router)
-app.include_router(question_answers.router)
-app.include_router(questions.router)
-app.include_router(roles.router)
-app.include_router(student_forms.router)
+# app.include_router(question_answers.router)
+# app.include_router(questions.router)
+app.include_router(skills.router)
+app.include_router(students.router)
 app.include_router(suggestions.router)
-# app.include_router(tally.router)
+app.include_router(participations.router)
+app.include_router(tally.router)
+# app.include_router(user_invites.router)
 app.include_router(user_invites.router)
+app.include_router(reset_password.router)
 app.include_router(users.router)
 
 
@@ -67,58 +67,39 @@ async def auth_exception_handler(request: Request, exception: AuthJWTException):
     return JSONResponse(status_code=exception.status_code, content={"message": exception.message})
 
 
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocketManager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect as e:
+        websocketManager.disconnect(websocket)
+        print(e)
+
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
+
     openapi_schema = get_openapi(
-        title="Custom title",
-        version="2.5.0",
-        description="This is a very custom OpenAPI schema",
+        title="My Auth API",
+        version="1.0",
+        description="An API with an Authorize Button",
         routes=app.routes,
         servers=[{"url": config.api_path}]
     )
-    openapi_schema["info"]["x-logo"] = {
-        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
-    }
 
-    cookie_security_schemes = {
-        "AuthJWTCookieAccess": {
+    openapi_schema["components"]["securitySchemes"] = {
+        "Bearer Auth": {
             "type": "apiKey",
             "in": "header",
-            "name": "X-CSRF-TOKEN"
-        },
-        "AuthJWTCookieRefresh": {
-            "type": "apiKey",
-            "in": "header",
-            "name": "X-CSRF-TOKEN"
-        }
-    }
-    refresh_token_cookie = {
-        "name": "refresh_token_cookie",
-        "in": "cookie",
-        "required": False,
-        "schema": {
-            "title": "refresh_token_cookie",
-            "type": "string"
-        }
-    }
-    access_token_cookie = {
-        "name": "access_token_cookie",
-        "in": "cookie",
-        "required": False,
-        "schema": {
-            "title": "access_token_cookie",
-            "type": "string"
+            "name": "Authorization",
+            "description": "Enter: **'Bearer &lt;JWT&gt;'**, where JWT is the access token"
         }
     }
 
-    if "components" in openapi_schema:
-        openapi_schema["components"].update(
-            {"securitySchemes": cookie_security_schemes})
-    else:
-        openapi_schema["components"] = {
-            "securitySchemes": cookie_security_schemes}
-
+    # Get all routes where jwt_optional() or jwt_required
     api_router = [route for route in app.routes if isinstance(route, APIRoute)]
 
     for route in api_router:
@@ -129,37 +110,16 @@ def custom_openapi():
         for method in methods:
             # access_token
             if (
-                re.search("jwt_required", inspect.getsource(endpoint))
-                    or re.search("fresh_jwt_required", inspect.getsource(endpoint))
-                    or re.search("jwt_optional", inspect.getsource(endpoint))
+                re.search("RoleChecker", inspect.getsource(endpoint))
+                or re.search("jwt_required", inspect.getsource(endpoint))
+                or re.search("fresh_jwt_required", inspect.getsource(endpoint))
+                or re.search("jwt_optional", inspect.getsource(endpoint))
             ):
-                try:
-                    openapi_schema["paths"][path][method]['parameters'].append(
-                        access_token_cookie)
-                except Exception:
-                    openapi_schema["paths"][path][method].update(
-                        {"parameters": [access_token_cookie]})
-
-                # method GET doesn't need to pass X-CSRF-TOKEN
-                if method != "get":
-                    openapi_schema["paths"][path][method].update({
-                        'security': [{"AuthJWTCookieAccess": []}]
-                    })
-
-            # refresh_token
-            if re.search("jwt_refresh_token_required", inspect.getsource(endpoint)):
-                try:
-                    openapi_schema["paths"][path][method]['parameters'].append(
-                        refresh_token_cookie)
-                except Exception:
-                    openapi_schema["paths"][path][method].update(
-                        {"parameters": [refresh_token_cookie]})
-
-                # method GET doesn't need to pass X-CSRF-TOKEN
-                if method != "get":
-                    openapi_schema["paths"][path][method].update({
-                        'security': [{"AuthJWTCookieRefresh": []}]
-                    })
+                openapi_schema["paths"][path][method]["security"] = [
+                    {
+                        "Bearer Auth": []
+                    }
+                ]
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema

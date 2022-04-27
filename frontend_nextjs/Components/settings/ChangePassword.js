@@ -1,8 +1,12 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
-import {log} from "../../utils/logger";
+import {api, Url} from "../../utils/ApiClient";
 
-export default function ChangePassword() {
+/**
+ * This component displays a settings-screen to change a user's password.
+ * @returns {JSX.Element}
+ */
+export default function ChangePassword(props) {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,13 +30,22 @@ export default function ChangePassword() {
         setConfirmPassword(event.target.value);
     }
 
+    /**
+     * This function makes a patch request to the api with the new password of the user
+     * @param event
+     */
     async function handleSubmitChange(event){
         event.preventDefault()
-        //todo make this work with backend and implement more checks
         if(newPassword === confirmPassword){
-            setChangedSuccess(true)
+            let body = {
+                "current_password": currentPassword,
+                "new_password": newPassword,
+                "confirm_password":confirmPassword
+            }
+
+            let response = await Url.fromName(api.me).extend("/password").setBody(body).patch();
+            if (response.success) { setChangedSuccess(true); }
         }
-        log(newPassword)
     }
 
     return(
@@ -49,7 +62,7 @@ export default function ChangePassword() {
                 <Form.Label>Repeat new password</Form.Label>
                 <Form.Control type="password" placeholder="Confirm password" value={confirmPassword} onChange={handleChangeConfirmPassword}/>
                 {(newPassword === confirmPassword) ? null : (<Form.Text className="text-muted">
-                    Passwords don't match!
+                    Passwords do not match!
                 </Form.Text>)}
                 {(changedSuccess)? (<Form.Text className="text-muted">Changed password!</Form.Text>) : null}
 

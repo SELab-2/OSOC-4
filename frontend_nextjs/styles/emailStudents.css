@@ -1,0 +1,125 @@
+.email-list-positioning {
+    margin-top: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+    height: 75vh;
+}
+
+.email-students-cell {
+    font-size: 18px;
+}
+
+.table-head {
+    font-size: 18px;
+}
+
+.send-emails-button {
+    font-size: 20px;
+    padding: 8px 15px;
+}
+
+.send-emails-positioning {
+    margin-top: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.change-emails-positioning {
+    align-self: center;
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.content-title {
+    padding-left: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.send-emails {
+    height: 180px;
+}
+
+.email-help-text {
+    font-size: 13px;
+    margin-top: -10px;
+}
+
+.send-email-names {
+    font-size: 18px;
+}
+
+.back-button {
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+.emails-margin {
+    margin: 20px 150px 30px;
+}
+
+.emails-title-margin {
+    margin: 0 150px 50px;
+}
+
+.nopadding {
+    padding: 0
+}
+
+.title-bottom-margin {
+    margin-bottom: 20px;
+}
+
+.email-title {
+    font-weight: bold;
+    font-size: 20px;
+    width: 300px;
+}
+
+.change-emails-savebutton {
+    margin-right: 160px;
+}
+
+.cancel-button {
+    margin-right: 20px;
+    width: 100px;
+}
+
+.save-button {
+    width: 100px;
+}
+
+.email-bar {
+    border-radius: 15px 15px 0px 0px;
+    background-color: rgb(245, 234, 140);
+}
+
+.arrow-button {
+    background-color: transparent;
+    transform: rotate(0deg);
+    transition: all 0.6s;
+
+}
+
+.arrow-button.down {
+    transform: rotate(180deg);
+    transition: all 0.6s;
+}
+
+.bottombar {
+    transition-timing-function: ease-in;
+    transition: 0.2s;
+    padding: 5px 0px 14px 0px;
+    max-height: auto;
+}
+
+.bottombar.down {
+    overflow: hidden;
+    max-height: 0;
+    padding: 0px 0px 0px 0px;
+    visibility: hidden;
+    transition: max-height 0s 1s;
+}

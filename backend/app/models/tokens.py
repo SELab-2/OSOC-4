@@ -9,5 +9,5 @@ class TokenExtended(BaseModel):
     refreshToken: str
 
     def __init__(self, **data):
-        data["id"] = config.api_url + "users/" + data["id"]
+        data["id"] = config.api_url + "users/" + str(data["id"])
         super().__init__(**data)

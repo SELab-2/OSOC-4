@@ -1,3 +1,9 @@
-// const FRONTEND_LOGS = (!import.meta.env.PROD) || false;
-// todo: fix env var
-export function log(msg) {if (true) console.log(msg);}
+
+const mode = process.env.NODE_ENV || ""
+
+/**
+ * Logs a message when the mode is development
+ *      for example when the mode is production, this won't log the message
+ * @param msg: the message you want to log
+ */
+export function log(msg) {if (mode ===  "development") console.log(msg);}

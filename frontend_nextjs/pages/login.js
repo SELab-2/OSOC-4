@@ -1,18 +1,18 @@
-import Head from 'next/head'
 import Image from 'next/image'
-import styles from '../styles/Home.module.css'
 import { useState } from 'react';
 import { useRouter } from 'next/router'
-import { login } from "../utils/json-requests";
-import { log } from "../utils/logger";
 import { signIn } from 'next-auth/react';
-import logoFull from '../public/assets/0-1-osoc-full-2.png';
+import logoScreen from '../public/assets/osoc-screen.png';
+import LoadingPage from "../Components/LoadingPage";
+import {api, Url} from "../utils/ApiClient";
 
 const Login = props => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showForgot, setShowForgot] = useState(false)
     const [emailForgot, setEmailForgot] = useState("")
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
     const router = useRouter()
     // let from = useLocation().state?.from?.pathname || "/";
     // const navigate = useNavigate()
@@ -31,32 +31,35 @@ const Login = props => {
     }
 
 
-    async function handleSubmitLogin(event) {
-        log("handle login submit")
-
+    async function handleLogin() {
+        await setLoading(true);
+        await signIn('credentials', {redirect: false, email: email, password: password });
+        await setMessage("Login failed, please provide the correct email address and password.")
+        await setLoading(false);
     }
 
 
     async function handleSubmitForgot(event) {
-        log("handle forgot submit")
         event.preventDefault();
         let credentials = JSON.stringify({
             "email": emailForgot,
         });
-        log(credentials)
         // post, if any errors, show them
-        let output = await forgot(credentials);
-        console.log(output)
+        let output = Url.fromName(api.forgot).setBody(credentials).post();
         if (output.success) {
         }
         setShowForgot(false)
+    }
+
+    if (loading) {
+        return (<LoadingPage/>);
     }
 
     return (
         <div className="body-login">
             <section className="body-left">
                 <div className="image-wrapper">
-                    <Image src={logoFull} alt="osoc-logo" width="100%" height="100%" layout={'responsive'} objectFit={'contain'} />
+                    <Image className="logo" src={logoScreen} alt="osoc-logo" />
                 </div>
             </section>
 
@@ -69,11 +72,14 @@ const Login = props => {
                             <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address" />
                             <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
 
-                            <button className="submit" onClick={() => { signIn('credentials', { email: email, password: password }) }}>
+                            <button className="submit" onClick={handleLogin}>
                                 Login
                             </button>
 
                         </div>
+
+                        <p>{message}</p>
+                        <br/>
                         <a href="#" onClick={() => { setEmailForgot(email); setShowForgot(true); }} >Forgot your password?</a>
                     </div>
                 ) : (

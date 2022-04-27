@@ -10,6 +10,7 @@ services:
         NEXT_INTERNAL_API_URL: http://${PATHPREFIX}-osoc-backend:8000
         NEXT_API_URL: https://sel2-4.ugent.be/${PATHPREFIX}/api
         NEXTAUTH_URL: https://sel2-4.ugent.be/${PATHPREFIX}/frontend/api/auth
+        NODE_ENV: production
     ports:
       - 3000
     environment:
@@ -27,6 +28,8 @@ services:
       # - traefik.http.middlewares.osocfrontendpathstrip.stripprefix.prefixes=${PATHPREFIX}/frontend
       - traefik.port=3000
     user: "1000:1000"
+    depends_on:
+      - osoc-backend
 
 
   osoc-backend:
@@ -35,10 +38,11 @@ services:
     ports:
       - 8000
     environment:
-      MONGO_URL: mongodb
-      MONGO_PORT: 27017
-      MONGO_USER: root
-      MONGO_PASSWORD: justapassword
+      POSTGRES_URL: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: justapassword
+      POSTGRES_DATABASE: OSOC
       REDIS_URL: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: justapassword
@@ -46,12 +50,14 @@ services:
       SMTP_SERVER: smtp.gmail.com
       SMTP_SSL_PORT: 465
       SENDER_EMAIL: osoc.groep4@gmail.com
-      SENDER_PASSWORD: Justapassword123!
+      SENDER_PASSWORD: abcPasswordOSOC-group4
       # Invite Settings
       INVITE_EXPIRE: 4320 #in minutes
       PASSWORDRESET_EXPIRE: 30 # in minutes
       PATHPREFIX: /${PATHPREFIX}
       DOMAIN: https://sel2-4.ugent.be
+      FRONTEND_URL: https://sel2-4.ugent.be/${PATHPREFIX}/frontend
+
     networks:
       - proxynet
       - default
@@ -65,17 +71,20 @@ services:
       - traefik.http.middlewares.${PATHPREFIX}-osocbackendpathstrip.stripprefix.prefixes=/${PATHPREFIX}/api
       - traefik.port=8000
     user: "1000:1000"
+    depends_on:
+      - postgres
+      - redis
     
-  mongodb:
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: justapassword
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
     ports:
-      - 27017
+      - 5432
+    environment:
+      - POSTGRES_PASSWORD=justapassword
+      - POSTGRES_DB=OSOC
     volumes:
-      - ./data/mongo:/data/db
-    user: "1000:1000"
+      - ./data/postgres:/var/lib/postgresql/data/
  
   redis:
     image: redis:latest

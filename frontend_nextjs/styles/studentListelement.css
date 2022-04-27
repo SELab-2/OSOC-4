@@ -1,0 +1,110 @@
+.list-element {
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--not-selected-gray);
+    border-radius: 7px;
+    margin: 7px 0 7px 0;
+    padding: 10px 12px 10px 10px;
+}
+
+.list-element-selected {
+    border-width: 6px;
+    border-style: solid;
+    border-radius: 7px;
+    margin: 5px -2px 5px -2px;
+    padding: 10px 12px 10px 10px;
+}
+
+.list-element:hover {
+    border-color: var(--selection-gray);
+}
+
+.name {
+    font-size: 22px;
+    padding: 0;
+    margin-right: 20px;
+}
+
+.info-titles {
+    font-weight: normal;
+    font-size: 14px;
+    padding: 0 17px 0 0;
+}
+
+.info-answers {
+    padding: 0;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.practical-problems {
+    font-size: 15px;
+    margin-top: 2px;
+    padding: 2px 6px;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+
+.suggestions {
+    padding: 0;
+    font-size: 15px;
+    margin-right: 5px;
+}
+
+.suggestionsYes {
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
+    background-color: var(--yes_green_65);
+}
+
+.suggestionsMaybe {
+    width: 25px;
+    height: 25px;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+    background-color: var(--maybe_yellow_65);
+}
+
+.suggestionsNo {
+    width: 25px;
+    height: 25px;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+    background-color: var(--no_red_65);
+}
+
+.skill {
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: var(--background-gray);
+    margin: 2px 5px 2px 0;
+    font-size: 12px;
+}
+
+.skills {
+    margin-top: 10px;
+    margin-right: 7px;
+    padding: 0;
+    align-self: end;
+}
+
+.question-answer-row {
+    margin: 7px 0;
+}
+
+.info {
+    margin-left: 0;
+}
+
+.upper-layer {
+    margin: 0;
+}
+
+.nomargin {
+    margin: 0;
+}

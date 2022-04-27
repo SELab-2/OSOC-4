@@ -3,3 +3,13 @@
     justify-content: left;
     text-align: left;
 }
+
+.table-button {
+    background-color: var(--color-background);
+    border-width: 0;
+
+}
+
+.errormessage {
+    -webkit-text-fill-color: red;
+}
