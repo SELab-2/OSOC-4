@@ -12,6 +12,7 @@ export default function AddStudentModal(props){
     const [skills, setSkills] = useState([])
 
     useEffect(() => {
+        setSelectedSkill(undefined)
         if(props.selectedStudent !== undefined && props.selectedProject !== undefined){
             let temp_dict = {}
             props.selectedProject.required_skills.map(skill => {
