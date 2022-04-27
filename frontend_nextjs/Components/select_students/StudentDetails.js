@@ -76,11 +76,9 @@ export default function StudentDetails(props) {
       setPrevStudentid(router.query.studentId)
       setDetailLoading(true)
       Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(retrieved_student => {
-        console.log(retrieved_student.data)
         setStudent(retrieved_student.data);
         setDecision(retrieved_student.data["decision"])
         setDecideField(retrieved_student.data["decision"])
-        console.log(retrieved_student.data["suggestions"])
         setSuggestions(retrieved_student.data["suggestions"]);
         // Fill in the questionAnswers
         Url.fromUrl(retrieved_student.data["question-answers"]).get().then(res => {
