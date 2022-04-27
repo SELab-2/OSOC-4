@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import SelectSearch, {fuzzySearch} from "react-select-search";
 import {api, Url} from "../utils/ApiClient";
+import {log} from "../utils/logger";
 
 
 export default function NewProjects() {
@@ -70,18 +71,20 @@ export default function NewProjects() {
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        let edition = await api.getCurrentYear();
         // TODO check forms
         let body = {
             "name":projectName,
             "description":projectDescription,
+            "goals": "",
+            "required_skills": [],
             "partner_name":partnerName,
             "partner_description": partnerDescription,
-            "goals": "",
-            "edition": edition
+            "edition": api.year,
+            "users": []
         }
+        log(body)
         // TODO add skills to project
-        await Url.fromName(api.edition_projects).extend("projects/create").setBody(body).post();
+        await Url.fromName(api.projects).extend("/create").setBody(body).post();
     }
 
 

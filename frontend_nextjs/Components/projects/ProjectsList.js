@@ -39,15 +39,19 @@ export default function ProjectsList(props) {
         }
     }, [])
 
+    function changeVisibleProjects(){
+        setVisibleProjects(allProjects.filter(project => project.name.includes(search)
+            && ((! peopleNeeded) || project.participations.length < project.required_skills.length)))
+    }
+
     async function handleSearchSubmit(event) {
         event.preventDefault();
-        setVisibleProjects(allProjects.filter((project) => project.name.includes(search)))
+        changeVisibleProjects()
     }
 
     async function changePeopleNeeded(event){
-        log(peopleNeeded)
         setPeopleNeeded(event.target.checked)
-        log(peopleNeeded)
+        changeVisibleProjects()
 
     }
 
