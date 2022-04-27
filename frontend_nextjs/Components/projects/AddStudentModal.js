@@ -2,6 +2,7 @@ import {Button, Modal} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import SkillSelector from "./SkillSelector";
 import {api, Url} from "../../utils/ApiClient";
+import {log} from "../../utils/logger";
 
 
 export default function AddStudentModal(props){
@@ -44,8 +45,8 @@ export default function AddStudentModal(props){
         }
     }
 
-    return(<div>
-        {(props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
+    function getAddModal() {
+        return(
             <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
@@ -68,7 +69,44 @@ export default function AddStudentModal(props){
                     </Button>
 
                 </Modal.Footer>
-            </Modal>: <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+            </Modal>)
+    }
+
+    function getAlreadyAddedModal(){
+        return(
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} can not be added to {props.selectedProject.name} project</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>The selected student already is assigned to the selected project.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={() => props.setShowAddStudent(false)}>
+                        Go back to the project tab
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    }
+
+    function getMustHaveValidSkill(){
+        return(
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} has no required skills for the {props.selectedProject.name} project</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>A student must have a required skill of the selected project to be added to that project.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={() => props.setShowAddStudent(false)}>
+                        Go back to the project tab
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    }
+
+    function getMustSelect(){
+        return(
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>No selected {props.selectedStudent === undefined ? "student" : "project"}{(props.selectedStudent === undefined && props.selectedProject === undefined) ? " or project" : ""}</Modal.Title>
                 </Modal.Header>
@@ -79,7 +117,14 @@ export default function AddStudentModal(props){
                     </Button>
                 </Modal.Footer>
             </Modal>
-        }
+        )
+    }
 
+    return(<div>
+        {(props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
+            ((skills.length > 0 ) ?
+                    ((! props.selectedProject.participations.map(p => p.student).includes(props.selectedStudent.id)) ?
+                            getAddModal() : getAlreadyAddedModal()) : getMustHaveValidSkill()) : getMustSelect()
+        }
     </div>)
 }

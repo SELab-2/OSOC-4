@@ -3,7 +3,6 @@ import { Col, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
 import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
-import { useSession } from "next-auth/react";
 import useWindowDimensions from "../utils/WindowDimensions";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 import EmailBottomBar from "../Components/select_students/EmailBottomBar";

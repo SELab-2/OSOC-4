@@ -8,8 +8,10 @@
 }
 
 .project-card-selected{
-    border: 2px solid var(--yes_green_45);
-    margin: -1px;
+    border-width: 6px;
+    border-style: solid;
+    border-radius: 7px;
+    border-color: var(--yes_green_45);
 }
 
 .project-card-div{

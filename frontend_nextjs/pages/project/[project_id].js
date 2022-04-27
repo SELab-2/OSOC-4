@@ -9,6 +9,7 @@ import Image from 'next/image'
 import back from "/public/assets/back.svg"
 import edit from "/public/assets/edit.svg"
 import delete_image from "/public/assets/delete.svg"
+import Hint from "../../Components/Hint";
 
 const Project = () => {
     const router = useRouter()
@@ -56,17 +57,23 @@ const Project = () => {
                 <div>
                     <Row className={"project-top-bar"}>
                         <Col xs="auto" >
-                            <Image alt={"back button"} onClick={() => router.back()} src={back} width={100} height={33}/>
+                            <Hint message="Go back" placement="top">
+                                <Image alt={"back button"} onClick={() => router.back()} src={back} width={100} height={33}/>
+                            </Hint>
                         </Col>
                         <Col>
                             <div className={"project-details-project-title"}>{project.name}</div>
                         </Col>
                         <Col xs="auto" >
-                            <Image alt={"edit button"} onClick={() => setShowEdit(prevState => ! prevState)} src={edit} width={33} height={33}/>
+                            <Hint message="Edit project" placement="top">
+                                <Image alt={"edit button"} onClick={() => setShowEdit(prevState => ! prevState)} src={edit} width={33} height={33}/>
+                            </Hint>
                             {/*TODO make this actually turn edit on*/}
                         </Col>
                         <Col xs="auto" >
-                            <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)}/>
+                            <Hint message="Delete project" placement="top">
+                                <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)}/>
+                            </Hint>
                             <Modal show={showDelete} onHide={() => setShowDelete(false)}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Delete project?</Modal.Title>
