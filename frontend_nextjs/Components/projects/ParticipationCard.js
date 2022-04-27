@@ -2,9 +2,10 @@ import {Card, Col, Row} from "react-bootstrap";
 import SkillCard from "./SkillCard";
 import {useEffect, useState} from "react";
 import Image from 'next/image'
-import {Url} from "../../utils/ApiClient";
+import {api, Url} from "../../utils/ApiClient";
 import red_cross from "/public/assets/wrong.svg"
 import {log} from "../../utils/logger";
+import {getID} from "../../utils/string";
 
 
 // TODO add extra info on hover
@@ -21,7 +22,9 @@ export default function ParticipationCard(props){
     }, [])
 
     function deleteStudentFromProject(){
-        log("TEST")
+        Url.fromName(api.participations)
+            .setParams({project_id:getID(props.project.id), student_id:getID(props.participation.student)})
+            .delete().then(res => log(res))
         // delete participation
     }
 
@@ -37,7 +40,7 @@ export default function ParticipationCard(props){
                     </Col>
                     <Col xs={"auto"} className={"participation-remove-student"}>
                         <div className={"participation-delete"}>
-                            <Image  alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25}/>
+                            <Image  alt={"delete student from project button"} onClick={() => deleteStudentFromProject()} src={red_cross} width={25} height={25}/>
                         </div>
                     </Col>
                 </Row>

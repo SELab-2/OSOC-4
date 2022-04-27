@@ -84,7 +84,7 @@ export default function ProjectCard(props) {
                             <div className={"project-title-list"}>
                                 <div className={"project-card-title"}>Assigned students</div>
                                 {(props.project.participations.length) ?
-                                    props.project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
+                                    props.project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation} project={props.project}/>)) :
                                     <div className={"project-empty-list"}>Currently there are no assigned students</div>
                                 }
                             </div>
