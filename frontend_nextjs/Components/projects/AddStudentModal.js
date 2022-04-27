@@ -2,6 +2,7 @@ import {Button, Modal} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import SkillSelector from "./SkillSelector";
 import {api, Url} from "../../utils/ApiClient";
+import {log} from "../../utils/logger";
 
 
 export default function AddStudentModal(props){
@@ -122,7 +123,7 @@ export default function AddStudentModal(props){
     return(<div>
         {(props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
             ((skills.length > 0 ) ?
-                    ((! props.selectedProject.participations.map(p => p.student)).include(props.selectedStudent.id) ?
+                    ((! props.selectedProject.participations.map(p => p.student).includes(props.selectedStudent.id)) ?
                             getAddModal() : getAlreadyAddedModal()) : getMustHaveValidSkill()) : getMustSelect()
         }
     </div>)
