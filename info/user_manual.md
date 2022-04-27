@@ -41,7 +41,7 @@
 
 #### [8. Interactions and use cases](#8-interactions-and-use-cases-1)
 
-[8.1. Logging in](#81-logging-in)
+[8.1. Logging in](#81-logging-in) \
 [8.2. Interaction diagram](#82-interaction-diagram)
 
 
