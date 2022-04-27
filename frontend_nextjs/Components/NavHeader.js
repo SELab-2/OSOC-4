@@ -15,7 +15,6 @@ export default function NavHeader(props) {
 
     const [role, setRole] = useState(0)
 
-
     useEffect(() => {
         if (role === 0 ) {
             Url.fromName(api.me).get().then(res => {
