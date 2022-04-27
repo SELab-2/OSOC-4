@@ -442,6 +442,27 @@ The navigation bar, probably the most important part of any website. If you're l
 Clicking on any of these links will require some requests to the API as new data needs to be loaded.
 
 ### 8.4. The settings
-The settings page, the place to configure (almost) everything! The page consists of multiple categories you can click on and will then open up to reveal the settings for that category. By default when you arrive on the settings page, the category `personal settings` will be revealed, in here you can change you personal information like your name, email address and password.
+The settings page, the place to configure (almost) everything! The page consists of multiple categories you can click on and will then open up to reveal the settings for that category. 
+
+By default when you arrive on the settings page, the category `personal settings` will be revealed, in here you can change you personal information like your name, email address and password. For each of these sub-categories you can find a button on the right that says "change" which opens up a window where you can change the chosen setting.
 
 ![settings personal](screenshots/settings_personal.png)
+
+If you are an admin, you'll be able to see some additional settings, these are described below.
+
+If you click on the `Edition settings` you'll see the title of the current (selected) edition, with underneath the description. Below that you'll see 3 more settings sub-categories that can be clicked on to open. \
+`Change edition` shows a dropdown where you can select another edition to view, this way you can see the students & projects from another edition (keep in mind that old editions will be read-only).
+
+![settings editions change](screenshots/settings_editions_change.png)
+
+If you click on `Question tags` you'll see a list of the question tags for this edition. In here you can change the name of the tag (if the tag is not mandatory) and the question that the tag corresponds to (click the pencil button on the right). You can also check the checkbox to show the tag and answer to the question in the list of students on the students tab and projects tab. If you think a tag is unnecessary, you can delete it if the tag isn't mandatory.
+
+![settings editions questiontags](screenshots/settings_editions_questiontags.png)
+
+If you click on `Create new edition` you'll see a form that you can fill in in order to create the new edition. You'll need to provide the year, name and description of the new edition, and then press the "create edition" button below.
+
+That's all for the edition settings. Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users". The `Invite users` can be used to send people an invite so they can join the application. You simply type the email addresses of the people you want to invite in the text-area, and click the send invites button. You'll get an alert when the emails have all been send. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line. 
+
+Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invite but hasn't yet activated the account.
+
+![setttings manageusers](screenshots/manageusers.png)
