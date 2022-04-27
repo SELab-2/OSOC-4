@@ -90,7 +90,7 @@ export default function EditionSettings() {
                 </AccordionItem>
                 <AccordionItem eventKey="1" onClick={() => setReloadQuestionTags(p => p + 1)}>
                     <AccordionHeader>
-                        <h3>Question Tags</h3>
+                        <h3>Question tags</h3>
                     </AccordionHeader>
                     <AccordionBody>
                         <div className="questiontags">

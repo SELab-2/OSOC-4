@@ -16,7 +16,6 @@ import change_password_image from "/public/assets/change_password.png"
 import dark_theme from "/public/assets/dark_theme.png"
 import EditionSettings from "../Components/settings/EditionSettings";
 import LoadingPage from "../Components/LoadingPage";
-import QuestionTags from "../Components/settings/QuestionTags";
 
 
 /**
@@ -64,20 +63,20 @@ function Settings() {
                     </AccordionHeader>
                     <AccordionBody>
                         <div className="personal-settings">
-                            <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
-                                <ChangePassword />
+                            <SettingCards image={change_name_image} title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
+                                <ChangeName user={me} />
                             </SettingCards>
                             <SettingCards image={change_email_image} title={"Change email"} subtitle={"Change to a different email-adress"}>
                                 <ChangeEmail user={me} />
                             </SettingCards>
-                            <SettingCards image={change_name_image} title={"Change name"} subtitle={"This name will be displayed throughout the website"}>
-                                <ChangeName user={me} />
+                            <SettingCards image={change_password_image} title={"Change password"} subtitle={"Having a strong password is a good idea"}>
+                                <ChangePassword />
                             </SettingCards>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
 
-
+                {(process.env.NODE_ENV !== "development")? null :  // THIS ISN'T READY YET, HIDE IN PRODUCTION
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
                         <h3>Website settings</h3>
@@ -89,7 +88,7 @@ function Settings() {
                             </SettingCards>
                         </div>
                     </AccordionBody>
-                </AccordionItem>
+                </AccordionItem>}
 
                 {(me.role === 2) ? (
                     <AccordionItem eventKey="2">
