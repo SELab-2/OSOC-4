@@ -26,11 +26,14 @@ export default function QuestionTags(props) {
     // This variable holds the error message that needs to be shown. If this is empty, no error message is shown.
     const [errorMessage, setErrorMessage] = useState("");
 
+    const [loading, setLoading] = useState(true);
+
     /**
      * Called when the component is build. It fetches all the question tags and inserts them the questionTags array
      */
     useEffect(() => {
-        if (props.reload) {
+        if(props.reload) {
+            setLoading(true);
             Url.fromName(api.editions_questiontags).get().then(res => {
                 if (res.success) {
                     Promise.all(res.data.map(url => Url.fromUrl(url).get())).then(
@@ -43,8 +46,8 @@ export default function QuestionTags(props) {
                             setQuestionTags(newQuestionTags);
                         }
                     )
-                }
-            });
+                }});
+            setLoading(false);
         }
     }, [props.reload]);
 
@@ -114,6 +117,9 @@ export default function QuestionTags(props) {
         setQuestionTags(newQuestionTags);
     }
 
+    if (loading) {
+        return (<LoadingPage/>);
+    }
     /**
      * The html that renders the question tags.
      */
