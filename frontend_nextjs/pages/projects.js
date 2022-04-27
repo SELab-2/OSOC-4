@@ -9,6 +9,11 @@ import useWindowDimensions from "../utils/WindowDimensions";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 import Hint from "../Components/Hint";
 
+/**
+ * The page corresponding with the 'projects' tab
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function Projects() {
 
     const [selectedProject, setSelectedProject] = useState(undefined);
