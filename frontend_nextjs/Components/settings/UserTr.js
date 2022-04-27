@@ -8,7 +8,7 @@ import {api, Url} from "../../utils/ApiClient";
  */
 export default function UserTr(props) {
     const [role, setRole] = useState(props.user.role)
-    const roles = ["No role", "Coach", "Admin", "Disabled"]
+    const roles = ["No role", "Coach", "Admin"]
     const [active, setActive] = useState(props.user.active);
     const [approved, setApproved] = useState(props.user.approved);
     const [disabled, setDisabled] = useState(props.user.disabled);

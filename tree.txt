@@ -1,0 +1,53 @@
+OSOC-selection-tool/
+├── LICENSE
+├── README.md
+├── docker-compose.yml
+├── deploy-docker-compose.yml
+├── test-docker-compose.yml
+├── backend
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   ├── app
+│   │   ├── api.py
+│   │   ├── config.py
+│   │   ├── crud.py
+│   │   ├── database.py
+│   │   ├── exceptions
+│   │   ├── models
+│   │   ├── routers
+│   │   ├── tests
+│   │   └── utils
+│   └── TestDockerfile
+├── data
+│   ├── postgres
+│   └── redis
+├── frontend_nextjs
+│   ├── Dockerfile
+│   ├── DevDockerfile
+│   ├── Components
+│   ├── pages
+│   ├── public
+│   │   ├── assets
+│   │   ├── favicon.ico
+│   │   └── vercel.svg
+│   ├── README.md
+│   ├── styles
+│   ├── tests
+│   └── utils
+│       ├── ApiClient.js
+│       ├── logger.js
+│       └── WindowDimensions.js
+└── info
+    ├── domain_model.svg
+    ├── architecture_and_design
+    │   ├── containers.drawio
+    │   ├── containers.svg
+    │   ├── design.drawio
+    │   └── design.svg
+    ├── use-cases
+    │   └── use-cases.md
+    ├── interaction_diagrams
+    │   └── login_diagram.svg
+    ├── screenshots
+    │   └── login_screen.png
+    └── user_manual.md

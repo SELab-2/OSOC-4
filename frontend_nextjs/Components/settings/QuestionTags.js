@@ -12,34 +12,59 @@ import LoadingPage from "../LoadingPage";
  * @returns {JSX.Element}
  */
 export default function QuestionTags(props) {
+
+    // represents the array of question tags.
     const [questionTags, setQuestionTags] = useState([]);
 
+    // represents the currently edited question tag.
     const [edited, setEdited] = useState(undefined);
+
+    // This variable represents the new questiontag, when the 'new question tag' button is clicked it is shown as an
+    // empty row in the end of the table.
     const [newQuestionTag, setNewQuestionTag] = useState(undefined);
+
+    // This variable holds the error message that needs to be shown. If this is empty, no error message is shown.
     const [errorMessage, setErrorMessage] = useState("");
 
+    /**
+     * Called when the component is build. It fetches all the question tags and inserts them the questionTags array
+     */
     useEffect(() => {
-        Url.fromName(api.editions_questiontags).get().then(res => {
-          if (res.success) {
-            Promise.all(res.data.map(url => Url.fromUrl(url).get())).then(
-              resq => {
-                let newQuestionTags = resq;
-                for (let i = 0; i < newQuestionTags.length; i ++) {
-                  newQuestionTags[i] = newQuestionTags[i]["data"];
-                  newQuestionTags[i]["url"] = res.data[i];
-                }
-                setQuestionTags(newQuestionTags);
-              }
-            )
-          }});
-    }, []);
+        if(props.reload) {
+            Url.fromName(api.editions_questiontags).get().then(res => {
+                if (res.success) {
+                    Promise.all(res.data.map(url => Url.fromUrl(url).get())).then(
+                        resq => {
+                            let newQuestionTags = resq;
+                            for (let i = 0; i < newQuestionTags.length; i ++) {
+                                newQuestionTags[i] = newQuestionTags[i]["data"];
+                                newQuestionTags[i]["url"] = res.data[i];
+                            }
+                            setQuestionTags(newQuestionTags);
+                        }
+                    )
+                }});
+        }
+    }, [props.reload]);
 
+    /**
+     * This function is called when the tag name or question of the new question tag are edited.
+     * @param ev The event of editing the input field
+     */
     function handleNewTagChange(ev) {
         let newQuestionTagAdj = {...newQuestionTag};
         newQuestionTagAdj[ev.target.name] = ev.target.value;
         setNewQuestionTag(newQuestionTagAdj);
     }
 
+    /**
+     * This function is called when clicking the save button of the new question tag. First it checks or the tag name
+     * and question of the new question tag are not empty and unique. Then It posts the new question tag. Only the tag
+     * name will be inserted in the database in the post. We follow the post by a patch that inserts the question,
+     * mandatory and showInList variables of the new question tag.
+     * @param event The event of clicking the save button
+     * @returns {Promise<void>}
+     */
     async function submitNewTag(event) {
         event.preventDefault();
         let requirements = [newQuestionTag["tag"].length > 0,
@@ -63,11 +88,21 @@ export default function QuestionTags(props) {
         }
     }
 
+    /**
+     * This function is called when a question tag is deleted. It removes the question tag from the local question tags.
+     * @param url
+     */
     function deleteTag(url) {
         const newArr = questionTags.filter(item => item["url"] !== url);
         setQuestionTags(newArr);
     }
 
+    /**
+     * This function is called when the tag name of a question tag is changed. It changes the url of the question tag
+     * locally.
+     * @param url The old url of the question tag.
+     * @param newUrl The new url of the question tag.
+     */
     function renameTag(url, newUrl) {
         let index = questionTags.map(qt => qt["tag"]).indexOf(url);
         let newQuestionTags = [...questionTags];
@@ -77,6 +112,9 @@ export default function QuestionTags(props) {
         setQuestionTags(newQuestionTags);
     }
 
+    /**
+     * The html that renders the question tags.
+     */
     return (
       <div>
           <Table>

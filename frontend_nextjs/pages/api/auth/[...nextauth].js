@@ -81,7 +81,7 @@ const callbacks = {
     redirect: async ({ url, baseUrl }) => {
 
         if (process.env.NODE_ENV === "production") {
-            return url.replace("http://localhost:3000", "https://sel2-4.ugent.be");
+            return url.replace("http://localhost:3000", process.env.BASE_URL);
         }
         return url;
     }
