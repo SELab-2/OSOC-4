@@ -39,10 +39,15 @@
 [7.1.15. Participation](#7115-participation) \
 [7.1.16. DefaultEmail](#7116-defaultemail)
 
-#### [8. Description of the user interface and common use cases](#8-description-of-the-user-interface-and-common-use-cases-1)
+#### [8. Interactions and use cases](#8-interactions-and-use-cases-1)
 
-[8.1. Login screen](#81-login-screen)
-
+[8.1. Interaction diagram](#81-interaction-diagram) \
+[8.2. Logging in](#82-logging-in) \
+[8.3. The navigation bar](#83-the-navigation-bar) \
+[8.4. The settings](#84-the-settings) \
+[8.4.1. Personal settings](#841-personal-settings) \
+[8.4.2. Edition settings](#842-edition-settings) \
+[8.4.3. Manage users](#843-manage-users)
 
 
 ## 1. Introduction
@@ -253,19 +258,13 @@ OSOC-selection-tool/                   root of the repository
 │       └── WindowDimensions.js
 └── info                               directory containing information about the project/application
     ├── domain_model.svg               the domain model
-    ├── architecture_and_design        images about the architecture and the design of the application, 
-    │   ├── containers.drawio                       you can open the .drawio files in draw.io if you wish to edit them
-    │   ├── containers.svg             
-    │   ├── design.drawio              
-    │   └── design.svg                 
+    ├── architecture_and_design        images about the architecture and the design of the application
     ├── use-cases                      the usecases of the application
-    │   └── use-cases.md
     ├── interaction_diagrams           diagrams explaining how certain interactions work 
-    │   └── login_diagram.svg
     ├── screenshots                    screenshot of the frontend, used in user manual to to explain how to to certain tasks
-    │   └── login_screen.png
     └── user_manual.md                 the user manual
 ```
+
 
 
 ## 7. Description of the main product elements
@@ -420,15 +419,59 @@ _attributes:_ \
 
 
 
-## 8. Description of the user interface and common use cases
+## 8. Interactions and use cases
 
-### 8.1. Login screen
+### 8.1. Interaction diagram
+All actions a user can do on our application, can be described by one diagram (shown below). It comes down to this: a user does an interaction with the website (frontend), this interaction is either immediately handled by the frontend (for example typing a letter in a text field) and is thus immediately visualized. Or the interaction transforms into a request to the API. The API will then receive and process the request, which might use some data from either of both databases, and respond with either a successful response, or an exception. The frontend will receive this response, and react upon it (visualize it to the user).
+
+![interaction diagram](interaction_diagrams/interaction_diagram.drawio.svg)
+
+Every interaction described below will use some parts (or all parts) of this diagram. We won't repeat this diagram for every interaction, but we'll show you an example for the log in interaction described in the next section.
+
+
+### 8.2. Logging in
+When you first visit the application, you have to log in. This requires the guest to type in his credentials (email address and password) and click on the login button. The login screen looks like this:
 
 ![Login screen](screenshots/login_screen.png)
 
-Before logging in, your profile must be approved by an admin.
-1. A field to write your email address that is linked to your profile.
-2. A field to write your password to enter the application.
-3. This button will give you access to the application if the email address and password match a valid profile. Otherwise, you will get a warning message.
-4. If you forgot your password, this button will send you an email to reset your password.
+The application (or website, or frontend) will then send a POST request to the API (backend), which will validate if you've given the email address of a user that exists, and that the passwords match. If so the backend also checks whether the user is allowed access (for example an admin might not have approved the user yet). If something went wrong then the API will respond with an error, which the guest will see on the login webpage. If on the other hand the login was succesful, then the guest will become a user (Coach or Admin) and will be redirected to the dashboard (main-page or index) of the application. The interaction is also described in the diagram below. As you can see we didn't need the Redis for this interaction.
 
+![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
+
+### 8.3. The navigation bar
+The navigation bar, probably the most important part of any website. If you're logged in, the navigation bar will always be shown at the top of the page, no mather what page you're currently viewing. This component is used to switch between pages, for example if you click on the `select-students` text (this is a link), you will be redirected to the select-students page. The same goes for `projects` which bring you to the projects page and for `settings` which brings you to the settings page. If you wish to go back to the `dashboard` (the main page, the page you view after having logged in), you can click on the image / logo all the way on the left. If you wish to log out, you can simply click on the `Log out` text all the way on the right. Keep in mind that when you're logged out you won't see the navigation bar, as you're not allowed to navigate the application (you must be logged in for that).
+
+![navigation component](screenshots/navigation_component.png)
+
+Clicking on any of these links will require some requests to the API as new data needs to be loaded.
+
+### 8.4. The settings
+The settings page, the place to configure (almost) everything! The page consists of multiple categories you can click on and will then open up to reveal the settings for that category. 
+
+#### 8.4.1. Personal settings
+By default when you arrive on the settings page, the category `personal settings` will be revealed, in here you can change you personal information like your name, email address and password. For each of these sub-categories you can find a button on the right that says "change" which opens up a window where you can change the chosen setting.
+
+![settings personal](screenshots/settings_personal.png)
+
+#### 8.4.2. Edition settings
+You'll only see these settings if you are an admin.
+
+If you click on the `Edition settings` you'll see the title of the current (selected) edition, with underneath the description. Below that you'll see 3 more settings sub-categories that can be clicked on to open. \
+`Change edition` shows a dropdown where you can select another edition to view, this way you can see the students & projects from another edition (keep in mind that old editions will be read-only).
+
+![settings editions change](screenshots/settings_editions_change.png)
+
+If you click on `Question tags` you'll see a list of the question tags for this edition. In here you can change the name of the tag (if the tag is not mandatory) and the question that the tag corresponds to (click the pencil button on the right). You can also check the checkbox to show the tag and answer to the question in the list of students on the students tab and projects tab. If you think a tag is unnecessary, you can delete it if the tag isn't mandatory.
+
+![settings editions questiontags](screenshots/settings_editions_questiontags.png)
+
+If you click on `Create new edition` you'll see a form that you can fill in in order to create the new edition. You'll need to provide the year, name and description of the new edition, and then press the "create edition" button below.
+
+#### 8.4.3. Manage users
+You'll only see these settings if you are an admin.
+
+Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users". The `Invite users` can be used to send people an invite so they can join the application. You simply type the email addresses of the people you want to invite in the text-area, and click the send invites button. You'll get an alert when the emails have all been send. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line. 
+
+Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invite but hasn't yet activated the account.
+
+![setttings manageusers](screenshots/manageusers.png)
