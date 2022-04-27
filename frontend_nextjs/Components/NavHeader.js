@@ -50,7 +50,7 @@ export default function NavHeader(props) {
               <Link href="/settings">Settings</Link>
             </Nav>
             <Nav>
-              <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
+              <Nav.Link onClick={logoutHandler}>Log out</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Navbar>
