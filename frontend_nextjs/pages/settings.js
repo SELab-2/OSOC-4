@@ -76,7 +76,7 @@ function Settings() {
                     </AccordionBody>
                 </AccordionItem>
 
-                {(process.env.NODE_ENV === "production")? null :  // THIS ISN'T READY YET, HIDE IN PRODUCTION
+                {(process.env.NODE_ENV !== "development")? null :  // THIS ISN'T READY YET, HIDE IN PRODUCTION
                 <AccordionItem eventKey="1">
                     <AccordionHeader>
                         <h3>Website settings</h3>
