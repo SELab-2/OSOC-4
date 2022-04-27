@@ -19,7 +19,7 @@ export default function StudentList(props) {
 
   const router = useRouter();
 
-  const listheights = { "emailstudents": "245px", "students": "175px", "projects": "146px" }
+  const listheights = { "emailstudents": "245px", "students": "178px", "projects": "146px" }
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);

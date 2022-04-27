@@ -27,13 +27,16 @@ export default function StudentList(props) {
                     <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="25px" />
                 </button>
             </Row>
-            <Row className="no-margin">
+
+            <Row className={`bottombar ${props.showEmailBar ? "" : "down"}`}>
+
                 <Col className="text-center"><h style={{ "font-weight": 'bold', "font-size": "25px" }}>{props.selectedStudents.length} / {props.students.length}</h></Col>
                 <Col><Button className="send-emails-button"
                     onClick={selectAll}>{props.selectedStudents.length === props.students.length ? "Deselect All" : "Select All"}</Button></Col>
                 <Col><Button className="send-emails-button" disabled={!props.selectedStudents.length}
                     onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button></Col>
             </Row>
+
         </div>
     ]
 

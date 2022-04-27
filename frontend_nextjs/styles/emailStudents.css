@@ -95,7 +95,6 @@
 .email-bar {
     border-radius: 15px 15px 0px 0px;
     background-color: rgb(245, 234, 140);
-    padding: 5px 0px 15px 0px;
 }
 
 .arrow-button {
@@ -108,4 +107,18 @@
 .arrow-button.down {
     transform: rotate(180deg);
     transition: all 0.6s;
+}
+
+.bottombar {
+    transition-timing-function: ease-in;
+    transition: 0.2s;
+    padding: 5px 0px 14px 0px;
+}
+
+.bottombar.down {
+    overflow: hidden;
+    height: 0px;
+    padding: 0px 0px 0px 0px;
+    visibility: hidden;
+    transition: all 0s 1s;
 }
