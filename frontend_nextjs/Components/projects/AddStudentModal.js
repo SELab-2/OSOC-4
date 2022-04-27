@@ -46,6 +46,7 @@ export default function AddStudentModal(props){
 
     return(<div>
         {(props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
+            (skills.length > 0 ?
             <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
@@ -68,7 +69,20 @@ export default function AddStudentModal(props){
                     </Button>
 
                 </Modal.Footer>
-            </Modal>: <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+            </Modal>:
+                    <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>{props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} has no required skills for the {props.selectedProject.name} project</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>A student must have a required skill of the selected project to be added to that project.</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={() => props.setShowAddStudent(false)}>
+                                Go back to the project tab
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+            ):
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>No selected {props.selectedStudent === undefined ? "student" : "project"}{(props.selectedStudent === undefined && props.selectedProject === undefined) ? " or project" : ""}</Modal.Title>
                 </Modal.Header>
