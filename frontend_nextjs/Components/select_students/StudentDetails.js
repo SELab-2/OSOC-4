@@ -80,6 +80,7 @@ export default function StudentDetails(props) {
         setStudent(retrieved_student.data);
         setDecision(retrieved_student.data["decision"])
         setDecideField(retrieved_student.data["decision"])
+        console.log(retrieved_student.data["suggestions"])
         setSuggestions(retrieved_student.data["suggestions"]);
         // Fill in the questionAnswers
         Url.fromUrl(retrieved_student.data["question-answers"]).get().then(res => {
@@ -139,8 +140,10 @@ export default function StudentDetails(props) {
     let result = [];
     const classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
 
-    for (let i = 0; i < Object.values(suggestions).length; i++) {
-      let suggestion = Object.values(suggestions)[i];
+    const sortedsuggestions = Object.values(suggestions).sort((a, b) => a.decision < b.decision);
+
+    for (let i = 0; i < sortedsuggestions.length; i++) {
+      let suggestion = sortedsuggestions[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
       result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}
         classNamesText={(suggestion["suggested_by_id"] === session["userid"]) ?
