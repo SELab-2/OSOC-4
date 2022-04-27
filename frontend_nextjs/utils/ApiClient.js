@@ -396,6 +396,10 @@ class Cache {
         }
     }
 
+    async clear() {
+        Object.keys(cache).map(key => delete cache[key]);
+    }
+
 }
 
 export const cache = new Cache();
