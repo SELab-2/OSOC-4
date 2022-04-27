@@ -28,11 +28,11 @@ export default function ProjectsList(props) {
                                     log(project.data.users)
                                     await setAllProjects(prevState => [...prevState, project.data]);
                                     // TODO clean this up (currently only works if updated here
-                                    await setVisibleProjects(prevState => [...prevState, project.data]);
                                 }
                             }
                         });
                     }
+                    changeVisibleProjects()
                     setLoaded(true);
                 }
             })
@@ -40,8 +40,18 @@ export default function ProjectsList(props) {
     }, [])
 
     function changeVisibleProjects(){
-        setVisibleProjects(allProjects.filter(project => project.name.includes(search)
-            && ((! peopleNeeded) || project.participations.length < project.required_skills.length)))
+        log("change projects")
+        log(peopleNeeded)
+        setVisibleProjects(allProjects.filter(project => {
+            let sum = 0;
+            if(! peopleNeeded){
+                project.required_skills.forEach(skill => {
+                    log(skill);
+                    sum += skill.number});
+            }
+            return project.name.includes(search)
+                && ((peopleNeeded) || sum > project.participations.length);
+        }))
     }
 
     async function handleSearchSubmit(event) {
@@ -52,7 +62,6 @@ export default function ProjectsList(props) {
     async function changePeopleNeeded(event){
         setPeopleNeeded(event.target.checked)
         changeVisibleProjects()
-
     }
 
     const handleNewProject = () => {
