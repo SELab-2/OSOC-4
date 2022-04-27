@@ -262,7 +262,7 @@ OSOC-selection-tool/                   root of the repository
 ```
 
 ### 6.3. Interaction / sequence diagrams
-First thing you need to do when you visit the application, is ofcourse log in. The interaction is described below.
+When you first visit the application, you have to log in. This requires the guest to type in his credentials (email address and password) and click on the login button. The application (or website, or frontend) will then send a POST request to the API (backend), which will validate if you've given the email address of a user that exists, and that the passwords match. If so the backend also checks whether the user is allowed access (for example an admin might not have approved the user yet). If something went wrong then the API will respond with an error, which the guest will see on the login webpage. If on the other hand the login was succesful, then the guest will become a user (Coach or Admin) and will be redirected to the dashboard (main-page or index) of the application. The interaction is also described in the diagram below.
 
 ![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
 
