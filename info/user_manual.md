@@ -418,7 +418,7 @@ _attributes:_ \
 
 ### 8.1. Logging in
 
-When you first visit the application, you have to log in. This requires the guest to type in his credentials (email address (1) and password) and click on the login button. The login screen looks like this:
+When you first visit the application, you have to log in. This requires the guest to type in his credentials (email address and password) and click on the login button. The login screen looks like this:
 
 ![Login screen](screenshots/login_screen.png)
 
