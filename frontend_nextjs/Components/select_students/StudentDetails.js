@@ -76,7 +76,6 @@ export default function StudentDetails(props) {
       setPrevStudentid(router.query.studentId)
       setDetailLoading(true)
       Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(retrieved_student => {
-        console.log(retrieved_student.data)
         setStudent(retrieved_student.data);
         setDecision(retrieved_student.data["decision"])
         setDecideField(retrieved_student.data["decision"])
@@ -139,8 +138,10 @@ export default function StudentDetails(props) {
     let result = [];
     const classes = ["suggestions-circle-red", "suggestions-circle-yellow", "suggestions-circle-green"];
 
-    for (let i = 0; i < Object.values(suggestions).length; i++) {
-      let suggestion = Object.values(suggestions)[i];
+    const sortedsuggestions = Object.values(suggestions).sort((a, b) => a.decision < b.decision);
+
+    for (let i = 0; i < sortedsuggestions.length; i++) {
+      let suggestion = sortedsuggestions[i];
       let classNames = "suggestions-circle " + classes[suggestion["decision"]];
       result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}
         classNamesText={(suggestion["suggested_by_id"] === session["userid"]) ?
