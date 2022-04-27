@@ -18,6 +18,7 @@
 
 [6.1. Architecture and Design](#61-architecture-and-design) \
 [6.2. Directory structure](#62-directory-structure)
+[6.3. Interaction / sequence diagrams](#63-interaction--sequence-diagrams)
 
 #### [7. Description of the main product elements](#7-description-of-the-main-product-elements-1)
 
@@ -253,19 +254,21 @@ OSOC-selection-tool/                   root of the repository
 │       └── WindowDimensions.js
 └── info                               directory containing information about the project/application
     ├── domain_model.svg               the domain model
-    ├── architecture_and_design        images about the architecture and the design of the application, 
-    │   ├── containers.drawio                       you can open the .drawio files in draw.io if you wish to edit them
-    │   ├── containers.svg             
-    │   ├── design.drawio              
-    │   └── design.svg                 
+    ├── architecture_and_design        images about the architecture and the design of the application
     ├── use-cases                      the usecases of the application
-    │   └── use-cases.md
     ├── interaction_diagrams           diagrams explaining how certain interactions work 
-    │   └── login_diagram.svg
     ├── screenshots                    screenshot of the frontend, used in user manual to to explain how to to certain tasks
-    │   └── login_screen.png
     └── user_manual.md                 the user manual
 ```
+
+### 6.3. Interaction / sequence diagrams
+First thing you need to do when you visit the application, is ofcourse log in. The interaction is described below.
+
+![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
+
+Once we're logged in, you are either a Coach, or an Admin. All actions can now be described by one simple diagram.
+
+![login interaction diagram](interaction_diagrams/interaction_diagram.drawio.svg)
 
 
 ## 7. Description of the main product elements
