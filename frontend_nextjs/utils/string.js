@@ -7,8 +7,11 @@ export function titlecase(text) {
     return text.charAt(0).toUpperCase() + text.substring(1, text.length).toLowerCase();
 }
 
+/**
+ *  Convert a url int the form /../../id to it's id
+ * @param url
+ * @returns {string}
+ */
 export function getID(url){
-    let temp_list = url.split("/")
-    let list = [1,2];
-    return temp_list[temp_list.length - 1]
+    return url.split("/").pop()
 }
