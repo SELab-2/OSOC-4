@@ -59,8 +59,8 @@ async def create_participation(participation: ParticipationCreate,
 
 
 @router.delete("", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Participation deleted")
-async def delete_participation(student_id: int,
-                               project_id: int,
+async def delete_participation(student_id: str,
+                               project_id: str,
                                session: AsyncSession = Depends(get_session),
                                Authorize: AuthJWT = Depends()):
     """delete_participations remove a participation
@@ -72,13 +72,13 @@ async def delete_participation(student_id: int,
     """
 
     # check if participation exists
-    participation = await read_where(Participation, Participation.project_id == project_id, Participation.student_id == student_id, session=session)
+    participation = await read_where(Participation, Participation.project_id == int(project_id), Participation.student_id == int(student_id), session=session)
 
     if not participation:
         raise ParticipationNotFoundException()
 
     # check edition
-    student = await read_where(Student, Student.id == student_id, session=session)
+    student = await read_where(Student, Student.id == int(student_id), session=session)
     if not student:
         raise ParticipationNotFoundException()
     await EditionChecker(update=True)(student.edition_year, Authorize, session)
