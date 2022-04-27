@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 import StudentDetails from "../Components/select_students/StudentDetails";
@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import useWindowDimensions from "../utils/WindowDimensions";
 import StudentsFilters from "../Components/select_students/StudentsFilters";
 import EmailBottomBar from "../Components/select_students/EmailBottomBar";
+import { api, Url } from "../utils/ApiClient";
 
 
 /**
@@ -20,6 +21,16 @@ export default function SelectStudents() {
 
     const [students, setStudents] = useState([]);
     const [selectedStudents, setSelectedStudents] = useState([]);
+
+    const [me, setMe] = useState(undefined);
+
+    useEffect(() => {
+        Url.fromName(api.me).get().then(res => {
+            if (res.success) {
+                setMe(res.data.data);
+            }
+        });
+    }, []);
 
     return (
 
@@ -37,8 +48,9 @@ export default function SelectStudents() {
                 <Row className="nomargin">
                     <StudentListAndFilters selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} setStudents={setStudents} category={showEmailBar ? "emailstudents" : "students"} studentsTab={true} />
                 </Row>
-                <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />
-
+                {(me && me.role === 2) &&
+                    <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />
+                }
             </Col>
             {
                 (router.query.studentId) &&

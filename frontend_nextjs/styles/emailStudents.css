@@ -113,12 +113,13 @@
     transition-timing-function: ease-in;
     transition: 0.2s;
     padding: 5px 0px 14px 0px;
+    max-height: auto;
 }
 
 .bottombar.down {
     overflow: hidden;
-    height: 0px;
+    max-height: 0;
     padding: 0px 0px 0px 0px;
     visibility: hidden;
-    transition: all 0s 1s;
+    transition: max-height 0s 1s;
 }
