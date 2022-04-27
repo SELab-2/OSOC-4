@@ -28,6 +28,7 @@ export default function ProjectsList(props) {
                                     log(project.data.users)
                                     await setAllProjects(prevState => [...prevState, project.data]);
                                     // TODO clean this up (currently only works if updated here
+                                    await setVisibleProjects(prevState => [...prevState, project.data])
                                 }
                             }
                         });
@@ -36,6 +37,8 @@ export default function ProjectsList(props) {
                     setLoaded(true);
                 }
             })
+
+
         }
     }, [])
 
@@ -86,7 +89,7 @@ export default function ProjectsList(props) {
                             </Form>
                         </Col >
                         <Col xs="auto" >
-                            <ConflictCard/>
+                            <ConflictCard />
                         </Col>
                         <Col xs="auto" >
                             <Button className={"center"} onClick={handleNewProject}>New project</Button>

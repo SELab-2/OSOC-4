@@ -1,22 +1,19 @@
 import {Button, Card} from "react-bootstrap";
 import {useEffect, useState} from "react";
+import {api, Url} from "../../utils/ApiClient";
 
 
 export default function ConflictCard() {
     const [conflicts, setConflicts] = useState([])
 
 
-    // useEffect(() => {
-    //     if(conflicts.length === 0){
-    //         urlManager.getConflicts().then(async conflict_url => {
-    //             let conflicts = await getJson(conflict_url)
-    //             log(conflicts)
-    //             if(conflicts){
-    //                 setConflicts(conflicts)
-    //             }
-    //         })
-    //     }
-    // }, [conflicts])
+    useEffect(() => {
+        Url.fromName(api.current_edition).extend("/resolving_conflicts").get().then(res => {
+            if(res.success){
+                setConflicts(res.data)
+            }
+        })
+    }, [])
 
     return(
         <div>
