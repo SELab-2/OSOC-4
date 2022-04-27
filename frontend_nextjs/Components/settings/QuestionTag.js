@@ -23,7 +23,7 @@ export default function QuestionTag(props) {
     useEffect(() => {
         setQuestionTag(props.questionTag);
         setPreviousTag(props.questionTag);
-    }, []);
+    }, [props.questionTag]);
 
   /**
    * This function is called when the tag name or question are edited. It changes their value in the questionTag
