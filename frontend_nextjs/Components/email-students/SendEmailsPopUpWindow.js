@@ -1,6 +1,7 @@
-import {Button, Col, Modal, ModalHeader, ModalTitle, Row} from "react-bootstrap";
+import { Button, Col, Modal, ModalHeader, ModalTitle, Row } from "react-bootstrap";
 import StudentFilter from "../select_students/StudentFilter";
-import {useState} from "react";
+import { useState, useEffect } from "react";
+import { cache } from "../../utils/ApiClient";
 
 /***
  * This element shows the pop up window when sending emails in the 'email students' tab.
@@ -14,6 +15,14 @@ export default function SendEmailsPopUpWindow(props) {
 
   // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
+
+  const [students, setStudents] = useState([])
+
+  useEffect(() => {
+    Promise.all(props.students.map(student => cache.getStudent(student, ""))).then(allstudents => {
+      setStudents([...allstudents]);
+    })
+  }, [props.students])
 
   /***
    * This function is called when the pop-up window is closed
@@ -45,24 +54,24 @@ export default function SendEmailsPopUpWindow(props) {
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
         <Row className="send-email-names">
-          {(props.students)? props.students.map(student => student.mandatory["first name"] + " " +
+          {(students) ? students.map(student => student.mandatory["first name"] + " " +
             student.mandatory["last name"]).join(", ") : null}
         </Row>
         <Row>
           <h5 className="content-title">Content</h5>
         </Row>
         <StudentFilter filter_id="default-email" filter_text="Use default emails" value={defaultEmail}
-                       onChange={ev => setDefaultEmail(true)}/>
-        <StudentFilter filter_id="own-email" filter_text="Type your email here:" value={! defaultEmail}
-                       onChange={ev => setDefaultEmail(false)}/>
+          onChange={ev => setDefaultEmail(true)} />
+        <StudentFilter filter_id="own-email" filter_text="Type your email here:" value={!defaultEmail}
+          onChange={ev => setDefaultEmail(false)} />
         <Row>
-          <Col/>
-          <Col md="auto" className={"email-help-text " + ((defaultEmail)? "disabled-text": null)}>
+          <Col />
+          <Col md="auto" className={"email-help-text " + ((defaultEmail) ? "disabled-text" : null)}>
             (Use @Name, @Firstname, @Lastname, @Decision to address the receiver)
           </Col>
         </Row>
         <Row>
-          <textarea id="student-emails" className="fill_width send-emails" disabled={defaultEmail}/>
+          <textarea id="student-emails" className="fill_width send-emails" disabled={defaultEmail} />
         </Row>
       </Modal.Body>
       <Modal.Footer>
