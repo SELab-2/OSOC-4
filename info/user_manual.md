@@ -17,8 +17,7 @@
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
 [6.1. Architecture and Design](#61-architecture-and-design) \
-[6.2. Directory structure](#62-directory-structure) \
-[6.3. Interaction / sequence diagrams](#63-interaction--sequence-diagrams)
+[6.2. Directory structure](#62-directory-structure)
 
 #### [7. Description of the main product elements](#7-description-of-the-main-product-elements-1)
 
@@ -40,7 +39,7 @@
 [7.1.15. Participation](#7115-participation) \
 [7.1.16. DefaultEmail](#7116-defaultemail)
 
-#### [8. Description of the user interface and common use cases](#8-description-of-the-user-interface-and-common-use-cases-1)
+#### [8. Interactions and use cases](#8-interactions-and-use-cases-1)
 
 [8.1. Login screen](#81-login-screen)
 
@@ -261,14 +260,6 @@ OSOC-selection-tool/                   root of the repository
     └── user_manual.md                 the user manual
 ```
 
-### 6.3. Interaction / sequence diagrams
-When you first visit the application, you have to log in. This requires the guest to type in his credentials (email address and password) and click on the login button. The application (or website, or frontend) will then send a POST request to the API (backend), which will validate if you've given the email address of a user that exists, and that the passwords match. If so the backend also checks whether the user is allowed access (for example an admin might not have approved the user yet). If something went wrong then the API will respond with an error, which the guest will see on the login webpage. If on the other hand the login was succesful, then the guest will become a user (Coach or Admin) and will be redirected to the dashboard (main-page or index) of the application. The interaction is also described in the diagram below.
-
-![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
-
-Once we're logged in, you are either a Coach, or an Admin, you are no longer a guest. All actions a user can do can now be described by one simple diagram (shown below). It comes down to this: a user does an interaction with the website (frontend), this interaction is either immediately handled by the frontend (for example typing a letter in a text field) and is thus immediately visualized. Or the interaction transforms into a request to the API, which will then execute the request, which might use some data from either of both databases, and respond with either a successful response, or an exception. The frontend will receive this response, and react upon it (visualize it to the user).
-
-![interaction diagram](interaction_diagrams/interaction_diagram.drawio.svg)
 
 
 ## 7. Description of the main product elements
@@ -423,9 +414,9 @@ _attributes:_ \
 
 
 
-## 8. Description of the user interface and common use cases
+## 8. Interactions and use cases
 
-### 8.1. Login screen
+### 8.1. Loggin in
 
 ![Login screen](screenshots/login_screen.png)
 
@@ -434,4 +425,13 @@ Before logging in, your profile must be approved by an admin.
 2. A field to write your password to enter the application.
 3. This button will give you access to the application if the email address and password match a valid profile. Otherwise, you will get a warning message.
 4. If you forgot your password, this button will send you an email to reset your password.
+
+### 6.3. Interaction / sequence diagrams
+When you first visit the application, you have to log in. This requires the guest to type in his credentials (email address and password) and click on the login button. The application (or website, or frontend) will then send a POST request to the API (backend), which will validate if you've given the email address of a user that exists, and that the passwords match. If so the backend also checks whether the user is allowed access (for example an admin might not have approved the user yet). If something went wrong then the API will respond with an error, which the guest will see on the login webpage. If on the other hand the login was succesful, then the guest will become a user (Coach or Admin) and will be redirected to the dashboard (main-page or index) of the application. The interaction is also described in the diagram below.
+
+![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
+
+Once we're logged in, you are either a Coach, or an Admin, you are no longer a guest. All actions a user can do can now be described by one simple diagram (shown below). It comes down to this: a user does an interaction with the website (frontend), this interaction is either immediately handled by the frontend (for example typing a letter in a text field) and is thus immediately visualized. Or the interaction transforms into a request to the API, which will then execute the request, which might use some data from either of both databases, and respond with either a successful response, or an exception. The frontend will receive this response, and react upon it (visualize it to the user).
+
+![interaction diagram](interaction_diagrams/interaction_diagram.drawio.svg)
 
