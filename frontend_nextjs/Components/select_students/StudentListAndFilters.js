@@ -43,7 +43,7 @@ export default function StudentList(props) {
     if (props.category === "emailstudents") {
       props.setStudents([...students.map(student => student.id), ...studentUrls])
     }
-  }, [students, studentUrls])
+  }, [students, studentUrls, props.category])
 
   useEffect(() => {
 

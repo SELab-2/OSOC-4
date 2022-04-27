@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Col, Row, Button } from "react-bootstrap";
-
+import SendEmailsPopUpWindow from "../email-students/SendEmailsPopUpWindow";
 import arrowUp from "../../public/assets/arrow_up.svg";
 
 import Image from "next/image";
 
 export default function StudentList(props) {
+
+    // These constant define wheater the pop-up windows should be shown or not
+    const [sendEmailsPopUpShow, setSendEmailsPopUpShow] = useState(false);
 
     const selectAll = (event) => {
         if (props.students.length === props.selectedStudents.length) {
@@ -15,21 +18,23 @@ export default function StudentList(props) {
         }
     }
 
-    return (
+    return [
         <div className="email-bar">
+            <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
+                students={props.selectedStudents} />
             <Row className="align-items-center">
                 <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
                     <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="25px" />
                 </button>
             </Row>
             <Row className="no-margin">
-                <Col>{props.selectedStudents.length} / {props.students.length}</Col>
+                <Col className="text-center"><h style={{ "font-weight": 'bold', "font-size": "25px" }}>{props.selectedStudents.length} / {props.students.length}</h></Col>
                 <Col><Button className="send-emails-button"
                     onClick={selectAll}>{props.selectedStudents.length === props.students.length ? "Deselect All" : "Select All"}</Button></Col>
                 <Col><Button className="send-emails-button" disabled={!props.selectedStudents.length}
                     onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button></Col>
             </Row>
         </div>
-    )
+    ]
 
 }
