@@ -22,13 +22,13 @@ export default function StudentList(props) {
         <div className="email-bar">
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
                 students={props.selectedStudents} />
-            <Row className="align-items-center">
+            <Row className="nomargin align-items-center">
                 <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
                     <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="25px" />
                 </button>
             </Row>
 
-            <Row className={`bottombar ${props.showEmailBar ? "" : "down"}`}>
+            <Row className={`bottombar ${props.showEmailBar ? "nomargin" : "nomargin down"}`}>
 
                 <Col className="text-center"><h style={{ "font-weight": 'bold', "font-size": "25px" }}>{props.selectedStudents.length} / {props.students.length}</h></Col>
                 <Col><Button className="send-emails-button"

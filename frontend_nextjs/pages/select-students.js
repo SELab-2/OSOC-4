@@ -34,7 +34,7 @@ export default function SelectStudents() {
 
 
             <Col>
-                <Row>
+                <Row className="nomargin">
                     <StudentListAndFilters selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} setStudents={setStudents} category={showEmailBar ? "emailstudents" : "students"} studentsTab={true} />
                 </Row>
                 <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />
