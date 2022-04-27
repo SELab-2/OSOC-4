@@ -266,9 +266,9 @@ When you first visit the application, you have to log in. This requires the gues
 
 ![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
 
-Once we're logged in, you are either a Coach, or an Admin. All actions can now be described by one simple diagram.
+Once we're logged in, you are either a Coach, or an Admin, you are no longer a guest. All actions a user can do can now be described by one simple diagram (shown below). It comes down to this: a user does an interaction with the website (frontend), this interaction is either immediately handled by the frontend (for example typing a letter in a text field) and is thus immediately visualized. Or the interaction transforms into a request to the API, which will then execute the request, which might use some data from either of both databases, and respond with either a successful response, or an exception. The frontend will receive this response, and react upon it (visualize it to the user).
 
-![login interaction diagram](interaction_diagrams/interaction_diagram.drawio.svg)
+![interaction diagram](interaction_diagrams/interaction_diagram.drawio.svg)
 
 
 ## 7. Description of the main product elements
