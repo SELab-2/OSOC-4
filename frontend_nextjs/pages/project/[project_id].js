@@ -112,7 +112,7 @@ const Project = () => {
                                 <div>
                                     <div className={"project-card-title"}>Assigned students</div>
                                     {(project.participations.length) ?
-                                        project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
+                                        project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation} project={project}/>)) :
                                         <div className={"project-empty-list"}>Currently there are no assigned students</div>
                                     }
                                 </div>
