@@ -237,6 +237,7 @@ export default function StudentList(props) {
             "transition": "height 0.6s"
           }}
           dataLength={students.length} //This is important field to render the next data
+          height={1}
           next={fetchData}
           hasMore={studentUrls.length > 0}
           loader={<LoadingPage />}
