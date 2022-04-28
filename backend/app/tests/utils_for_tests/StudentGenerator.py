@@ -23,6 +23,6 @@ class StudentGenerator(DataGenerator):
     def generate_students(self, number: int):
         return [self.generate_student() for _ in range(number)]
 
-    async def add_to_db(self):
-        await super().add_to_db()
-        await self.question_answer_generator.add_to_db()
+    def add_to_db(self):
+        super().add_to_db()
+        self.question_answer_generator.add_to_db()

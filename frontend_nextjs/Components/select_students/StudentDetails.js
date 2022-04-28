@@ -257,8 +257,10 @@ export default function StudentDetails(props) {
                             <button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>No</button>
                         </Col>
                         <Col xs="auto" className="close-button">
-                            <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
-                                   src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'}/>
+                            <Hint message="Close the details" placement="top">
+                                <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
+                                       src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'}/>
+                            </Hint>
                         </Col>
                     </Row>
                     <Row>

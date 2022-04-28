@@ -11,12 +11,21 @@ import selected from "/public/assets/selected.svg"
 import not_selected from "/public/assets/not_selected.svg"
 import Hint from "../Hint";
 
+/**
+ * Card like representation of the given project
+ * @param props project the project that it represents, selectedProject the currently selected project in the project tab,
+ * setSelectedProject the setter for the currently selected project in the project tab.
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function ProjectCard(props) {
 
     const router = useRouter()
 
     const [skills, setSkills] = useState([])
-
+    /**
+     * Navigates to the detail page of props.project
+     */
     const toProjectDetails = () => {
         log("navigate to new project")
         // currently hacky way to get id will be changed with updated api
@@ -25,11 +34,17 @@ export default function ProjectCard(props) {
 
         router.push("/project/" + id)
     }
-
+    /**
+     * selects the props.project unless it is already selected, in that case selectedProject is set to undefined.
+     */
     const selectProject = () => {
         props.setSelectedProject((props.project === props.selectedProject) ? undefined : props.project)
     }
 
+    /**
+     * Gets called once after mounting the Component and loads all finds all the skills that are
+     * not yet filled by a participation
+     */
     useEffect(() => {
         let temp_dict = {}
         props.project.required_skills.map(skill => {
