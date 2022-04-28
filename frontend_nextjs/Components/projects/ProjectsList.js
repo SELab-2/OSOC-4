@@ -22,6 +22,9 @@ export default function ProjectsList(props) {
     const [visibleProjects, setVisibleProjects] = useState([])
     const router = useRouter()
 
+    /**
+     * Gets called once after mounting the Component and gets all the projects
+     */
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
             Url.fromName(api.edition_projects).get().then(res => {

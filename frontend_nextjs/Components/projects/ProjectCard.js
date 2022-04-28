@@ -42,7 +42,8 @@ export default function ProjectCard(props) {
     }
 
     /**
-     *
+     * Gets called once after mounting the Component and loads all finds all the skills that are
+     * not yet filled by a participation
      */
     useEffect(() => {
         let temp_dict = {}
