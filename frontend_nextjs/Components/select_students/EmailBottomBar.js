@@ -4,6 +4,7 @@ import SendEmailsPopUpWindow from "../email-students/SendEmailsPopUpWindow";
 import arrowUp from "../../public/assets/arrow_up.svg";
 
 import Image from "next/image";
+import Hint from "../Hint";
 
 export default function StudentList(props) {
 
@@ -23,9 +24,11 @@ export default function StudentList(props) {
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
                 students={props.selectedStudents} />
             <Row className="nomargin align-items-center">
-                <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
-                    <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="25px" />
-                </button>
+                <Hint message="Open to email students" placement="top">
+                    <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
+                        <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="25px" />
+                    </button>
+                </Hint>
             </Row>
 
             <Row className={`bottombar ${props.showEmailBar ? "nomargin" : "nomargin down"}`}>
