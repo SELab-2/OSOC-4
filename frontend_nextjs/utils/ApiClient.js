@@ -200,6 +200,7 @@ class API {
     editions_questiontags = "editions_questiontags";
     skills = "skills";
     participations = "participations";
+    emailtemplates = "emailtemplates";
 
     // the paths, the key should be the value of the api.[name]
     //            the value should be the url
@@ -209,6 +210,7 @@ class API {
         forgot: this.baseUrl + "/forgot",
         invite: this.baseUrl + "/invite",
         resetpassword: this.baseUrl + "/resetpassword",
+
 
         me: null,
         students: null,
