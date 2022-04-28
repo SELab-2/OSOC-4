@@ -43,7 +43,7 @@ export default function DefaultEmail(props) {
           <Row className="nomargin">
             <Col />
             <Col md="auto" className="email-help-text">
-              (Use @Name, @Firstname, @Lastname, @Decision to address the receiver)
+              (Use @firstname, @lastname to address the receiver)
             </Col>
           </Row>
           <Row className="nomargin">

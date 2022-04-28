@@ -71,6 +71,7 @@ def root(role: RoleChecker(UserRole.COACH) = Depends()):
              "skills": f"{config.api_url}skills",
              "participations": f"{config.api_url}participations",
              "emailtemplates": f"{config.api_url}emailtemplates",
+             "sendemails": f"{config.api_url}sendemails"
              }
     if role == UserRole.ADMIN:
         paths["users"] = f"{config.api_url}users"

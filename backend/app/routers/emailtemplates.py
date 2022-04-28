@@ -27,7 +27,7 @@ async def get_email_template(name: str, session: AsyncSession = Depends(get_sess
     return template
 
 
-@router.patch("/{name}")
+@router.patch("/{name}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def update_email_template(name: str, newtemplate: EmailTemplatePatch, session: AsyncSession = Depends(get_session)):
     # check if valid template name
 

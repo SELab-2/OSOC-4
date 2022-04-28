@@ -22,7 +22,7 @@ export default function StudentList(props) {
     return [
         <div className="email-bar">
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
-                students={props.selectedStudents} />
+                selectedStudents={props.selectedStudents} />
             <Row className="nomargin align-items-center">
                 <Hint message="Open to email students" placement="top">
                     <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
