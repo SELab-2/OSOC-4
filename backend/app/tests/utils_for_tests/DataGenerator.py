@@ -2,8 +2,6 @@ from typing import Any, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import update_all
-
 
 class DataGenerator:
     first_names = ["Eva", "Mark", "Jonathan", "Christine", "Sebatian", "Ava",
