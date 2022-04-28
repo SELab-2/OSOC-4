@@ -21,6 +21,7 @@ from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
 from app.models.skill import StudentSkill
 from app.models.student import DecisionOption, Student
+from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
@@ -128,7 +129,7 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
@@ -136,7 +137,21 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     """
 
     student_query = select(Student).where(Student.edition_year == year)
+    if own_suggestion:
 
+        s = own_suggestion.upper().split(",")
+        if "NO-SUGGESTION" in s:
+            suggestion_sub_query = select(Suggestion).where(Suggestion.suggested_by_id == int(Authorize.get_jwt_subject())).where(Suggestion.decision.in_([SuggestionOption[d] for d in list(set(["YES", "MAYBE", "NO", "NO-SUGGESTION"]) - set(s))]))
+            suggestion_sub_query = aliased(Suggestion, suggestion_sub_query.distinct().subquery())
+            student_query = student_query.outerjoin(suggestion_sub_query, suggestion_sub_query.student_id == Student.id).where(suggestion_sub_query.student_id.is_(None))
+        else:
+            # Get all the suggestion that match with the user
+            suggestion_sub_query = select(Suggestion).where(Suggestion.suggested_by_id == int(Authorize.get_jwt_subject())).where(Suggestion.decision.in_([SuggestionOption[d] for d in own_suggestion.upper().split(",") if d != "NO-SUGGESTION"]))
+            suggestion_sub_query = aliased(Suggestion, suggestion_sub_query.distinct().subquery())
+            student_query = student_query.join(suggestion_sub_query)
+
+        own_suggsetion_students = aliased(Student, student_query.distinct().subquery())
+        student_query = select(own_suggsetion_students)
     if decision:
         student_query = student_query.where(Student.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
     if skills:
