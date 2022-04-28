@@ -75,6 +75,9 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     edition_generator = EditionGenerator(session)
     edition = edition_generator.generate_edition(2022, coaches)
     edition_generator.add_to_db()
+    await session.commit()
+    for d in edition_generator.data:
+        await session.refresh(d)
 
     user_generator.add_to_db()
 
