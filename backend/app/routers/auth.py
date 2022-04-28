@@ -69,7 +69,9 @@ def root(role: RoleChecker(UserRole.COACH) = Depends()):
              "students": f"{config.api_url}students",
              "projects": f"{config.api_url}projects",
              "skills": f"{config.api_url}skills",
-             "participations": f"{config.api_url}participations"}
+             "participations": f"{config.api_url}participations",
+             "emailtemplates": f"{config.api_url}emailtemplates",
+             }
     if role == UserRole.ADMIN:
         paths["users"] = f"{config.api_url}users"
     return paths

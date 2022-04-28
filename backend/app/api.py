@@ -11,8 +11,9 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from app.config import config
 from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
-from app.routers import (auth, ddd, editions, projects, reset_password, skills,
-                         students, suggestions, participations, tally, user_invites, users)
+from app.routers import (auth, ddd, editions, emailtemplates, participations,
+                         projects, reset_password, skills, students,
+                         suggestions, tally, user_invites, users)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -41,6 +42,7 @@ async def shutdown():
 
 app.include_router(ddd.router)
 # app.include_router(answers.router)
+app.include_router(emailtemplates.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
 app.include_router(projects.router)
