@@ -26,7 +26,6 @@ from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
-from sqlalchemy import all_, func, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
@@ -146,7 +145,7 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
             student_query = student_query.join(suggestion_sub_query)
         else:
             # Get all the suggestion that match with the user
-            student_query = student_query.outerjoin(suggestion_sub_query, suggestion_sub_query.student_id == Student.id).where(suggestion_sub_query.student_id == None)
+            student_query = student_query.outerjoin(suggestion_sub_query, suggestion_sub_query.student_id == Student.id).where(suggestion_sub_query.student_id.is_(None))
 
         own_suggsetion_students = aliased(Student, student_query.distinct().subquery())
         student_query = select(own_suggsetion_students)
