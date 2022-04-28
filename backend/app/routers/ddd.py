@@ -74,6 +74,9 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     edition_generator = EditionGenerator(session)
     edition = edition_generator.generate_edition(2022, coaches)
+    await edition_generator.add_to_db()
+
+    await user_generator.add_to_db()
 
     project = Project(
         name="Student Volunteer Project",
@@ -109,6 +112,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     student_generator = StudentGenerator(session, edition, skills)
     # generate students without suggestions
     student_generator.generate_students(3)
+    await student_generator.add_to_db()
 
     suggestions = []
     participations = []
@@ -136,9 +140,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     for skill in project2_skills:
         session.add(skill)
 
-    await user_generator.add_to_db()
-    await edition_generator.add_to_db()
-    await student_generator.add_to_db()
 
     for suggestion in suggestions:
         session.add(suggestion)
