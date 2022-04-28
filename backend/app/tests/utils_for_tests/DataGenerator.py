@@ -21,5 +21,6 @@ class DataGenerator:
         self.data: List[Any] = []
         self.session: AsyncSession = session
 
-    async def add_to_db(self):
-        await update_all(self.data, self.session)
+    def add_to_db(self):
+        for d in self.data:
+            self.session.add(d)
