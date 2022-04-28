@@ -79,8 +79,8 @@ export default function StudentList(props) {
           }
         ).get().then(res => {
           if (res.success) {
-            let p1 = res.data.slice(0, 10);
-            let p2 = res.data.slice(10);
+            let p1 = res.data.slice(0, 20);
+            let p2 = res.data.slice(20);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl =>
               cache.getStudent(studentUrl, session["userid"])
@@ -187,8 +187,8 @@ export default function StudentList(props) {
 
   const fetchData = () => {
 
-    let p1 = studentUrls.slice(0, 10);
-    let p2 = studentUrls.slice(10);
+    let p1 = studentUrls.slice(0, 20);
+    let p2 = studentUrls.slice(20);
 
     Promise.all(p1.map(studentUrl =>
       cache.getStudent(studentUrl, session["userid"])
