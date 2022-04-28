@@ -73,7 +73,7 @@ export default function StudentList(props) {
         Url.fromName(api.editions_students).setParams(
           {
             decision: router.query.decision || "",
-            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || ""
+            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || "", own_suggestion: "False"
           }
         ).get().then(res => {
           if (res.success) {
