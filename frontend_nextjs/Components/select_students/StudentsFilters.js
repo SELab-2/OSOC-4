@@ -42,6 +42,7 @@ export default function StudentsFilters(props) {
   const filters = (router.query.filters) ? router.query.filters.split(",") : []
   const chosenSkills = (router.query.skills) ? router.query.skills.split(",") : []
   const decision = (router.query.decision) ? router.query.decision.split(",") : []
+  const own_suggestion = (router.query.own_suggestion) ? router.query.own_suggestion.split(",") : []
 
   useEffect(() => {
     Url.fromName(api.skills).get().then(async res => {
@@ -202,6 +203,20 @@ export default function StudentsFilters(props) {
         onChange={(ev) => addFilter("decision", decision, "no", ev.target.checked)} />
       <StudentsFilter filter_id="undecided-checkbox" filter_text="Undecided" value={decision.includes("undecided")}
         onChange={(ev) => addFilter("decision", decision, "undecided", ev.target.checked)} />
+
+
+      <Row className="filter-title">
+        <Col><h3>Own Suggestion</h3></Col>
+      </Row>
+
+      <StudentsFilter filter_id="yes-checkbox" filter_text="Yes" value={own_suggestion.includes("yes")}
+        onChange={(ev) => addFilter("own_suggestion", own_suggestion, "yes", ev.target.checked)} />
+      <StudentsFilter filter_id="maybe-checkbox" filter_text="Maybe" value={own_suggestion.includes("maybe")}
+        onChange={(ev) => addFilter("own_suggestion", own_suggestion, "maybe", ev.target.checked)} />
+      <StudentsFilter filter_id="no-checkbox" filter_text="No" value={own_suggestion.includes("no")}
+        onChange={(ev) => addFilter("own_suggestion", own_suggestion, "no", ev.target.checked)} />
+      <StudentsFilter filter_id="undecided-checkbox" filter_text="No suggestion" value={own_suggestion.includes("no-suggestion")}
+        onChange={(ev) => addFilter("own_suggestion", own_suggestion, "no-suggestion", ev.target.checked)} />
 
     </Col>
   )

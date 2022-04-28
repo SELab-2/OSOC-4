@@ -31,6 +31,7 @@ export default function StudentList(props) {
   let [sortby, setSortby] = useState("first name+asc,last name+asc");
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
+  const [ownSuggestion, setOwnSuggestion] = useState("")
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
@@ -63,17 +64,18 @@ export default function StudentList(props) {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will
       // provoke the second part of useEffect to filter the students again.
-      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills)) {
+      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion)) {
         setSearch(router.query.search);
         setSortby(router.query.sortby);
         setDecisions(router.query.decision);
         setSkills(router.query.skills);
+        setOwnSuggestion(router.query.own_suggestion)
 
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
           {
             decision: router.query.decision || "",
-            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || "", own_suggestion: "False"
+            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || "", own_suggestion: router.query.own_suggestion || ""
           }
         ).get().then(res => {
           if (res.success) {
@@ -89,7 +91,7 @@ export default function StudentList(props) {
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, search, sortby])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby])
 
 
   const updateDetailsFromWebsocket = (event) => {

@@ -21,7 +21,7 @@ from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
 from app.models.skill import StudentSkill
 from app.models.student import DecisionOption, Student
-from app.models.suggestion import Suggestion
+from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
@@ -138,14 +138,17 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
     student_query = select(Student).where(Student.edition_year == year)
     if own_suggestion:
-        suggestion_sub_query = select(Suggestion).where(Suggestion.suggested_by_id == int(Authorize.get_jwt_subject()))
-        suggestion_sub_query = aliased(Suggestion, suggestion_sub_query.distinct().subquery())
 
-        if own_suggestion == "True":
-            student_query = student_query.join(suggestion_sub_query)
+        s = own_suggestion.upper().split(",")
+        if "NO-SUGGESTION" in s:
+            suggestion_sub_query = select(Suggestion).where(Suggestion.suggested_by_id == int(Authorize.get_jwt_subject())).where(Suggestion.decision.in_([SuggestionOption[d] for d in list(set(["YES", "MAYBE", "NO", "NO-SUGGESTION"]) - set(s))]))
+            suggestion_sub_query = aliased(Suggestion, suggestion_sub_query.distinct().subquery())
+            student_query = student_query.outerjoin(suggestion_sub_query, suggestion_sub_query.student_id == Student.id).where(suggestion_sub_query.student_id.is_(None))
         else:
             # Get all the suggestion that match with the user
-            student_query = student_query.outerjoin(suggestion_sub_query, suggestion_sub_query.student_id == Student.id).where(suggestion_sub_query.student_id.is_(None))
+            suggestion_sub_query = select(Suggestion).where(Suggestion.suggested_by_id == int(Authorize.get_jwt_subject())).where(Suggestion.decision.in_([SuggestionOption[d] for d in own_suggestion.upper().split(",") if d != "NO-SUGGESTION"]))
+            suggestion_sub_query = aliased(Suggestion, suggestion_sub_query.distinct().subquery())
+            student_query = student_query.join(suggestion_sub_query)
 
         own_suggsetion_students = aliased(Student, student_query.distinct().subquery())
         student_query = select(own_suggsetion_students)
