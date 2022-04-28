@@ -2,9 +2,9 @@ from typing import List, Optional, Type, TypeVar
 
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select, SQLModel
+from sqlmodel import SQLModel, select
 
-from app.database import get_session, engine
+from app.database import engine, get_session
 from app.models.user import User
 
 T = TypeVar("T", SQLModel, object)
@@ -83,7 +83,7 @@ async def update(model: T, session: AsyncSession) -> Optional[T]:
     """
 
     session.add(model)
-    await session.commit()
+    await session.commit(expire_on_commit=False)
     await session.refresh(model)
     return model
 
@@ -100,7 +100,7 @@ async def update_all(models: List[T], session: AsyncSession) -> Optional[List[T]
     """
 
     session.add_all(models)
-    await session.commit()
+    await session.commit(expire_on_commit=False)
 
     for model in models:
         await session.refresh(model)
@@ -126,4 +126,4 @@ async def clear_data(session: AsyncSession = get_session()):
         elif table[0] is not None:  # One of the tables is None
             await session.execute(f"TRUNCATE {table[0]} CASCADE")
 
-        await session.commit()  # apply changes to table (has to happen per table)
+        await session.commit(expire_on_commit=False)  # apply changes to table (has to happen per table)
