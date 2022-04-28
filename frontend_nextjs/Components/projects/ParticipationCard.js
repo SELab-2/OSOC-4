@@ -6,12 +6,18 @@ import {Url} from "../../utils/ApiClient";
 import red_cross from "/public/assets/wrong.svg"
 import {log} from "../../utils/logger";
 
-
-// TODO add extra info on hover
+/**
+ * Card like representation of the given participation, which also allows the deletion of the participation
+ * @param props participation the participation that the component shows
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function ParticipationCard(props){
 
     const [student, setStudent] = useState({})
-
+    /**
+     * Loads once after the component mounts, it sets the student state.
+     */
     useEffect(() => {
         Url.fromUrl(props.participation.student).get().then(response => {
             if(response.success){
@@ -20,8 +26,10 @@ export default function ParticipationCard(props){
         })
     }, [])
 
+    /**
+     * deletes props.participation
+     */
     function deleteStudentFromProject(){
-        log("TEST")
         // delete participation
     }
 
