@@ -19,7 +19,8 @@ class TestSkills(TestBase):
 
         skill_generator = SkillGenerator(self.session)
         skill_generator.generate_skills()
-        await skill_generator.add_to_db()
+        skill_generator.add_to_db()
+        await self.session.commit()
 
     async def test_get_skills(self):
         path = "/skills"
