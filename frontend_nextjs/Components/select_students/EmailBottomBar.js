@@ -23,12 +23,23 @@ export default function StudentList(props) {
         <div className="email-bar">
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
                 students={props.selectedStudents} />
-            <Row className="nomargin align-items-center">
-                <Hint message="Open to email students" placement="top">
+            <Row style={{ height: "20px" }} className="nomargin align-items-center">
+                {!props.showEmailBar ?
+                    <Hint message="Open email students" placement="top">
+                        <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
+                            <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="20px" />
+                        </button>
+                    </Hint>
+                    :
                     <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
-                        <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="25px" />
+                        <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="20px" />
                     </button>
-                </Hint>
+                }
+            </Row>
+            <Row className="nomargin align-items-center">
+                <button style={{ textAlign: "center", "font-size": "14px", "height": "20px", overflow: "hidden" }} className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
+                    {props.showEmailBar ? "dismiss" : "send emails"}
+                </button>
             </Row>
 
             <Row className={`bottombar ${props.showEmailBar ? "nomargin" : "nomargin down"}`}>
@@ -40,7 +51,7 @@ export default function StudentList(props) {
                     onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button></Col>
             </Row>
 
-        </div>
+        </div >
     ]
 
 }

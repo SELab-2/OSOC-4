@@ -20,5 +20,4 @@ class DataGenerator:
         self.session: AsyncSession = session
 
     def add_to_db(self):
-        for d in self.data:
-            self.session.add(d)
+        self.session.add_all(self.data)
