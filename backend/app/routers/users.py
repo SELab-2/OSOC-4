@@ -166,12 +166,10 @@ async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession 
     if user is None:
         raise UserNotFoundException()
 
-    user.name = new_data.name
-    user.active = new_data.active
-    user.approved = new_data.approved
-    user.disabled = new_data.disabled
-    user.role = new_data.role
+    new_user_data = new_data.dict(exclude_unset=True)
 
+    for key, value in new_user_data.items():
+        setattr(user, key, value)
     user = await update(user, session=session)
 
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
