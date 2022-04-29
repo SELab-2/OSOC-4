@@ -11,6 +11,7 @@ yarn.lock
 cypress-default
 cypress/videos
 cypress/screenshots
+.nyc_output
 
 # next.js
 /.next/

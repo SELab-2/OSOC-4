@@ -2,9 +2,9 @@ from typing import List, Optional, Type, TypeVar
 
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select, SQLModel
+from sqlmodel import SQLModel, select
 
-from app.database import get_session, engine
+from app.database import engine, get_session
 from app.models.user import User
 
 T = TypeVar("T", SQLModel, object)

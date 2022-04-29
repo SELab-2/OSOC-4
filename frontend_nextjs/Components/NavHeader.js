@@ -29,11 +29,13 @@ export default function NavHeader(props) {
   return (
     <Row className="navheader">
       <Navbar collapseOnSelect className="navbar navbar-expand-lg navbar-light">
-        <Navbar.Brand href="/">
-          <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="90px" height="50px" objectFit={'contain'} />
-        </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto">
+            <Link href="/">
+              <Image className="d-inline-block align-top" src={osocEmblem} alt="osoc-logo" width="90px" height="50px" objectFit={'contain'} />
+            </Link>
+          </Nav>
           <Nav className="me-auto">
             <Link href="/select-students">Select Students</Link>
           </Nav>

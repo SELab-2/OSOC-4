@@ -16,7 +16,7 @@ describe("Test login page", () => {
         cy.url().should("eq", Cypress.config().baseUrl + "/");// Check we are in homepage
 
         // logout
-        cy.contains("logout", {matchCase: false}).click();
+        cy.contains("log out", {matchCase: false}).click();
 
         // todo: doesn't seem to logout
         // check link

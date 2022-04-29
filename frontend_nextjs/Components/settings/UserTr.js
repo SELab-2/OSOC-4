@@ -1,6 +1,6 @@
-import React, {useState} from "react";
-import {Button, Dropdown} from "react-bootstrap";
-import {api, Url} from "../../utils/ApiClient";
+import React, { useState } from "react";
+import { Button, Dropdown } from "react-bootstrap";
+import { api, Url } from "../../utils/ApiClient";
 
 /**
  * This component displays a row of the ManageUsers settings-screen, this component represents a single user in the list
@@ -18,14 +18,14 @@ export default function UserTr(props) {
      * @param role
      */
     async function changeRole(role) {
-        if(props.isMe){
+        if (props.isMe) {
             return
         }
-        let json = props.user
-        json.disabled = role === 0;
-        json.role = role
-        let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody(json).patch();
-        if (response.success){setRole(role)}
+        let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody({
+            "role": role,
+            "disabled": role === 0
+        }).patch();
+        if (response.success) { setRole(role) }
     }
 
     /**

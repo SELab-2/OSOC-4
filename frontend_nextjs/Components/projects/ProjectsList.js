@@ -7,6 +7,13 @@ import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 
+/**
+ * Lists all of the projects that a user is allowed to view.
+ * @param props selectedProject the currently selected project in the project tab,
+ * setSelectedProject the setter for the currently selected project in the project tab.
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function ProjectsList(props) {
     const [allProjects, setAllProjects] = useState([])
     const [loaded, setLoaded] = useState(false)
@@ -16,6 +23,9 @@ export default function ProjectsList(props) {
     const [me, setMe] = useState(undefined)
     const router = useRouter()
 
+    /**
+     * Gets called once after mounting the Component and gets all the projects
+     */
     useEffect(() => {
         if (! allProjects.length && ! loaded) {
             Url.fromName(api.edition_projects).get().then(res => {
@@ -51,6 +61,9 @@ export default function ProjectsList(props) {
         });
     }, [])
 
+    /**
+     * Applies the search filter and "people needed" (only projects who have required skills)
+     */
     function changeVisibleProjects(){
         log("change projects")
         log(peopleNeeded)
@@ -66,16 +79,29 @@ export default function ProjectsList(props) {
         }))
     }
 
+    /**
+     * changes the current search value
+     * @param event
+     * @returns {Promise<void>}
+     */
     async function handleSearchSubmit(event) {
         event.preventDefault();
         changeVisibleProjects()
     }
 
+    /**
+     * changes the value of peopleNeeded
+     * @param event
+     * @returns {Promise<void>}
+     */
     async function changePeopleNeeded(event){
         setPeopleNeeded(event.target.checked)
         changeVisibleProjects()
     }
 
+    /**
+     * navigate to the new-project tab
+     */
     const handleNewProject = () => {
         log("navigate to new project")
         router.push("/new-project")
