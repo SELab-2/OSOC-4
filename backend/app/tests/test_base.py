@@ -154,7 +154,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             responses[user_name] = await self.do_request(request_type, path, user_name, Status.SUCCESS, json_body=body)
         # Disallowed users
         for user_name in set(self.users.keys()).difference(allowed_users):
-            user = self.users[user_name]
+            user = await self.get_user_by_name(user_name)
             if user.active and user.approved and not user.disabled:
                 await self.do_request(request_type, path, user_name, Status.FORBIDDEN, json_body=body)
 

@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from typing import Dict, Set, Tuple
 
@@ -222,7 +223,6 @@ class TestUsers(TestBase):
                                      edited_by_{user_title} was found in the database,
                                      the user was wrongly modified.""")
 
-    @unittest.skip("Prevent email spam.")
     async def test_post_invite_user(self):
         unactivated_user = await self.get_user_by_name("user_unactivated_coach")
 
@@ -230,7 +230,7 @@ class TestUsers(TestBase):
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         body = {}
 
-        unactivated_user.email = "Stef.VandenHaute+SEL2TEST@UGent.be"  # TODO: set in env
+        unactivated_user.email = os.getenv("TEST_EMAIL")
         await update(unactivated_user, session=self.session)
 
         active_user = await self.get_user_by_name("user_activated_coach")
