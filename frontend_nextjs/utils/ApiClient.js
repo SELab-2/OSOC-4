@@ -36,7 +36,7 @@ export class Url {
      * @param useAuth: whether the request requires authentication (session tokens) or not
      * @returns {Url}
      */
-    static fromName(name, useAuth = false) {
+    static fromName(name, useAuth = true) {
         return new Url(name, null);
     }
 
@@ -47,7 +47,7 @@ export class Url {
      * @param useAuth: whether the request requires authentication (session tokens) or not
      * @returns {Url}
      */
-    static fromUrl(url, useAuth = false) {
+    static fromUrl(url, useAuth = true) {
         return new Url(null, url);
     }
 
@@ -93,7 +93,7 @@ export class Url {
      */
     async _setupRequest(context = null) {
         if (!this._name && !this._url) { throw Error(`ApiPath not properly instantiated, 'url' and 'name' are undefined`); }
-        this._headers = await api._headers(context, this._useAuth);
+        this._headers = await api.getHeaders(context, this._useAuth);
         if (!this._url) { this._url = await api.getUrl(this._name, context); }
         this._url += this._extension;
     }
@@ -101,6 +101,7 @@ export class Url {
     /**
      * Makes a GET request to its url
      * @param context: when making a request from server-side you need to provide the context, this is needed to get a session
+     * @param student: denotes whether the request was for a student or not.
      * @returns {Promise<{success: boolean, error}|{data: any, success: boolean}>}
      */
     async get(context = null, student = false) {
@@ -109,7 +110,7 @@ export class Url {
             log(`API: GET ${this._url}`)
             if (student) {
 
-                const session = await api._session(context);
+                const session = await api.getSession(context);
                 const res = await cache.getStudent(this._url, session["userid"])
 
                 return { success: true, data: res }
@@ -198,6 +199,7 @@ class API {
     edition_projects = "editions_projects";
     editions_questiontags = "editions_questiontags";
     skills = "skills";
+    participations = "participations";
 
     // the paths, the key should be the value of the api.[name]
     //            the value should be the url
@@ -217,7 +219,8 @@ class API {
         editions_students: null,
         editions_projects: null,
         editions_questiontags: null,
-        skills: null
+        skills: null,
+        participations: null
     }
     _ready = false;
 
@@ -234,7 +237,7 @@ class API {
      * @returns {Promise<Session>}
      * @private
      */
-    async _session(context = null) {
+    async getSession(context = null) {
         if (context) { return await getSession(context); }
         else { return await getSession(); }
     }
@@ -245,7 +248,7 @@ class API {
      * @returns {Promise<string>}
      * @private
      */
-    async _csrfToken(context = null) {
+    async getCsrfToken(context = null) {
         if (context) { return await getCsrfToken(context); }
         else { return await getCsrfToken(); }
     }
@@ -253,18 +256,18 @@ class API {
     /**
      * Returns the headers needed
      * @param context: for server-side requests
-     * @param isPublic: if the url is public, set this to true, so you don't use auth headers
+     * @param useAuth: if the url is public, set this to true, so you don't use auth headers
      * @returns {Promise<{Authorization: string, "Access-Control-Allow-Origin": string, "X-CSRF-TOKEN": string, "Content-Type": string}|{"Access-Control-Allow-Origin": string, "Content-Type": string}>}
      * @private
      */
-    async _headers(context = null, isPublic = false) {
+    async getHeaders(context = null, useAuth = true) {
         let headers = {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
         }
-        if (isPublic) { return headers; }
-        const session = await this._session(context);
-        const csrfToken = await this._csrfToken(context);
+        if (!useAuth) { return headers; }
+        const session = await this.getSession(context);
+        const csrfToken = await this.getCsrfToken(context);
         if (!session) { return headers; }
         return {
             ...headers,
@@ -294,11 +297,11 @@ class API {
     async _setup(context = null) {
         log("Engine:setup");
         try {
-            const session = await this._session(context);
+            const session = await this.getSession(context);
             if (!session) { throw Error("Engine:_setup: session is undefined"); }
 
             // set up all urls
-            const headers = await this._headers(context);
+            const headers = await this.getHeaders(context);
             const config = { "headers": headers };
             this._paths.me = session.userid;
             let res = await axios.get(this.baseUrl, config);
@@ -307,22 +310,23 @@ class API {
             this._paths.editions = res.data[this.editions];
             this._paths.users = res.data[this.users];
             this._paths.skills = res.data[this.skills];
-            if (this._year) {
-                this._paths.current_edition = this._paths.editions + "/" + this._year;
+            this._paths.participations = res.data[this.participations];
+            if (this.year) {
+                this._paths.current_edition = this._paths.editions + "/" + this.year;
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
                 this._paths.current_edition = (res.data.length) ? res.data[0] : null;
             }
             if (this._paths.current_edition) {
                 let editionData = await axios.get(this._paths.current_edition, config);
-                this._year = editionData.data["year"];
+                this.year = editionData.data["year"];
                 this._paths.editions_students = editionData.data[this.students];
                 this._paths.editions_projects = editionData.data[this.projects];
                 this._paths.editions_questiontags = editionData.data["questiontags"];
             }
         } catch (e) {
-            log(e)
             log("API: setup failed")
+            log(e)
         }
 
     }
@@ -330,10 +334,10 @@ class API {
     /**
      * Set the current edition to another year
      * @param year: the year of the edition to make requests to
-     * @returns {Promise<void>}
      */
-    async setCurrentEdition(year = null) {
-        this._year = year;
+    setCurrentEdition(year = null) {
+        log("API: changing edition to: " + year)
+        this.year = year;
         this.invalidate();
     }
 }
@@ -354,7 +358,7 @@ class Cache {
                 console.log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
-                    if (item["suggested_by_id"] == userid) {
+                    if (item["suggested_by_id"] === userid) {
                         res["own_suggestion"] = item;
                     }
                 });
@@ -390,6 +394,10 @@ class Cache {
                 cache[data["id"]] = new_student
             }
         }
+    }
+
+    async clear() {
+        Object.keys(cache).map(key => delete cache[key]);
     }
 
 }

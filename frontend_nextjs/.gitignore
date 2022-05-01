@@ -4,9 +4,14 @@
 /node_modules
 /.pnp
 .pnp.js
+yarn.lock
 
 # testing
 /coverage
+cypress-default
+cypress/videos
+cypress/screenshots
+.nyc_output
 
 # next.js
 /.next/

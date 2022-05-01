@@ -11,12 +11,15 @@ import { api, Url } from "../../utils/ApiClient";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
-import { WebsocketContext } from "../Auth"
+import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
+import EmailStudentListElement from "../email-students/EmailStudentListelement"
 
-export default function StudentListAndFilters(props) {
+export default function StudentList(props) {
 
   const router = useRouter();
+
+  const listheights = { "emailstudents": "253px", "students": "186px", "projects": "146px" }
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
@@ -28,33 +31,32 @@ export default function StudentListAndFilters(props) {
   let [sortby, setSortby] = useState("first name+asc,last name+asc");
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
-
-  const [localFilters, setLocalFilters] = useState([0, 0, 0]);
-
-  // These constants represent the filters
-  const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
-  (router.query.skills) ? router.query.skills.split(",") : [],
-  (router.query.decision) ? router.query.decision.split(",") : []]
+  const [ownSuggestion, setOwnSuggestion] = useState("")
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
 
   const [showFilter, setShowFilter] = useState(false);
 
-  const ws = useContext(WebsocketContext)
+  const { websocketConn } = useWebsocketContext();
 
+  useEffect(() => {
+    if (props.category === "emailstudents") {
+      props.setStudents([...students.map(student => student.id), ...studentUrls])
+    }
+  }, [students, studentUrls, props.category])
 
   useEffect(() => {
 
-    if (ws) {
-      ws.addEventListener("message", updateDetailsFromWebsocket)
+    if (websocketConn) {
+      websocketConn.addEventListener("message", updateDetailsFromWebsocket)
 
       return () => {
-        ws.removeEventListener('message', updateDetailsFromWebsocket)
+        websocketConn.removeEventListener('message', updateDetailsFromWebsocket)
       }
     }
 
-  }, [ws, students, studentUrls, router.query, decisions])
+  }, [websocketConn, students, studentUrls, router.query, decisions])
 
   useEffect(() => {
     if (session) {
@@ -62,30 +64,34 @@ export default function StudentListAndFilters(props) {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will
       // provoke the second part of useEffect to filter the students again.
-      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills)) {
+      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion)) {
         setSearch(router.query.search);
         setSortby(router.query.sortby);
         setDecisions(router.query.decision);
         setSkills(router.query.skills);
+        setOwnSuggestion(router.query.own_suggestion)
 
         // the urlManager returns the url for the list of students
-        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+        Url.fromName(api.editions_students).setParams(
+          {
+            decision: router.query.decision || "",
+            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || "", own_suggestion: router.query.own_suggestion || ""
+          }
+        ).get().then(res => {
           if (res.success) {
-            setLocalFilters([0, 0, 0]);
-            let p1 = res.data.slice(0, 10);
-            let p2 = res.data.slice(10);
+            let p1 = res.data.slice(0, 20);
+            let p2 = res.data.slice(20);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl =>
               cache.getStudent(studentUrl, session["userid"])
             )).then(newstudents => {
               setStudents([...newstudents]);
-              setLocalFilters([0, 0, 0]);
             })
           }
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, localFilters, filters])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -181,8 +187,8 @@ export default function StudentListAndFilters(props) {
 
   const fetchData = () => {
 
-    let p1 = studentUrls.slice(0, 10);
-    let p2 = studentUrls.slice(10);
+    let p1 = studentUrls.slice(0, 20);
+    let p2 = studentUrls.slice(20);
 
     Promise.all(p1.map(studentUrl =>
       cache.getStudent(studentUrl, session["userid"])
@@ -193,23 +199,19 @@ export default function StudentListAndFilters(props) {
   }
 
   return [
-    ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
-      <Col md="auto" key="studentFilters">
-        <StudentsFilters students={students} filters={filters} />
-      </Col>
-      :
-      <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
-        <StudentsFilters students={students} filters={filters} />
-      </CheeseburgerMenu>
+    !((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
+    <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
+      <StudentsFilters />
+    </CheeseburgerMenu>
     ,
 
-    (width > 800 || (!props.studentId && props.studentsTab)) &&
+    (width > 800 || (!router.query.studentId && props.studentsTab)) &&
 
     <div className={(props.studentsTab) ? "col nomargin student-list-positioning" :
-      ((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) ?
+      ((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) ?
         "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
       <Row className="nomargin">
-        {!((width > 1500) || (width > 1000 && !props.studentId && props.studentsTab)) &&
+        {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
           <Col md="auto">
             <div className="hamburger">
               <HamburgerMenu
@@ -232,10 +234,12 @@ export default function StudentListAndFilters(props) {
       <Row className="infinite-scroll">
         <InfiniteScroll
           style={{
-            "height": "calc(100vh - 146px)",
-            "position": "relative"
+            "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 146px)",
+            "position": "relative",
+            "transition": "height 0.6s"
           }}
           dataLength={students.length} //This is important field to render the next data
+          height={1}
           next={fetchData}
           hasMore={studentUrls.length > 0}
           loader={<LoadingPage />}
@@ -245,11 +249,15 @@ export default function StudentListAndFilters(props) {
             </p>
           }
         >
-          {students.map((i, index) => (
+          {students.map((i, index) => {
 
-            <StudentListelement key={index} student={i} studentsTab={props.studentsTab} />
+            if (props.category === "emailstudents") {
+              return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
+            } else {
+              return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
+            }
 
-          ))}
+          })}
         </InfiniteScroll>
       </Row>
     </div>

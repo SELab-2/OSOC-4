@@ -2,8 +2,8 @@ import axios from 'axios';
 import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from 'next-auth/react';
-import {api, Url} from "../../../utils/ApiClient";
-import {log} from "../../../utils/logger";
+import { api, Url } from "../../../utils/ApiClient";
+import { log } from "../../../utils/logger";
 
 async function refreshAccessToken(tokenObject) {
     const csrfToken = await getCsrfToken()
@@ -35,9 +35,7 @@ const providers = [
         authorize: async (credentials) => {
             try {
                 // Authenticate user with credentials
-                const user = await Url.fromName(api.login).setBody({ "email": credentials.email, "password": credentials.password }).post();
-
-                if (!user.success) {return null;}
+                const user = await axios.post(process.env.NEXT_INTERNAL_API_URL + "/login", { "email": credentials.email, "password": credentials.password }, { "headers": { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
 
                 user.data = user.data.data
 
@@ -83,13 +81,13 @@ const callbacks = {
     redirect: async ({ url, baseUrl }) => {
 
         if (process.env.NODE_ENV === "production") {
-            return url.replace("http://localhost:3000", "https://sel2-4.ugent.be");
+            return url.replace("http://localhost:3000", process.env.BASE_URL);
         }
         return url;
     }
 }
 
-export const options = (process.env.NODE_ENV === "development")? {
+export const options = (process.env.NODE_ENV === "development") ? {
     providers,
     callbacks,
     pages: {

@@ -8,7 +8,15 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test_watch": "jest --watchAll --verbose"
+    "test_watch": "jest --watchAll --verbose",
+    "cypress": "cypress open",
+    "cypress:headless": "cypress run",
+    "e2e": "start-server-and-test start http://localhost:3000 cypress",
+    "e2e:headless": "start-server-and-test start http://localhost:3000 cypress:headless"
+  },
+  "nyc": {
+    "all": true,
+    "include": "*.js"
   },
   "dependencies": {
     "axios": "^0.26.1",
@@ -30,6 +38,11 @@
     "swr": "^1.2.2"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.9.12",
+    "@cypress/react": "^5.12.4",
+    "babel-plugin-istanbul": "^6.1.1",
+    "cypress": "^9.5.4",
+    "dotenv": "^16.0.0",
     "eslint": "8.11.0",
     "eslint-config-next": "12.1.0",
     "jest": "^27.5.1"

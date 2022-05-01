@@ -1,7 +1,44 @@
 .index-header {
-    margin-left: 10%;
+    padding: 1% 3%;
 }
 
-.index-card-title {
-    margin-left: 10%;
+.carousel {
+    padding: 0;
+}
+
+.carousel-inner {
+    padding: 0 3%;
+}
+
+.news-col {
+    padding: 1% 3%;
+}
+
+.message {
+    border-radius: 0.5em;
+    margin: 15pt;
+    max-width: 40rem; /* Delete when more columns are added*/
+}
+
+.message .card-title {
+    font-size: 1.5rem;
+}
+
+.message .row {
+    margin-top: 15pt;
+    justify-content: right;
+    padding: 0 10pt;
+}
+
+.approve-btn {
+    max-width: 9em;
+    background: #67BA98;
+    border-color: #67BA98;
+    margin-right: 12px;
+}
+
+.remove-btn {
+    max-width: 9em;
+    background: #F14A3B;
+    border-color: #F14A3B;
 }

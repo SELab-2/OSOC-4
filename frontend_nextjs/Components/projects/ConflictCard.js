@@ -1,23 +1,28 @@
 import {Button, Card} from "react-bootstrap";
 import {useEffect, useState} from "react";
+import {api, Url} from "../../utils/ApiClient";
 
-
+/**
+ * Shows the current amount of conflicts, in a card like div.
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function ConflictCard() {
     const [conflicts, setConflicts] = useState([])
 
-
-    // useEffect(() => {
-    //     if(conflicts.length === 0){
-    //         urlManager.getConflicts().then(async conflict_url => {
-    //             let conflicts = await getJson(conflict_url)
-    //             log(conflicts)
-    //             if(conflicts){
-    //                 setConflicts(conflicts)
-    //             }
-    //         })
-    //     }
-    // }, [conflicts])
-
+    /**
+     * Loads once after the component mounts, it sets the conflicts state.
+     */
+    useEffect(() => {
+        Url.fromName(api.current_edition).extend("/resolving_conflicts").get().then(res => {
+            if(res.success){
+                setConflicts(res.data)
+            }
+        })
+    }, [])
+    /**
+     * returns the current amount of conflicts
+     */
     return(
         <div>
             <Button variant={"conflicts"}>conflicts {conflicts.length}</Button>
