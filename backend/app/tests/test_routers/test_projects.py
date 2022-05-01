@@ -8,8 +8,7 @@ from app.tests.test_base import Status, TestBase, Request
 from app.models.user import User, UserRole
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.config import config
-from backend import app
-from backend.app.tests.utils_for_tests.SkillGenerator import SkillGenerator
+from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 
 
 class TestProjects(TestBase):
@@ -31,8 +30,8 @@ class TestProjects(TestBase):
             "goals": "doing a test",
             "partner_name": "Testing inc.",
             "partner_description": "Testing inc. is focused on being dummy data.",
-            "required_skills":[],
-            "users":[],
+            "required_skills": [],
+            "users": [],
             "edition": edition.year,
         }
 
@@ -84,8 +83,8 @@ class TestProjects(TestBase):
             "goals": "doing a test",
             "partner_name": "Testing inc.",
             "partner_description": "Testing inc. is focused on being dummy data.",
-            "required_skills":project_skills,
-            "users":[project_coach.id],
+            "required_skills": project_skills,
+            "users": [project_coach.id],
             "edition": edition.year,
         }
 
@@ -126,7 +125,6 @@ class TestProjects(TestBase):
         project_skill_names = [skill.skill_name for skill in project_skills_in_db]
         for skill in skills:
             self.assertTrue(skill.name in project_skill_names, f"Skill {skill.name} not found for project {project_name}")
-
 
     async def test_get_projects_id_with_admin_user(self):
 
@@ -235,7 +233,7 @@ class TestProjects(TestBase):
 
         body = project_updated.dict()
         body["required_skills"] = project_skills
-        body["users"] =[coaches[1].id]
+        body["users"] = [coaches[1].id]
 
         # Send patch project request
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users, body)
@@ -255,7 +253,7 @@ class TestProjects(TestBase):
                               f"Expected: {value}\n"
                               f"Got: {db_project_dict[key]}"))
 
-         # test project user
+        # test project user
         project_coaches_in_db = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(project_id), session=self.session)
         self.assertIsNotNone(project_coaches_in_db, f"User has not been added for project {project_name} ")
 
