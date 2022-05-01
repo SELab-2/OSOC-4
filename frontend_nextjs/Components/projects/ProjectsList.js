@@ -119,9 +119,7 @@ export default function ProjectsList(props) {
                             </Form>
                         </Col>
                         <Col xs="auto" className={"project-people-needed"}>
-                            <Form>
-                                <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                            </Form>
+                            <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
                         </Col >
                         <Col xs="auto" >
                             <ConflictCard />

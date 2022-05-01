@@ -1,6 +1,6 @@
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
-import {Button, Col, Modal, Row} from "react-bootstrap";
+import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 import AdminCard from "../../Components/projects/AdminCard";
 import SkillCard from "../../Components/projects/SkillCard";
@@ -8,17 +8,28 @@ import ParticipationCard from "../../Components/projects/ParticipationCard";
 import Image from 'next/image'
 import back from "/public/assets/back.svg"
 import edit from "/public/assets/edit.svg"
+import save_image from "/public/assets/save.svg"
 import delete_image from "/public/assets/delete.svg"
 import Hint from "../../Components/Hint";
+import * as PropTypes from "prop-types";
 
+function Input(props) {
+    return null;
+}
+
+Input.propTypes = {children: PropTypes.node};
 const Project = () => {
-    const router = useRouter()
-    const { project_id } = router.query
-    const [loaded, setLoaded] = useState(false)
-    const [project, setProject] = useState(undefined)
+    const router = useRouter();
+    const { project_id } = router.query;
+    const [loaded, setLoaded] = useState(false);
+    const [project, setProject] = useState(undefined);
     const [showDelete, setShowDelete] = useState(false);
-    const [skills, setSkills] = useState([])
-    const [showEdit, setShowEdit] = useState(false)
+    const [skills, setSkills] = useState([]);
+    const [showEdit, setShowEdit] = useState(false);
+    const [partnerDescription, setPartnerDescription] = useState("");
+    const [projectDescription, setProjectDescription] = useState("");
+    const [projectPartnerName, setProjectPartnerName] = useState("");
+    const [projectName, setProjectName] = useState("")
 
     useEffect(() => {
         if (! loaded) {
@@ -26,6 +37,14 @@ const Project = () => {
             Url.fromName(api.projects).extend(`/${project_id}`).get().then(res => {
                 if (res.success) {
                     setProject(res.data)
+
+                    setProjectName(res.data.name)
+
+                    setProjectPartnerName(res.data.partner_name)
+                    setProjectDescription(res.data.description)
+
+                    setPartnerDescription(res.data.partner_description)
+
                     setLoaded(true)
                     let temp_dict = {}
 
@@ -36,6 +55,7 @@ const Project = () => {
                     res.data.participations.map(participation => {
                         temp_dict[participation.skill] = temp_dict[participation.skill] - 1;
                     })
+
                     // let temp_list = []
                     Object.keys(temp_dict).map(async name => {
                         await setSkills(prevState => [...prevState, {"amount": temp_dict[name], "name": name}])
@@ -48,27 +68,36 @@ const Project = () => {
 
     //TODO make this delete project
     async function deleteProject(){
-
     }
 
     return (
-        <div className="remaining_height fill_width">
-            { loaded ? (
-                <div>
-                    <Row className={"project-top-bar"}>
+        <Row>
+            { loaded ? (<div>
+                    <Row className={"project-top-bar nomargin"}>
                         <Col xs="auto" >
                             <Hint message="Go back" placement="top">
                                 <Image alt={"back button"} onClick={() => router.back()} src={back} width={100} height={33}/>
                             </Hint>
                         </Col>
                         <Col>
-                            <div className={"project-details-project-title"}>{project.name}</div>
+                            {showEdit ?
+                                <Form.Control className={"project-details-project-title"} type="text" value={projectName} onChange={e => setProjectName(e.target.value)} />
+                                :
+                                <div className={"project-details-project-title"}>{project.name}</div>
+
+                            }
                         </Col>
                         <Col xs="auto" >
-                            <Hint message="Edit project" placement="top">
-                                <Image alt={"edit button"} onClick={() => setShowEdit(prevState => ! prevState)} src={edit} width={33} height={33}/>
-                            </Hint>
-                            {/*TODO make this actually turn edit on*/}
+                            {showEdit ?
+                                <Hint message="Save changes" placement="top">
+                                    <Image alt={"save button"} src={save_image} onClick={() => setShowEdit(false)} width={33} height={33} />
+                                </Hint>
+                                :
+                                <Hint message="Edit project" placement="top">
+                                    <Image alt={"edit button"} onClick={() => setShowEdit(true)} src={edit} width={33} height={33}/>
+                                </Hint>
+
+                            }
                         </Col>
                         <Col xs="auto" >
                             <Hint message="Delete project" placement="top">
@@ -96,11 +125,32 @@ const Project = () => {
                         </Col>
                     </Row>
                     <div className={"project-details-page"} >
-                        <div className={"project-details-title"} >Project by: {project.partner_name}</div>
-                        <div className={"project-details-subtitle"}>{project.partner_description}</div>
+                        {showEdit ?
+                            <>
+                                <Row>
+                                    <Col xs={"auto"}>
+                                        <div className={"project-details-title"} >Project by: </div>
+                                    </Col>
+                                    <Col>
+                                        <Form.Control className={"project-details-title"} type="text" value={projectPartnerName} onChange={e => setProjectPartnerName(e.target.value)} />
+
+                                    </Col>
+                                </Row>
+                                <Form.Control className={"project-details-subtitle"} type="text" value={partnerDescription} onChange={e => setPartnerDescription(e.target.value)} />
+                            </>
+                            :
+                            <>
+                                <div className={"project-details-title"} >Project by: {project.partner_name}</div>
+                                <div className={"project-details-subtitle"}>{project.partner_description}</div>
+                            </>
+                        }
 
                         <div className={"project-details-title"}>About the project</div>
+                        {showEdit ?
+                            <Form.Control className={"project-details-subtitle"} type="text" value={projectDescription} onChange={e => setProjectDescription(e.target.value)} />
+                            :
                         <div className={"project-details-subtitle"}>{project.description}</div>
+                        }
 
                         <div>
                             <div className={"project-details-title"}>Assigned staff</div>
@@ -128,8 +178,7 @@ const Project = () => {
                     </div>
 
                 </div>) : null}
-        </div>
-
+        </Row>
     )
 }
 
