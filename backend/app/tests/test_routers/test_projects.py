@@ -68,7 +68,8 @@ class TestProjects(TestBase):
 
         skill_generator = SkillGenerator(self.session)
         skills = skill_generator.generate_skills()
-        await skill_generator.add_to_db()
+        skill_generator.add_to_db()
+        await self.session.commit()
 
         project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
 
@@ -218,7 +219,8 @@ class TestProjects(TestBase):
         # prepare data for update
         skill_generator = SkillGenerator(self.session)
         skills = skill_generator.generate_skills()
-        await skill_generator.add_to_db()
+        skill_generator.add_to_db()
+        await self.session.commit()
 
         project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
 
