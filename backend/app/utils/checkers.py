@@ -1,7 +1,7 @@
 from typing import List
 
 from app.crud import read_where
-from app.database import get_session
+from app.database import get_session, db
 from app.exceptions.edition_exceptions import EditionNotFound
 from app.exceptions.permissions import NotPermittedException
 from app.models.edition import Edition
@@ -59,3 +59,22 @@ class EditionChecker:
             raise EditionNotFound()
 
         return edition
+
+
+async def check_key(key: str, key_identifier: str, session: AsyncSession):
+    if key[0] != key_identifier:  # check identifier
+        return False
+
+    uid = db.redis.get(key)
+    try:  # make sure uid is an int
+        uid = int(uid)
+    except ValueError:
+        return False
+
+    if uid <= 0:  # make sure uid is a valid id
+        return False
+
+    user = await read_where(User, User.id == uid, session=session)
+
+    # make sure user exists
+    return user is not None

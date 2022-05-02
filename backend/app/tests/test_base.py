@@ -93,9 +93,9 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         login = await self.client.post("/login", json={"email": email, "password": password})
         return login.json()["data"]["accessToken"]
 
-    async def do_request(self, request_type: Request, path: str, user: str,
+    async def do_request(self, request_type: Request, path: str, user: str = "",
                          expected_status: int = 200, access_token: str = None,
-                         use_access_token: bool = True, json_body: Any = None) -> Response:
+                         json_body: Any = None) -> Response:
         """request test template
 
         Tests whether a request with the given data matches the expected status and returns the response.
@@ -119,7 +119,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         """
         headers: Dict[str, str] = {}
 
-        if use_access_token:
+        if user != "":
             if access_token is None:
                 access_token = await self.get_access_token(user)
             headers["Authorization"] = "Bearer " + access_token
@@ -129,7 +129,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         f"""While doing {request_type.name} request with body =
                         '{json_body}'
                         to '{path}':
-                        Unexpected status for {user},
+                        Unexpected status for '{user}',
                         status code was {response.status_code},
                         expected {expected_status}
                         """)
@@ -140,10 +140,8 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         return response
 
     async def _auth_test_request(self, request_type: Request, path: str, body: Dict):
-        await self.do_request(request_type, path, "user_admin", Status.UNAUTHORIZED,
-                              json_body=body, use_access_token=False)
-        await self.do_request(request_type, path, "user_admin", Status.UNPROCESSABLE,
-                              json_body=body, access_token="wrong token")
+        await self.do_request(request_type, path, expected_status=Status.UNAUTHORIZED, json_body=body)
+        await self.do_request(request_type, path, expected_status=Status.UNPROCESSABLE, json_body=body)
 
     async def _access_test_request(
             self, request_type: Request, path, allowed_users: Set[str], body: Dict = None

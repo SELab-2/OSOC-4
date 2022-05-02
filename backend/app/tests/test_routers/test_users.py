@@ -1,6 +1,5 @@
 import json
 import os
-import unittest
 from typing import Dict, Set, Tuple
 
 from httpx import Response

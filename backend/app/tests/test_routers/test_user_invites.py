@@ -17,23 +17,23 @@ class TestUserInvites(TestBase):
         # correct key
         key = generate_new_invite_key()
         db.redis.setex(key[0], key[1], new_user.id)
-        await self.do_request(Request.GET, f"{path}{key[0]}", "", Status.SUCCESS, use_access_token=False)
+        await self.do_request(Request.GET, f"{path}{key[0]}", expected_status=Status.SUCCESS)
 
         # key with bad user id
         key = generate_new_invite_key()
         db.redis.setex(key[0], key[1], "bad_user_id")
-        await self.do_request(Request.GET, f"{path}{key[0]}", "", Status.BAD_REQUEST, use_access_token=False)
+        await self.do_request(Request.GET, f"{path}{key[0]}", expected_status=Status.BAD_REQUEST)
 
         # key without user connected to id
         key = generate_new_invite_key()
         db.redis.setex(key[0], key[1], self.bad_id)
-        await self.do_request(Request.GET, f"{path}{key[0]}", "", Status.BAD_REQUEST, use_access_token=False)
+        await self.do_request(Request.GET, f"{path}{key[0]}", expected_status=Status.BAD_REQUEST)
 
         # Bad key
         key = generate_new_invite_key()
         bad_key = "R" + key[0][1:]
         db.redis.setex(bad_key, key[1], new_user.id)
-        await self.do_request(Request.GET, f"{path}{bad_key}", "", Status.BAD_REQUEST, use_access_token=False)
+        await self.do_request(Request.GET, f"{path}{bad_key}", expected_status=Status.BAD_REQUEST)
 
     async def test_invited_user(self):
         path = "/invite/"
