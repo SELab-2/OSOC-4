@@ -199,6 +199,27 @@ class TestUsers(TestBase):
         await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_approved_coach",
                               json_body={}, expected_status=Status.FORBIDDEN)
 
+    async def test_delete_user(self):
+        user_to_del: User = await self.get_user_by_name("user_no_role")
+        path = f"/users/{user_to_del.id}"
+
+        # check coach access
+        await self.do_request(Request.DELETE, path, "user_approved_coach", expected_status=Status.FORBIDDEN)
+        db_user = await read_where(User, User.id == user_to_del.id, session=self.session)
+        self.assertNotEquals((db_user.disabled, db_user.active, db_user.approved, db_user.password),
+                             (True, False, False, ""),
+                             "The user was deleted by a coach.")
+
+        # correct request with admin
+        await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.SUCCESS)
+        db_user = await read_where(User, User.id == user_to_del.id, session=self.session)
+        self.assertEquals((db_user.disabled, db_user.active, db_user.approved, db_user.password),
+                          (True, False, False, ""),
+                          "The user wasn't deleted by the admin.")
+
+        # Try to delete imaginary user
+        await self.do_request(Request.DELETE, f"/users/{self.bad_id}", "user_admin", expected_status=Status.NOT_FOUND)
+
     async def test_post_invite_disabled_user(self):
         eg = EditionGenerator(self.session)
         eg.generate_edition()

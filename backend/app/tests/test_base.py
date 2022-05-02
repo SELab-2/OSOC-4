@@ -23,7 +23,7 @@ class Request(Enum):
 
     async def do_request(self, client: AsyncClient, path: str, headers: Dict[str, str], body: Any = None) -> Response:
         if self.name == "DELETE":
-            raise NotImplementedError
+            return await client.delete(path, headers=headers)
         elif self.name == "GET":
             return await client.get(path, headers=headers)
         elif self.name == "POST":
