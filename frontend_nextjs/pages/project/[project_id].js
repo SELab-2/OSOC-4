@@ -105,6 +105,10 @@ const Project = () => {
         await setUsers(users.filter((_, i) => i !== index))
     }
 
+    //TODO make this add user to project
+    function addUser(){
+    }
+
 
     async function changeProject(){
         let body = {
@@ -215,8 +219,17 @@ const Project = () => {
 
                         <div>
                             <div className={"project-details-title"}>Assigned staff</div>
-                            {(users.length) ? users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>)) : <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
+                            {(users.length) ?
+                                users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>))
+                                :
+                                <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
                         </div>
+                        {showEdit ?
+                            // TODO make this pop up a selection tool for users
+                            <Button onClick={() => addUser()}>
+                                Add new coach / admin to the project
+                            </Button>
+                            : null}
                         <br/>
                         <Row>
                             <Col>
@@ -228,7 +241,7 @@ const Project = () => {
                                         } else {
                                             return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                         }
-                                    })) : <div className={"project-empty-list"}>Currently there are no required skills</div>
+                                    })) : <div className={"project-empty-list-col"}>Currently there are no required skills</div>
                                     }
                                 </div>
                                 {showEdit ?
@@ -249,7 +262,7 @@ const Project = () => {
                                         }
                                     }))
                                         :
-                                        <div className={"project-empty-list"}>Currently there are no required skills</div>
+                                        <div className={"project-empty-list-col"}>Currently there are no required skills</div>
                                     }
                                 </div>
                             </Col>
@@ -258,7 +271,7 @@ const Project = () => {
                                     <div className={"project-card-title"}>Assigned students</div>
                                     {(project.participations.length) ?
                                         project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
-                                        <div className={"project-empty-list"}>Currently there are no assigned students</div>
+                                        <div className={"project-empty-list-col"}>Currently there are no assigned students</div>
                                     }
                                 </div>
                             </Col>

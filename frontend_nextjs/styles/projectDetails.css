@@ -38,7 +38,9 @@
     font-size: 20px;
     background-color: var(--maybe_yellow_45);
     text-align: center;
-    margin: 5px 15px 5px 15px;
+    /*margin: 0 15px 5px 15px;*/
+    margin-bottom: 10px;
+    margin-left: 0;
 }
 
 .project-details-title{
