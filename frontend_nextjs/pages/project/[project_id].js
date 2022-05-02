@@ -13,6 +13,7 @@ import delete_image from "/public/assets/delete.svg"
 import Hint from "../../Components/Hint";
 import * as PropTypes from "prop-types";
 import RequiredSkillSelector from "../../Components/projects/RequiredSkillSelector";
+import red_cross from "/public/assets/wrong.svg"
 import {log} from "../../utils/logger";
 import {getID} from "../../utils/string";
 
@@ -35,6 +36,7 @@ const Project = () => {
     const [partnerName, setPartnerName] = useState("");
     const [projectName, setProjectName] = useState("")
     const [stillRequiredSkills, setStillRequiredSkills] = useState([]);
+    const [users, setUsers] = useState([])
 
     useEffect(() => {
         if (! loaded) {
@@ -49,6 +51,8 @@ const Project = () => {
                     setProjectDescription(res.data.description)
 
                     setPartnerDescription(res.data.partner_description)
+
+                    setUsers(res.data.users)
 
                     setLoaded(true)
                     let temp_dict = {}
@@ -93,9 +97,16 @@ const Project = () => {
     async function deleteProject(){
     }
 
+    function addRequiredSkill(){
+        setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
+    }
+
+    async function deleteUser(index){
+        await setUsers(users.filter((_, i) => i !== index))
+    }
+
 
     async function changeProject(){
-        // TODO check forms
         let body = {
             "name":projectName,
             "description":projectDescription,
@@ -104,7 +115,7 @@ const Project = () => {
             "partner_name":partnerName,
             "partner_description": partnerDescription,
             "edition": api.year,
-            "users": []
+            "users": users.map(url => getID(url))
         }
         await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
     }
@@ -142,28 +153,37 @@ const Project = () => {
                             }
                         </Col>
                         <Col xs="auto" >
-                            <Hint message="Delete project" placement="top">
-                                <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)}/>
-                            </Hint>
-                            <Modal show={showDelete} onHide={() => setShowDelete(false)}>
-                                <Modal.Header closeButton>
-                                    <Modal.Title>Delete project?</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>Are you sure you want to delete this project? Doing so will not be reversible. </Modal.Body>
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={() => setShowDelete(false)}>
-                                        Keep project
-                                    </Button>
-                                    <Button variant="primary" onClick={() => {
-                                        setShowDelete(false)
-                                        deleteProject()
-                                        router.push("/projects")
-                                    }}>
-                                        Delete project
-                                    </Button>
+                            {showEdit ?
+                                <Hint message="Cancel edit" placement="top">
+                                    <Image alt={"cancel edit button"} src={red_cross} width={33} height={33} onClick={() => setShowEdit(false) }/>
+                                </Hint>
+                                :
+                                <div>
+                                    <Hint message="Delete project" placement="top">
+                                        <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)}/>
+                                    </Hint>
+                                    <Modal show={showDelete} onHide={() => setShowDelete(false)}>
+                                        <Modal.Header closeButton>
+                                            <Modal.Title>Delete project?</Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>Are you sure you want to delete this project? Doing so will not be reversible. </Modal.Body>
+                                        <Modal.Footer>
+                                            <Button variant="secondary" onClick={() => setShowDelete(false)}>
+                                                Keep project
+                                            </Button>
+                                            <Button variant="primary" onClick={() => {
+                                                setShowDelete(false)
+                                                deleteProject()
+                                                router.push("/projects")
+                                            }}>
+                                                Delete project
+                                            </Button>
 
-                                </Modal.Footer>
-                            </Modal>
+                                        </Modal.Footer>
+                                    </Modal>
+                                </div>
+                            }
+
                         </Col>
                     </Row>
                     <div className={"project-details-page"} >
@@ -175,7 +195,6 @@ const Project = () => {
                                     </Col>
                                     <Col>
                                         <Form.Control className={"project-details-title"} type="text" value={partnerName} onChange={e => setPartnerName(e.target.value)} />
-
                                     </Col>
                                 </Row>
                                 <Form.Control className={"project-details-subtitle"} type="text" value={partnerDescription} onChange={e => setPartnerDescription(e.target.value)} />
@@ -196,7 +215,7 @@ const Project = () => {
 
                         <div>
                             <div className={"project-details-title"}>Assigned staff</div>
-                            {(project.users.length) ? project.users.map(item => (<AdminCard key={item} user={item}/>)) : <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
+                            {(users.length) ? users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>)) : <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
                         </div>
                         <br/>
                         <Row>
@@ -212,6 +231,11 @@ const Project = () => {
                                     })) : <div className={"project-empty-list"}>Currently there are no required skills</div>
                                     }
                                 </div>
+                                {showEdit ?
+                                    <Button onClick={() => addRequiredSkill()}>
+                                        Add new required skill
+                                    </Button>
+                                    : null}
                             </Col>
                             <Col>
                                 <div>

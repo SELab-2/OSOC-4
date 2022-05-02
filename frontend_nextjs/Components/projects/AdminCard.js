@@ -1,5 +1,8 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Url} from "../../utils/ApiClient";
+import {Col, Row} from "react-bootstrap";
+import Image from "next/image";
+import red_cross from "../../public/assets/wrong.svg";
 
 /**
  * Shows the user in a color according to the users role
@@ -41,9 +44,16 @@ export default function AdminCard(props){
      * returns the name of the user with a css layout according to the users role
      */
     return (
-        <div key={props.user} className={getCssClass()}>
-            {user.name}
-        </div>
+        <Row key={props.user} className={getCssClass()}>
+            <Col>
+                {user.name}
+            </Col>
+            {props.showEdit ? <Col xs={"auto"}>
+                    <Image alt={"remove user"} src={red_cross} width={20} height={20} onClick={() => props.deleteUser(props.index) }/>
+                </Col> :
+                null
+            }
+        </Row>
     )
 
 }
