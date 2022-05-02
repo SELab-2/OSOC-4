@@ -14,6 +14,7 @@ import Hint from "../../Components/Hint";
 import RequiredSkillSelector from "../../Components/projects/RequiredSkillSelector";
 import red_cross from "/public/assets/wrong.svg"
 import {getID} from "../../utils/string";
+import PropTypes from "prop-types";
 
 function Input(props) {
     return null;
