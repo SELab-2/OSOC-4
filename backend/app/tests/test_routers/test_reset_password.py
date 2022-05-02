@@ -39,45 +39,49 @@ class TestResetPassword(TestBase):
         path = "/resetpassword/"
 
         new_pass: str = "ValidPass?!123"
+        body = {"password": new_pass, "validate_password": new_pass}
 
+        # Request using invalid reset keys
+        await self.do_request(Request.POST, f"{path}Rohnonotsogood", json_body=body, expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.POST, f"{path}Iohnoevenworse", json_body=body, expected_status=Status.BAD_REQUEST)
+
+        # Test with a bad userid
         key = generate_new_reset_password_key()
-        forgotten_user = await self.get_user_by_name("user_approved_coach")
-        db.redis.setex(key[0], key[1], int(forgotten_user.id))
+        db.redis.setex(key[0], key[1], self.bad_id)
+        await self.do_request(Request.POST, f"{path}{key[0]}", json_body=body, expected_status=Status.FORBIDDEN)
+
+        # Test with an inactive user
+        key = generate_new_reset_password_key()
+        user: User = await self.get_user_by_name("user_unactivated_coach")
+        db.redis.setex(key[0], key[1], user.id)
+        await self.do_request(Request.POST, f"{path}{key[0]}", json_body=body, expected_status=Status.FORBIDDEN)
+
+        # create a real key
+        key = generate_new_reset_password_key()
+        user = await self.get_user_by_name("user_approved_coach")
+        db.redis.setex(key[0], key[1], int(user.id))
 
         # Test using a wrong validate password
         await self.do_request(Request.POST, f"{path}{key[0]}",
                               json_body={"password": new_pass, "validate_password": new_pass + "1"},
                               expected_status=Status.BAD_REQUEST)
 
-        # Request using invalid reset keys
-        await self.do_request(Request.POST, f"{path}Rohnonotsogood",
-                              json_body={"password": new_pass, "validate_password": new_pass},
-                              expected_status=Status.BAD_REQUEST)
-        await self.do_request(Request.POST, f"{path}Iohnoevenworse",
-                              json_body={"password": new_pass, "validate_password": new_pass},
-                              expected_status=Status.BAD_REQUEST)
-
         ##################################
         # Check passwords aren't changed #
         ##################################
-        forgotten_user = await self.get_user_by_name("user_approved_coach")
-        self.assertTrue(verify_password(self.saved_objects["passwords"][forgotten_user.name], forgotten_user.password),
+        user = await self.get_user_by_name("user_approved_coach")
+        self.assertTrue(verify_password(self.saved_objects["passwords"][user.name], user.password),
                         "The password was changed after bad requests")
 
         #####################
         # Do a good request #
         #####################
-        key = generate_new_reset_password_key()
-        db.redis.setex(key[0], key[1], int(forgotten_user.id))
-
         # change to new password
-        await self.do_request(Request.POST, f"{path}{key}",
-                              json_body={"password": new_pass, "validate_password": new_pass},
-                              expected_status=Status.BAD_REQUEST)
+        await self.do_request(Request.POST, f"{path}{key[0]}", json_body=body, expected_status=Status.SUCCESS)
 
         ###########################
         # Check current passwords #
         ###########################
-        forgotten_user = await self.get_user_by_name("user_approved_coach")
-        self.assertFalse(verify_password(new_pass, forgotten_user.password),
-                         "The password was changed after successful request")
+        user = await self.get_user_by_name("user_approved_coach")
+        self.assertTrue(verify_password(new_pass, user.password),
+                         "The password wasn't changed after successful request")
