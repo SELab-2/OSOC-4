@@ -84,4 +84,4 @@ class TestResetPassword(TestBase):
         ###########################
         user = await self.get_user_by_name("user_approved_coach")
         self.assertTrue(verify_password(new_pass, user.password),
-                         "The password wasn't changed after successful request")
+                        "The password wasn't changed after successful request")
