@@ -99,3 +99,11 @@
 .select-search__row:not(:first-child) {
     border-top: 1px solid #eee;
 }
+
+.select-search__input{
+    height: 38px;
+    border-width: 1px;
+    border-color: darkgray;
+    border-radius: 5px;
+}
+

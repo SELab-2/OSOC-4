@@ -12,6 +12,9 @@ import save_image from "/public/assets/save.svg"
 import delete_image from "/public/assets/delete.svg"
 import Hint from "../../Components/Hint";
 import * as PropTypes from "prop-types";
+import RequiredSkillSelector from "../../Components/projects/RequiredSkillSelector";
+import {log} from "../../utils/logger";
+import {getID} from "../../utils/string";
 
 function Input(props) {
     return null;
@@ -25,11 +28,13 @@ const Project = () => {
     const [project, setProject] = useState(undefined);
     const [showDelete, setShowDelete] = useState(false);
     const [skills, setSkills] = useState([]);
+    const [requiredSkills, setRequiredSkills] = useState([])
     const [showEdit, setShowEdit] = useState(false);
     const [partnerDescription, setPartnerDescription] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
-    const [projectPartnerName, setProjectPartnerName] = useState("");
+    const [partnerName, setPartnerName] = useState("");
     const [projectName, setProjectName] = useState("")
+    const [stillRequiredSkills, setStillRequiredSkills] = useState([]);
 
     useEffect(() => {
         if (! loaded) {
@@ -40,7 +45,7 @@ const Project = () => {
 
                     setProjectName(res.data.name)
 
-                    setProjectPartnerName(res.data.partner_name)
+                    setPartnerName(res.data.partner_name)
                     setProjectDescription(res.data.description)
 
                     setPartnerDescription(res.data.partner_description)
@@ -52,13 +57,17 @@ const Project = () => {
                         temp_dict[skill.skill_name] = skill.number
                     })
 
+                    Object.keys(temp_dict).map(async name => {
+                        await setRequiredSkills(prevState => [...prevState, {"number": temp_dict[name], "skill_name": name}])
+                    })
+
                     res.data.participations.map(participation => {
                         temp_dict[participation.skill] = temp_dict[participation.skill] - 1;
                     })
 
                     // let temp_list = []
                     Object.keys(temp_dict).map(async name => {
-                        await setSkills(prevState => [...prevState, {"amount": temp_dict[name], "name": name}])
+                        await setStillRequiredSkills(prevState => [...prevState, {"number": temp_dict[name], "skill_name": name}])
                     })
                     // setSkills(temp_list)
                 }
@@ -66,8 +75,38 @@ const Project = () => {
         }
     }, [])
 
+    useEffect(() => {
+        Url.fromName(api.skills).get().then(async res => {
+            if (res.success) {
+                res = res.data;
+                if(res){
+                    // scuffed way to get unique skills (should be fixed in backend soon)
+                    let array = [];
+                    res.map(skill => array.push({"value":skill, "name":skill}));
+                    setSkills(array);
+                }
+            }
+        })
+    }, [])
+
     //TODO make this delete project
     async function deleteProject(){
+    }
+
+
+    async function changeProject(){
+        // TODO check forms
+        let body = {
+            "name":projectName,
+            "description":projectDescription,
+            "goals": "",
+            "required_skills": requiredSkills,
+            "partner_name":partnerName,
+            "partner_description": partnerDescription,
+            "edition": api.year,
+            "users": []
+        }
+        await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
     }
 
     return (
@@ -90,7 +129,10 @@ const Project = () => {
                         <Col xs="auto" >
                             {showEdit ?
                                 <Hint message="Save changes" placement="top">
-                                    <Image alt={"save button"} src={save_image} onClick={() => setShowEdit(false)} width={33} height={33} />
+                                    <Image alt={"save button"} src={save_image} onClick={() =>{
+                                        changeProject()
+                                        setShowEdit(false)
+                                    }} width={33} height={33} />
                                 </Hint>
                                 :
                                 <Hint message="Edit project" placement="top">
@@ -132,7 +174,7 @@ const Project = () => {
                                         <div className={"project-details-title"} >Project by: </div>
                                     </Col>
                                     <Col>
-                                        <Form.Control className={"project-details-title"} type="text" value={projectPartnerName} onChange={e => setProjectPartnerName(e.target.value)} />
+                                        <Form.Control className={"project-details-title"} type="text" value={partnerName} onChange={e => setPartnerName(e.target.value)} />
 
                                     </Col>
                                 </Row>
@@ -160,9 +202,31 @@ const Project = () => {
                         <Row>
                             <Col>
                                 <div>
-                                    <div className={"project-card-title"}>Required skills</div>
-                                    { (skills.length) ? (skills.map(skill =>
-                                        (<SkillCard key={`${skill.amount}${skill.name}`} name={skill.name} amount={skill.amount} />))): <div className={"project-empty-list"}>Currently there are no required skills</div>}
+                                    <div className={"project-card-title"}>All required skills</div>
+                                    { (requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) =>{
+                                        if(showEdit){
+                                            return <RequiredSkillSelector className={"required-skill-selector-row"} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}/>
+                                        } else {
+                                            return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
+                                        }
+                                    })) : <div className={"project-empty-list"}>Currently there are no required skills</div>
+                                    }
+                                </div>
+                            </Col>
+                            <Col>
+                                <div>
+                                    <div className={"project-card-title"}>Still required skills</div>
+                                    { (stillRequiredSkills.length) ? (stillRequiredSkills.map((requiredSkill, index) => {
+                                        if(requiredSkill.number > 0){
+                                            return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
+                                        }
+                                        else{
+                                            return null
+                                        }
+                                    }))
+                                        :
+                                        <div className={"project-empty-list"}>Currently there are no required skills</div>
+                                    }
                                 </div>
                             </Col>
                             <Col>

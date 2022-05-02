@@ -97,7 +97,7 @@ export default function ProjectCard(props) {
                             <div className={"project-title-list"}>
                                 <div className={"project-card-title"}>Required skills</div>
                                 { (skills.length) ? (skills.map(skill =>
-                                    (skill.amount > 0 ? <SkillCard key={`${skill.amount}${skill.name}`} name={skill.name} amount={skill.amount} /> : null))): <div className={"project-empty-list"}>Currently there are no required skills</div>}
+                                    (skill.amount > 0 ? <SkillCard key={`${skill.amount}${skill.name}`} skill_name={skill.name} number={skill.amount} /> : null))): <div className={"project-empty-list"}>Currently there are no required skills</div>}
                             </div>
                         </Col>
                         <Col>

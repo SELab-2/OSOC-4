@@ -41,7 +41,7 @@ export default function ParticipationCard(props){
                         <div className={"participation-name"}>
                             {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null }
                         </div>
-                        <SkillCard amount={0} name={props.participation.skill}/>
+                        <SkillCard number={0} skill_name={props.participation.skill}/>
                     </Col>
                     <Col xs={"auto"} className={"participation-remove-student"}>
                         <div className={"participation-delete"}>
