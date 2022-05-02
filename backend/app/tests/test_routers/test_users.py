@@ -7,11 +7,29 @@ from httpx import Response
 from app.crud import read_where, read_all_where, update
 from app.models.user import User, UserRole
 from app.tests.test_base import Status, TestBase, Request
+from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 
 
 class TestUsers(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    async def assert_name_edits(self, allowed_users):
+        """
+        This function can be used to check whether all allowed users were able to successfully edit a name
+
+        :param allowed_users:
+        :return:
+        """
+        for user_title in self.users.keys():
+            if user_title in allowed_users:
+                user = await read_where(User, User.name == f"edited_by_{user_title}", session=self.session)
+                self.assertIsNotNone(user, f"""'edited_by_{user_title}' was not found in the database,
+                                               the user was not modified correctly.""")
+            else:
+                user = await read_where(User, User.name == f"edited_by_{user_title}", session=self.session)
+                self.assertIsNone(user, f"""'edited_by_{user_title}' was found in the database,
+                                            the user was wrongly modified.""")
 
     async def test_get_users(self):
         path = "/users"
@@ -33,7 +51,7 @@ class TestUsers(TestBase):
                             Expected: {db_users}
                             Was: {ep_users}""")
 
-    async def test_get_users_me(self):
+    async def test_get_user_me(self):
         path = "/users/me"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
@@ -45,6 +63,25 @@ class TestUsers(TestBase):
             user = await self.get_user_by_name(user_title)  # collected from test_base
             ep_user = json.loads(response.content)["data"]  # collected from endpoint
             self.assertSequenceEqual({"name": user.name, "email": user.email, "role": user.role}, ep_user)
+
+    async def test_patch_user_me(self):
+        path = "/users/me"
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
+        allowed_users_path_and_body = {}
+        blocked_users_path_and_body = {}
+
+        for user_title in self.users.keys():
+            body = {"name": f"edited_by_{user_title}"}
+            if user_title in allowed_users:
+                allowed_users_path_and_body[user_title] = path, body
+            else:
+                blocked_users_path_and_body[user_title] = path, body
+
+        await self.auth_access_request_test_per_user(Request.PATCH,
+                                                     allowed_users_path_and_body,
+                                                     blocked_users_path_and_body)
+
+        await self.assert_name_edits(allowed_users)
 
     async def test_post_add_user_data(self):
         # This test needs to be reworked when multiple users are allowed,
@@ -134,25 +171,13 @@ class TestUsers(TestBase):
                                          "active": True, "approved": True, "disabled": False},
                               expected_status=Status.NOT_FOUND)
 
-        # assert edits
-        for user_title in self.users.keys():
-            if user_title in allowed_users:
-                user = await read_where(User, User.name == f"edited_by_{user_title}", session=self.session)
-                self.assertIsNotNone(user, f"""
-                                     edited_by_{user_title} was not found in the database,
-                                     the user was not modified correctly.""")
-            else:
-                user = await read_where(User, User.name == f"edited_by_{user_title}", session=self.session)
-                self.assertIsNone(user, f"""
-                                     edited_by_{user_title} was found in the database,
-                                     the user was wrongly modified.""")
+        await self.assert_name_edits(allowed_users)
 
     async def test_post_invite_user(self):
         unactivated_user = await self.get_user_by_name("user_unactivated_coach")
 
         path = f"/users/{unactivated_user.id}/invite"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        body = {}
 
         unactivated_user.email = os.getenv("TEST_EMAIL")
         await update(unactivated_user, session=self.session)
@@ -161,7 +186,7 @@ class TestUsers(TestBase):
         bad_user = self.bad_id
 
         # Test authorization & access-control
-        await self.auth_access_request_test(Request.POST, path, allowed_users, body)
+        await self.auth_access_request_test(Request.POST, path, allowed_users, {})
 
         # Test other cases
         await self.do_request(Request.POST, f"/users/{active_user.id}/invite", "user_admin",
@@ -173,6 +198,20 @@ class TestUsers(TestBase):
                               json_body={}, expected_status=Status.FORBIDDEN)
         await self.do_request(Request.POST, f"/users/{bad_user}/invite", "user_approved_coach",
                               json_body={}, expected_status=Status.FORBIDDEN)
+
+    async def test_post_invite_disabled_user(self):
+        eg = EditionGenerator(self.session)
+        eg.generate_edition()
+        eg.add_to_db()
+        await self.session.commit()
+
+        disabled_user = await self.get_user_by_name("user_disabled_coach")
+        disabled_user.active = False
+        disabled_user.email = os.getenv("TEST_EMAIL")
+        await update(disabled_user, session=self.session)
+
+        await self.do_request(Request.POST, f"/users/{disabled_user.id}/invite", "user_admin",
+                              json_body={}, expected_status=Status.SUCCESS)
 
     async def test_post_approve_user(self):
         activated_user: User = await self.get_user_by_name("user_activated_coach")

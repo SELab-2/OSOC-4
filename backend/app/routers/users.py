@@ -99,6 +99,7 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
         raise UserNotFoundException()
 
     if not role == UserRole.ADMIN and not user.approved:
+        # This can't be reached since access would be blocked for users matching this if
         raise UserBadStateException()
 
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
@@ -205,7 +206,6 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
     if user.disabled:
         user.disabled = False
         await update(user, session=session)
-        # todo add user to latest edition, else it is useless that we invite him
 
         # get the latest edition
         stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())
