@@ -5,11 +5,8 @@ from typing import Dict, Set, Tuple
 from httpx import Response
 
 from app.crud import read_where, read_all_where, update
-from app.database import db
 from app.models.user import User, UserRole
 from app.tests.test_base import Status, TestBase, Request
-from app.utils.cryptography import verify_password
-from app.utils.keygenerators import generate_new_reset_password_key
 
 
 class TestUsers(TestBase):
