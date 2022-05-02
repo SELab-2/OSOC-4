@@ -141,7 +141,8 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
     async def _auth_test_request(self, request_type: Request, path: str, body: Dict):
         await self.do_request(request_type, path, expected_status=Status.UNAUTHORIZED, json_body=body)
-        await self.do_request(request_type, path, expected_status=Status.UNPROCESSABLE, json_body=body)
+        await self.do_request(request_type, path, "user_admin", expected_status=Status.UNPROCESSABLE,
+                              json_body=body, access_token="wrong token")
 
     async def _access_test_request(
             self, request_type: Request, path, allowed_users: Set[str], body: Dict = None
