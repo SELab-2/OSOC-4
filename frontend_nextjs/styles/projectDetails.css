@@ -41,12 +41,42 @@
     margin: 5px 15px 5px 15px;
 }
 
+.project-details-title-info{
+    font-weight: bold;
+    font-size: 25px;
+    padding-bottom: 7px;
+    padding-top: 7px;
+    margin-bottom: 10px;
+}
+
 .project-details-title{
     font-weight: bold;
     font-size: 25px;
+    padding-bottom: 7px;
+    padding-top: 7px;
+    padding-left: 13px;
+    margin-bottom: 10px;
+}
+
+.project-details-title-edit{
+    font-weight: bold;
+    font-size: 25px;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
 .project-details-subtitle{
+    font-weight: lighter;
+    font-size: 18px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 13px;
+    margin-bottom: 15px;
+
+
+}
+
+.project-details-subtitle-edit{
     font-weight: lighter;
     font-size: 18px;
     margin-bottom: 15px;
@@ -56,6 +86,26 @@
     text-align: center;
     font-weight: bold;
     font-size: 30px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 50%;
+}
+
+.project-details-project-title-edit{
+    text-align: center;
+    font-weight: bold;
+    font-size: 30px;
+    margin-bottom: 10px;
+    align-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 50%;
+}
+.project-details-edit-field-width{
+    max-width: 50%;
 }
 
 .project-details-page{
@@ -71,3 +121,4 @@
 .participation-div{
     margin: 5px 5px;
 }
+

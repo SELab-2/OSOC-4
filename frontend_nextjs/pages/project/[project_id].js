@@ -1,6 +1,6 @@
 import {useRouter} from "next/router";
 import React, {useEffect, useState} from "react";
-import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Alert, Button, Col, Modal, Row} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 import AdminCard from "../../Components/projects/AdminCard";
 import SkillCard from "../../Components/projects/SkillCard";
@@ -15,6 +15,8 @@ import RequiredSkillSelector from "../../Components/projects/RequiredSkillSelect
 import red_cross from "/public/assets/wrong.svg"
 import {getID} from "../../utils/string";
 import PropTypes from "prop-types";
+import EditableDiv from "../../Components/projects/EditableDiv";
+import {log} from "../../utils/logger";
 
 function Input(props) {
     return null;
@@ -39,42 +41,41 @@ const Project = () => {
     const [showError, setShowError] = useState(false)
 
     useEffect(() => {
-        if (! loaded) {
-            api.invalidate();
-            Url.fromName(api.projects).extend(`/${project_id}`).get().then(res => {
-                if (res.success) {
-                    setProject(res.data)
+            if(! loaded){
+                api.invalidate();
+                Url.fromName(api.projects).extend(`/${project_id}`).get().then(async res => {
+                    if (res.success) {
+                        setProject(res.data)
+                        setEditFields(res.data)
 
-                    setProjectName(res.data.name)
+                        setLoaded(true)
+                        let temp_dict = {}
 
-                    setPartnerName(res.data.partner_name)
-                    setProjectDescription(res.data.description)
+                        res.data.required_skills.map(skill => {
+                            temp_dict[skill.skill_name] = skill.number
+                        })
 
-                    setPartnerDescription(res.data.partner_description)
+                        Object.keys(temp_dict).map(async name => {
+                            await setRequiredSkills(prevState => [...prevState, {
+                                "number": temp_dict[name],
+                                "skill_name": name
+                            }])
+                        })
 
-                    setUsers(res.data.users)
+                        res.data.participations.map(participation => {
+                            temp_dict[participation.skill] = temp_dict[participation.skill] - 1;
+                        })
 
-                    setLoaded(true)
-                    let temp_dict = {}
+                        Object.keys(temp_dict).map(async name => {
+                            await setStillRequiredSkills(prevState => [...prevState, {
+                                "number": temp_dict[name],
+                                "skill_name": name
+                            }])
+                        })
+                    }
+                });
+            }
 
-                    res.data.required_skills.map(skill => {
-                        temp_dict[skill.skill_name] = skill.number
-                    })
-
-                    Object.keys(temp_dict).map(async name => {
-                        await setRequiredSkills(prevState => [...prevState, {"number": temp_dict[name], "skill_name": name}])
-                    })
-
-                    res.data.participations.map(participation => {
-                        temp_dict[participation.skill] = temp_dict[participation.skill] - 1;
-                    })
-
-                    Object.keys(temp_dict).map(async name => {
-                        await setStillRequiredSkills(prevState => [...prevState, {"number": temp_dict[name], "skill_name": name}])
-                    })
-                }
-            });
-        }
     }, [])
 
     useEffect(() => {
@@ -105,6 +106,22 @@ const Project = () => {
 
     //TODO make this add user to project
     function addUser(){
+        log(project)
+    }
+
+    function setEditFields(original){
+        setProjectName(original.name)
+
+        setPartnerName(original.partner_name)
+        setProjectDescription(original.description)
+
+        setPartnerDescription(original.partner_description)
+
+        setUsers(original.users)
+    }
+
+    function setFields(body){
+        setProject(prevState => ({...prevState, ...body, "users":users}))
     }
 
 
@@ -121,6 +138,7 @@ const Project = () => {
         }
         let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
         if(res.success){
+            setFields(body)
             setShowEdit(false)
         } else{
             setShowError(true)
@@ -143,12 +161,7 @@ const Project = () => {
                                 </Hint>
                             </Col>
                             <Col>
-                                {showEdit ?
-                                    <Form.Control className={"project-details-project-title"} type="text" value={projectName} onChange={e => setProjectName(e.target.value)} />
-                                    :
-                                    <div className={"project-details-project-title"}>{project.name}</div>
-
-                                }
+                                <EditableDiv cssClass={"project-details-project-title"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName}/>
                             </Col>
                             <Col xs="auto" >
                                 {showEdit ?
@@ -159,9 +172,11 @@ const Project = () => {
                                     </Hint>
                                     :
                                     <Hint message="Edit project" placement="top">
-                                        <Image alt={"edit button"} onClick={() => setShowEdit(true)} src={edit} width={33} height={33}/>
+                                        <Image alt={"edit button"} onClick={() => {
+                                            setEditFields(project)
+                                            setShowEdit(true)
+                                        }} src={edit} width={33} height={33}/>
                                     </Hint>
-
                                 }
                             </Col>
                             <Col xs="auto" >
@@ -199,34 +214,24 @@ const Project = () => {
                             </Col>
                         </Row>
                         <div className={"project-details-page"} >
-                            {showEdit ?
-                                <>
-                                    <Row>
-                                        <Col xs={"auto"}>
-                                            <div className={"project-details-title"} >Project by: </div>
-                                        </Col>
-                                        <Col>
-                                            <Form.Control className={"project-details-title"} type="text" value={partnerName} onChange={e => setPartnerName(e.target.value)} />
-                                        </Col>
-                                    </Row>
-                                    <Form.Control className={"project-details-subtitle"} type="text" value={partnerDescription} onChange={e => setPartnerDescription(e.target.value)} />
-                                </>
-                                :
-                                <>
-                                    <div className={"project-details-title"} >Project by: {project.partner_name}</div>
-                                    <div className={"project-details-subtitle"}>{project.partner_description}</div>
-                                </>
-                            }
+                            <div className={"project-details-edit-field-width"}>
+                                <Row className={"nomargin"}>
+                                    <Col xs={"auto"}>
+                                        <div className={"project-details-title-info"} >Project by: </div>
+                                    </Col>
+                                    <Col>
+                                        <EditableDiv isTextArea={false} showEdit={showEdit} value={project.partner_name} changeValue={partnerName} setChangeValue={setPartnerName} cssClass={"project-details-title"}/>
+                                    </Col>
+                                </Row>
 
-                            <div className={"project-details-title"}>About the project</div>
-                            {showEdit ?
-                                <Form.Control className={"project-details-subtitle"} type="text" value={projectDescription} onChange={e => setProjectDescription(e.target.value)} />
-                                :
-                            <div className={"project-details-subtitle"}>{project.description}</div>
-                            }
+                                <EditableDiv isTextArea={false} showEdit={showEdit}  value={project.partner_description} changeValue={partnerDescription} setChangeValue={setPartnerDescription} cssClass={"project-details-subtitle"}/>
+                                <div className={"project-details-title-info"}>About the project</div>
+                                <EditableDiv isTextArea={true} cssClass={"project-details-subtitle"} showEdit={showEdit} value={project.description} changeValue={projectDescription} setChangeValue={setProjectDescription}/>
+
+                            </div>
 
                             <div>
-                                <div className={"project-details-title"}>Assigned staff</div>
+                                <div className={"project-details-title-info"}>Assigned staff</div>
                                 {(users.length) ?
                                     users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>))
                                     :
@@ -246,9 +251,8 @@ const Project = () => {
                                         { (requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) =>{
                                             if(showEdit){
                                                 return <RequiredSkillSelector className={"required-skill-selector-row"} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}/>
-                                            } else {
-                                                return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                             }
+                                            return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                         })) : <div className={"project-empty-list-col"}>Currently there are no required skills</div>
                                         }
                                     </div>
@@ -265,9 +269,7 @@ const Project = () => {
                                             if(requiredSkill.number > 0){
                                                 return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                             }
-                                            else{
-                                                return null
-                                            }
+                                            return null
                                         }))
                                             :
                                             <div className={"project-empty-list-col"}>Currently there are no required skills</div>
