@@ -26,7 +26,7 @@ router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 @router.get("/{student_id}", response_description="Student retrieved",
             dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_student(student_id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+async def get_student(student_id: int, session: AsyncSession = Depends(get_session)):
     """get_student get the Student instances with id from the database
 
     :return: student with id

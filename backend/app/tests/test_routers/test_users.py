@@ -98,8 +98,8 @@ class TestUsers(TestBase):
 
         for user_title in allowed_users:
             self.assertEqual(json.loads(responses1.get(user_title).content)["data"],
-                              json.loads(responses2.get(user_title).content)["data"],
-                              "The returned user was different for it's creation and it's duplicate creation")
+                             json.loads(responses2.get(user_title).content)["data"],
+                             "The returned user was different for it's creation and it's duplicate creation")
 
         # Test whether created user is in the database
         user = await read_where(User, User.email == body["email"], session=self.session)
@@ -214,8 +214,8 @@ class TestUsers(TestBase):
         await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.SUCCESS)
         db_user = await read_where(User, User.id == user_to_del.id, session=self.session)
         self.assertEqual((db_user.disabled, db_user.active, db_user.approved, db_user.password),
-                          (True, False, False, ""),
-                          "The user wasn't deleted by the admin.")
+                         (True, False, False, ""),
+                         "The user wasn't deleted by the admin.")
 
         # Try to delete imaginary user
         await self.do_request(Request.DELETE, f"/users/{self.bad_id}", "user_admin", expected_status=Status.NOT_FOUND)
