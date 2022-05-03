@@ -33,6 +33,10 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     :rtype: StudentOutExtended
     """
 
+    student = await read_where(Student, Student.id == student_id, session=session)
+    if not student:
+        raise StudentNotFoundException
+
     studentstat = select(Student).where(Student.id == student_id).options(selectinload(Student.skills))
     studentres = await session.execute(studentstat)
     (student,) = studentres.one()

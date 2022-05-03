@@ -30,6 +30,27 @@ class TestStudents(TestBase):
 
         await self.session.commit()
 
+    async def test_get_student(self):
+        path = "/students/"
+        allowed_users = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
+
+        # Request with bad id
+        await self.do_request(Request.GET, f"{path}{self.bad_id}", "user_admin",
+                              expected_status=Status.NOT_FOUND)
+
+        # find a random student in the testdata
+        student: Student = await read_where(Student, session=self.session)
+        student_id: int = student.id
+
+        # Access tests + good requests
+        responses = await self.auth_access_request_test(Request.GET, f"{path}{student_id}",
+                                                        allowed_users=allowed_users)
+        # Assert the responses match and are not empty. TODO find a better way to assert the responses.
+        for user_title, response in responses.items():
+            # checking other data is difficult enough that it would need its own tests
+            self.assertEqual(response.json()["id_int"], student_id)
+            self.assertEqual(response.json()["decision"], student.decision)
+
     async def test_get_student_questionanswers(self):
         path = "/students/{}/question-answers"
         allowed_users = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
