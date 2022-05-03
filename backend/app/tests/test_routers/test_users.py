@@ -206,9 +206,9 @@ class TestUsers(TestBase):
         # check coach access
         await self.do_request(Request.DELETE, path, "user_approved_coach", expected_status=Status.FORBIDDEN)
         db_user = await read_where(User, User.id == user_to_del.id, session=self.session)
-        self.assertNotEquals((db_user.disabled, db_user.active, db_user.approved, db_user.password),
-                             (True, False, False, ""),
-                             "The user was deleted by a coach.")
+        self.assertNotEqual((db_user.disabled, db_user.active, db_user.approved, db_user.password),
+                            (True, False, False, ""),
+                            "The user was deleted by a coach.")
 
         # correct request with admin
         await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.SUCCESS)

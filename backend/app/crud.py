@@ -4,7 +4,7 @@ from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import SQLModel, select
 
-from app.database import engine, get_session
+from app.database import get_session
 from app.models.user import User
 
 T = TypeVar("T", SQLModel, object)
@@ -110,18 +110,16 @@ async def update_all(models: List[T], session: AsyncSession) -> Optional[List[T]
 
 async def clear_data(session: AsyncSession = get_session()):
     # Get all tables
-    async with engine.connect() as conn:
-        # tables in dependency order (delete last first and/or cascade)
-        tables = await conn.run_sync(
-            lambda sync_conn: inspect(sync_conn).get_sorted_table_and_fkc_names()
-        )
+    conn = await session.connection()
+    tables = await conn.run_sync(
+        lambda sync_conn: inspect(sync_conn).get_sorted_table_and_fkc_names()
+    )
 
     # Delete tables in reversed order
     for table in reversed(tables):
         # TODO: fix this, doing "TRUNCATE user CASCADE" gives syntax error, thus workaround
         if table[0] == "user":  # workaround for user table
-            users = await read_all_where(User, session=session)
-            for user in users:
+            for user in await read_all_where(User, session=session):
                 await session.delete(user)
         elif table[0] is not None:  # One of the tables is None
             await session.execute(f"TRUNCATE {table[0]} CASCADE")

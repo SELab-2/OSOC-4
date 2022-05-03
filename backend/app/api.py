@@ -40,12 +40,9 @@ async def shutdown():
     await disconnect_db()
 
 app.include_router(ddd.router)
-# app.include_router(answers.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
 app.include_router(projects.router)
-# app.include_router(question_answers.router)
-# app.include_router(questions.router)
 app.include_router(skills.router)
 app.include_router(students.router)
 app.include_router(suggestions.router)

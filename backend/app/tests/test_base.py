@@ -111,8 +111,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         :type json_body: Depends on the request, most of the time a dict
         :param access_token: The access token of the request, defaults to token of user
         :type access_token: str
-        :param use_access_token: Toggle whether an access token is used in the request
-        :type use_access_token: bool
 
         :return: The response of the request
         :rtype: Response

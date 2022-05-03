@@ -19,7 +19,6 @@ class WebSocketManager:
         await websocket.send(message)
 
     async def broadcast(self, message: str):
-        print(self.active_connections)
-        print("broadcasting ...")
+        print(f"broadcasting to active connections '{self.active_connections}' ...")
         for conn in self.active_connections:
             await conn.send_json(message)
