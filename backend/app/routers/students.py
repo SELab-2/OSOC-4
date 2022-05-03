@@ -83,9 +83,9 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
 @router.get("/{student_id}/question-answers", response_description="Student retrieved",
             dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def get_student_questionanswers(student_id, session: AsyncSession = Depends(get_session)):
-    """get_student get the Student instances with id from the database
+    """get the question answers of the Student instance with id
 
-    :return: A list of dicts with a question as keys and the answers of the
+    :return: the question answers for the given student_id
     :rtype: list[dict[str,Any]]
     """
     # student questionAnswers
