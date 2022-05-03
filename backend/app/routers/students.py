@@ -63,8 +63,7 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     r = await session.execute(select(Participation)
                               .select_from(Participation)
                               .where(Participation.student_id == int(student_id)))
-    student_info = r.all()
-    info["participations"] = [ParticipationOutStudent.parse_raw(s.json()) for (s,) in student_info]
+    info["participations"] = [ParticipationOutStudent.parse_raw(s.json()) for (s,) in r.all()]
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
 
@@ -74,8 +73,7 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     r = await session.execute(select(Suggestion)
                               .select_from(Suggestion)
                               .where(Suggestion.student_id == int(student_id)))
-    student_info = r.all()
-    info["suggestions"] = {s.id: SuggestionExtended.parse_raw(s.json()) for (s,) in student_info}
+    info["suggestions"] = {s.id: SuggestionExtended.parse_raw(s.json()) for (s,) in r.all()}
 
     return info
 
@@ -95,10 +93,7 @@ async def get_student_questionanswers(student_id, session: AsyncSession = Depend
                               .join(Answer, QuestionAnswer.answer)
                               .outerjoin(QuestionTag, Question.question_tags)
                               .where(QuestionAnswer.student_id == int(student_id)))
-    info = r.all()
-    info = [{"question": x[0], "answer": x[1]} for x in info if x[2] is None]
-
-    return info
+    return [{"question": x[0], "answer": x[1]} for x in r.all() if x[2] is None]
 
 
 @router.patch("/{student_id}",

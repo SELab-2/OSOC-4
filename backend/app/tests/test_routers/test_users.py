@@ -97,7 +97,7 @@ class TestUsers(TestBase):
         responses2: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
 
         for user_title in allowed_users:
-            self.assertEquals(json.loads(responses1.get(user_title).content)["data"],
+            self.assertEqual(json.loads(responses1.get(user_title).content)["data"],
                               json.loads(responses2.get(user_title).content)["data"],
                               "The returned user was different for it's creation and it's duplicate creation")
 
@@ -213,7 +213,7 @@ class TestUsers(TestBase):
         # correct request with admin
         await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.SUCCESS)
         db_user = await read_where(User, User.id == user_to_del.id, session=self.session)
-        self.assertEquals((db_user.disabled, db_user.active, db_user.approved, db_user.password),
+        self.assertEqual((db_user.disabled, db_user.active, db_user.approved, db_user.password),
                           (True, False, False, ""),
                           "The user wasn't deleted by the admin.")
 

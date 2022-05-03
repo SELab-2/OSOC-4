@@ -2,6 +2,7 @@ from typing import Any
 
 from app.crud import read_where
 from app.models.student import Student, DecisionOption
+from app.models.user import UserRole
 from app.tests.test_base import TestBase, Request, Status
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
@@ -28,6 +29,29 @@ class TestStudents(TestBase):
         studg.add_to_db()
 
         await self.session.commit()
+
+    async def test_get_student_questionanswers(self):
+        path = "/students/{}/question-answers"
+        allowed_users = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
+
+        # Request with bad id
+        response = await self.do_request(Request.GET, path.format(self.bad_id), "user_admin",
+                                         expected_status=Status.SUCCESS)
+        # assert is empty
+        self.assertTrue(response.json() == [],
+                        "'get_student_questionanswers' returned a non empty list for a student that doesn't exist.")
+
+        # find a random editable student in the testdata
+        student: Student = await read_where(Student, session=self.session)
+
+        # Access tests + good requests
+        responses = await self.auth_access_request_test(Request.GET, path.format(student.id),
+                                                        allowed_users=allowed_users)
+        # Assert the responses match and are not empty. TODO find a better way to assert the responses.
+        self.assertTrue(len(responses["user_admin"].json()) >= 1)
+        for user_title, response in responses.items():
+            self.assertEqual(responses["user_admin"].json(), response.json(),
+                             f"The response of {user_title} did not match that of admin.")
 
     async def test_update_student(self):
         path = "/students/"
