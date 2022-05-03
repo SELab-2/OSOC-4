@@ -31,7 +31,7 @@ const Project = () => {
     const [project, setProject] = useState(undefined);
     const [showDelete, setShowDelete] = useState(false);
     const [skills, setSkills] = useState([]);
-    const [requiredSkills, setRequiredSkills] = useState([])
+    const [requiredSkills, setRequiredSkills] = useState([]);
     const [showEdit, setShowEdit] = useState(false);
     const [partnerDescription, setPartnerDescription] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
@@ -39,7 +39,9 @@ const Project = () => {
     const [projectName, setProjectName] = useState("")
     const [stillRequiredSkills, setStillRequiredSkills] = useState([]);
     const [users, setUsers] = useState([]);
-    const [showError, setShowError] = useState(false)
+    const [showError, setShowError] = useState(false);
+    const [showBackExit, setShowBackExit] = useState(false);
+    const [showStopEditing, setShowStopEditing] = useState(false);
 
     useEffect(() => {
             if(! loaded){
@@ -157,8 +159,32 @@ const Project = () => {
                         <Row className={"project-top-bar nomargin"}>
                             <Col xs="auto" >
                                 <Hint message="Go back" placement="top">
-                                    <Image alt={"back button"} onClick={() => router.back()} src={back} width={100} height={33}/>
+                                    <Image alt={"back button"} onClick={() => {
+                                        if(showEdit){
+                                            setShowBackExit(true)
+                                        } else {
+                                            router.back()
+                                        }
+                                    }} src={back} width={100} height={33}/>
                                 </Hint>
+                                <Modal show={showBackExit} onHide={() => setShowBackExit(false)}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Leave page while editing</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>Are you sure you want to leave this page while editing it? Doing so will lose your current changes. </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={() => setShowDelete(false)}>
+                                            Keep editing
+                                        </Button>
+                                        <Button variant="primary" onClick={() => {
+                                            setShowBackExit(true)
+                                            router.back()
+                                        }}>
+                                            Leave page
+                                        </Button>
+
+                                    </Modal.Footer>
+                                </Modal>
                             </Col>
                             <Col>
                                 <EditableDiv cssClass={"project-details-project-title"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName}/>
@@ -181,9 +207,30 @@ const Project = () => {
                             </Col>
                             <Col xs="auto" >
                                 {showEdit ?
-                                    <Hint message="Cancel edit" placement="top">
-                                        <Image alt={"cancel edit button"} src={red_cross} width={33} height={33} onClick={() => setShowEdit(false) }/>
-                                    </Hint>
+                                    <>
+                                        <Hint message="Cancel edit" placement="top">
+                                            <Image alt={"cancel edit button"} src={red_cross} width={33} height={33} onClick={() => setShowStopEditing(true) }/>
+                                        </Hint>
+                                        <Modal show={showStopEditing} onHide={() => setShowStopEditing(false)}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Stop editing</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>Are you sure you want to stop editing? Doing so will lose your current changes.</Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={() => setShowStopEditing(false)}>
+                                                    Keep editing
+                                                </Button>
+                                                <Button variant="primary" onClick={() => {
+                                                    setShowStopEditing(false)
+                                                    setShowEdit(false)
+                                                }}>
+                                                    Stop editing
+                                                </Button>
+
+                                            </Modal.Footer>
+                                        </Modal>
+                                    </>
+
                                     :
                                     <div>
                                         <Hint message="Delete project" placement="top">
