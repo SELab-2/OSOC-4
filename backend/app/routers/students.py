@@ -99,7 +99,7 @@ async def get_student_questionanswers(student_id, session: AsyncSession = Depend
 
 
 @router.patch("/{student_id}",
-            dependencies=[Depends(RoleChecker(UserRole.COACH))])
+              dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def update_student(student_id: int, student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
     student = await read_where(Student, Student.id == student_id, session=session)
     if student:
