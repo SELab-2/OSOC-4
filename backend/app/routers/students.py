@@ -14,7 +14,6 @@ from app.utils.checkers import RoleChecker
 from app.utils.response import response
 from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
-from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
