@@ -38,17 +38,17 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     (student,) = studentres.one()
 
     # student info
-    info = {"id": f"{config.api_url}students/{student_id}"}
-
-    info["skills"] = student.skills
-    info["id_int"] = student_id
+    info = {"id": f"{config.api_url}students/{student_id}",
+            "skills": student.skills,
+            "id_int": student_id}
 
     # student info from tags
-    r = await session.execute(
-        select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer).select_from(
-            Student).where(Student.id == int(student_id)).join(QuestionAnswer).join(QuestionTag,
-                                                                                    QuestionAnswer.question_id == QuestionTag.question_id).join(
-            Answer))
+    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer)
+                              .select_from(Student)
+                              .where(Student.id == int(student_id))
+                              .join(QuestionAnswer)
+                              .join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id)
+                              .join(Answer))
     student_info = r.all()
 
     mandatory = {k: v for (k, mandatory, _, v) in student_info if mandatory}
@@ -60,8 +60,9 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     info["detailtags"] = detailTags
 
     # student participations
-    r = await session.execute(
-        select(Participation).select_from(Participation).where(Participation.student_id == int(student_id)))
+    r = await session.execute(select(Participation)
+                              .select_from(Participation)
+                              .where(Participation.student_id == int(student_id)))
     student_info = r.all()
     info["participations"] = [ParticipationOutStudent.parse_raw(s.json()) for (s,) in student_info]
     # student questionAnswers
@@ -70,8 +71,9 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     info["decision"] = student.decision
 
     # student suggestions
-    r = await session.execute(
-        select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
+    r = await session.execute(select(Suggestion)
+                              .select_from(Suggestion)
+                              .where(Suggestion.student_id == int(student_id)))
     student_info = r.all()
     info["suggestions"] = {s.id: SuggestionExtended.parse_raw(s.json()) for (s,) in student_info}
 
@@ -87,7 +89,8 @@ async def get_student_questionanswers(student_id, session: AsyncSession = Depend
     :rtype: list[dict[str,Any]]
     """
     # student questionAnswers
-    r = await session.execute(select(Question.question, Answer.answer, QuestionTag.tag).select_from(QuestionAnswer)
+    r = await session.execute(select(Question.question, Answer.answer, QuestionTag.tag)
+                              .select_from(QuestionAnswer)
                               .join(Question, QuestionAnswer.question)
                               .join(Answer, QuestionAnswer.answer)
                               .outerjoin(QuestionTag, Question.question_tags)

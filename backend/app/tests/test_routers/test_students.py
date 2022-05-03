@@ -1,8 +1,6 @@
 from typing import Any
 
-from app.crud import read_all_where, read_where
-from app.models.edition import Edition
-from app.models.skill import Skill
+from app.crud import read_where
 from app.models.student import Student, DecisionOption
 from app.tests.test_base import TestBase, Request, Status
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
@@ -20,19 +18,15 @@ class TestStudents(TestBase):
         eg = EditionGenerator(self.session)
         eg.generate_edition()
         eg.add_to_db()
-        await self.session.commit()
 
-        skill_generator = SkillGenerator(self.session)
-        skill_generator.generate_skills()
-        skill_generator.add_to_db()
-        await self.session.commit()
+        skillg = SkillGenerator(self.session)
+        skillg.generate_skills()
+        skillg.add_to_db()
 
-        skills = await read_all_where(Skill, session=self.session)
-        edition = await read_where(Edition, session=self.session)
+        studg = StudentGenerator(self.session, eg.data[0], skillg.data)
+        studg.generate_students(len(self.users))
+        studg.add_to_db()
 
-        sg = StudentGenerator(self.session, edition, skills)
-        sg.generate_students(len(self.users))
-        sg.add_to_db()
         await self.session.commit()
 
     async def test_update_student(self):
