@@ -45,14 +45,16 @@ export default function AdminCard(props){
      */
     return (
         <Row key={props.user} className={getCssClass()}>
-            <Col>
+            <Col className={"user-col"}>
                 {user.name}
             </Col>
-            {props.showEdit ? <Col xs={"auto"}>
-                    <Image alt={"remove user"} src={red_cross} width={20} height={20} onClick={() => props.deleteUser(props.index) }/>
-                </Col> :
-                null
-            }
+            {props.showEdit ?
+                <Col xs={"auto"}>
+                    <div className={"delete-cross-user"}>
+                        <Image alt={"remove user"} src={red_cross} width={24} height={24} onClick={() => props.deleteUser(props.index) }/>
+                    </div>
+                </Col>
+                : null}
         </Row>
     )
 

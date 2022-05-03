@@ -4,6 +4,8 @@
     text-align: center;
     max-width: 250px;
     margin: 10px 15px 5px 15px;
+    padding-top: 5px;
+    padding-bottom:5px
 }
 
 .participation-name{
@@ -26,19 +28,28 @@
 }
 
 .admin-div{
-    max-width: 250px;
-    font-size: 20px;
     background-color: var(--no_red_45);
-    text-align: center;
-    margin: 5px 15px 5px 15px;
+    max-width: 250px;
 }
 
 .coach-div{
-    max-width: 250px;
-    font-size: 20px;
     background-color: var(--maybe_yellow_45);
+    max-width: 250px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left:15px;
+}
+
+.user-col{
+    font-size: 20px;
     text-align: center;
-    margin: 5px 15px 5px 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.delete-cross-user{
+    margin-top: 8px;
+    cursor: pointer;
 }
 
 .project-details-title-info{
@@ -72,11 +83,24 @@
     padding-bottom: 7px;
     padding-left: 13px;
     margin-bottom: 15px;
-
-
 }
 
 .project-details-subtitle-edit{
+    font-weight: lighter;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.project-details-big-subtitle{
+    font-weight: lighter;
+    font-size: 18px;
+    padding-top: 7px;
+    padding-bottom: 73px;
+    padding-left: 13px;
+    margin-bottom: 15px;
+}
+
+.project-details-big-subtitle-edit{
     font-weight: lighter;
     font-size: 18px;
     margin-bottom: 15px;
@@ -120,5 +144,29 @@
 
 .participation-div{
     margin: 5px 5px;
+}
+
+.project-details-user-div{
+    margin-left: -15px !important;
+    margin-bottom: 55px;
+}
+
+.project-details-user-div-edit{
+    margin-left: -15px !important;
+}
+
+.project-details-plus-user{
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.project-details-plus-skill{
+    cursor: pointer;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.delete-cross{
+    cursor: pointer;
 }
 

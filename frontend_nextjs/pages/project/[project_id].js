@@ -17,6 +17,7 @@ import {getID} from "../../utils/string";
 import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
 import {log} from "../../utils/logger";
+import plus from "/public/assets/plus.svg"
 
 function Input(props) {
     return null;
@@ -106,7 +107,6 @@ const Project = () => {
 
     //TODO make this add user to project
     function addUser(){
-        log(project)
     }
 
     function setEditFields(original){
@@ -226,24 +226,25 @@ const Project = () => {
 
                                 <EditableDiv isTextArea={false} showEdit={showEdit}  value={project.partner_description} changeValue={partnerDescription} setChangeValue={setPartnerDescription} cssClass={"project-details-subtitle"}/>
                                 <div className={"project-details-title-info"}>About the project</div>
-                                <EditableDiv isTextArea={true} cssClass={"project-details-subtitle"} showEdit={showEdit} value={project.description} changeValue={projectDescription} setChangeValue={setProjectDescription}/>
+                                <EditableDiv isTextArea={true} cssClass={"project-details-big-subtitle"} showEdit={showEdit} value={project.description} changeValue={projectDescription} setChangeValue={setProjectDescription}/>
 
                             </div>
 
-                            <div>
-                                <div className={"project-details-title-info"}>Assigned staff</div>
+                            <div className={"project-details-title-info"}>Assigned staff</div>
+                            <div className={"project-details-user-div" + (showEdit ? "-edit" : "")}>
                                 {(users.length) ?
-                                    users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>))
-                                    :
-                                    <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
+                                        users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>))
+                                        :
+                                        <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
                             </div>
                             {showEdit ?
                                 // TODO make this pop up a selection tool for users
-                                <Button onClick={() => addUser()}>
-                                    Add new coach / admin to the project
-                                </Button>
+                                <Hint message={"Add new coach / admin to the project"} >
+                                    <div className={"project-details-plus-user"}>
+                                        <Image  width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addUser()} />
+                                    </div>
+                                </Hint>
                                 : null}
-                            <br/>
                             <Row>
                                 <Col>
                                     <div>
@@ -257,9 +258,11 @@ const Project = () => {
                                         }
                                     </div>
                                     {showEdit ?
-                                        <Button onClick={() => addRequiredSkill()}>
-                                            Add new required skill
-                                        </Button>
+                                        <Hint message={"Add new required skill"} placement="top">
+                                            <div className={"project-details-plus-skill"} >
+                                                <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addRequiredSkill()} />
+                                            </div>
+                                        </Hint>
                                         : null}
                                 </Col>
                                 <Col>

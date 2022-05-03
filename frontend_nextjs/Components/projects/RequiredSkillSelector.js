@@ -43,7 +43,7 @@ export default function RequiredSkillSelector(props){
                 <Col xs="auto">
                     <Form.Control className={"required-skill-amount"} type="number" value={props.requiredSkill.number} onChange={e => ChangeAmountRequiredSkill(e.target.value)} />
                 </Col>
-                <Col xs="auto">
+                <Col xs="auto" className={"delete-cross"}>
                     <Image  alt={"delete student"} onClick={() => DeleteRequiredSkill()} src={red_cross} width={25} height={25}/>
                 </Col>
             </Row>
