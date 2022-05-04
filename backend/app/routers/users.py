@@ -201,10 +201,12 @@ async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)
     return response(UserOut.parse_raw(user.json()), "User deleted successfully")
 
 
-@router.patch("/{user_id}/password", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_password(user_id: str, passwords: ChangePassword, session: AsyncSession = Depends(get_session)):
+@router.patch("/me/password", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def update_password(passwords: ChangePassword, session: AsyncSession = Depends(get_session),
+                          Authorize: AuthJWT = Depends()):
     """"update_password this changes the password of given user if previous password is given
-        :param user_id: the user id
+
+    :param user_id: the user id
     :type user_id: str
     :param passwords: current_password, new_password and confirm_password
     :type passwords: ChangePassword
@@ -212,11 +214,12 @@ async def update_password(user_id: str, passwords: ChangePassword, session: Asyn
     :return: response
     :rtype: success or error
     """
+    current_user_id = Authorize.get_jwt_subject()
 
     if passwords.new_password != passwords.confirm_password:
         raise PasswordsDoNotMatchException()
 
-    user = await read_where(User, User.id == int(user_id), session=session)
+    user = await read_where(User, User.id == int(current_user_id), session=session)
 
     if user is None:
         raise UserNotFoundException()
