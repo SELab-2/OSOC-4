@@ -4,20 +4,41 @@ import React from "react";
 import Image from 'next/image'
 import red_cross from "../../public/assets/wrong.svg";
 
+
+/**
+ * Searchable skill dropdown menu with a amount selector and remove button
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function RequiredSkillSelector(props){
 
+    /**
+     * removes the RequiredSkillSelector
+     * @returns {Promise<void>}
+     * @constructor
+     */
     async function DeleteRequiredSkill() {
         if (props.requiredSkills.length > 1) {
             await props.setRequiredSkills(props.requiredSkills.filter((_, i) => i !== props.index))
         }
     }
 
+    /**
+     * changes the value of the selected dropdown menu
+     * @param value
+     */
     function changeRequiredSkill(value){
         let newArr = [...props.requiredSkills]
         newArr[props.index].skill_name = value
         props.setRequiredSkills(newArr)
     }
 
+    /**
+     * changes the amount
+     * @param amount
+     * @constructor
+     */
     function ChangeAmountRequiredSkill(amount){
         if (0 < amount && amount < 100){
             let newArr = [...props.requiredSkills]

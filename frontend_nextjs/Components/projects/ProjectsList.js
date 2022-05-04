@@ -53,6 +53,9 @@ export default function ProjectsList(props) {
         }
     }, [])
 
+    /**
+     * Gets called once after mounting the Component and gets the currently logged in user
+     */
     useEffect(() => {
         Url.fromName(api.me).get().then(res => {
             if (res.success) {

@@ -1,7 +1,12 @@
 import {Form} from "react-bootstrap";
 import React from "react";
 
-
+/**
+ * Div which can switch between an editable field and a normal field
+ * @param props
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function EditableDiv(props){
 
     return(

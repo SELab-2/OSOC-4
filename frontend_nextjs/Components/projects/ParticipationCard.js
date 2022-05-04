@@ -4,7 +4,6 @@ import {useEffect, useState} from "react";
 import Image from 'next/image'
 import {Url} from "../../utils/ApiClient";
 import red_cross from "/public/assets/wrong.svg"
-import {log} from "../../utils/logger";
 
 /**
  * Card like representation of the given participation, which also allows the deletion of the participation

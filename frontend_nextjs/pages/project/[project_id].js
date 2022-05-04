@@ -16,7 +16,6 @@ import red_cross from "/public/assets/wrong.svg"
 import {getID} from "../../utils/string";
 import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
-import {log} from "../../utils/logger";
 import plus from "/public/assets/plus.svg"
 
 function Input(props) {
@@ -24,6 +23,11 @@ function Input(props) {
 }
 
 Input.propTypes = {children: PropTypes.node};
+/**
+ * this page corresponds with the projects/id tab
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const Project = () => {
     const router = useRouter();
     const { project_id } = router.query;
@@ -42,6 +46,7 @@ const Project = () => {
     const [showError, setShowError] = useState(false);
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
+    const [notAvailableSkills, setNotAvailableSkills] = useState([]);
 
     useEffect(() => {
             if(! loaded){
@@ -58,23 +63,13 @@ const Project = () => {
                             temp_dict[skill.skill_name] = skill.number
                         })
 
-                        Object.keys(temp_dict).map(async name => {
-                            await setRequiredSkills(prevState => [...prevState, {
-                                "number": temp_dict[name],
-                                "skill_name": name
-                            }])
-                        })
+                        setRequiredSkills(Object.keys(temp_dict).map(name => ({"number": temp_dict[name], "skill_name": name})))
 
                         res.data.participations.map(participation => {
                             temp_dict[participation.skill] = temp_dict[participation.skill] - 1;
                         })
 
-                        Object.keys(temp_dict).map(async name => {
-                            await setStillRequiredSkills(prevState => [...prevState, {
-                                "number": temp_dict[name],
-                                "skill_name": name
-                            }])
-                        })
+                        setStillRequiredSkills(Object.keys(temp_dict).map(name => ({"number": temp_dict[name], "skill_name": name})))
                     }
                 });
             }
@@ -99,10 +94,18 @@ const Project = () => {
     async function deleteProject(){
     }
 
+    /**
+     * Add new empty value in dropdown menu
+     */
     function addRequiredSkill(){
         setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
     }
 
+    /**
+     * Gets called after successfully removing a user from a project.
+     * @param index
+     * @returns {Promise<void>}
+     */
     async function deleteUser(index){
         await setUsers(users.filter((_, i) => i !== index))
     }
@@ -111,6 +114,10 @@ const Project = () => {
     function addUser(){
     }
 
+    /**
+     * sets the edit fields with the current values of the project
+     * @param original
+     */
     function setEditFields(original){
         setProjectName(original.name)
 
@@ -122,11 +129,37 @@ const Project = () => {
         setUsers(original.users)
     }
 
+    /**
+     * sets the project with the current values of the edit fields
+     * @param body
+     */
     function setFields(body){
+        // in body users only consists of its ids, not the full links so we have to use the "users" state
         setProject(prevState => ({...prevState, ...body, "users":users}))
     }
 
+    /**
+     * check if body if the given body is correct, if not show error message
+     * @param body
+     */
+    function checkBody(body){
+        if(body.required_skills.some(skill => skill.skill_name === "")){
+            setShowError(true)
+            return false
+        }
 
+        if(body.required_skills.some((skill, index) => body.required_skills.indexOf(skill.skill_name) !== index)){
+            setShowError(true)
+            return false
+        }
+
+        return true
+    }
+
+    /**
+     * make patch request to change project
+     * @returns {Promise<void>}
+     */
     async function changeProject(){
         let body = {
             "name":projectName,
@@ -138,12 +171,14 @@ const Project = () => {
             "edition": api.year,
             "users": users.map(url => getID(url))
         }
-        let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
-        if(res.success){
-            setFields(body)
-            setShowEdit(false)
-        } else{
-            setShowError(true)
+        if(checkBody(body)){
+            let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
+            if(res.success){
+                setFields(body)
+                setShowEdit(false)
+            } else{
+                setShowError(true)
+            }
         }
     }
 
