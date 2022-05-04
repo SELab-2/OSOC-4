@@ -4,6 +4,7 @@ import {useRouter} from "next/router";
 import SelectSearch, {fuzzySearch} from "react-select-search";
 import {api, Url} from "../utils/ApiClient";
 import {log} from "../utils/logger";
+import RequiredSkillSelector from "../Components/projects/RequiredSkillSelector";
 
 
 export default function NewProjects() {
@@ -16,7 +17,7 @@ export default function NewProjects() {
     const [tools, setTools] = useState("")
     const [codeLanguages, setCodeLanguages] = useState("")
 
-    const [students, setStudents] = useState([{"skill":"", "amount":1}])
+    const [requiredSkills, setRequiredSkills] = useState([{"skill_name":"", "number":1}])
 
     const [skills, setSkills] = useState([])
     const [show, setShow] = useState(false);
@@ -40,32 +41,14 @@ export default function NewProjects() {
             })
 
         }
-    })
+    }, [])
 
-    async function DeleteStudent(index) {
-        if (students.length > 1) {
-            await setStudents(students.filter((_, i) => i !== index))
-        }
-    }
 
-    function changeSkillStudent(index, value){
-        let newArr = [...students]
-        newArr[index].skill = value
-        setStudents(newArr)
-    }
-
-    function AddToStudent(index, amount){
-        if (0 < (students[index].amount + amount) &&  (students[index].amount + amount) < 100){
-            let newArr = [...students]
-            newArr[index]["amount"] += amount
-            setStudents(newArr)
-        }
-    }
 
     function AddStudent(){
         // can't have more different type of students then amount of skills
-        if (students.length <= skills.length){
-            setStudents(prevState => [...prevState, {"skill": "", "amount": 1}])
+        if (requiredSkills.length <= skills.length){
+            setRequiredSkills(prevState => [...prevState, {"skill_name": "", "number": 1}])
         }
     }
 
@@ -135,40 +118,10 @@ export default function NewProjects() {
                 <Form.Label>Code languages:</Form.Label>
                 <Form.Control type="text" value={codeLanguages} placeholder={"What code languages will be used in the project"} onChange={e => setCodeLanguages(e.target.value)} />
 
-                <Form.Label>Students:</Form.Label>
+                <Form.Label>Required skills:</Form.Label>
 
-                {(students.length) ? (students.map((student,index) => (
-                    <Row key={index}>
-                        <Col>
-
-                            <SelectSearch
-                                options={skills}
-                                value={student.skill}
-                                search
-                                filterOptions={fuzzySearch}
-                                onChange={value => changeSkillStudent(index, value)}
-                                emptyMessage={() => <div style={{ textAlign: 'center', fontSize: '0.8em' }}>Skill not found</div>}
-                                placeholder="Select the required skill"
-                            />
-
-                        </Col>
-                        <Col>
-                            <Card>
-                                <Row>
-                                    <Col>
-                                        {student.amount}
-                                    </Col>
-                                    <Col>
-                                        <p onClick={() => AddToStudent(index, 1)}>+</p>
-                                        <p onClick={() => AddToStudent(index, -1)}>-</p>
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </Col>
-                        <Col>
-                            <Button onClick={() => DeleteStudent(index)}>Remove student role</Button>
-                        </Col>
-                    </Row>
+                {(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (
+                    <RequiredSkillSelector className={"required-skill-selector-row"} key={index} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} index={index} requiredSkills={requiredSkills} skills={skills}/>
                 ))) : null}
 
                 <Button onClick={AddStudent}> Add extra student role</Button>

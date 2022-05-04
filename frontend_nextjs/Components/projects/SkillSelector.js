@@ -20,7 +20,8 @@ export default function SkillSelector(props){
                     filterOptions={fuzzySearch}
                     autoComplete={true}
                     onChange={value => props.setSelectedSkill(value)}
-                    emptyMessage={() => <div style={{ textAlign: 'center', fontSize: '0.8em' }}>Skill not found</div>}/> : <div>
+                    emptyMessage={() => <div style={"skill-not-found"}>Skill not found</div>}/> :
+                <div>
                     The selected student does not seem to have any needed skills for the selected project
                 </div>}
         </div>
