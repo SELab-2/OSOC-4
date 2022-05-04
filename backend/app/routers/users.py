@@ -68,7 +68,7 @@ async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
 
 @router.patch("/me/password", dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def update_password(passwords: ChangePassword, Authorize: AuthJWT = Depends(),
-                         session: AsyncSession = Depends(get_session)):
+                          session: AsyncSession = Depends(get_session)):
     """"update_password this changes the password of given user if previous password is given
 
     :param passwords: current_password, new_password and confirm_password
