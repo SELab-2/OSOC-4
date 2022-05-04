@@ -63,9 +63,9 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.session: AsyncSession = sessionmaker(
             engine, expire_on_commit=False, class_=AsyncSession
         )()
-        await clear_data(self.session)
 
         user_generator = UserGenerator(self.session)
+        user_generator.generate_default_users()
         self.users = {user.name: user for user in user_generator.data}
         self.saved_objects["passwords"] = user_generator.passwords
 

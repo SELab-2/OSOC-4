@@ -8,8 +8,10 @@ from app.utils.cryptography import get_password_hash
 class UserGenerator(DataGenerator):
     def __init__(self, session):
         super().__init__(session)
-        # Default users
-        self.data = [
+        self.passwords = {}
+
+    def generate_default_users(self):
+        self.data += [
             User(
                 email="user_admin@test.be",
                 name="user_admin",

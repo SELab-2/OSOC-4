@@ -2,13 +2,14 @@ import json
 from typing import Dict, Set
 import uuid
 from httpx import Response
+from app.config import config
 from app.crud import read_all_where, read_where, update, update_all
 from app.models.project import Project, ProjectCoach, ProjectRequiredSkill
+from app.models.user import UserRole
 from app.tests.test_base import Status, TestBase, Request
-from app.models.user import User, UserRole
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
-from app.config import config
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
+from app.tests.utils_for_tests.UserGenerator import UserGenerator
 
 
 class TestProjects(TestBase):
@@ -73,7 +74,7 @@ class TestProjects(TestBase):
 
         project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
 
-        project_coach = await read_where(User, User.role == UserRole.COACH, session=self.session)
+        project_coach = await self.get_user_by_name("user_approved_coach")
 
         path = "/projects/create"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
@@ -102,7 +103,7 @@ class TestProjects(TestBase):
         self.assertIsNotNone(project_in_db, f"'{project_name}' was not found in the database.")
 
         # Project id in the database should be same as it in the response url
-        self.assertEqual(str(project_in_db.id), project_id, f"Project id of '{project_name}' in the response url is not same as it in the database.")
+        self.assertEqual(str(project_in_db.id), project_id, f"Project id of '{project_name}' in the response URL is not same as the id found in the database.")
 
         # compare every field in the database with the test value
         db_project_dict = project_in_db.dict()
@@ -122,7 +123,7 @@ class TestProjects(TestBase):
         self.assertGreater(len(project_coaches_in_db), 0, f"Skill has not been added for project {project_name}")
 
         # test project required skills
-        self.assertEqual(len(project_skills_in_db), len(skills), f"Not all skills have not been added for project {project_name}")
+        self.assertEqual(len(project_skills_in_db), len(skills), f"Not all skills have been added for project {project_name}")
         project_skill_names = [skill.skill_name for skill in project_skills_in_db]
         for skill in skills:
             self.assertTrue(skill.name in project_skill_names, f"Skill {skill.name} not found for project {project_name}")
@@ -162,7 +163,7 @@ class TestProjects(TestBase):
         url = f"{config.api_url}projects/"
 
         # Set up coach, edition and project object
-        coach = await read_where(User, User.role == UserRole.COACH, session=self.session)
+        coach = await self.get_user_by_name("user_approved_coach")
 
         edition_generator = EditionGenerator(self.session)
         edition = edition_generator.generate_edition(2022)
@@ -195,7 +196,9 @@ class TestProjects(TestBase):
     async def test_patch_projects_with_id(self):
 
         # Set up coach, edition and project object
-        coaches = await read_all_where(User, User.role == UserRole.COACH, session=self.session)
+        user_generator = UserGenerator(self.session)
+        coaches = user_generator.generate_users(2)
+        user_generator.add_to_db()
 
         edition_generator = EditionGenerator(self.session)
         edition = edition_generator.generate_edition(2022)
