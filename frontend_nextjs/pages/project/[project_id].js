@@ -17,6 +17,7 @@ import {getID} from "../../utils/string";
 import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
+import {log} from "../../utils/logger";
 
 function Input(props) {
     return null;
@@ -46,7 +47,6 @@ const Project = () => {
     const [showError, setShowError] = useState(false);
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
-    const [notAvailableSkills, setNotAvailableSkills] = useState([]);
 
     useEffect(() => {
             if(! loaded){
@@ -147,9 +147,10 @@ const Project = () => {
             setShowError(true)
             return false
         }
-
-        if(body.required_skills.some((skill, index) => body.required_skills.indexOf(skill.skill_name) !== index)){
+        let names_list = body.required_skills.map(skill => skill.skill_name)
+        if(names_list.some((skill_name, index) => names_list.indexOf(skill_name) !== index)){
             setShowError(true)
+            log("Duplicate")
             return false
         }
 
