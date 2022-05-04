@@ -3,7 +3,7 @@ from typing import Dict, Set
 import uuid
 from httpx import Response
 from app.config import config
-from app.crud import read_all_where, read_where, update, update_all
+from app.crud import read_all_where, read_where, update
 from app.models.project import Project, ProjectCoach, ProjectRequiredSkill
 from app.models.user import UserRole
 from app.tests.test_base import Status, TestBase, Request
@@ -13,28 +13,62 @@ from app.tests.utils_for_tests.UserGenerator import UserGenerator
 
 
 class TestProjects(TestBase):
+    project_data = {
+        "name": "Student Volunteer Project",
+        "goals": "Free\nReal\nEstate",
+        "description": "Free real estate",
+        "partner_name": "UGent",
+        "partner_description": "De C in UGent staat voor communicatie",
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def test_post_add_project_data(self):
-
+    async def asyncSetUp(self) -> None:
+        await super().asyncSetUp()
         edition_generator = EditionGenerator(self.session)
-        edition = edition_generator.generate_edition(2022)
-        await update(edition, self.session)
+        self.edition = edition_generator.generate_edition(2022)
+        await update(self.edition, self.session)
 
+    async def assert_projects_equal(self, test_data: dict[str, any], project: Project):
+        project_name = test_data["name"]
+
+        project_dict = project.dict()
+        skills = test_data.pop("required_skills")
+        users = test_data.pop("users")
+
+        # compare data
+        for key, value in test_data.items():
+            self.assertEqual(project_dict[key], value,
+                             (f"{key} of project '{project_name}' did not match.\n"
+                              f"Expected: {value}\n"
+                              f"Got: {project_dict[key]}"))
+
+        # compare project users
+        db_users = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(project.id), session=self.session)
+        self.assertEqual(len(db_users), len(users), f"Number of users for project {project_name} does not match number of users in database")
+        for db_user in db_users:
+            self.assertTrue(db_user.coach_id in users, f"User with id {db_user.coach_id} not found for project {project_name}")
+
+        # compare project required skills
+        db_skills = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(project.id), session=self.session)
+        self.assertEqual(len(db_skills), len(skills), f"Number of required skills for project {project_name} does not match number of skills in database")
+        db_skill_names = [skill.skill_name for skill in db_skills]
+        for skill in skills:
+            self.assertTrue(skill["skill_name"] in db_skill_names, f"Skill with name {skill['skill_name']} not found for project {project_name}")
+
+    async def test_post_add_project_data(self):
         path = "/projects/create"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        project_name = str(uuid.uuid1())
+
         body = {
-            "name": project_name,
-            "description": "an added project",
-            "goals": "doing a test",
-            "partner_name": "Testing inc.",
-            "partner_description": "Testing inc. is focused on being dummy data.",
             "required_skills": [],
             "users": [],
-            "edition": edition.year,
+            "edition": self.edition.year,
         }
+        body.update(self.project_data)
+
+        project_name = body["name"]
 
         # Post create project request
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
@@ -52,21 +86,9 @@ class TestProjects(TestBase):
         self.assertEqual(str(project_in_db.id), project_id, f"Project id of '{project_name}' in the response url is not same as it in the database.")
 
         # compare every field in the database with the test value
-        db_project_dict = project_in_db.dict()
-        body.pop("required_skills")
-        body.pop("users")
-        for key, value in body.items():
-            self.assertEqual(db_project_dict[key], value,
-                             (f"{key} of project '{project_name}' did not match.\n"
-                              f"Expected: {value}\n"
-                              f"Got: {db_project_dict[key]}"))
+        await self.assert_projects_equal(body, project_in_db)
 
     async def test_post_add_project_data_with_skills_and_users(self):
-
-        edition_generator = EditionGenerator(self.session)
-        edition = edition_generator.generate_edition(2022)
-        await update(edition, self.session)
-
         skill_generator = SkillGenerator(self.session)
         skills = skill_generator.generate_skills()
         skill_generator.add_to_db()
@@ -78,17 +100,15 @@ class TestProjects(TestBase):
 
         path = "/projects/create"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        project_name = str(uuid.uuid1())
+
         body = {
-            "name": project_name,
-            "description": "an added project",
-            "goals": "doing a test",
-            "partner_name": "Testing inc.",
-            "partner_description": "Testing inc. is focused on being dummy data.",
             "required_skills": project_skills,
             "users": [project_coach.id],
-            "edition": edition.year,
+            "edition": self.edition.year,
         }
+        body.update(self.project_data)
+
+        project_name = body["name"]
 
         # Post create project request
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
@@ -106,44 +126,17 @@ class TestProjects(TestBase):
         self.assertEqual(str(project_in_db.id), project_id, f"Project id of '{project_name}' in the response URL is not same as the id found in the database.")
 
         # compare every field in the database with the test value
-        db_project_dict = project_in_db.dict()
-        body.pop("required_skills")
-        body.pop("users")
-        for key, value in body.items():
-            self.assertEqual(db_project_dict[key], value,
-                             (f"{key} of project '{project_name}' did not match.\n"
-                              f"Expected: {value}\n"
-                              f"Got: {db_project_dict[key]}"))
-
-        # test project user
-        project_coaches_in_db = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(project_id), session=self.session)
-        self.assertIsNotNone(project_coaches_in_db, f"User has not been added for project {project_name} ")
-
-        project_skills_in_db = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(project_id), session=self.session)
-        self.assertGreater(len(project_coaches_in_db), 0, f"Skill has not been added for project {project_name}")
-
-        # test project required skills
-        self.assertEqual(len(project_skills_in_db), len(skills), f"Not all skills have been added for project {project_name}")
-        project_skill_names = [skill.skill_name for skill in project_skills_in_db]
-        for skill in skills:
-            self.assertTrue(skill.name in project_skill_names, f"Skill {skill.name} not found for project {project_name}")
+        await self.assert_projects_equal(body, project_in_db)
 
     async def test_get_projects_id_with_admin_user(self):
-
         url = f"{config.api_url}projects/"
 
-        # Set up edition and project object
-        edition_generator = EditionGenerator(self.session)
-        edition = edition_generator.generate_edition(2022)
+        # Set up project
         project = Project(
-            name="Student Volunteer Project",
-            goals="Free\nReal\nEstate",
-            description="Free real estate",
-            partner_name="UGent",
-            partner_description="De C in UGent staat voor communicatie",
             coaches=[],
-            edition=edition.year)
-        await update_all([edition, project], self.session)
+            edition=self.edition.year,
+            **self.project_data)
+        await update(project, self.session)
 
         path = "/projects/" + str(project.id)
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
@@ -159,23 +152,16 @@ class TestProjects(TestBase):
                              f"The project gotten by {user_title} did not match the expected project.")
 
     async def test_get_projects_id_with_coach_user(self):
-
         url = f"{config.api_url}projects/"
 
-        # Set up coach, edition and project object
+        # Set up coach and project
         coach = await self.get_user_by_name("user_approved_coach")
 
-        edition_generator = EditionGenerator(self.session)
-        edition = edition_generator.generate_edition(2022)
         project = Project(
-            name="Student Volunteer Project",
-            goals="Free\nReal\nEstate",
-            description="Free real estate",
-            partner_name="UGent",
-            partner_description="De C in UGent staat voor communicatie",
             coaches=[coach],
-            edition=edition.year)
-        await update_all([edition, project], self.session)
+            edition=self.edition.year,
+            **self.project_data)
+        await update(project, self.session)
 
         path = "/projects/" + str(project.id)
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
@@ -194,25 +180,16 @@ class TestProjects(TestBase):
                              f"The project gotten by {user_title} did not match the expected project.")
 
     async def test_patch_projects_with_id(self):
-
-        # Set up coach, edition and project object
+        # Set up coaches and project
         user_generator = UserGenerator(self.session)
-        coaches = user_generator.generate_users(2)
+        coaches = user_generator.generate_users(4)
         user_generator.add_to_db()
 
-        edition_generator = EditionGenerator(self.session)
-        edition = edition_generator.generate_edition(2022)
-
-        project_name = str(uuid.uuid1())
         project = Project(
-            name=project_name,
-            goals="Free\nReal\nEstate",
-            description="Free real estate",
-            partner_name="UGent",
-            partner_description="De C in UGent staat voor communicatie",
             coaches=[coaches[0]],
-            edition=edition.year)
-        await update_all([edition, project], self.session)
+            edition=self.edition.year,
+            **self.project_data)
+        await update(project, self.session)
 
         project_id = project.id
 
@@ -227,18 +204,17 @@ class TestProjects(TestBase):
 
         project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
 
-        project_updated = Project(
-            name=str(uuid.uuid1()),
-            goals=str(uuid.uuid1()),
-            description=str(uuid.uuid1()),
-            partner_name=str(uuid.uuid1()),
-            partner_description=str(uuid.uuid1()),
-            coaches=[],
-            edition=edition.year)
-
-        body = project_updated.dict()
-        body["required_skills"] = project_skills
-        body["users"] = [coaches[1].id]
+        # updated data to be sent in a patch request
+        body = {
+            "name": str(uuid.uuid1()),
+            "goals": str(uuid.uuid1()),
+            "description": str(uuid.uuid1()),
+            "partner_name": str(uuid.uuid1()),
+            "partner_description": str(uuid.uuid1()),
+            "users": [coach.id for coach in coaches],
+            "required_skills": project_skills,
+            "edition": self.edition.year
+        }
 
         # Send patch project request
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users, body)
@@ -248,25 +224,4 @@ class TestProjects(TestBase):
         # check values in db after update
         project_in_db = await read_where(Project, Project.id == project.id, session=self.session)
 
-        db_project_dict = project_in_db.dict()
-        body.pop("id")
-        body.pop("required_skills")
-        body.pop("users")
-        for key, value in body.items():
-            self.assertEqual(db_project_dict[key], value,
-                             (f"{key} of project '{project_name}' did not match.\n"
-                              f"Expected: {value}\n"
-                              f"Got: {db_project_dict[key]}"))
-
-        # test project user
-        project_coaches_in_db = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(project_id), session=self.session)
-        self.assertIsNotNone(project_coaches_in_db, f"User has not been added for project {project_name} ")
-
-        project_skills_in_db = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(project_id), session=self.session)
-        self.assertGreater(len(project_coaches_in_db), 0, f"Skill has not been added for project {project_name}")
-
-        # test project required skills
-        self.assertEqual(len(project_skills_in_db), len(skills), f"Not all skills have not been added for project {project_name}")
-        project_skill_names = [skill.skill_name for skill in project_skills_in_db]
-        for skill in skills:
-            self.assertTrue(skill.name in project_skill_names, f"Skill {skill.name} not found for project {project_name}")
+        await self.assert_projects_equal(body, project_in_db)
