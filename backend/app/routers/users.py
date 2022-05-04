@@ -81,15 +81,11 @@ async def update_password(passwords: ChangePassword, Authorize: AuthJWT = Depend
     current_user_id = Authorize.get_jwt_subject()
 
     if passwords.new_password != passwords.confirm_password:
-        print("passwords did not match")
         raise PasswordsDoNotMatchException()
 
     user = await read_where(User, User.id == int(current_user_id), session=session)
 
     if not verify_password(passwords.current_password, user.password):
-        print("failed while verifying")
-        print(user.password)
-        print(get_password_hash(passwords.new_password))
         raise InvalidEmailOrPasswordException()
 
     user.password = get_password_hash(passwords.new_password)
