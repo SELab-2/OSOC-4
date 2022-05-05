@@ -1,5 +1,5 @@
 .required-skill-selector-row{
-    max-width: 1000px;
+    max-width: 500px;
     margin-left: 5px;
     margin-bottom: 10px;
 }
@@ -7,5 +7,5 @@
 .required-skill-amount{
     border-width: 1px;
     border-color: darkgray;
-    max-width: 100px;
+    max-width: 70px;
 }

@@ -47,6 +47,7 @@ const Project = () => {
     const [showError, setShowError] = useState(false);
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
+    const [availableSkills, setAvailableSkills] = useState([])
 
     useEffect(() => {
             if(! loaded){
@@ -83,12 +84,22 @@ const Project = () => {
                 if(res){
                     // scuffed way to get unique skills (should be fixed in backend soon)
                     let array = [];
-                    res.map(skill => array.push({"value":skill, "name":skill}));
+                    res.map(skill => array.push({"value":skill, "label":skill}));
                     setSkills(array);
                 }
             }
         })
     }, [])
+
+    /**
+     * Initalize the value of available skills after mounting the component
+     */
+    useEffect(() => {
+        if(availableSkills.length === 0 && skills.length !== 0 && requiredSkills.length !== 0){
+            let skillNames = requiredSkills.map(skill => skill.skill_name);
+            setAvailableSkills(skills.filter(skill => ! skillNames.includes(skill.value)).map(skill => skill.value))
+        }
+    }, [requiredSkills, skills])
 
     //TODO make this delete project
     async function deleteProject(){
@@ -101,6 +112,22 @@ const Project = () => {
         setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
     }
 
+    function changeRequiredSkill(value, index){
+        log("change skill")
+        log(value)
+        log(index)
+        log(requiredSkills[index])
+        if(requiredSkills[index].label !== ""){
+            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
+        } else {
+            log( [...(availableSkills.filter(skill => skill !== value.label))])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
+        }
+        let newArray = [...requiredSkills]
+        newArray[index] = value
+        setRequiredSkills(newArray)
+    }
     /**
      * Gets called after successfully removing a user from a project.
      * @param index
@@ -150,7 +177,6 @@ const Project = () => {
         let names_list = body.required_skills.map(skill => skill.skill_name)
         if(names_list.some((skill_name, index) => names_list.indexOf(skill_name) !== index)){
             setShowError(true)
-            log("Duplicate")
             return false
         }
 
@@ -333,7 +359,7 @@ const Project = () => {
                                         <div className={"project-card-title"}>All required skills</div>
                                         { (requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) =>{
                                             if(showEdit){
-                                                return <RequiredSkillSelector className={"required-skill-selector-row"} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}/>
+                                                return <RequiredSkillSelector  className={"required-skill-selector-row"} availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}/>
                                             }
                                             return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                         })) : <div className={"project-empty-list-col"}>Currently there are no required skills</div>

@@ -107,7 +107,6 @@
 }
 
 .select-search__input{
-
     display: block;
     width: 100%;
     padding: 0 40px 0 16px;
@@ -121,6 +120,5 @@
     text-overflow: ellipsis;
     line-height: 36px;
     -webkit-appearance: none;
-    height: 38px;
+    height: 20px;
 }
-
