@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
-import { Form, Button } from 'react-bootstrap';
 import {api, Url} from "../../utils/ApiClient";
 import logoScreen from '../../public/assets/osoc-screen.png';
 import Image from 'next/image'
