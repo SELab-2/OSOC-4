@@ -58,7 +58,6 @@ export default function NewProjects() {
         let body = {
             "name":projectName,
             "description":projectDescription,
-            "goals": "",
             "required_skills": [],
             "partner_name":partnerName,
             "partner_description": partnerDescription,
