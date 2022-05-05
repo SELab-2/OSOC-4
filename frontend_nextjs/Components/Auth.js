@@ -40,10 +40,10 @@ export default function RouteGuard(props) {
         } else {
 
             return (
-                <Container fluid>
+                <>
                     <NavHeader key="Navbar" className="navheader" />
                     {props.children}
-                </Container>
+                </>
             )
         }
     } else if (!props.auth && !isUser) {

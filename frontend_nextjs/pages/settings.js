@@ -32,7 +32,7 @@ function Settings() {
 
 
     useEffect(() => {
-            Url.fromName(api.me).get().then(res => {
+            Url.fromName(api.myself).get().then(res => {
                 if (res.success) {
                     setMe(res.data.data);
                     setLoading(false);

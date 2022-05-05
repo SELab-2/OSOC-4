@@ -55,15 +55,7 @@ class UserGenerator(DataGenerator):
                 role=UserRole.COACH,
                 active=True,
                 approved=True,
-                disabled=True),
-            User(
-                email="user_no_role@test.be",
-                name="user_no_role",
-                password="Test123!user_no_role",
-                role=UserRole.NO_ROLE,
-                active=False,
-                approved=False,
-                disabled=False)
+                disabled=True)
         ]
         self.passwords = {user.name: user.password for user in self.data}
         for user in self.data:

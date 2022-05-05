@@ -4,7 +4,6 @@ import {useEffect, useState} from "react";
 import Image from 'next/image'
 import {Url} from "../../utils/ApiClient";
 import red_cross from "/public/assets/wrong.svg"
-import {log} from "../../utils/logger";
 
 /**
  * Card like representation of the given participation, which also allows the deletion of the participation
@@ -41,7 +40,7 @@ export default function ParticipationCard(props){
                         <div className={"participation-name"}>
                             {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null }
                         </div>
-                        <SkillCard amount={0} name={props.participation.skill}/>
+                        <SkillCard number={0} skill_name={props.participation.skill}/>
                     </Col>
                     <Col xs={"auto"} className={"participation-remove-student"}>
                         <div className={"participation-delete"}>
