@@ -3,7 +3,7 @@ from app.database import get_session, websocketManager
 from app.models.sendemails import SendCustomEmail, SendEmails
 from app.models.student import Student
 from app.models.user import UserRole
-from app.utils.checkers import RoleChecker
+from app.utils.checkers import EditionChecker, RoleChecker
 from app.utils.mailsender import send_decision_template_email, send_email
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
@@ -19,7 +19,11 @@ async def send_decision_emails(data: SendEmails, Authorize: AuthJWT = Depends(),
 
     for studenturl in data.emails:
         studentid = studenturl.split("/")[-1]
-        await send_decision_template_email(studentid, user_id, session=session)
+
+        student = await read_where(Student, Student.id == int(studentid), session=session)
+        await EditionChecker(update=True)(student.edition_year, Authorize, session)
+
+        await send_decision_template_email(student, user_id, session=session)
         await websocketManager.broadcast({"id": studenturl, "email_sent": True})
 
 
@@ -27,6 +31,8 @@ async def send_decision_emails(data: SendEmails, Authorize: AuthJWT = Depends(),
 async def send_custom_email(custom_email: SendCustomEmail, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     studentid = custom_email.student.split("/")[-1]
     student = await read_where(Student, Student.id == int(studentid), session=session)
+
+    await EditionChecker(update=True)(student.edition_year, Authorize, session)
 
     user_id = Authorize.get_jwt_subject()
 

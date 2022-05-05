@@ -77,9 +77,7 @@ def send_invite(email: str, invitekey: str):
         server.sendmail(SENDER_EMAIL, receiver_email, text)
 
 
-async def send_decision_template_email(studentid, userid, session):
-
-    student = await read_where(Student, Student.id == int(studentid), session=session)
+async def send_decision_template_email(student, userid, session):
 
     # get the decision template
     if student.decision == DecisionOption.YES:
