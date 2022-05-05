@@ -1,6 +1,7 @@
 from app.config import config
 from app.crud import read_where, read_all_where, update, update_all
 from app.database import get_session
+from app.exceptions.permissions import NotPermittedException
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
                                 ProjectOutExtended, ProjectOutSimple)
@@ -52,23 +53,21 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
     :rtype: ProjectOutExtended
     """
 
-    if role == UserRole.ADMIN:
-        project = await read_where(Project, Project.id == int(id), session=session)
-    else:
-        current_user_id = Authorize.get_jwt_subject()
-        stat = select(Project).select_from(ProjectCoach).where(ProjectCoach.coach_id == int(current_user_id)).join(Project).where(Project.id == int(id))
-        res = await session.execute(stat)
-        try:
-            result = res.one()
-            project = result[0]
-        except Exception:
-            raise ProjectNotFoundException()
+    project = await read_where(Project, Project.id == int(id), session=session)
     if not project:
         raise ProjectNotFoundException()
 
+    projectUsers = (
+        await session.execute(select(User.id).join(ProjectCoach).where(ProjectCoach.project_id == int(id)))
+    ).all()
+
+    if role == UserRole.COACH:
+        current_user_id = Authorize.get_jwt_subject()
+        if (current_user_id,) not in projectUsers:
+            raise NotPermittedException()
+
     projectOutExtended = ProjectOutExtended.parse_raw(project.json())
-    projectUsers = await session.execute(select(User.id).join(ProjectCoach).where(ProjectCoach.project_id == int(id)))
-    projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers.all()]
+    projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers]
     projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
     projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]
     projectParticipations = await session.execute(select(Participation).where(Participation.project_id == int(id)))

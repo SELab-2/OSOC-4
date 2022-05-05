@@ -50,6 +50,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     #########
 
     user_generator = UserGenerator(session)
+    user_generator.generate_default_users()
 
     user_generator.generate_user(role=UserRole.COACH, active=False, approved=False, disabled=False),
     user_generator.generate_user(role=UserRole.COACH, active=True, approved=False, disabled=False),
@@ -83,7 +84,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     project = Project(
         name="Student Volunteer Project",
-        goals="Teach students about creating open source projects",
         description="Innovative open source projects, made by incredibly motivated students, coaches & organisations.",
         partner_name="UGent",
         partner_description="Universiteit Gent",
@@ -98,7 +98,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     project2 = Project(
         name="Cyberfest",
-        goals="Goal 1\nGoal 2",
         description="Hackers & Cyborgs",
         partner_name="HoGent",
         partner_description="Hogeschool Gent",

@@ -136,6 +136,7 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     :rtype: dict
     """
 
+    student_alias = Student
     student_query = select(Student).where(Student.edition_year == year)
     if own_suggestion:
 
@@ -150,10 +151,10 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
             suggestion_sub_query = aliased(Suggestion, suggestion_sub_query.distinct().subquery())
             student_query = student_query.join(suggestion_sub_query)
 
-        own_suggsetion_students = aliased(Student, student_query.distinct().subquery())
-        student_query = select(own_suggsetion_students)
+        student_alias = aliased(Student, student_query.distinct().subquery())
+        student_query = select(student_alias)
     if decision:
-        student_query = student_query.where(Student.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
+        student_query = student_query.where(student_alias.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
     if skills:
         student_query = student_query.join(StudentSkill).where(StudentSkill.skill_name.in_(skills.split(",")))
     if search:

@@ -20,6 +20,7 @@ export default function ProjectsList(props) {
     const [search, handleSearch] = useState("")
     const [peopleNeeded, setPeopleNeeded] = useState(false)
     const [visibleProjects, setVisibleProjects] = useState([])
+    const [me, setMe] = useState(undefined)
     const router = useRouter()
 
     /**
@@ -50,6 +51,17 @@ export default function ProjectsList(props) {
 
 
         }
+    }, [])
+
+    /**
+     * Gets called once after mounting the Component and gets the currently logged in user
+     */
+    useEffect(() => {
+        Url.fromName(api.me).get().then(res => {
+            if (res.success) {
+                setMe(res.data.data);
+            }
+        });
     }, [])
 
     /**
@@ -110,16 +122,17 @@ export default function ProjectsList(props) {
                             </Form>
                         </Col>
                         <Col xs="auto" className={"project-people-needed"}>
-                            <Form>
-                                <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                            </Form>
+                            <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
                         </Col >
                         <Col xs="auto" >
                             <ConflictCard />
                         </Col>
-                        <Col xs="auto" >
-                            <Button className={"center"} onClick={handleNewProject}>New project</Button>
-                        </Col>
+                        { me !== undefined && me.role === 2 ?
+                            <Col xs="auto" >
+                                <Button className={"center"} onClick={handleNewProject}>New project</Button>
+                            </Col> : null
+                        }
+
                     </Row>
                     <Row className="nomargin">
                             {

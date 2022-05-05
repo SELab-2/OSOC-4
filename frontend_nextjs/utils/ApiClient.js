@@ -201,7 +201,8 @@ class API {
     skills = "skills";
     participations = "participations";
     emailtemplates = "emailtemplates";
-    sendemails = "sendemails"
+    sendemails = "sendemails";
+    myself = "myself";
 
     // the paths, the key should be the value of the api.[name]
     //            the value should be the url
@@ -225,7 +226,8 @@ class API {
         skills: null,
         participations: null,
         emailtemplates: null,
-        sendemails: null
+        sendemails: null,
+        myself: null
     }
     _ready = false;
 
@@ -318,6 +320,7 @@ class API {
             this._paths.participations = res.data[this.participations];
             this._paths.emailtemplates = res.data[this.emailtemplates];
             this._paths.sendemails = res.data[this.sendemails];
+            this._paths.myself = res.data[this.myself];
             if (this.year) {
                 this._paths.current_edition = this._paths.editions + "/" + this.year;
             } else { // get the latest edition if any

@@ -42,15 +42,16 @@ export default function SelectStudents() {
                 </Col>
             }
 
-
-            <Col>
-                <Row className="nomargin">
-                    <StudentListAndFilters selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} setStudents={setStudents} category={showEmailBar ? "emailstudents" : "students"} studentsTab={true} />
-                </Row>
-                {(me && me.role === 2) &&
-                    <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />
-                }
-            </Col>
+            {(width > 800 || !router.query.studentId) &&
+                <Col>
+                    <Row className="nomargin">
+                        <StudentListAndFilters selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} setStudents={setStudents} category={showEmailBar ? "emailstudents" : "students"} studentsTab={true} />
+                    </Row>
+                    {(me && me.role === 2) &&
+                        <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />
+                    }
+                </Col>
+            }
             {
                 (router.query.studentId) &&
                 (<Col>

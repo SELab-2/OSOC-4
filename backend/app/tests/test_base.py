@@ -12,6 +12,7 @@ from app.crud import read_where, clear_data, read_all_where
 from app.database import engine
 from app.models.user import User, UserRole
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
+from sqlalchemy.orm import sessionmaker
 
 
 class Request(Enum):
@@ -48,6 +49,10 @@ class Status(IntEnum):
 class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.sessionmaker = sessionmaker(
+            engine, expire_on_commit=False, class_=AsyncSession
+        )
+
         self.bad_id = 0
         self.users: Dict[str, User] = {}
         self.saved_objects = {
@@ -59,9 +64,10 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.client: AsyncClient = AsyncClient(app=app, base_url="http://test")
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
-        self.session: AsyncSession = AsyncSession(engine)
+        self.session: AsyncSession = self.sessionmaker()
 
         user_generator = UserGenerator(self.session)
+        user_generator.generate_default_users()
         self.users = {user.name: user for user in user_generator.data}
         self.saved_objects["passwords"] = user_generator.passwords
 

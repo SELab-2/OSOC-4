@@ -62,7 +62,13 @@
 
 .project-empty-list{
     margin-top: 15px;
-    margin-left: 15px;
+    margin-left: 0;
+    font-size: 18px;
+}
+
+.project-empty-list-col{
+    margin-top: 15px;
+    margin-left: 11px;
     font-size: 18px;
 }
 
@@ -73,4 +79,46 @@
 .button-match-student-project {
      cursor: pointer;
     border: none;
+}
+
+.select-search__options {
+    list-style: none;
+    width: 250px;
+    padding: 0;
+    background-color: white;
+}
+
+.select-search__option,
+.select-search__not-found {
+    display: block;
+    height: 36px;
+    width: 100%;
+    padding: 0 16px;
+    background: #fff;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.select-search__row:not(:first-child) {
+    border-top: 1px solid #eee;
+}
+
+.select-search__input{
+    display: block;
+    width: 100%;
+    padding: 0 40px 0 16px;
+    background: #fff;
+    border: 1px solid darkgray;
+    box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+    outline: none;
+    font-size: 14px;
+    text-align: left;
+    text-overflow: ellipsis;
+    line-height: 36px;
+    -webkit-appearance: none;
+    height: 20px;
 }
