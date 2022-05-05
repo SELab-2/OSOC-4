@@ -41,6 +41,7 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
 
     info["skills"] = student.skills
     info["id_int"] = student_id
+    info["email_sent"] = student.email_sent
 
     # student info from tags
     r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer).select_from(Student).where(Student.id == int(student_id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
@@ -96,8 +97,13 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
     student = await read_where(Student, Student.id == student_id, session=session)
     if student:
         student_update_data = student_update.dict(exclude_unset=True)
+
+        prev_decision = student.decision
         for key, value in student_update_data.items():
             setattr(student, key, value)
+
+        if prev_decision != student_update.decision:
+            student.email_sent = False
         await update(student, session)
 
         await websocketManager.broadcast({"id": config.api_url + "students/" + str(student_id), "decision": jsonable_encoder(StudentUpdate.parse_raw(student.json()))})

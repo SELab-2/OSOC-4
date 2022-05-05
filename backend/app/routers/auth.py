@@ -70,6 +70,8 @@ def root(role: RoleChecker(UserRole.COACH) = Depends()):
              "projects": f"{config.api_url}projects",
              "skills": f"{config.api_url}skills",
              "participations": f"{config.api_url}participations",
+             "emailtemplates": f"{config.api_url}emailtemplates",
+             "sendemails": f"{config.api_url}sendemails",
              "myself": f"{config.api_url}users/me"
              }
     if role == UserRole.ADMIN:

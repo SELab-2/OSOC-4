@@ -29,8 +29,6 @@ export default function DecisionPopUpWindow(props) {
    */
   function submitDecision() {
 
-    console.log(props.decision)
-
     Url.fromUrl(props.student.id).setBody({ "decision": parseInt(props.decision) }).patch().then(res => {
 
       if (res.success) {
