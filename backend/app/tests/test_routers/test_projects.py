@@ -15,7 +15,6 @@ from app.tests.utils_for_tests.UserGenerator import UserGenerator
 class TestProjects(TestBase):
     project_data = {
         "name": "Student Volunteer Project",
-        "goals": "Free\nReal\nEstate",
         "description": "Free real estate",
         "partner_name": "UGent",
         "partner_description": "De C in UGent staat voor communicatie",
@@ -91,7 +90,7 @@ class TestProjects(TestBase):
 
         project_coach = await self.get_user_by_name("user_approved_coach")
         self.project_data.update({
-            "required_skills":  [{"skill_name": skill.name, "number": 3} for skill in skills],
+            "required_skills": [{"skill_name": skill.name, "number": 3} for skill in skills],
             "users": [project_coach.id],
         })
 
@@ -173,7 +172,6 @@ class TestProjects(TestBase):
         # updated data to be sent in a patch request
         body = {
             "name": str(uuid.uuid1()),
-            "goals": str(uuid.uuid1()),
             "description": str(uuid.uuid1()),
             "partner_name": str(uuid.uuid1()),
             "partner_description": str(uuid.uuid1()),
