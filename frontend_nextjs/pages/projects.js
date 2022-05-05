@@ -32,7 +32,7 @@ export default function Projects() {
                 <Col md="auto" style={{ marginLeft: "0" }}>
                     <div style={{ paddingTop: "40vh" }} className="fill_height">
                         <div className="button-match-student-project">
-                            <Hint message="Add the selected student(s) to the selected project" placement="top">
+                            <Hint message="Add the selected student(s) to the selected project">
                                 <Image onClick={() => setShowAddStudent(true)} src={matchIcon} alt="match student to project" width={80} />
                             </Hint>
                             <AddStudentModal selectedProject={selectedProject} selectedStudent={selectedStudent} setShowAddStudent={setShowAddStudent} showAddStudent={showAddStudent} />

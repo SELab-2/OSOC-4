@@ -63,14 +63,14 @@ export default function SearchSortBar() {
       </Col>
       <Col xs="auto" >
         <button className="reset-search-button" onClick={() => setSearch("")}>
-          <Hint message="Clear the search-bar" placement="bottom">
+          <Hint message="Clear the search-bar">
             <Image src={resetSearchIcon} />
           </Hint>
         </button>
       </Col>
       <Col xs="auto">
         <button className="search-button" onClick={() => setSearch(() => doSearch())}>
-          <Hint message="Search" placement="bottom">
+          <Hint message="Search">
             <Image src={searchIcon} />
           </Hint>
         </button>

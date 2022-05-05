@@ -25,7 +25,7 @@ export default function StudentList(props) {
                 students={props.selectedStudents} />
             <Row style={{ height: "20px" }} className="nomargin align-items-center">
                 {!props.showEmailBar ?
-                    <Hint message="Open email students" placement="top">
+                    <Hint message="Open email students">
                         <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
                             <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="20px" />
                         </button>
