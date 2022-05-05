@@ -175,14 +175,14 @@ class TestUsers(TestBase):
                 email=f"to_be_edited_by_{user_title}@test.be",
                 name=f"to_be_edited_by_{user_title}",
                 password="Test123!user_no_role",
-                role=UserRole.NO_ROLE,
+                role=UserRole.COACH,
                 active=False,
                 approved=False,
                 disabled=False)
             await update(editable_user, session=self.session)
             body = {
                 "name": f"edited_by_{user_title}",
-                "role": int(UserRole.NO_ROLE),
+                "role": int(UserRole.ADMIN),
                 "active": True,
                 "approved": True,
                 "disabled": False
@@ -205,7 +205,7 @@ class TestUsers(TestBase):
         await self.do_request(Request.PATCH, bad_path, "user_admin",
                               json_body={"email": "bad_edited_by_user_admin@test.test",
                                          "name": "bad_edited_by_user_admin",
-                                         "role": int(UserRole.NO_ROLE),
+                                         "role": int(UserRole.COACH),
                                          "active": True, "approved": True, "disabled": False},
                               expected_status=Status.NOT_FOUND)
 
