@@ -4,6 +4,7 @@ import editIcon from '../../public/assets/edit.svg';
 import saveIcon from '../../public/assets/save.svg';
 import Image from "next/image";
 import {cache, Url} from "../../utils/ApiClient";
+import Hint from "../Hint";
 
 /**
  * This component represents a row in the table of question tags. It represents one question tag.
@@ -122,28 +123,36 @@ export default function QuestionTag(props) {
             </td>
             <td>
                 {(!questionTag["mandatory"]) &&
+                <Hint message="Show in the students list">
                     <input name="showInList" type="checkbox" checked={questionTag["showInList"]}
                            onChange={handleCheckboxChange}/>
+                </Hint>
                 }
             </td>
             <td>
                 {(!questionTag["mandatory"]) &&
                     ((!props.edited) ?
-                        <button className="table-button" onClick={(ev) => {
-                            props.setNewQuestionTag(undefined);
-                            props.setEdited(previousTag["url"])
-                        }}>
-                            <Image src={editIcon} height="30px"/>
-                        </button>
+                        <Hint message="Edit question-tag">
+                            <button className="table-button" onClick={(ev) => {
+                                props.setNewQuestionTag(undefined);
+                                props.setEdited(previousTag["url"])
+                            }}>
+                                <Image src={editIcon} height="30px"/>
+                            </button>
+                        </Hint>
                         :
-                        <button className="table-button" onClick={handleSubmit}>
-                            <Image src={saveIcon} height="30px"/>
-                        </button>)
+                        <Hint message="Save">
+                            <button className="table-button" onClick={handleSubmit}>
+                                <Image src={saveIcon} height="30px"/>
+                            </button>
+                        </Hint>)
                 }
                 {(!questionTag["mandatory"]) &&
-                    <button onClick={deleteTag} className="table-button">
-                        <Image src={deleteIcon} height="30px"/>
-                    </button>
+                    <Hint message="Delete question-tag">
+                        <button onClick={deleteTag} className="table-button">
+                            <Image src={deleteIcon} height="30px"/>
+                        </button>
+                    </Hint>
                 }
             </td>
         </tr>
