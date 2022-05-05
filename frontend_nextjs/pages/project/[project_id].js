@@ -165,7 +165,6 @@ const Project = () => {
         let body = {
             "name":projectName,
             "description":projectDescription,
-            "goals": "",
             "required_skills": requiredSkills,
             "partner_name":partnerName,
             "partner_description": partnerDescription,

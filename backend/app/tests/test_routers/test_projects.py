@@ -24,7 +24,6 @@ class TestProjects(TestBase):
         body = {
             "name": "added project",
             "description": "an added project",
-            "goals": "doing a test",
             "partner": "",  # Partner(name="Testing inc.", about="Testing inc. is focused on being dummy data."),
             "required_skills": [],
             "users": [],

@@ -28,7 +28,6 @@ class Project(SQLModel, table=True):
 
     name: str
     description: str
-    goals: str
 
     partner_name: str
     partner_description: str
@@ -52,7 +51,6 @@ class RequiredSkillOut(BaseModel):
 class ProjectCreate(BaseModel):
     name: str
     description: str
-    goals: str
     required_skills: List[RequiredSkillOut]
     partner_name: str
     partner_description: str
@@ -72,7 +70,6 @@ class ProjectOutExtended(BaseModel):
     id: str
     name: str
     description: str
-    goals: str
     partner_name: str
     partner_description: str
     required_skills: List[RequiredSkillOut] = []
