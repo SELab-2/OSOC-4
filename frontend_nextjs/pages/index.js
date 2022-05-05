@@ -59,7 +59,7 @@ function Home() {
      */
     function showNewUsers() {
         if (newUsers && newUsers.length) {
-            return [(<h1 key="newly-joined-users-title">Newly joined users:</h1>), ...newUsers.map((user) => {
+            return [(<h1 key="newly-joined-users-title">Newly joined users:</h1>), ...newUsers.map(user => {
                 async function approveUser() {
                     const res = await Url.fromName(api.users).extend("/" + user.id + "/approve").post()
                     if (res.success) {
@@ -73,7 +73,7 @@ function Home() {
                     const res = await Url.fromName(api.users).extend("/" + user.id).delete();
                     if (res.success) {
                         setNewUsers(prevState => {
-                            return [...prevState.filter(u => u.id !== user.id)]
+                            return [...prevState.filter(u => String(u.id) !== String(user.id))]
                         })
                     }
                 }
