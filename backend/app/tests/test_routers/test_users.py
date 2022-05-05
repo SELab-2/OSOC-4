@@ -200,7 +200,7 @@ class TestUsers(TestBase):
                               json_body={}, expected_status=Status.FORBIDDEN)
 
     async def test_delete_user(self):
-        user_to_del: User = await self.get_user_by_name("user_no_role")
+        user_to_del: User = await self.get_user_by_name("user_disabled_coach")
         path = f"/users/{user_to_del.id}"
 
         # check coach access

@@ -76,7 +76,7 @@ class TestStudents(TestBase):
 
     async def test_update_student(self):
         path = "/students/"
-        body: dict[str, Any] = {"decision": DecisionOption.MAYBE, "email_sent": True}
+        body: dict[str, Any] = {"decision": DecisionOption.MAYBE}
 
         # Bad request with bad id
         await self.do_request(Request.PATCH, f"{path}{self.bad_id}", "user_admin",
@@ -85,7 +85,6 @@ class TestStudents(TestBase):
         # find a random editable student in the testdata
         student: Student = await read_where(Student, session=self.session)
         # change body if necessary
-        body["email_sent"] = not student.email_sent
         if student.decision == body["decision"]:
             body["decision"] = DecisionOption.YES
 
@@ -96,13 +95,11 @@ class TestStudents(TestBase):
                               expected_status=Status.FORBIDDEN, json_body=body)
         # assert student wasn't changed
         student = await read_where(Student, Student.id == student_id, session=self.session)
-        self.assertTrue(student.email_sent != body["email_sent"] and student.decision != body["decision"],
-                        "A student was updated by user_approved_coach.")
+        self.assertTrue(student.decision != body["decision"], "A student was updated by user_approved_coach.")
 
         # good request
         await self.do_request(Request.PATCH, f"{path}{student_id}", "user_admin",
                               expected_status=Status.SUCCESS, json_body=body)
         # assert student was updated
         student = await read_where(Student, Student.id == student_id, session=self.session)
-        self.assertTrue(student.email_sent == body["email_sent"] and student.decision == body["decision"],
-                        "A student was updated by user_approved_coach.")
+        self.assertTrue(student.decision == body["decision"], "The student was not updated by user_admin.")
