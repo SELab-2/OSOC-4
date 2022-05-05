@@ -1,5 +1,4 @@
 import {Col, Form, Row} from "react-bootstrap";
-import SelectSearch, {fuzzySearch} from "react-select-search";
 import React, {useEffect, useState} from "react";
 import Image from 'next/image'
 import Select from "react-select";
