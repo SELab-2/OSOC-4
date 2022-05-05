@@ -73,7 +73,7 @@ class TestUserInvites(TestBase):
 
         # Assert that the invites were unsuccessful
         new_user = await read_where(User, User.id == new_user.id, session=self.session)
-        self.check_user(new_user, ["", email.lower(), 0, False, False, True], True)
+        self.check_user(new_user, ["", email.lower(), 1, False, False, True], True)
 
         # Try with activated user
         user = await self.get_user_by_name("user_admin")
@@ -96,7 +96,7 @@ class TestUserInvites(TestBase):
                               json_body=bad_body, use_access_token=False)
         # Assert that the invite was unsuccessful
         new_user = await read_where(User, User.id == new_user.id, session=self.session)
-        self.check_user(new_user, ["", email.lower(), 0, False, False, True], True)
+        self.check_user(new_user, ["", email.lower(), 1, False, False, True], True)
 
         # Try successful
         await self.do_request(Request.POST, f"{path}{key[0]}", "", Status.SUCCESS,
@@ -104,7 +104,7 @@ class TestUserInvites(TestBase):
         # Assert that the invite was successful
         new_user = await read_where(User, User.id == new_user.id, session=self.session)
         # check role
-        self.check_user(new_user, [username, email.lower(), 0, True, False, True], False)
+        self.check_user(new_user, [username, email.lower(), 1, True, False, True], False)
 
     def check_user(self, user: User, expected_values: list, password_empty):
         user_values: list = [user.name, user.email, user.role,
