@@ -43,4 +43,3 @@ class StudentOutSimple(BaseModel):
 
 class StudentUpdate(BaseModel):
     decision: DecisionOption
-    email_sent: bool = False

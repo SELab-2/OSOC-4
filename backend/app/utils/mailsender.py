@@ -4,7 +4,15 @@ import ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from app.crud import read_where, update
+from app.models.answer import Answer
+from app.models.emailtemplate import EmailTemplate, EmailTemplateName
+from app.models.question_answer import QuestionAnswer
+from app.models.question_tag import QuestionTag
+from app.models.student import DecisionOption, Student
+from app.models.user import User
 from dotenv import load_dotenv
+from sqlmodel import select
 
 load_dotenv()
 
@@ -67,3 +75,64 @@ def send_invite(email: str, invitekey: str):
     with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_SSL_PORT, context=context) as server:
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.sendmail(SENDER_EMAIL, receiver_email, text)
+
+
+async def send_decision_template_email(student, userid, session):
+
+    # get the decision template
+    if student.decision == DecisionOption.YES:
+        template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.YES_DECISION, session=session)
+    elif student.decision == DecisionOption.MAYBE:
+        template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.MAYBE_DECISION, session=session)
+    elif student.decision == DecisionOption.NO:
+        template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.NO_DECISION, session=session)
+    elif student.decision == DecisionOption.UNDECIDED:
+        template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.UNDECIDED, session=session)
+
+    if not template:
+        template_body = ""
+        template_subject = ""
+    else:
+        template_body = template.template
+        template_subject = template.subject
+
+    await send_email(template_subject, template_body, student, userid, session=session)
+
+
+async def send_email(subject, email_body, student, userid, session):
+
+    r = await session.execute(select(QuestionTag.tag, Answer.answer).where(QuestionTag.tag.in_(["first name", "last name", "email"])).select_from(Student).where(Student.id == int(student.id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
+    student_info = r.all()
+
+    user = await read_where(User, User.id == int(userid), session=session)
+
+    for (k, v) in student_info:
+        if k == "first name":
+            firstname = v
+        elif k == "last name":
+            lastname = v
+        elif k == "email":
+            email = v
+
+    # format student info in template
+    formatted_template = email_body.replace("@firstname", firstname)
+    formatted_template = formatted_template.replace("@lastname", lastname)
+    formatted_template = formatted_template.replace("@username", user.name)
+
+    receiver_email = email  # Enter receiver address
+
+    message = MIMEMultipart()
+    message["From"] = SENDER_EMAIL
+    message["To"] = receiver_email
+    message["Subject"] = subject
+
+    message.attach(MIMEText(formatted_template, "plain"))
+    text = message.as_string()
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_SSL_PORT, context=context) as server:
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.sendmail(SENDER_EMAIL, receiver_email, text)
+
+    student.email_sent = True
+    await update(student, session=session)

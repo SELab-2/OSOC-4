@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {Button, Form} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
+import {log} from "../../utils/logger";
 
 /**
  * This component displays a settings-screen to change a user's password.
@@ -43,7 +44,7 @@ export default function ChangePassword(props) {
                 "confirm_password":confirmPassword
             }
 
-            let response = await Url.fromName(api.me).extend("/password").setBody(body).patch();
+            let response = await Url.fromName(api.myself).extend("/password").setBody(body).patch();
             if (response.success) { setChangedSuccess(true); }
         }
     }

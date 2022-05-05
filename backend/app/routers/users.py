@@ -63,6 +63,33 @@ async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
+@router.patch("/me/password", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def update_password(passwords: ChangePassword, Authorize: AuthJWT = Depends(),
+                          session: AsyncSession = Depends(get_session)):
+    """"update_password this changes the password of given user if previous password is given
+
+    :param passwords: current_password, new_password and confirm_password
+    :type passwords: ChangePassword
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    current_user_id = Authorize.get_jwt_subject()
+
+    if passwords.new_password != passwords.confirm_password:
+        raise PasswordsDoNotMatchException()
+
+    user = await read_where(User, User.id == int(current_user_id), session=session)
+
+    if not verify_password(passwords.current_password, user.password):
+        raise InvalidEmailOrPasswordException()
+
+    user.password = get_password_hash(passwords.new_password)
+    await update(user, session=session)
+    return response(None, "Updated password successfully")
+
+
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
              response_description="User data added into the database")
 async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_session)):
@@ -156,34 +183,6 @@ async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)
     user = await update(user, session=session)
 
     return response(UserOut.parse_raw(user.json()), "User deleted successfully")
-
-
-@router.patch("/{user_id}/password", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_password(user_id: str, passwords: ChangePassword, session: AsyncSession = Depends(get_session)):
-    """"update_password this changes the password of given user if previous password is given
-        :param user_id: the user id
-    :type user_id: str
-    :param passwords: current_password, new_password and confirm_password
-    :type passwords: ChangePassword
-    :raises NotPermittedException: Unauthorized
-    :return: response
-    :rtype: success or error
-    """
-
-    if passwords.new_password != passwords.confirm_password:
-        raise PasswordsDoNotMatchException()
-
-    user = await read_where(User, User.id == int(user_id), session=session)
-
-    if user is None:
-        raise UserNotFoundException()
-
-    if not verify_password(passwords.current_password, user.password):
-        raise InvalidEmailOrPasswordException()
-
-    user.password = get_password_hash(passwords.new_password)
-    await update(user, session=session)
-    return response(None, "Updated password successfully")
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])

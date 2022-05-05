@@ -25,8 +25,7 @@ export default function ChangeName(props) {
     async function handleSubmitChange(event) {
         log("handle submit change name");
         event.preventDefault();
-
-        let response = await Url.fromName(api.me).setBody({"name": changeName}).patch();
+        let response = await Url.fromName(api.myself).setBody({"name": changeName}).patch();
         if (response.success) {
             setSavedSuccess(true);
             setName(changeName);

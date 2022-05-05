@@ -1,5 +1,10 @@
-.index-header {
-    padding: 1% 3%;
+.index-header, .news-col, .carousel-inner {
+    margin-top: 2rem;
+    padding: 1% 4rem;
+}
+
+.row {
+    margin: 0;
 }
 
 .carousel {
@@ -7,11 +12,16 @@
 }
 
 .carousel-inner {
-    padding: 0 3%;
+    height: 130px; /* To accommodate for word wrapping in portrait mode */
 }
 
-.news-col {
-    padding: 1% 3%;
+.carousel-indicators {
+    visibility: hidden;
+}
+
+.carousel-control-prev, .carousel-control-prev:hover,
+.carousel-control-next, .carousel-control-next:hover {
+    opacity: 0 !important;
 }
 
 .message {
@@ -30,15 +40,53 @@
     padding: 0 10pt;
 }
 
+.approve-btn, .remove-btn {
+    max-width: 10em;
+    font-weight: bold;
+}
+
 .approve-btn {
-    max-width: 9em;
-    background: #67BA98;
-    border-color: #67BA98;
+    background: var(--green);
+    border-color: var(--green);
     margin-right: 12px;
 }
 
+.approve-btn:hover {
+    background: var(--green);
+    border-color: var(--green);
+
+    filter: saturate(300%);
+    transition: 500ms;
+}
+
 .remove-btn {
-    max-width: 9em;
-    background: #F14A3B;
-    border-color: #F14A3B;
+    background: var(--red);
+    border-color: var(--red);
+}
+
+.remove-btn:hover {
+    background: var(--red);
+    border-color: var(--red);
+
+    filter: saturate(300%);
+    transition: 500ms;
+}
+
+@media (orientation: portrait) {
+    .news-col {
+        padding: 1% 0;
+    }
+
+    .news-col h1 {
+        padding: 1% 4rem;
+    }
+
+    .message .row {
+        justify-content: center;
+    }
+
+    .approve-btn, .remove-btn {
+        width: 45%;
+        font-weight: bold;
+    }
 }

@@ -53,6 +53,9 @@ export default function ProjectsList(props) {
         }
     }, [])
 
+    /**
+     * Gets called once after mounting the Component and gets the currently logged in user
+     */
     useEffect(() => {
         Url.fromName(api.me).get().then(res => {
             if (res.success) {
@@ -119,9 +122,7 @@ export default function ProjectsList(props) {
                             </Form>
                         </Col>
                         <Col xs="auto" className={"project-people-needed"}>
-                            <Form>
-                                <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
-                            </Form>
+                            <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
                         </Col >
                         <Col xs="auto" >
                             <ConflictCard />
