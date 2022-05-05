@@ -1,8 +1,10 @@
 import {Col, Form, Row} from "react-bootstrap";
 import SelectSearch, {fuzzySearch} from "react-select-search";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Image from 'next/image'
+import Select from "react-select";
 import red_cross from "../../public/assets/wrong.svg";
+import {log} from "../../utils/logger";
 
 
 /**
@@ -24,15 +26,17 @@ export default function RequiredSkillSelector(props){
         }
     }
 
-    /**
-     * changes the value of the selected dropdown menu
-     * @param value
-     */
-    function changeRequiredSkill(value){
-        let newArr = [...props.requiredSkills]
-        newArr[props.index].skill_name = value
-        props.setRequiredSkills(newArr)
-    }
+    // /**
+    //  * changes the value of the selected dropdown menu
+    //  * @param value
+    //  */
+    // function changeRequiredSkill(value){
+    //     let newArr = [...props.requiredSkills]
+    //     newArr[props.index].skill_name = value
+    //     props.setRequiredSkills(newArr)
+    // }
+
+
 
     /**
      * changes the amount
@@ -47,17 +51,29 @@ export default function RequiredSkillSelector(props){
         }
     }
 
+
+    const filterOption = (candidate, input) => {
+        // log("haha filter")
+        // log(props.availableSkills)
+        return props.availableSkills.includes(candidate.label) && (input === undefined || candidate.label.includes(input))
+    };
+
     return(
             <Row className={"required-skill-selector-row"}>
-                <Col md={"auto"}>
-                    <SelectSearch
-                        options={props.skills}
-                        value={props.requiredSkill.skill_name}
-                        search
-                        filterOptions={fuzzySearch}
-                        onChange={value => changeRequiredSkill(value)}
-                        emptyMessage={() => <div style={{ textAlign: 'center', fontSize: '0.8em' }}>Skill not found</div>}
-                        placeholder="Select the required skill"
+                <Col>
+                    <Select classNamePrefix="select-search"
+                            defaultValue={props.requiredSkills[props.index].skill_name !== "" ?
+                                {"label": props.requiredSkills[props.index].skill_name, "value": props.requiredSkills[props.index].skill_name}
+                            :
+                                {"label": "no skill selected", "value":"no skill selected"}
+                            }
+                            onChange={async (value) => {
+                                log(value)
+                                await props.changeRequiredSkill(value, props.index)
+                            }}
+                            filterOption={filterOption}
+                            noOptionsMessage={() => "No more options"}
+                            options={props.skills}
                     />
 
                 </Col>
