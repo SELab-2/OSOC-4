@@ -9,7 +9,7 @@ import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
 import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
-import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
+import SendCustomEmailPopUp from "./SendCustomEmailPopUp";
 import deleteIcon from '../../public/assets/delete.svg';
 import DeletePopUpWindow from "./DeletePopUpWindow";
 import { useRouter } from "next/router";
@@ -225,7 +225,7 @@ export default function StudentDetails(props) {
                         updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
                     <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow}
                         decision={decideField} student={student} />
-                    <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow}
+                    <SendCustomEmailPopUp popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow}
                         decision={decision} student={student} />
                     <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
                 </div>
@@ -300,7 +300,7 @@ export default function StudentDetails(props) {
                         <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
                     </Row>
                     <Row md="auto" className="nomargin">
-                        <Button className="send-email-button" disabled={decision === -1}
+                        <Button className="send-email-button"
                             onClick={() => setEmailPopUpShow(true)}>
                             Send email
                         </Button>

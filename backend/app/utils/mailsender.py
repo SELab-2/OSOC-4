@@ -77,21 +77,9 @@ def send_invite(email: str, invitekey: str):
         server.sendmail(SENDER_EMAIL, receiver_email, text)
 
 
-async def send_decision_email(studentid, userid, session):
+async def send_decision_template_email(studentid, userid, session):
 
     student = await read_where(Student, Student.id == int(studentid), session=session)
-    user = await read_where(User, User.id == int(userid), session=session)
-
-    r = await session.execute(select(QuestionTag.tag, Answer.answer).where(QuestionTag.tag.in_(["first name", "last name", "email"])).select_from(Student).where(Student.id == int(studentid)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
-    student_info = r.all()
-
-    for (k, v) in student_info:
-        if k == "first name":
-            firstname = v
-        elif k == "last name":
-            lastname = v
-        elif k == "email":
-            email = v
 
     # get the decision template
     if student.decision == DecisionOption.YES:
@@ -105,11 +93,31 @@ async def send_decision_email(studentid, userid, session):
 
     if not template:
         template_body = ""
+        template_subject = ""
     else:
         template_body = template.template
+        template_subject = template.subject
+
+    await send_email(template_subject, template_body, student, userid, session=session)
+
+
+async def send_email(subject, email_body, student, userid, session):
+
+    r = await session.execute(select(QuestionTag.tag, Answer.answer).where(QuestionTag.tag.in_(["first name", "last name", "email"])).select_from(Student).where(Student.id == int(student.id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
+    student_info = r.all()
+
+    user = await read_where(User, User.id == int(userid), session=session)
+
+    for (k, v) in student_info:
+        if k == "first name":
+            firstname = v
+        elif k == "last name":
+            lastname = v
+        elif k == "email":
+            email = v
 
     # format student info in template
-    formatted_template = template_body.replace("@firstname", firstname)
+    formatted_template = email_body.replace("@firstname", firstname)
     formatted_template = formatted_template.replace("@lastname", lastname)
     formatted_template = formatted_template.replace("@username", user.name)
 
@@ -118,7 +126,7 @@ async def send_decision_email(studentid, userid, session):
     message = MIMEMultipart()
     message["From"] = SENDER_EMAIL
     message["To"] = receiver_email
-    message["Subject"] = template.subject
+    message["Subject"] = subject
 
     message.attach(MIMEText(formatted_template, "plain"))
     text = message.as_string()
