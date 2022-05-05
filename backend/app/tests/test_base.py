@@ -49,6 +49,10 @@ class Status(IntEnum):
 class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.sessionmaker = sessionmaker(
+            engine, expire_on_commit=False, class_=AsyncSession
+        )
+
         self.bad_id = 0
         self.users: Dict[str, User] = {}
         self.saved_objects = {
@@ -60,9 +64,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.client: AsyncClient = AsyncClient(app=app, base_url="http://test")
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
-        self.session: AsyncSession = sessionmaker(
-            engine, expire_on_commit=False, class_=AsyncSession
-        )()
+        self.session: AsyncSession = self.sessionmaker()
 
         user_generator = UserGenerator(self.session)
         user_generator.generate_default_users()
@@ -150,7 +152,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                               json_body=body, access_token="wrong token")
 
     async def _access_test_request(
-            self, request_type: Request, path, allowed_users: Set[str], body: Dict = None, unauthorized_status: int = Status.FORBIDDEN
+            self, request_type: Request, path, allowed_users: Set[str], body: Dict = None
     ) -> Dict[str, Response]:
         responses: Dict[str, Response] = {}
         # Allowed users
@@ -160,12 +162,12 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         for user_name in set(self.users.keys()).difference(allowed_users):
             user = self.users[user_name]
             if user.active and user.approved and not user.disabled:
-                await self.do_request(request_type, path, user_name, unauthorized_status, json_body=body)
+                await self.do_request(request_type, path, user_name, Status.FORBIDDEN, json_body=body)
 
         return responses
 
     async def auth_access_request_test(self, request_type: Request, path: str, allowed_users: Set[str],
-                                       body: Dict = None, unauthorized_status: int = Status.FORBIDDEN) -> Dict[str, Response]:
+                                       body: Dict = None) -> Dict[str, Response]:
         """
         Assert for all users whether only allowed_users are allowed request access to the given path.
 
@@ -178,7 +180,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         # Check bad access tokens
         await self._auth_test_request(request_type, path, body)
         # Check all users with their access tokens:
-        return await self._access_test_request(request_type, path, allowed_users, body, unauthorized_status)
+        return await self._access_test_request(request_type, path, allowed_users, body)
 
     async def auth_access_request_test_per_user(
             self, request_type: Request,

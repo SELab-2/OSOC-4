@@ -6,7 +6,7 @@ from app.config import config
 from app.crud import read_all_where, read_where, update
 from app.models.project import Project, ProjectCoach, ProjectRequiredSkill
 from app.models.user import UserRole
-from app.tests.test_base import Status, TestBase, Request
+from app.tests.test_base import TestBase, Request
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
@@ -19,6 +19,8 @@ class TestProjects(TestBase):
         "description": "Free real estate",
         "partner_name": "UGent",
         "partner_description": "De C in UGent staat voor communicatie",
+        "required_skills": [],
+        "users": [],
     }
 
     def __init__(self, *args, **kwargs):
@@ -29,6 +31,7 @@ class TestProjects(TestBase):
         edition_generator = EditionGenerator(self.session)
         self.edition = edition_generator.generate_edition(2022)
         await update(self.edition, self.session)
+        self.project_data["edition"] = self.edition.year
 
     async def assert_projects_equal(self, test_data: dict[str, any], project: Project):
         project_name = test_data["name"]
@@ -60,19 +63,10 @@ class TestProjects(TestBase):
     async def test_post_add_project_data(self):
         path = "/projects/create"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-
-        body = {
-            "required_skills": [],
-            "users": [],
-            "edition": self.edition.year,
-        }
-        body.update(self.project_data)
-
-        project_name = body["name"]
-
+        project_name = self.project_data["name"]
         # Post create project request
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
-
+        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users,
+                                                                              self.project_data)
         # Get project id from the response url
         project_id = ""
         for user_title in allowed_users:
@@ -83,10 +77,11 @@ class TestProjects(TestBase):
         self.assertIsNotNone(project_in_db, f"'{project_name}' was not found in the database.")
 
         # Project id in the database should be same as it in the response url
-        self.assertEqual(str(project_in_db.id), project_id, f"Project id of '{project_name}' in the response url is not same as it in the database.")
-
+        self.assertEqual(str(project_in_db.id), project_id,
+                         f"""Project id of '{project_name}'
+                                 in the response URL is not equal to the id found in the database.""")
         # compare every field in the database with the test value
-        await self.assert_projects_equal(body, project_in_db)
+        await self.assert_projects_equal(self.project_data, project_in_db)
 
     async def test_post_add_project_data_with_skills_and_users(self):
         skill_generator = SkillGenerator(self.session)
@@ -94,39 +89,13 @@ class TestProjects(TestBase):
         skill_generator.add_to_db()
         await self.session.commit()
 
-        project_skills = [{"skill_name": skill.name, "number": 3} for skill in skills]
-
         project_coach = await self.get_user_by_name("user_approved_coach")
-
-        path = "/projects/create"
-        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-
-        body = {
-            "required_skills": project_skills,
+        self.project_data.update({
+            "required_skills":  [{"skill_name": skill.name, "number": 3} for skill in skills],
             "users": [project_coach.id],
-            "edition": self.edition.year,
-        }
-        body.update(self.project_data)
+        })
 
-        project_name = body["name"]
-
-        # Post create project request
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, body)
-
-        # Get project id from the response url
-        project_id = ""
-        for user_title in allowed_users:
-            project_id = json.loads(responses1.get(user_title).content)["data"]["id"].split("/")[-1]
-
-        # Test whether created project is in the database
-        project_in_db = await read_where(Project, Project.name == project_name, session=self.session)
-        self.assertIsNotNone(project_in_db, f"'{project_name}' was not found in the database.")
-
-        # Project id in the database should be same as it in the response url
-        self.assertEqual(str(project_in_db.id), project_id, f"Project id of '{project_name}' in the response URL is not same as the id found in the database.")
-
-        # compare every field in the database with the test value
-        await self.assert_projects_equal(body, project_in_db)
+        await self.test_post_add_project_data()
 
     async def test_get_projects_id_with_admin_user(self):
         url = f"{config.api_url}projects/"
@@ -134,7 +103,6 @@ class TestProjects(TestBase):
         # Set up project
         project = Project(
             coaches=[],
-            edition=self.edition.year,
             **self.project_data)
         await update(project, self.session)
 
@@ -142,7 +110,7 @@ class TestProjects(TestBase):
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
 
         # Send get project by id request
-        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users, unauthorized_status=Status.BAD_REQUEST)
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Test response message
         # Project url in the response message should be same as the expected value.
@@ -159,7 +127,6 @@ class TestProjects(TestBase):
 
         project = Project(
             coaches=[coach],
-            edition=self.edition.year,
             **self.project_data)
         await update(project, self.session)
 
@@ -170,7 +137,7 @@ class TestProjects(TestBase):
         allowed_users.add(coach.name)
 
         # Send get project by id request
-        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users, unauthorized_status=Status.BAD_REQUEST)
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Test response message
         # Project url in the response message should be same as the expected value.
@@ -187,7 +154,6 @@ class TestProjects(TestBase):
 
         project = Project(
             coaches=[coaches[0]],
-            edition=self.edition.year,
             **self.project_data)
         await update(project, self.session)
 
