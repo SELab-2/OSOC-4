@@ -3,6 +3,8 @@ import React, {useEffect, useState} from "react";
 import SkillSelector from "./SkillSelector";
 import {api, Url} from "../../utils/ApiClient";
 import {log} from "../../utils/logger";
+import {StringListToOptionsList} from "../../utils/skillselector";
+
 
 /**
  * When clicking on the button to assign a student to a project, this modal pops-up. If the selected student and project
@@ -21,9 +23,9 @@ export default function AddStudentModal(props){
     const [selectedSkill, setSelectedSkill] = useState({"value": "None", "label": "None"})
 
     const [skills, setSkills] = useState([])
-
     const [projectNeededSkills, setProjectNeededSkills] = useState([]);
     const [skillsLeft, setSkillsLeft] = useState([]);
+    const [options, setOptions] = useState([{"value": "None", "label": "None"}])
 
     /**
      * This function gets called when props.selectedStudent or props.selectedProject changes. It finds the intersection
@@ -39,26 +41,22 @@ export default function AddStudentModal(props){
                 temp_dict[skill.skill_name] = skill.number
             })
 
-            let all_project_skills = Object.keys(temp_dict)
-
-            props.selectedProject.participations.map(participation => {
+            props.selectedProject.participations.forEach(participation => {
                 if(participation.skill in temp_dict){
                     temp_dict[participation.skill] -= 1 ;
                 }
             })
 
-            // first map the skill names in an array
-            let skill_name_array = Object.keys(temp_dict)
-            log("project needed skills")
-            log(skill_name_array)
-            setProjectNeededSkills(skill_name_array)
-            // setProjectNotNeededSkills(all_project_skills.filter(skill => ! skill_name_array.includes(skill)))
+            setProjectNeededSkills(Object.keys(temp_dict).filter(skill => temp_dict[skill] > 0))
         }
     }, [props.selectedProject])
 
+
+
     useEffect(() => {
-        Url.fromUrl(api.skills).get().then(res => {
+        Url.fromName(api.skills).get().then(res => {
             if (res.success){
+                log("skills halen lunkt")
                 setSkills(res.data)
             }
         })
@@ -66,9 +64,20 @@ export default function AddStudentModal(props){
 
     useEffect(() => {
         if(skills.length !== 0 && props.selectedStudent !== undefined && projectNeededSkills.length !== 0){
-            log("skills left:")
-            log((skills.filter(skill => ! projectNeededSkills.includes(skill)).filter(skill => props.selectedStudent.skills.includes(skill))))
-            setSkillsLeft(skills.filter(skill => ! projectNeededSkills.includes(skill)).filter(skill => props.selectedStudent.skills.includes(skill)))
+            let studentClean = props.selectedStudent.skills.map(value => value.name)
+            log("student clean")
+            log(studentClean)
+            log(props.selectedStudent.skills)
+            let overlap = StringListToOptionsList(studentClean.filter(skill => projectNeededSkills.includes(skill)))
+            let studentSkills = StringListToOptionsList(studentClean.filter(skill => ! projectNeededSkills.includes(skill)))
+            let projectSkills = StringListToOptionsList(projectNeededSkills.filter(skill => ! studentClean.includes(skill)))
+            let otherSkills = StringListToOptionsList(skills.filter(skill => ! projectNeededSkills.includes(skill)
+                                                             && ! studentClean.includes(skill)))
+            setOptions([{"value": "None", "label": "None"},
+                {"label": "Student project overlap", "options": overlap},
+                {"label": "Student skills", "options": studentSkills},
+                {"label": "Project needed skills", "options": projectSkills},
+                {"label": "Other skills", "options": otherSkills}])
         }
     }, [skills, projectNeededSkills, props.selectedStudent])
 
@@ -106,8 +115,9 @@ export default function AddStudentModal(props){
                         For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?
                     </div>
                     <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
-                                   studentSkills={props.selectedStudent.skills} projectNeededSkills={projectNeededSkills}
-                                   skillsLeft={skillsLeft}
+                                   options={options}
+                                   // studentSkills={props.selectedStudent.skills} projectNeededSkills={projectNeededSkills}
+                                   // skillsLeft={skillsLeft}
                     />
                 </Modal.Body>
                 <Modal.Footer>

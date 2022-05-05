@@ -11,39 +11,55 @@ import {StringListToOptionsList} from "../../utils/skillselector";
  * @constructor
  */
 export default function SkillSelector(props){
+    //
+    // const [options, setOptions] = useState([{"value": "None", "label": "None"},{"label": "Student project overlap", "options": []},
+    //     {"label": "Student skills", "options":[]}, {"label": "Project needed skills", "options": []},
+    //     {"label": "Other skills", "options": []}]
+    // )
 
-    const [options, setOptions] = useState([{"value": "None", "label": "None"},
-        {"label": "Student skills", "options":[]}, {"label": "Project needed skills", "options": []},
-        {"label": "other skills", "value": []}]
-    )
-
-    useEffect(() => {
-        let tempArray = [...options]
-        // log(props.studentSkills)
-        tempArray[1] = {"label": "Student skills", "options":StringListToOptionsList(props.studentSkills)}
-        log("TEST DING IN studentskills")
-        log(tempArray)
-        setOptions(tempArray)
-    }, [props.studentSkills])
-
-    useEffect(() => {
-        let tempArray = [...options]
-        tempArray[2] = {"label": "Student skills", "options":StringListToOptionsList(props.projectNeededSkills)}
-        setOptions(tempArray)
-    }, [props.projectNeededSkills])
-
-    useEffect(() => {
-        let tempArray = [...options]
-        tempArray[3] = {"label": "Student skills", "options": StringListToOptionsList(props.skillsLeft)}
-        setOptions(tempArray)
-    }, [props.skillsLeft])
-
-    useEffect(() => {
-        log("option logger")
-        log(options)
-    }, [options])
+    // useEffect(() => {
+    //     if(props.studentSkills !== undefined && props.projectNeededSkills.length !== 0){
+    //         let tempArray = [...options]
+    //         let overlap = props.studentSkills.filter(skill => props.projectNeededSkills.includes(skill.value))
+    //         tempArray[1] = {"label": "Student project overlap", "options": StringListToOptionsList(overlap.map(value => value.name))}
+    //         setOptions(tempArray)
+    //     }
+    // }, [props.studentSkills, props.projectNeededSkills])
+    //
+    // useEffect(() => {
+    //     if(props.studentSkills !== undefined){
+    //         let tempArray = [...options]
+    //
+    //         tempArray[2] = {"label": "Student skills", "options": StringListToOptionsList(props.studentSkills.map(value => value.name))}
+    //         setOptions(tempArray)
+    //     }
+    // }, [props.studentSkills])
+    //
+    // useEffect(() => {
+    //     if(props.projectNeededSkills.length !== 0){
+    //         log("projectneeded skills")
+    //         let tempArray = [...options]
+    //         tempArray[3] = {"label": "Project needed skills", "options":StringListToOptionsList(props.projectNeededSkills)}
+    //         setOptions(tempArray)
+    //     }
+    // }, [props.projectNeededSkills])
+    //
+    // useEffect(() => {
+    //     if(props.skillsLeft.length !== 0){
+    //         log("skills left")
+    //         let tempArray = [...options]
+    //         tempArray[4] = {"label": "Other skills", "options": StringListToOptionsList(props.skillsLeft)}
+    //         setOptions(tempArray)
+    //     }
+    // }, [props.skillsLeft])
+    //
+    // useEffect(() => {
+    //     log("option logger")
+    //     log(options)
+    // }, [options])
 
     const filterOption = (candidate, input) => {
+        log(props.options)
         return input === undefined || candidate.label.includes(input)
     };
 
@@ -52,12 +68,14 @@ export default function SkillSelector(props){
             <Select classNamePrefix="select-search"
                     defaultValue={props.selectedSkill}
                     onChange={async (value) => {
+                        log("on change in skill selector")
                         log(value)
+                        log(props.options)
                         await props.setSelectedSkill(value)
                     }}
                     filterOption={filterOption}
                     noOptionsMessage={() => "No more options"}
-                    options={options}
+                    options={props.options}
             />
             {/*{props.skills.length ?*/}
             {/*    <SelectSearch*/}
