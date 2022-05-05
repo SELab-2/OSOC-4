@@ -88,7 +88,10 @@ export default function AddStudentModal(props){
      */
     async function AddStudentToProject() {
         if (props.selectedStudent !== undefined && props.selectedProject !== undefined && selectedSkill !== undefined) {
-
+            // currently you can't add "None" as skill so we have to skip this
+            if(selectedSkill.value === "None"){
+                return
+            }
             let response = await Url.fromName(api.participations)
                 .extend("/create")
                 .setBody({
