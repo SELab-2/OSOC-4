@@ -7,8 +7,8 @@ import { api, Url } from "../../utils/ApiClient";
  * @returns {JSX.Element}
  */
 export default function UserTr(props) {
-    const [role, setRole] = useState(props.user.role)
-    const roles = ["No role", "Coach", "Admin"]
+    const [role, setRole] = useState(props.user.role);
+    const roles = ["Coach", "Admin"];
     const [active, setActive] = useState(props.user.active);
     const [approved, setApproved] = useState(props.user.approved);
     const [disabled, setDisabled] = useState(props.user.disabled);
@@ -21,11 +21,8 @@ export default function UserTr(props) {
         if (props.isMe) {
             return
         }
-        let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody({
-            "role": role,
-            "disabled": role === 0
-        }).patch();
-        if (response.success) { setRole(role) }
+        let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody({"role": role}).patch();
+        if (response.success) { setRole(role); }
     }
 
     /**
@@ -67,13 +64,12 @@ export default function UserTr(props) {
         return (
             <Dropdown className={"dropdown-button"}>
                 <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                    {roles[role]}
+                    {(role == 2)? "Admin" : "Coach"}
                 </Dropdown.Toggle>
                 {props.isMe ? null :
                     <Dropdown.Menu aria-disabled className={"dropdown-button"} >
                         <Dropdown.Item active={role === 2} onClick={() => changeRole(2)}>Admin</Dropdown.Item>
                         <Dropdown.Item active={role === 1} onClick={() => changeRole(1)}>Coach</Dropdown.Item>
-                        <Dropdown.Item active={role === 0} onClick={() => changeRole(0)}>No role</Dropdown.Item>
                     </Dropdown.Menu>
                 }
             </Dropdown>)
