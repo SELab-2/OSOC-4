@@ -14,7 +14,6 @@ from app.utils.checkers import RoleChecker
 from app.utils.response import response
 from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
-from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
@@ -24,27 +23,36 @@ router = APIRouter(prefix="/students")
 router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 
-@router.get("/{student_id}", response_description="Student retrieved")
-async def get_student(student_id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+@router.get("/{student_id}", response_description="Student retrieved",
+            dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def get_student(student_id: int, session: AsyncSession = Depends(get_session)):
     """get_student get the Student instances with id from the database
 
     :return: student with id
     :rtype: StudentOutExtended
     """
 
+    student = await read_where(Student, Student.id == student_id, session=session)
+    if not student:
+        raise StudentNotFoundException
+
     studentstat = select(Student).where(Student.id == student_id).options(selectinload(Student.skills))
     studentres = await session.execute(studentstat)
-    (student, ) = studentres.one()
+    (student,) = studentres.one()
 
     # student info
-    info = {"id": f"{config.api_url}students/{student_id}"}
-
-    info["skills"] = student.skills
-    info["id_int"] = student_id
-    info["email_sent"] = student.email_sent
+    info = {"id": f"{config.api_url}students/{student_id}",
+            "skills": student.skills,
+            "id_int": student_id,
+            "email_sent": student.email_sent}
 
     # student info from tags
-    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer).select_from(Student).where(Student.id == int(student_id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
+    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer)
+                              .select_from(Student)
+                              .where(Student.id == int(student_id))
+                              .join(QuestionAnswer)
+                              .join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id)
+                              .join(Answer))
     student_info = r.all()
 
     mandatory = {k: v for (k, mandatory, _, v) in student_info if mandatory}
@@ -56,44 +64,45 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     info["detailtags"] = detailTags
 
     # student participations
-    r = await session.execute(select(Participation).select_from(Participation).where(Participation.student_id == int(student_id)))
-    student_info = r.all()
-    info["participations"] = [ParticipationOutStudent.parse_raw(s.json()) for (s,) in student_info]
+    r = await session.execute(select(Participation)
+                              .select_from(Participation)
+                              .where(Participation.student_id == int(student_id)))
+    info["participations"] = [ParticipationOutStudent.parse_raw(s.json()) for (s,) in r.all()]
     # student questionAnswers
     info["question-answers"] = f"{config.api_url}students/{student_id}/question-answers"
 
     info["decision"] = student.decision
 
     # student suggestions
-    r = await session.execute(select(Suggestion).select_from(Suggestion).where(Suggestion.student_id == int(student_id)))
-    student_info = r.all()
-    info["suggestions"] = {s.id: SuggestionExtended.parse_raw(s.json()) for (s,) in student_info}
+    r = await session.execute(select(Suggestion)
+                              .select_from(Suggestion)
+                              .where(Suggestion.student_id == int(student_id)))
+    info["suggestions"] = {s.id: SuggestionExtended.parse_raw(s.json()) for (s,) in r.all()}
 
     return info
 
 
-@router.get("/{student_id}/question-answers", response_description="Student retrieved")
+@router.get("/{student_id}/question-answers", response_description="Student retrieved",
+            dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def get_student_questionanswers(student_id, session: AsyncSession = Depends(get_session)):
-    """get_student get the Student instances with id from the database
+    """get the question answers of the Student instance with id
 
-    :return: student with id
-    :rtype: StudentOutExtended
+    :return: the question answers for the given student_id
+    :rtype: list[dict[str,Any]]
     """
     # student questionAnswers
-    r = await session.execute(select(Question.question, Answer.answer, QuestionTag.tag).select_from(QuestionAnswer)
+    r = await session.execute(select(Question.question, Answer.answer, QuestionTag.tag)
+                              .select_from(QuestionAnswer)
                               .join(Question, QuestionAnswer.question)
                               .join(Answer, QuestionAnswer.answer)
                               .outerjoin(QuestionTag, Question.question_tags)
                               .where(QuestionAnswer.student_id == int(student_id)))
-    info = r.all()
-    info = [{"question": x[0], "answer":x[1]} for x in info if x[2] is None]
-
-    return info
+    return [{"question": x[0], "answer": x[1]} for x in r.all() if x[2] is None]
 
 
-@router.patch("/{student_id}")
+@router.patch("/{student_id}",
+              dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def update_student(student_id: int, student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
-
     student = await read_where(Student, Student.id == student_id, session=session)
     if student:
         student_update_data = student_update.dict(exclude_unset=True)
@@ -106,7 +115,8 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
             student.email_sent = False
         await update(student, session)
 
-        await websocketManager.broadcast({"id": config.api_url + "students/" + str(student_id), "decision": jsonable_encoder(StudentUpdate.parse_raw(student.json()))})
+        await websocketManager.broadcast({"id": config.api_url + "students/" + str(student_id),
+                                          "decision": jsonable_encoder(StudentUpdate.parse_raw(student.json()))})
 
         return response(None, "Student updated succesfully")
 

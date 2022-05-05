@@ -9,6 +9,7 @@ from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
                                             UserAlreadyActiveException)
 from app.models.user import User, UserInvite
 from app.utils.cryptography import get_password_hash
+from app.utils.checkers import check_key
 from app.utils.response import response
 
 router = APIRouter(prefix="/invite")
@@ -16,25 +17,11 @@ router = APIRouter(prefix="/invite")
 
 @router.get("/{invitekey}")
 async def valid_invitekey(invitekey: str, session: AsyncSession = Depends(get_session)):
-    if invitekey[0] != "I":
+    valid = await check_key(invitekey, "I", session)
+    if valid:
+        return response(None, "Valid invitekey")
+    else:
         raise InvalidInviteException()
-
-    uid = db.redis.get(invitekey)
-
-    # Check whether the uid is valid
-    try:
-        uid = int(uid)
-    except ValueError:
-        raise InvalidInviteException()
-
-    if uid <= 0:
-        raise InvalidInviteException()
-
-    user = await read_where(User, User.id == uid, session=session)
-
-    if user is None:
-        raise InvalidInviteException()
-    return response(None, "Valid invitekey")
 
 
 @router.post("/{invitekey}")
