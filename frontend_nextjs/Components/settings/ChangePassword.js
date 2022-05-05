@@ -45,7 +45,6 @@ export default function ChangePassword(props) {
             }
 
             let response = await Url.fromName(api.myself).extend("/password").setBody(body).patch();
-            log(response)
             if (response.success) { setChangedSuccess(true); }
         }
     }
