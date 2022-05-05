@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Button, Form, Table} from "react-bootstrap";
+import {Button, Form, Modal, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
 
@@ -23,6 +23,10 @@ export default function ManageUsers(props) {
     const [shownUsers, setShownUsers] = useState([])
     const [toInvite, setToInvite] = useState("");
     const [loading, setLoading] = useState(false)
+    const [show, setShow] = useState(false);
+  
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
@@ -69,6 +73,7 @@ export default function ManageUsers(props) {
             Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(async resp => {
                 if (resp.success && resp.data.data.id) {
                     await Url.fromUrl(resp.data.data.id).extend("/invite").post();
+
                 }
             }))
         );
@@ -112,17 +117,32 @@ export default function ManageUsers(props) {
 
     return (
         <div>
-            <h4>Invite new users</h4>
-
-            <Form id="invite-users" onSubmit={handleSubmitInvite}>
-                <Form.Group controlId="inviteUserTextarea">
-                    <Form.Label>List of email-address(es) of the users you want to invite </Form.Label>
-                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
-                </Form.Group>
-                <br />
-                <Button variant={"outline-secondary"} type="submit"> Invite users</Button>
-            </Form>
-            <br />
+            <Button variant="primary" onClick={handleShow} className="invite-users-button">
+                Invite new users
+            </Button>
+                <Modal 
+                    show={show} 
+                    onHide={handleClose}
+                    size="lg"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Invite users</Modal.Title>
+                    </Modal.Header>
+                        <Form id="invite-users" onSubmit={handleSubmitInvite}>
+                            <Modal.Body>
+                            <Form.Group controlId="inviteUserTextarea">
+                                <Form.Label>List of email-address(es) of the users you want to invite </Form.Label>
+                                <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                            </Form.Group>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                                <Button variant={"primary"} type="submit"> Invite users</Button>
+                            </Modal.Footer> 
+                        </Form>
+                </Modal>
 
             <h4>Manage users</h4>
             <Table className={"table-manage-users"}>
