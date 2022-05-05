@@ -50,6 +50,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     #########
 
     user_generator = UserGenerator(session)
+    user_generator.generate_default_users()
 
     user_generator.generate_user(role=UserRole.COACH, active=False, approved=False, disabled=False),
     user_generator.generate_user(role=UserRole.COACH, active=True, approved=False, disabled=False),
