@@ -21,7 +21,6 @@ export default function QuestionTag(props) {
 
 
     useEffect(() => {
-        setQuestionTag(props.questionTag);
         setPreviousTag(props.questionTag);
     }, [props.questionTag]);
 
@@ -127,19 +126,20 @@ export default function QuestionTag(props) {
                 }
             </td>
             <td>
-                {(!questionTag["mandatory"]) &&
-                    ((!props.edited) ?
-                        <button className="table-button" onClick={(ev) => {
-                            props.setNewQuestionTag(undefined);
-                            props.setEdited(previousTag["url"])
-                        }}>
-                            <Image src={editIcon} height="30px"/>
-                        </button>
-                        :
-                        <button className="table-button" onClick={handleSubmit}>
-                            <Image src={saveIcon} height="30px"/>
-                        </button>)
-                }
+
+                {((!props.edited) ?
+                    <button className="table-button" onClick={(ev) => {
+                        props.setNewQuestionTag(undefined);
+                        setQuestionTag({...previousTag});
+                        props.setEdited(previousTag["url"])
+                    }}>
+                        <Image src={editIcon} height="30px"/>
+                    </button>
+                    :
+                    <button className="table-button" onClick={handleSubmit}>
+                        <Image src={saveIcon} height="30px"/>
+                    </button>)}
+
                 {(!questionTag["mandatory"]) &&
                     <button onClick={deleteTag} className="table-button">
                         <Image src={deleteIcon} height="30px"/>
