@@ -19,9 +19,7 @@ export default function RouteGuard(props) {
         if (props.auth && !isUser) {
             router.push('/login') //Redirect to login
         } else if (isUser && props.auth && !websocketConn && !creatingConnection) {
-
             connect();
-
         }
 
     }, [router, isUser, props.auth, status, websocketConn])
