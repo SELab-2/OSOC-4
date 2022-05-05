@@ -17,3 +17,7 @@
     color: var(--dark_blue);
     font-size: 1.2rem;
 }
+
+#logout-link {
+    color: var(--red);
+}
