@@ -21,6 +21,7 @@ export default function DefaultEmails() {
                 <DefaultEmail templatename="YES_DECISION" value="'Yes'" />
                 <DefaultEmail templatename="MAYBE_DECISION" value="'Maybe'" />
                 <DefaultEmail templatename="NO_DECISION" value="'No'" />
+                <DefaultEmail templatename="UNDECIDED" value="'Undecided'" />
             </Col>
         </Row>
     )

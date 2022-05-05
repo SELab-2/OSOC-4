@@ -398,6 +398,7 @@ class Cache {
             if (student) {
                 let new_student = student
                 new_student["decision"] = data["decision"]["decision"];
+                new_student["email_sent"] = false;
                 cache[data["id"]] = new_student
             }
         }

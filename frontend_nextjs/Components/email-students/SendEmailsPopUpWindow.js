@@ -70,7 +70,7 @@ export default function SendEmailsPopUpWindow(props) {
         <Row>
           <Col />
           <Col md="auto" className={"email-help-text " + ((defaultEmail) ? "disabled-text" : null)}>
-            (Use @firstname, @lastname to address the receiver)
+            (Use @firstname, @lastname, @username to address the receiver)
           </Col>
         </Row>
         <Row>

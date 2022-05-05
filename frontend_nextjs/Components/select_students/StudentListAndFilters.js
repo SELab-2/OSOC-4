@@ -122,6 +122,7 @@ export default function StudentList(props) {
           } else {
             let new_students = [...students]
             new_students[i]["decision"] = data["decision"]["decision"];
+            new_students[i]["email_sent"] = false;
             setStudents(new_students);
           }
           return true;
@@ -155,6 +156,7 @@ export default function StudentList(props) {
               // get the student from the cache + update the decision (needed when cache updated later than studentlis)
               let student = cache.getStudent(studentUrl, session["userid"])
               student["decision"] = data["decision"]["decision"];
+              student["email_sent"] = false;
               return student;
             }
             )).then(newstudents => {
@@ -172,6 +174,7 @@ export default function StudentList(props) {
               // get the student from the cache + update the decision (needed when cache updated later than studentlis)
               let student = cache.getStudent(studentUrl, session["userid"])
               student["decision"] = data["decision"]["decision"];
+              student["email_sent"] = false;
               return student;
             }
 

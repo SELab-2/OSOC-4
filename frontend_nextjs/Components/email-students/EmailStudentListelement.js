@@ -78,21 +78,7 @@ export default function StudentListelement(props) {
    */
   function selectStudent() {
     // if the selected student is this student then unselect the student
-    log(props.student)
-    if (props.student.decision === -1) {
-      let i = props.student.id.lastIndexOf('/');
-      let id = props.student.id.substring(i + 1);
-
-      let newQuery = router.query;
-      newQuery["studentId"] = id;
-
-      // the path is not changed, but there is a query added wich contains the id of the student
-      router.push({
-        pathname: router.pathname,
-        query: newQuery
-      }, undefined, { shallow: true })
-    }
-    else if (props.selectedStudents.includes(props.student.id)) {
+    if (props.selectedStudents.includes(props.student.id)) {
       props.setSelectedStudents((prevState) => prevState.filter((o, i) => o !== props.student.id))
     } else {
       props.setSelectedStudents(prevState => [...prevState, props.student.id])

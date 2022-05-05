@@ -10,6 +10,7 @@ from app.models.emailtemplate import EmailTemplate, EmailTemplateName
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import DecisionOption, Student
+from app.models.user import User
 from dotenv import load_dotenv
 from sqlmodel import select
 
@@ -76,9 +77,10 @@ def send_invite(email: str, invitekey: str):
         server.sendmail(SENDER_EMAIL, receiver_email, text)
 
 
-async def send_decision_email(studentid, session):
+async def send_decision_email(studentid, userid, session):
 
     student = await read_where(Student, Student.id == int(studentid), session=session)
+    user = await read_where(User, User.id == int(userid), session=session)
 
     r = await session.execute(select(QuestionTag.tag, Answer.answer).where(QuestionTag.tag.in_(["first name", "last name", "email"])).select_from(Student).where(Student.id == int(studentid)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
     student_info = r.all()
@@ -98,6 +100,8 @@ async def send_decision_email(studentid, session):
         template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.MAYBE_DECISION, session=session)
     elif student.decision == DecisionOption.NO:
         template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.NO_DECISION, session=session)
+    elif student.decision == DecisionOption.UNDECIDED:
+        template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.UNDECIDED, session=session)
 
     if not template:
         template_body = ""
@@ -107,6 +111,7 @@ async def send_decision_email(studentid, session):
     # format student info in template
     formatted_template = template_body.replace("@firstname", firstname)
     formatted_template = formatted_template.replace("@lastname", lastname)
+    formatted_template = formatted_template.replace("@username", user.name)
 
     receiver_email = email  # Enter receiver address
 
@@ -125,5 +130,3 @@ async def send_decision_email(studentid, session):
 
     student.email_sent = True
     await update(student, session=session)
-
-    # TODO: send websocket message to update sent email

@@ -8,6 +8,7 @@ class EmailTemplateName(int, Enum):
     YES_DECISION = 2
     MAYBE_DECISION = 1
     NO_DECISION = 0
+    UNDECIDED = -1
 
 
 class EmailTemplate(SQLModel, table=True):

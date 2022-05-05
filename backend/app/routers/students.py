@@ -97,8 +97,13 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
     student = await read_where(Student, Student.id == student_id, session=session)
     if student:
         student_update_data = student_update.dict(exclude_unset=True)
+
+        prev_decision = student.decision
         for key, value in student_update_data.items():
             setattr(student, key, value)
+
+        if prev_decision != student_update.decision:
+            student.email_sent = False
         await update(student, session)
 
         await websocketManager.broadcast({"id": config.api_url + "students/" + str(student_id), "decision": jsonable_encoder(StudentUpdate.parse_raw(student.json()))})
