@@ -64,7 +64,7 @@ function Home() {
                     const res = await Url.fromName(api.users).extend("/" + user.id + "/approve").post()
                     if (res.success) {
                         setNewUsers(prevState => {
-                            return [...prevState.filter(u => u.id === user.id)]
+                            return [...prevState.filter(u => String(u.id) === String(user.id))]
                         })
                     }
                 }
