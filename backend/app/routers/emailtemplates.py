@@ -41,5 +41,6 @@ async def update_email_template(name: str, newtemplate: EmailTemplatePatch, sess
     if not template:
         template = EmailTemplate(name=name)
     template.template = newtemplate.template
+    template.subject = newtemplate.subject
 
     await update(template, session=session)

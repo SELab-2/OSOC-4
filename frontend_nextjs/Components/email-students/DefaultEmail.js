@@ -1,4 +1,4 @@
-import { Button, Col, Row } from "react-bootstrap";
+import { Button, Col, Row, Form } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import { api, Url } from "../../utils/ApiClient";
 
@@ -10,15 +10,15 @@ import { api, Url } from "../../utils/ApiClient";
  */
 export default function DefaultEmail(props) {
 
-  const [template, setTemplate] = useState("")
-  const [prevTemplate, setPrevTemplate] = useState("")
+  const [template, setTemplate] = useState({ "subject": "", "template": "" })
+  const [prevTemplate, setPrevTemplate] = useState({ "subject": "", "template": "" })
 
   useEffect(() => {
     Url.fromName(api.emailtemplates).extend("/" + props.templatename).get().then(res => {
       if (res.success) {
         res = res.data;
-        setTemplate(res.template);
-        setPrevTemplate(res.template)
+        setTemplate(res);
+        setPrevTemplate(res)
       }
     })
   }, [])
@@ -28,7 +28,7 @@ export default function DefaultEmail(props) {
  * 'email students' page
  */
   function saveDefaultEmails() {
-    Url.fromName(api.emailtemplates).extend("/" + props.templatename).setBody({ "template": template }).patch().then(res => {
+    Url.fromName(api.emailtemplates).extend("/" + props.templatename).setBody(template).patch().then(res => {
       setPrevTemplate(template)
     })
   }
@@ -41,14 +41,21 @@ export default function DefaultEmail(props) {
         </Col>
         <Col>
           <Row className="nomargin">
+            <Form>
+              <Form.Label>Email Subject</Form.Label>
+              <Form.Control type="text" placeholder="Enter email subject" value={template.subject} onChange={(ev => setTemplate({ ...template, ["subject"]: ev.target.value }))} />
+            </Form>
+          </Row>
+
+          <Row className="nomargin">
             <Col />
             <Col md="auto" className="email-help-text">
               (Use @firstname, @lastname to address the receiver)
             </Col>
           </Row>
           <Row className="nomargin">
-            <textarea id="yes-email" className="send-emails" value={template}
-              onChange={(ev => setTemplate(ev.target.value))} />
+            <textarea id="yes-email" className="send-emails" value={template.template}
+              onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))} />
           </Row>
         </Col>
       </Row>

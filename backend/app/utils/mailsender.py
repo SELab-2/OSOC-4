@@ -110,12 +110,10 @@ async def send_decision_email(studentid, session):
 
     receiver_email = email  # Enter receiver address
 
-    subject = "Decision"
-
     message = MIMEMultipart()
     message["From"] = SENDER_EMAIL
     message["To"] = receiver_email
-    message["Subject"] = subject
+    message["Subject"] = template.subject
 
     message.attach(MIMEText(formatted_template, "plain"))
     text = message.as_string()
