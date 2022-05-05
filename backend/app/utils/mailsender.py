@@ -100,12 +100,12 @@ async def send_decision_email(studentid, session):
         template = await read_where(EmailTemplate, EmailTemplate.name == EmailTemplateName.NO_DECISION, session=session)
 
     if not template:
-        template = ""
+        template_body = ""
     else:
-        template = template.template
+        template_body = template.template
 
     # format student info in template
-    formatted_template = template.replace("@firstname", firstname)
+    formatted_template = template_body.replace("@firstname", firstname)
     formatted_template = formatted_template.replace("@lastname", lastname)
 
     receiver_email = email  # Enter receiver address

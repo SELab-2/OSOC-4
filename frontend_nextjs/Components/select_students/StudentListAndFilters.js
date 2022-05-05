@@ -181,6 +181,18 @@ export default function StudentList(props) {
           }
         });
       }
+    } else if ("email_sent" in data) {
+
+      students.find((o, i) => {
+        if (o["id"] === data["id"]) {
+          let new_students = [...students]
+          new_students[i]["email_sent"] = data["email_sent"];
+          setStudents(new_students);
+          return true; // stop searching
+        }
+      });
+
+
     }
 
   }

@@ -113,6 +113,18 @@ export default function StudentDetails(props) {
                 setDecision(data["decision"]["decision"])
                 setDecideField(data["decision"]["decision"])
             }
+        } else if ("email_sent" in data) {
+
+            students.find((o, i) => {
+                if (o["id"] === data["id"]) {
+                    let new_student = student
+                    new_student["email_sent"] = data["email_sent"];
+                    setStudent({ ...new_student });
+                    return true; // stop searching
+                }
+            });
+
+
         }
     }
 

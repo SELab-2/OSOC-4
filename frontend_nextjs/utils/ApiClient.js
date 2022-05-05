@@ -401,6 +401,14 @@ class Cache {
                 cache[data["id"]] = new_student
             }
         }
+        else if ("email_sent" in data) {
+            let student = cache[data["id"]]
+            if (student) {
+                let new_student = student
+                new_student["email_sent"] = data["email_sent"];
+                cache[data["id"]] = new_student;
+            }
+        }
     }
 
     async clear() {
