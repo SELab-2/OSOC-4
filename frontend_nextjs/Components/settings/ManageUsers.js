@@ -27,7 +27,13 @@ export default function ManageUsers(props) {
     const [show, setShow] = useState(false);
     const [sent, setSent] = useState(false);
     const [sending, setSending] = useState(false);
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setToInvite("");
+        setShow(false);
+        setSent(false);
+        setSending(false);
+    }
+
     const handleShow = () => setShow(true);
 
     const handleSearch = (event) => {
@@ -134,28 +140,19 @@ export default function ManageUsers(props) {
                         <Modal.Title>Invite users</Modal.Title>
                     </Modal.Header>
                         <Form id="invite-users" onSubmit={handleSubmitInvite}>
-                            {(sending || sent) ? (
-                                <fieldset disabled>
-                                    <Modal.Body>
-                                        <Form.Group controlId="inviteUserTextarea">
-                                            <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
-                                            <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
-                                            {(sending)? <Form.Label>Invites are being sent!</Form.Label>: null}
-                                            {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
-                                        </Form.Group>
-                                    </Modal.Body>
-                                </fieldset>
-                            ) : (
-                                <Modal.Body>
-                                        <Form.Group controlId="inviteUserTextarea">
-                                            <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
-                                            <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
-                                            {(sending)? <Form.Label className="invites-sent">Invites are being sent!</Form.Label>: null}
-                                            {(sent)? <Form.Label className="invites-sent">Invites have been sent!</Form.Label>: null}
-                                        </Form.Group>
-                                </Modal.Body>
-                            )
-                        }
+                        <Modal.Body>
+                            <Form.Group controlId="inviteUserTextarea">
+                                <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
+                                {(sent || sending) ? (
+                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
+                                ) : (
+                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                                )}
+                                {(sending || sent) ? <br/> : null}
+                                {(sending)? <Form.Label>Invites are being sent!</Form.Label>: null}
+                                {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
+                            </Form.Group>
+                        </Modal.Body>
                             {(sent) ? 
                             (
                                 <Modal.Footer>
