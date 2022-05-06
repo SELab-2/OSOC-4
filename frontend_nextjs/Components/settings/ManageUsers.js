@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {Button, Form, Modal, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
+import { getSelectStudentsPath } from "../../routes";
 
 /**
  * This component displays a settings-screen where you can manage the users in the application
@@ -24,7 +25,8 @@ export default function ManageUsers(props) {
     const [toInvite, setToInvite] = useState("");
     const [loading, setLoading] = useState(false)
     const [show, setShow] = useState(false);
-  
+    const [sent, setSent] = useState(false);
+    const [sending, setSending] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
@@ -68,16 +70,17 @@ export default function ManageUsers(props) {
      */
     async function handleSubmitInvite(event) {
         event.preventDefault();
+        setSending(true);
         const emails = toInvite.trim().split("\n").map(a => a.trim());
         await Promise.all(emails.map(email =>
             Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(async resp => {
                 if (resp.success && resp.data.data.id) {
                     await Url.fromUrl(resp.data.data.id).extend("/invite").post();
-
                 }
             }))
         );
-        alert("Invites have been sent.");
+        setSent(true);
+        setSending(false);
     }
 
     async function handleSearchSubmit(event) {
@@ -131,16 +134,39 @@ export default function ManageUsers(props) {
                         <Modal.Title>Invite users</Modal.Title>
                     </Modal.Header>
                         <Form id="invite-users" onSubmit={handleSubmitInvite}>
-                            <Modal.Body>
-                            <Form.Group controlId="inviteUserTextarea">
-                                <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
-                                <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
-                            </Form.Group>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                <Button variant={"primary"} type="submit"> Invite users</Button>
-                            </Modal.Footer> 
+                            {(sending || sent) ? (
+                                <fieldset disabled>
+                                    <Modal.Body>
+                                        <Form.Group controlId="inviteUserTextarea">
+                                            <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
+                                            <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                                            {(sending)? <Form.Label>Invites are being sent!</Form.Label>: null}
+                                            {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
+                                        </Form.Group>
+                                    </Modal.Body>
+                                </fieldset>
+                            ) : (
+                                <Modal.Body>
+                                        <Form.Group controlId="inviteUserTextarea">
+                                            <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
+                                            <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                                            {(sending)? <Form.Label className="invites-sent">Invites are being sent!</Form.Label>: null}
+                                            {(sent)? <Form.Label className="invites-sent">Invites have been sent!</Form.Label>: null}
+                                        </Form.Group>
+                                </Modal.Body>
+                            )
+                        }
+                            {(sent) ? 
+                            (
+                                <Modal.Footer>
+                                    <Button variant={"primary"} onClick={handleClose}>Close</Button>
+                                </Modal.Footer> 
+                            ):(
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                                    <Button variant={"primary"} type="submit">Invite users</Button>
+                                </Modal.Footer>
+                            )}
                         </Form>
                 </Modal>
 
