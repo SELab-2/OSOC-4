@@ -133,7 +133,7 @@ export default function ManageUsers(props) {
                         <Form id="invite-users" onSubmit={handleSubmitInvite}>
                             <Modal.Body>
                             <Form.Group controlId="inviteUserTextarea">
-                                <Form.Label>List of email-address(es) of the users you want to invite </Form.Label>
+                                <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
                                 <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
                             </Form.Group>
                             </Modal.Body>
