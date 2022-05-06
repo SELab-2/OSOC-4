@@ -9,7 +9,7 @@ import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
 import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
-import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
+import SendCustomEmailPopUp from "./SendCustomEmailPopUp";
 import deleteIcon from '../../public/assets/delete.svg';
 import DeletePopUpWindow from "./DeletePopUpWindow";
 import { useRouter } from "next/router";
@@ -109,10 +109,22 @@ export default function StudentDetails(props) {
             if (student && student["id"] === data["id"]) {
                 let new_student = student
                 new_student["decision"] = data["decision"]["decision"];
+                new_student["email_sent"] = false
                 setStudent({ ...new_student })
                 setDecision(data["decision"]["decision"])
                 setDecideField(data["decision"]["decision"])
             }
+        } else if ("email_sent" in data) {
+
+            if (student && student["id"] === data["id"]) {
+                let new_student = student
+                new_student["email_sent"] = data["email_sent"];
+                setStudent({ ...new_student });
+                return true; // stop searching
+            }
+
+
+
         }
     }
 
@@ -213,7 +225,7 @@ export default function StudentDetails(props) {
                         updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
                     <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow}
                         decision={decideField} student={student} />
-                    <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow}
+                    <SendCustomEmailPopUp popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow}
                         decision={decision} student={student} />
                     <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
                 </div>
@@ -294,7 +306,7 @@ export default function StudentDetails(props) {
                         <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
                     </Row>
                     <Row md="auto" className="nomargin">
-                        <Button className="send-email-button" disabled={decision === -1}
+                        <Button className="send-email-button"
                             onClick={() => setEmailPopUpShow(true)}>
                             Send email
                         </Button>

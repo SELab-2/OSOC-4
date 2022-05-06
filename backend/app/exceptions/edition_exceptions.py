@@ -3,7 +3,7 @@ from app.exceptions.base_exception import BaseException
 
 class EditionNotFound(BaseException):
     def __init__(self):
-        super().__init__(400, "Edition not found")
+        super().__init__(404, "Edition not found")
 
 
 class AlreadyEditionWithYearException(BaseException):
@@ -23,4 +23,4 @@ class EditionYearModifyException(BaseException):
 
 class StudentNotFoundException(BaseException):
     def __init__(self):
-        super().__init__(400, "Student not found")
+        super().__init__(404, "Student not found")

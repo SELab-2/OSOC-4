@@ -22,7 +22,6 @@ export default function QuestionTag(props) {
 
 
     useEffect(() => {
-        setQuestionTag(props.questionTag);
         setPreviousTag(props.questionTag);
     }, [props.questionTag]);
 

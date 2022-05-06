@@ -200,6 +200,8 @@ class API {
     editions_questiontags = "editions_questiontags";
     skills = "skills";
     participations = "participations";
+    emailtemplates = "emailtemplates";
+    sendemails = "sendemails";
     myself = "myself";
 
     // the paths, the key should be the value of the api.[name]
@@ -210,6 +212,7 @@ class API {
         forgot: this.baseUrl + "/forgot",
         invite: this.baseUrl + "/invite",
         resetpassword: this.baseUrl + "/resetpassword",
+
 
         me: null,
         students: null,
@@ -222,6 +225,8 @@ class API {
         editions_questiontags: null,
         skills: null,
         participations: null,
+        emailtemplates: null,
+        sendemails: null,
         myself: null
     }
     _ready = false;
@@ -313,6 +318,8 @@ class API {
             this._paths.users = res.data[this.users];
             this._paths.skills = res.data[this.skills];
             this._paths.participations = res.data[this.participations];
+            this._paths.emailtemplates = res.data[this.emailtemplates];
+            this._paths.sendemails = res.data[this.sendemails];
             this._paths.myself = res.data[this.myself];
             if (this.year) {
                 this._paths.current_edition = this._paths.editions + "/" + this.year;
@@ -394,7 +401,16 @@ class Cache {
             if (student) {
                 let new_student = student
                 new_student["decision"] = data["decision"]["decision"];
+                new_student["email_sent"] = false;
                 cache[data["id"]] = new_student
+            }
+        }
+        else if ("email_sent" in data) {
+            let student = cache[data["id"]]
+            if (student) {
+                let new_student = student
+                new_student["email_sent"] = data["email_sent"];
+                cache[data["id"]] = new_student;
             }
         }
     }

@@ -77,7 +77,7 @@ export default function ProjectsList(props) {
                     log(skill);
                     sum += skill.number});
             }
-            return project.name.includes(search)
+            return project.name.toLowerCase().includes(search.toLowerCase())
                 && ((peopleNeeded) || sum > project.participations.length);
         }))
     }

@@ -2,15 +2,12 @@ from typing import List
 
 from app.crud import read_all_where, read_where, update
 from app.database import db, get_session
-from app.exceptions.key_exceptions import InvalidResetKeyException
-from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
                                             UserNotFoundException)
 from app.models.edition import Edition
-from app.models.passwordreset import PasswordResetInput
 from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
                              UserCreate, UserMe, UserOut, UserOutSimple,
                              UserRole)
@@ -19,7 +16,7 @@ from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import response
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -113,47 +110,6 @@ async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_se
     return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
-@router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends(),
-                          session: AsyncSession = Depends(get_session)):
-    """change_password function that changes the user password
-
-    :param reset_key: the reset key
-    :type reset_key: str
-    :param passwords: password and validate_password are needed, defaults to Body(...)
-    :type passwords: PasswordResetInput, optional
-    :raises InvalidResetKeyException: invalid reset key
-    :raises PasswordsDoNotMatchException: passwords don't match
-    :raises NotPermittedException: Unauthorized
-    :return: message to check the emails
-    :rtype: dict
-    """
-
-    if reset_key[0] != "R":
-        raise InvalidResetKeyException()
-
-    userid = db.redis.get(reset_key)
-
-    if not userid:
-        raise InvalidResetKeyException()
-    elif passwords.password != passwords.validate_password:
-        raise PasswordsDoNotMatchException()
-
-    user = await read_where(User, User.id == int(userid), session=session)
-
-    Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-
-    if not user or user.disabled or int(current_user_id) != int(userid):
-        raise NotPermittedException()
-
-    user.password = get_password_hash(passwords.password)
-    db.redis.delete(reset_key)
-    await update(user, session=session)
-
-    return response(None, "Password updated successfully")
-
-
 @router.get("/{id}")
 async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
                    session: AsyncSession = Depends(get_session)):
@@ -170,6 +126,7 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
         raise UserNotFoundException()
 
     if not role == UserRole.ADMIN and not user.approved:
+        # This can't be reached since access would be blocked for users matching this if
         raise UserBadStateException()
 
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
@@ -248,7 +205,6 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
     if user.disabled:
         user.disabled = False
         await update(user, session=session)
-        # todo add user to latest edition, else it is useless that we invite him
 
         # get the latest edition
         stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())
