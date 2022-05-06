@@ -27,7 +27,10 @@ export default function ManageUsers(props) {
     const [show, setShow] = useState(false);
     const [sent, setSent] = useState(false);
     const [sending, setSending] = useState(false);
+    const [fail, setFail] = useState(false);
+
     const handleClose = () => {
+        setFail(false);
         setToInvite("");
         setShow(false);
         setSent(false);
@@ -81,12 +84,17 @@ export default function ManageUsers(props) {
         await Promise.all(emails.map(email =>
             Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(async resp => {
                 if (resp.success && resp.data.data.id) {
-                    await Url.fromUrl(resp.data.data.id).extend("/invite").post();
+                    await Url.fromUrl(resp.data.data.id).extend("/invite").post().then(async resp2 => {
+                        setSending(false);
+                        if (resp2.success) {
+                            setSent(true);
+                        } else {
+                            setFail(true);
+                        }
+                    });
                 }
             }))
         );
-        setSent(true);
-        setSending(false);
     }
 
     async function handleSearchSubmit(event) {
@@ -143,14 +151,15 @@ export default function ManageUsers(props) {
                         <Modal.Body>
                             <Form.Group controlId="inviteUserTextarea">
                                 <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
-                                {(sent || sending) ? (
+                                {(sent || sending || fail) ? (
                                     <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
                                 ) : (
                                     <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
                                 )}
                                 {(sending || sent) ? <br/> : null}
-                                {(sending)? <Form.Label>Invites are being sent!</Form.Label>: null}
+                                {(sending)? <Form.Label>Trying to sent invites!</Form.Label>: null}
                                 {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
+                                {(fail)? <Form.Label>Something went wrong, please try again</Form.Label>: null}
                             </Form.Group>
                         </Modal.Body>
                             {(sent) ? 
