@@ -54,7 +54,7 @@ export default function NavHeader(props) {
                                 </Nav.Link>
                             )
                         })}
-                        <Nav.Link onClick={logoutHandler}>Log out</Nav.Link>
+                        <Nav.Link onClick={logoutHandler} id="logout-link">Log out</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
