@@ -1,7 +1,6 @@
 import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import SelectSearch, {fuzzySearch} from "react-select-search";
 import {api, Url} from "../utils/ApiClient";
 import {log} from "../utils/logger";
 import RequiredSkillSelector from "../Components/projects/RequiredSkillSelector";
