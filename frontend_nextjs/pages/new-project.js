@@ -1,10 +1,14 @@
 import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import SelectSearch, {fuzzySearch} from "react-select-search";
 import {api, Url} from "../utils/ApiClient";
 import {log} from "../utils/logger";
 import RequiredSkillSelector from "../Components/projects/RequiredSkillSelector";
+import back from "/public/assets/back.svg";
+import Hint from "../Components/Hint";
+import Image from 'next/image';
+import plus from "/public/assets/plus.svg"
+
 
 
 export default function NewProjects() {
@@ -21,6 +25,7 @@ export default function NewProjects() {
 
     const [skills, setSkills] = useState([])
     const [show, setShow] = useState(false);
+    const [availableSkills, setAvailableSkills] = useState([])
 
 
     const router = useRouter()
@@ -34,8 +39,9 @@ export default function NewProjects() {
                     if(res){
                         // scuffed way to get unique skills (should be fixed in backend soon)
                         let array = [];
-                        res.map(skill => array.push({"value":skill, "name":skill}));
+                        res.map(skill => array.push({"value":skill, "label":skill}));
                         setSkills(array);
+                        setAvailableSkills(array.map(skill => skill.value))
                     }
                 }
             })
@@ -43,13 +49,22 @@ export default function NewProjects() {
         }
     }, [])
 
+    function addRequiredSkill(){
+        setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
+    }
 
-
-    function AddStudent(){
-        // can't have more different type of students then amount of skills
-        if (requiredSkills.length <= skills.length){
-            setRequiredSkills(prevState => [...prevState, {"skill_name": "", "number": 1}])
+    function changeRequiredSkill(value, index){
+        log("change skill")
+        if(requiredSkills[index].label !== ""){
+            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
+        } else {
+            log( [...(availableSkills.filter(skill => skill !== value.label))])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
+        let newArray = [...requiredSkills]
+        newArray[index] = value
+        setRequiredSkills(newArray)
     }
 
     async function handleSubmitChange(event){
@@ -71,62 +86,73 @@ export default function NewProjects() {
 
 
         return(
+
         <div>
-            <Button onClick={() => setShow(true)}>Go back to projects</Button>
+            <Row className={"project-top-bar nomargin"}>
+                <Col xs={"auto"}>
+                    <Hint message="Go back" placement="top">
+                        <Image alt={"back button"} onClick={() => setShow(true)} src={back} width={100} height={33}/>
+                    </Hint>
 
-            <Modal show={show} onHide={() => setShow(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Leave page?</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Doing so will lose all your current progress.</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
-                        setShow(false)
-                        router.push("/projects")
-                    }}>
-                        Leave page
-                    </Button>
-                    <Button variant="primary" onClick={() => setShow(false)}>
-                        Stay on page
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+                    <Modal show={show} onHide={() => setShow(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Leave page?</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>Doing so will lose all your current progress.</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => {
+                                setShow(false)
+                                router.push("/projects")
+                            }}>
+                                Leave page
+                            </Button>
+                            <Button variant="primary" onClick={() => setShow(false)}>
+                                Stay on page
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </Col>
 
-            <h1>New project</h1>
-            <Form onSubmit={handleSubmitChange}>
-                <Form.Label>Project name:</Form.Label>
-                <Form.Control type="text" value={projectName} placeholder={"Project name"} onChange={e => setProjectName(e.target.value)} />
+                <Col>
+                    <div className={"project-details-project-title"}>New project</div>
+                </Col>
+            </Row>
+            <div className={"project-details-page"}>
+                <Form onSubmit={handleSubmitChange}>
+                    <Form.Label>Project name:</Form.Label>
+                    <Form.Control type="text" value={projectName} placeholder={"Project name"} onChange={e => setProjectName(e.target.value)} />
 
-                <Form.Label>Partner name:</Form.Label>
-                <Form.Control type="text" value={partnerName} placeholder={"Partner name"} onChange={e => setPartnerName(e.target.value)} />
+                    <Form.Label>Partner name:</Form.Label>
+                    <Form.Control type="text" value={partnerName} placeholder={"Partner name"} onChange={e => setPartnerName(e.target.value)} />
 
-                <Form.Label>About partner:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={partnerDescription} placeholder={"Short bio about the partner, website, ..."} onChange={e => setPartnerDescription(e.target.value)} />
+                    <Form.Label>About partner:</Form.Label>
+                    <Form.Control as="textarea" rows={3} value={partnerDescription} placeholder={"Short bio about the partner, website, ..."} onChange={e => setPartnerDescription(e.target.value)} />
 
-                <Form.Label>About project:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={projectDescription} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectDescription(e.target.value)} />
+                    <Form.Label>About project:</Form.Label>
+                    <Form.Control as="textarea" rows={3} value={projectDescription} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectDescription(e.target.value)} />
 
-                <Form.Label>Briefing:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={briefing} placeholder={"Link to the project page"} onChange={e => setBriefing(e.target.value)} />
+                    <Form.Label>Required skills:</Form.Label>
 
-                <h3>Resources</h3>
+                    {(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (
+                        <RequiredSkillSelector className={"required-skill-selector-row"}
+                                               availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
+                                               key={index} index={index} skills={skills} requiredSkill={requiredSkill}
+                                               setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
+                        />
+                    ))) : null}
 
-                <Form.Label>Tooling:</Form.Label>
-                <Form.Control type="text" value={tools} placeholder={"What tools will be used in the project"} onChange={e => setTools(e.target.value)} />
+                    <Hint message={"Add new required skill"} placement="top">
+                        <div className={"project-details-plus-skill"} >
+                            <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addRequiredSkill()} />
+                        </div>
+                    </Hint>
 
-                <Form.Label>Code languages:</Form.Label>
-                <Form.Control type="text" value={codeLanguages} placeholder={"What code languages will be used in the project"} onChange={e => setCodeLanguages(e.target.value)} />
+                    <div>
+                        <Button type="submit">Create new project</Button>
 
-                <Form.Label>Required skills:</Form.Label>
-
-                {(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (
-                    <RequiredSkillSelector className={"required-skill-selector-row"} key={index} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} index={index} requiredSkills={requiredSkills} skills={skills}/>
-                ))) : null}
-
-                <Button onClick={AddStudent}> Add extra student role</Button>
-                <Button type="submit">Create new project</Button>
-            </Form>
-
+                    </div>
+                </Form>
+            </div>
         </div>
     )
 }

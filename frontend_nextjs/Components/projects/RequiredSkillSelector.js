@@ -25,18 +25,19 @@ export default function RequiredSkillSelector(props){
         }
     }
 
-    // /**
-    //  * changes the value of the selected dropdown menu
-    //  * @param value
-    //  */
-    // function changeRequiredSkill(value){
-    //     let newArr = [...props.requiredSkills]
-    //     newArr[props.index].skill_name = value
-    //     props.setRequiredSkills(newArr)
-    // }
-
-
-
+    function changeRequiredSkill(value, index){
+        log("change skill")
+        if(requiredSkills[index].label !== ""){
+            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
+        } else {
+            log( [...(availableSkills.filter(skill => skill !== value.label))])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
+        }
+        let newArray = [...requiredSkills]
+        newArray[index] = value
+        setRequiredSkills(newArray)
+    }
     /**
      * changes the amount
      * @param amount
@@ -52,8 +53,6 @@ export default function RequiredSkillSelector(props){
 
 
     const filterOption = (candidate, input) => {
-        // log("haha filter")
-        // log(props.availableSkills)
         return props.availableSkills.includes(candidate.label) && (input === undefined || candidate.label.includes(input))
     };
 
@@ -77,7 +76,7 @@ export default function RequiredSkillSelector(props){
 
                 </Col>
                 <Col xs="auto">
-                    <Form.Control className={"required-skill-amount"} type="number" value={props.requiredSkill.number} onChange={e => ChangeAmountRequiredSkill(e.target.value)} />
+                    <Form.Control className={"required-skill-amount"} type="number" min={1} value={props.requiredSkill.number} onChange={e => ChangeAmountRequiredSkill(e.target.value)} />
                 </Col>
                 <Col xs="auto" className={"delete-cross"}>
                     <Image  alt={"delete student"} onClick={() => DeleteRequiredSkill()} src={red_cross} width={25} height={25}/>

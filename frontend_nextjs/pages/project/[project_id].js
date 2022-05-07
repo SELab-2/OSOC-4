@@ -114,9 +114,6 @@ const Project = () => {
 
     function changeRequiredSkill(value, index){
         log("change skill")
-        log(value)
-        log(index)
-        log(requiredSkills[index])
         if(requiredSkills[index].label !== ""){
             log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
@@ -359,7 +356,12 @@ const Project = () => {
                                         <div className={"project-card-title"}>All required skills</div>
                                         { (requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) =>{
                                             if(showEdit){
-                                                return <RequiredSkillSelector  className={"required-skill-selector-row"} availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}/>
+                                                return
+                                                <RequiredSkillSelector className={"required-skill-selector-row"}
+                                                                       availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
+                                                                       key={index} index={index} skills={skills} requiredSkill={requiredSkill}
+                                                                       setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
+                                                />
                                             }
                                             return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                         })) : <div className={"project-empty-list-col"}>Currently there are no required skills</div>
