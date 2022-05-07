@@ -120,7 +120,7 @@ const Project = () => {
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
         let newArray = [...requiredSkills]
-        newArray[index] = value
+        newArray[index]["skill_name"] = value.value
         setRequiredSkills(newArray)
     }
     /**
@@ -192,6 +192,7 @@ const Project = () => {
             "edition": api.year,
             "users": users.map(url => getID(url))
         }
+        log(requiredSkills)
         if(checkBody(body)){
             let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
             if(res.success){

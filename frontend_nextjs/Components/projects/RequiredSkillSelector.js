@@ -45,7 +45,7 @@ export default function RequiredSkillSelector(props){
     function ChangeAmountRequiredSkill(amount){
         if (0 < amount && amount < 100){
             let newArr = [...props.requiredSkills]
-            newArr[props.index]["number"] = amount
+            newArr[props.index]["number"] = parseInt(amount)
             props.setRequiredSkills(newArr)
         }
     }

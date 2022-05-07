@@ -1,4 +1,4 @@
-import {Button, Form, Modal} from "react-bootstrap";
+import {Button, Form, Modal, Row, Col} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {api, Url} from "../utils/ApiClient";
@@ -7,8 +7,7 @@ import RequiredSkillSelector from "../Components/projects/RequiredSkillSelector"
 import back from "/public/assets/back.svg";
 import Hint from "../Components/Hint";
 import Image from 'next/image';
-import plus from "/public/assets/plus.svg"
-
+import plus from "/public/assets/plus.svg";
 
 
 export default function NewProjects() {
@@ -31,22 +30,19 @@ export default function NewProjects() {
 
     const router = useRouter()
 
-
     useEffect(() => {
-        if (skills.length === 0) {
-            Url.fromName(api.skills).get().then(async res => {
-                if (res.success) {
-                    res = res.data;
-                    if(res){
-                        // scuffed way to get unique skills (should be fixed in backend soon)
-                        let array = [];
-                        res.map(skill => array.push({"value":skill, "name":skill}));
-                        setSkills(array);
-                    }
+        Url.fromName(api.skills).get().then(async res => {
+            if (res.success) {
+                res = res.data;
+                if(res){
+                    // scuffed way to get unique skills (should be fixed in backend soon)
+                    let array = [];
+                    res.map(skill => array.push({"value":skill, "label":skill}));
+                    setSkills(array);
+                    setAvailableSkills(res)
                 }
-            })
-
-        }
+            }
+        })
     }, [])
 
     /**
@@ -75,7 +71,7 @@ export default function NewProjects() {
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
         let newArray = [...requiredSkills]
-        newArray[index] = value
+        newArray[index]["skill_name"] = value.value
         setRequiredSkills(newArray)
     }
 
