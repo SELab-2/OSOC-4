@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {Button, Form, Table} from "react-bootstrap";
+import {Button, Form, Modal, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
+import { getSelectStudentsPath } from "../../routes";
 
 /**
  * This component displays a settings-screen where you can manage the users in the application
@@ -23,6 +24,20 @@ export default function ManageUsers(props) {
     const [shownUsers, setShownUsers] = useState([])
     const [toInvite, setToInvite] = useState("");
     const [loading, setLoading] = useState(false)
+    const [show, setShow] = useState(false);
+    const [sent, setSent] = useState(false);
+    const [sending, setSending] = useState(false);
+    const [fail, setFail] = useState(false);
+
+    const handleClose = () => {
+        setFail(false);
+        setToInvite("");
+        setShow(false);
+        setSent(false);
+        setSending(false);
+    }
+
+    const handleShow = () => setShow(true);
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
@@ -64,15 +79,22 @@ export default function ManageUsers(props) {
      */
     async function handleSubmitInvite(event) {
         event.preventDefault();
+        setSending(true);
         const emails = toInvite.trim().split("\n").map(a => a.trim());
         await Promise.all(emails.map(email =>
             Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(async resp => {
                 if (resp.success && resp.data.data.id) {
-                    await Url.fromUrl(resp.data.data.id).extend("/invite").post();
+                    await Url.fromUrl(resp.data.data.id).extend("/invite").post().then(async resp2 => {
+                        setSending(false);
+                        if (resp2.success) {
+                            setSent(true);
+                        } else {
+                            setFail(true);
+                        }
+                    });
                 }
             }))
         );
-        alert("Invites have been sent.");
     }
 
     async function handleSearchSubmit(event) {
@@ -112,17 +134,47 @@ export default function ManageUsers(props) {
 
     return (
         <div>
-            <h4>Invite new users</h4>
-
-            <Form id="invite-users" onSubmit={handleSubmitInvite}>
-                <Form.Group controlId="inviteUserTextarea">
-                    <Form.Label>List of email-address(es) of the users you want to invite </Form.Label>
-                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
-                </Form.Group>
-                <br />
-                <Button variant={"outline-secondary"} type="submit"> Invite users</Button>
-            </Form>
-            <br />
+            <Button variant="primary" onClick={handleShow} className="invite-users-button">
+                Invite new users
+            </Button>
+                <Modal 
+                    show={show} 
+                    onHide={handleClose}
+                    size="lg"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Invite users</Modal.Title>
+                    </Modal.Header>
+                        <Form id="invite-users" onSubmit={handleSubmitInvite}>
+                        <Modal.Body>
+                            <Form.Group controlId="inviteUserTextarea">
+                                <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
+                                {(sent || sending || fail) ? (
+                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
+                                ) : (
+                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                                )}
+                                {(sending || sent) ? <br/> : null}
+                                {(sending)? <Form.Label>Trying to sent invites!</Form.Label>: null}
+                                {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
+                                {(fail)? <Form.Label>Something went wrong, please try again</Form.Label>: null}
+                            </Form.Group>
+                        </Modal.Body>
+                            {(sent) ? 
+                            (
+                                <Modal.Footer>
+                                    <Button variant={"primary"} onClick={handleClose}>Close</Button>
+                                </Modal.Footer> 
+                            ):(
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                                    <Button variant={"primary"} type="submit">Invite users</Button>
+                                </Modal.Footer>
+                            )}
+                        </Form>
+                </Modal>
 
             <h4>Manage users</h4>
             <Table className={"table-manage-users"}>
