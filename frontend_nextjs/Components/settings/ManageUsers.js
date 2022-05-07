@@ -162,7 +162,7 @@ export default function ManageUsers(props) {
                                 {(fail)? <Form.Label>Something went wrong, please try again</Form.Label>: null}
                             </Form.Group>
                         </Modal.Body>
-                            {(sent) ? 
+                            {(sent || fail) ? 
                             (
                                 <Modal.Footer>
                                     <Button variant={"primary"} onClick={handleClose}>Close</Button>
@@ -170,7 +170,7 @@ export default function ManageUsers(props) {
                             ):(
                                 <Modal.Footer>
                                         <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                        {(sending || fail) ? (
+                                        {(sending) ? (
                                             <Button variant={"primary"} type="submit" disabled>Invite users</Button>
                                         ): (
                                             <Button variant={"primary"} type="submit">Invite users</Button>
