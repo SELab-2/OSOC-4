@@ -1,9 +1,11 @@
 import {Card, Col, Row} from "react-bootstrap";
 import SkillCard from "./SkillCard";
 import {useEffect, useState} from "react";
-import Image from 'next/image'
-import {Url} from "../../utils/ApiClient";
-import red_cross from "/public/assets/wrong.svg"
+import Image from 'next/image';
+import red_cross from "/public/assets/wrong.svg";
+import {api, Url} from "../../utils/ApiClient";
+import {getID} from "../../utils/string";
+
 
 /**
  * Card like representation of the given participation, which also allows the deletion of the participation
@@ -43,6 +45,8 @@ export default function ParticipationCard(props){
     }
 
     return(
+        <div>
+            {! deletedCard ?
         <Card className={"participation-card"} key={props.participation}>
             <div className={"participation-div"}>
                 <Row>
