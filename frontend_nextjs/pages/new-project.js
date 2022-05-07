@@ -1,4 +1,4 @@
-import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
+import {Button, Form, Modal} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {api, Url} from "../utils/ApiClient";
@@ -40,9 +40,8 @@ export default function NewProjects() {
                     if(res){
                         // scuffed way to get unique skills (should be fixed in backend soon)
                         let array = [];
-                        res.map(skill => array.push({"value":skill, "label":skill}));
+                        res.map(skill => array.push({"value":skill, "name":skill}));
                         setSkills(array);
-                        setAvailableSkills(array.map(skill => skill.value))
                     }
                 }
             })
@@ -101,7 +100,6 @@ export default function NewProjects() {
 
 
         return(
-
         <div>
             <Row className={"project-top-bar nomargin"}>
                 <Col xs={"auto"}>

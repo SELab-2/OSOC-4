@@ -9,23 +9,24 @@ from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import PasswordsDoNotMatchException
 from app.models.user import User, UserResetPassword
 from app.utils.cryptography import get_password_hash
+from app.utils.checkers import check_key
 from app.utils.response import response
 
 router = APIRouter(prefix="/resetpassword")
 
 
 @router.get("/{resetkey}")
-async def valid_resetkey(resetkey: str):
-    if resetkey[0] != "R":
+async def valid_resetkey(resetkey: str, session: AsyncSession = Depends(get_session)):
+    valid = await check_key(resetkey, "R", session)
+    if valid:
+        return response(None, "Valid resetkey")
+    else:
         raise InvalidResetKeyException()
-    userid = db.redis.get(resetkey)
-    if userid is None:
-        raise InvalidResetKeyException()
-    return response(None, "Valid resetkey")
 
 
 @router.post("/{resetkey}")
-async def use_resetkey(resetkey: str, reset: UserResetPassword = Body(...), session: AsyncSession = Depends(get_session)):
+async def use_resetkey(resetkey: str, reset: UserResetPassword = Body(...),
+                       session: AsyncSession = Depends(get_session)):
     if resetkey[0] != "R":
         raise InvalidResetKeyException()
 

@@ -214,7 +214,7 @@ const Project = () => {
                 { loaded ? (<div>
                         <Row className={"project-top-bar nomargin"}>
                             <Col xs="auto" >
-                                <Hint message="Go back" placement="top">
+                                <Hint message="Go back">
                                     <Image alt={"back button"} onClick={() => {
                                         if(showEdit){
                                             setShowBackExit(true)
@@ -247,13 +247,13 @@ const Project = () => {
                             </Col>
                             <Col xs="auto" >
                                 {showEdit ?
-                                    <Hint message="Save changes" placement="top">
+                                    <Hint message="Save changes">
                                         <Image alt={"save button"} src={save_image} onClick={() =>{
                                             changeProject()
                                         }} width={33} height={33} />
                                     </Hint>
                                     :
-                                    <Hint message="Edit project" placement="top">
+                                    <Hint message="Edit project">
                                         <Image alt={"edit button"} onClick={() => {
                                             setEditFields(project)
                                             setShowEdit(true)
@@ -264,7 +264,7 @@ const Project = () => {
                             <Col xs="auto" >
                                 {showEdit ?
                                     <>
-                                        <Hint message="Cancel edit" placement="top">
+                                        <Hint message="Cancel edit">
                                             <Image alt={"cancel edit button"} src={red_cross} width={33} height={33} onClick={() => setShowStopEditing(true) }/>
                                         </Hint>
                                         <Modal show={showStopEditing} onHide={() => setShowStopEditing(false)}>
@@ -289,7 +289,7 @@ const Project = () => {
 
                                     :
                                     <div>
-                                        <Hint message="Delete project" placement="top">
+                                        <Hint message="Delete project">
                                             <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)}/>
                                         </Hint>
                                         <Modal show={showDelete} onHide={() => setShowDelete(false)}>
@@ -342,7 +342,7 @@ const Project = () => {
                             </div>
                             {showEdit ?
                                 // TODO make this pop up a selection tool for users
-                                <Hint message={"Add new coach / admin to the project"} >
+                                <Hint message="Add new coach / admin to the project">
                                     <div className={"project-details-plus-user"}>
                                         <Image  width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addUser()} />
                                     </div>
@@ -354,19 +354,14 @@ const Project = () => {
                                         <div className={"project-card-title"}>All required skills</div>
                                         { (requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) =>{
                                             if(showEdit){
-                                                return
-                                                <RequiredSkillSelector className={"required-skill-selector-row"}
-                                                                       availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
-                                                                       key={index} index={index} skills={skills} requiredSkill={requiredSkill}
-                                                                       setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
-                                                />
+                                                return <RequiredSkillSelector  className={"required-skill-selector-row"} availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}/>
                                             }
                                             return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                         })) : <div className={"project-empty-list-col"}>Currently there are no required skills</div>
                                         }
                                     </div>
                                     {showEdit ?
-                                        <Hint message={"Add new required skill"} placement="top">
+                                        <Hint message="Add new required skill">
                                             <div className={"project-details-plus-skill"} >
                                                 <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addRequiredSkill()} />
                                             </div>

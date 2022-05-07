@@ -25,19 +25,18 @@ export default function RequiredSkillSelector(props){
         }
     }
 
-    function changeRequiredSkill(value, index){
-        log("change skill")
-        if(requiredSkills[index].label !== ""){
-            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
-            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
-        } else {
-            log( [...(availableSkills.filter(skill => skill !== value.label))])
-            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
-        }
-        let newArray = [...requiredSkills]
-        newArray[index] = value
-        setRequiredSkills(newArray)
-    }
+    // /**
+    //  * changes the value of the selected dropdown menu
+    //  * @param value
+    //  */
+    // function changeRequiredSkill(value){
+    //     let newArr = [...props.requiredSkills]
+    //     newArr[props.index].skill_name = value
+    //     props.setRequiredSkills(newArr)
+    // }
+
+
+
     /**
      * changes the amount
      * @param amount

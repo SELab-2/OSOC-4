@@ -129,6 +129,7 @@ class QuestionAnswerGenerator(DataGenerator):
         answer_first_name = Answer(answer=first_name)
         answer_last_name = Answer(answer=last_name)
         answer_email = Answer(answer=f"{first_name.lower()}.{last_name.lower()}@{choice(self.emails)}")
+        # answer_email = Answer(answer=f"your email")
         answer_phone_number = Answer(answer=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}")
 
         self.other_answers += [answer_first_name, answer_last_name,

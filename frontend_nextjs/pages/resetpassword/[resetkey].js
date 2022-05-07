@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
-import Error from 'next/error'
 import React, { useEffect } from 'react'
 import { useState } from 'react';
 import LoadingPage from "../../Components/LoadingPage"
-import { Form, Button } from 'react-bootstrap';
 import {api, Url} from "../../utils/ApiClient";
+import logoScreen from '../../public/assets/osoc-screen.png';
+import Image from 'next/image'
 
 const Reset = () => {
     const router = useRouter()
@@ -55,20 +55,32 @@ const Reset = () => {
     }
 
     return (
-        <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" onChange={handleChangePassword} value={password} />
-                {(password.length > 11) ? null : (<Form.Text className="text-muted">Password should be at least 12 characters long!</Form.Text>)}
-                <br/>
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" onChange={handleChangeValidationPassword} value={validatePassword} />
-                {(password === validatePassword) ? null : (<Form.Text className="text-muted">Passwords should be the same!</Form.Text>)}
-            </Form.Group>
-            <Button variant="primary" type="submit">
-                Submit
-            </Button>
-        </Form>
+        <div className='body-login'>
+            <section className="body-left">
+                <div className="image-wrapper">
+                    <Image className="logo" src={logoScreen} alt="osoc-logo" />
+                </div>
+            </section>
+            <section className='body-right'>
+                <div className="login-container">
+                    <p className="welcome-message">Reset your password</p>
+                    <div className="login-form">
+                            <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
+                            {(password.length > 11) ? <p className='text-right'>Password is at least 12 characters long</p>: (<p className='text-wrong'>Password should be at least 12 characters long!</p>)}
+                            <input type="password" name="validatePassword" value={validatePassword} onChange={handleChangeValidationPassword} placeholder="Confirm password" />
+                            {(password !== "" && password === validatePassword) ? <p className='text-right'>Password are the same</p> : (<p className='text-wrong'>Passwords should be the same!</p>)}
+                            <button className="submit" onClick={handleSubmit}>
+                                Submit
+                            </button>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+
+       
     )
 }
 
