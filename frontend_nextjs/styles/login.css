@@ -6,7 +6,7 @@
     margin: 10% auto 0;
 }
 
-.body-login .body-right {
+.body-left .body-right {
     margin-left: 10%;
     justify-content: left;
 }
@@ -55,10 +55,20 @@
     margin-bottom: 24px;
 }
 
+.login-container .login-form .text-wrong {
+    margin-bottom: 1px;
+    color: var(--no_red_65);
+}
+
+.login-container .login-form .text-right {
+    margin-bottom: 1px;
+    color: var(--yes_green_65);
+}
+
 .login-container input,
 .login-container .submit {
     outline: none;
-    border-radius: 3em;
+    border-radius: 7px;
     font-size: 1.1em;
 }
 
@@ -69,7 +79,7 @@
     padding: 0.75em 2.5em;
     margin: 0.2em 0.2em 0.2em 0.2em;
     border-color: var(--dark_blue);
-    border-width: 4px;
+    border-width: 2.5px;
 }
 
 
@@ -82,16 +92,17 @@
     padding: 14px 64px;
     margin: 32px auto;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     font-weight: bold;
     background-color: var(--dark_blue) !important;
+    border-color: var(--dark_blue);
     cursor: pointer;
     transition: opacity 0.4s;
 }
 
 
 .login-container .submit:hover {
-    opacity: 0.9;
+    opacity: 0.8;
 }
 
 /* ----  Responsiveness   ----  */

@@ -71,14 +71,14 @@ export default function ProjectCard(props) {
                         </Col>
                         <Col xs={"auto"}>
                             <div className={"project-show-detail"}>
-                                <Hint message="Select project" placement="top">
+                                <Hint message="Select project">
                                     <Image src={props.project === props.selectedProject ? selected : not_selected} height={25} width={25} onClick={selectProject}/>
                                 </Hint>
                             </div>
                         </Col>
                         <Col xs={"auto"}>
                             <div className={"project-show-detail"}>
-                                <Hint message="Show details" placement="top">
+                                <Hint message="Show details">
                                     <Image src={details} height={25} width={25} onClick={toProjectDetails}/>
                                 </Hint>
                             </div>

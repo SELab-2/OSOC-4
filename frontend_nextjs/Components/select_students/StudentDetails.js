@@ -9,7 +9,7 @@ import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
 import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
-import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
+import SendCustomEmailPopUp from "./SendCustomEmailPopUp";
 import deleteIcon from '../../public/assets/delete.svg';
 import DeletePopUpWindow from "./DeletePopUpWindow";
 import { useRouter } from "next/router";
@@ -109,10 +109,22 @@ export default function StudentDetails(props) {
             if (student && student["id"] === data["id"]) {
                 let new_student = student
                 new_student["decision"] = data["decision"]["decision"];
+                new_student["email_sent"] = false
                 setStudent({ ...new_student })
                 setDecision(data["decision"]["decision"])
                 setDecideField(data["decision"]["decision"])
             }
+        } else if ("email_sent" in data) {
+
+            if (student && student["id"] === data["id"]) {
+                let new_student = student
+                new_student["email_sent"] = data["email_sent"];
+                setStudent({ ...new_student });
+                return true; // stop searching
+            }
+
+
+
         }
     }
 
@@ -213,7 +225,7 @@ export default function StudentDetails(props) {
                         updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
                     <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow}
                         decision={decideField} student={student} />
-                    <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow}
+                    <SendCustomEmailPopUp popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow}
                         decision={decision} student={student} />
                     <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
                 </div>
@@ -227,7 +239,7 @@ export default function StudentDetails(props) {
                             {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
                         </Col>
                         <Col>
-                            <Hint message="Delete the student" placement="top">
+                            <Hint message="Delete the student">
                                 <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
                                     <Image src={deleteIcon} className="delete-icon" />
                                 </button>
@@ -246,18 +258,22 @@ export default function StudentDetails(props) {
                 <Col xs="auto" className="buttongroup-paddingtop">
                     <Row>
                         <Col xs="auto" className="nopadding">
-                            <button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>Yes
-                            </button>
+                            <Hint message="Suggest yes">
+                                <button className="suggest-yes-button suggest-button" onClick={() => suggest(2)}>Yes</button>
+                            </Hint>
                         </Col>
                         <Col xs="auto" className="nopadding">
-                            <button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>Maybe
-                            </button>
+                            <Hint message="Suggest maybe">
+                                <button className="suggest-maybe-button suggest-button" onClick={() => suggest(1)}>Maybe</button>
+                            </Hint>
                         </Col>
                         <Col xs="auto" className="nopadding">
-                            <button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>No</button>
+                            <Hint message="Suggest no">
+                                <button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>No</button>
+                            </Hint>
                         </Col>
                         <Col xs="auto" className="close-button">
-                            <Hint message="Close the details" placement="top">
+                            <Hint message="Close the details">
                                 <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
                                     src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
                             </Hint>
@@ -265,7 +281,7 @@ export default function StudentDetails(props) {
                     </Row>
                     <Row>
                         <Col>
-                            <select className="dropdown-decision" id="dropdown-decision"
+                        <select className="dropdown-decision" id="dropdown-decision"
                                 onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
                                 <option value={-1}>Undecided</option>
                                 <option value={0}>No</option>
@@ -274,10 +290,12 @@ export default function StudentDetails(props) {
                             </select>
                         </Col>
                         <Col md="auto">
-                            <Button className="suggest-confirm-button" disabled={decideField == decision}
-                                onClick={() => setDecisionPopUpShow(true)}>
-                                Confirm
-                            </Button>
+                            <Hint message="Confirms the decision">
+                                <Button className="suggest-confirm-button" disabled={decideField == decision}
+                                    onClick={() => setDecisionPopUpShow(true)}>
+                                    Confirm
+                                </Button>
+                            </Hint>
                         </Col>
                     </Row>
                 </Col>
@@ -288,7 +306,7 @@ export default function StudentDetails(props) {
                         <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
                     </Row>
                     <Row md="auto" className="nomargin">
-                        <Button className="send-email-button" disabled={decision === -1}
+                        <Button className="send-email-button"
                             onClick={() => setEmailPopUpShow(true)}>
                             Send email
                         </Button>

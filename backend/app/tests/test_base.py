@@ -12,6 +12,7 @@ from app.crud import read_where, clear_data, read_all_where
 from app.database import engine
 from app.models.user import User, UserRole
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
+from sqlalchemy.orm import sessionmaker
 
 
 class Request(Enum):
@@ -23,7 +24,7 @@ class Request(Enum):
 
     async def do_request(self, client: AsyncClient, path: str, headers: Dict[str, str], body: Any = None) -> Response:
         if self.name == "DELETE":
-            raise NotImplementedError
+            return await client.delete(path, headers=headers)
         elif self.name == "GET":
             return await client.get(path, headers=headers)
         elif self.name == "POST":
@@ -48,6 +49,10 @@ class Status(IntEnum):
 class TestBase(unittest.IsolatedAsyncioTestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.sessionmaker = sessionmaker(
+            engine, expire_on_commit=False, class_=AsyncSession
+        )
+
         self.bad_id = 0
         self.users: Dict[str, User] = {}
         self.saved_objects = {
@@ -59,9 +64,10 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.client: AsyncClient = AsyncClient(app=app, base_url="http://test")
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
-        self.session: AsyncSession = AsyncSession(engine)
+        self.session: AsyncSession = self.sessionmaker()
 
         user_generator = UserGenerator(self.session)
+        user_generator.generate_default_users()
         self.users = {user.name: user for user in user_generator.data}
         self.saved_objects["passwords"] = user_generator.passwords
 
@@ -93,9 +99,9 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         login = await self.client.post("/login", json={"email": email, "password": password})
         return login.json()["data"]["accessToken"]
 
-    async def do_request(self, request_type: Request, path: str, user: str,
+    async def do_request(self, request_type: Request, path: str, user: str = "",
                          expected_status: int = 200, access_token: str = None,
-                         use_access_token: bool = True, json_body: Any = None) -> Response:
+                         json_body: Any = None) -> Response:
         """request test template
 
         Tests whether a request with the given data matches the expected status and returns the response.
@@ -111,15 +117,13 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         :type json_body: Depends on the request, most of the time a dict
         :param access_token: The access token of the request, defaults to token of user
         :type access_token: str
-        :param use_access_token: Toggle whether an access token is used in the request
-        :type use_access_token: bool
 
         :return: The response of the request
         :rtype: Response
         """
         headers: Dict[str, str] = {}
 
-        if use_access_token:
+        if user != "":
             if access_token is None:
                 access_token = await self.get_access_token(user)
             headers["Authorization"] = "Bearer " + access_token
@@ -129,7 +133,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                         f"""While doing {request_type.name} request with body =
                         '{json_body}'
                         to '{path}':
-                        Unexpected status for {user},
+                        Unexpected status for '{user}',
                         status code was {response.status_code},
                         expected {expected_status}
                         """)
@@ -140,9 +144,8 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         return response
 
     async def _auth_test_request(self, request_type: Request, path: str, body: Dict):
-        await self.do_request(request_type, path, "user_admin", Status.UNAUTHORIZED,
-                              json_body=body, use_access_token=False)
-        await self.do_request(request_type, path, "user_admin", Status.UNPROCESSABLE,
+        await self.do_request(request_type, path, expected_status=Status.UNAUTHORIZED, json_body=body)
+        await self.do_request(request_type, path, "user_admin", expected_status=Status.UNPROCESSABLE,
                               json_body=body, access_token="wrong token")
 
     async def _access_test_request(
@@ -154,7 +157,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
             responses[user_name] = await self.do_request(request_type, path, user_name, Status.SUCCESS, json_body=body)
         # Disallowed users
         for user_name in set(self.users.keys()).difference(allowed_users):
-            user = self.users[user_name]
+            user = await self.get_user_by_name(user_name)
             if user.active and user.approved and not user.disabled:
                 await self.do_request(request_type, path, user_name, Status.FORBIDDEN, json_body=body)
 
