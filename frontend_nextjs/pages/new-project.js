@@ -86,15 +86,17 @@ export default function NewProjects() {
         let body = {
             "name":projectName,
             "description":projectDescription,
-            "required_skills": [],
+            "required_skills": requiredSkills,
             "partner_name":partnerName,
             "partner_description": partnerDescription,
             "edition": api.year,
             "users": []
         }
-        log(body)
-        // TODO add skills to project
-        await Url.fromName(api.projects).extend("/create").setBody(body).post();
+        log(requiredSkills)
+        let res = await Url.fromName(api.projects).extend("/create").setBody(body).post();
+        if(res.success){
+            router.push("/projects")
+        }
     }
 
 
@@ -147,7 +149,7 @@ export default function NewProjects() {
                         <Col>
                             <Form.Label>Required skills:</Form.Label>
 
-                            {(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (
+                            {(requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) => (
                                 <RequiredSkillSelector className={"required-skill-selector-row"}
                                                        availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
                                                        key={index} index={index} skills={skills} requiredSkill={requiredSkill}

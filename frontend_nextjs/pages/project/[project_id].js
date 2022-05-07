@@ -115,10 +115,8 @@ const Project = () => {
     function changeRequiredSkill(value, index){
         log("change skill")
         if(requiredSkills[index].label !== ""){
-            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
         } else {
-            log( [...(availableSkills.filter(skill => skill !== value.label))])
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
         let newArray = [...requiredSkills]
