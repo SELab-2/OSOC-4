@@ -31,10 +31,17 @@ export default function ManageUsers(props) {
 
     const handleClose = () => {
         setFail(false);
-        setToInvite("");
-        setShow(false);
         setSent(false);
         setSending(false);
+        setShow(false);
+        setToInvite("");
+    }
+
+    const handleFail = () => {
+        setFail(false);
+        setSent(false);
+        setSending(false);
+        setToInvite("");
     }
 
     const handleShow = () => setShow(true);
@@ -162,12 +169,16 @@ export default function ManageUsers(props) {
                                 {(fail)? <Form.Label>Something went wrong, please try again</Form.Label>: null}
                             </Form.Group>
                         </Modal.Body>
-                            {(sent || fail) ? 
+                            {(sent) ? 
                             (
                                 <Modal.Footer>
                                     <Button variant={"primary"} onClick={handleClose}>Close</Button>
                                 </Modal.Footer> 
-                            ):(
+                            ): ((fail) ? (
+                                <Modal.Footer>
+                                    <Button variant={"primary"} onClick={handleFail}>Try again</Button>
+                                </Modal.Footer> 
+                            ) : (
                                 <Modal.Footer>
                                         <Button variant="secondary" onClick={handleClose}>Cancel</Button>
                                         {(sending) ? (
@@ -176,7 +187,7 @@ export default function ManageUsers(props) {
                                             <Button variant={"primary"} type="submit">Invite users</Button>
                                         )}
                                 </Modal.Footer>
-                            )}
+                            ))}
                         </Form>
                 </Modal>
 
