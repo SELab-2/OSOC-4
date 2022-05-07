@@ -2,7 +2,7 @@ import {useRouter} from "next/router";
 
 
 /**
- * The page corresponding with the 'index' (dashboard) of the application,
+ * The page corresponding with the 'index' of the application, as we have no index page, we simply re-route to select-students
  *  the params are filled in by nextjs from the function defined below (getServerSideProps)
  * @returns {JSX.Element}
  */
