@@ -8,8 +8,10 @@ from app.utils.cryptography import get_password_hash
 class UserGenerator(DataGenerator):
     def __init__(self, session):
         super().__init__(session)
-        # Default users
-        self.data = [
+        self.passwords = {}
+
+    def generate_default_users(self):
+        self.data += [
             User(
                 email="user_admin@test.be",
                 name="user_admin",
@@ -53,15 +55,7 @@ class UserGenerator(DataGenerator):
                 role=UserRole.COACH,
                 active=True,
                 approved=True,
-                disabled=True),
-            User(
-                email="user_no_role@test.be",
-                name="user_no_role",
-                password="Test123!user_no_role",
-                role=UserRole.NO_ROLE,
-                active=False,
-                approved=False,
-                disabled=False)
+                disabled=True)
         ]
         self.passwords = {user.name: user.password for user in self.data}
         for user in self.data:

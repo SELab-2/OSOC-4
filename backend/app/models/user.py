@@ -14,7 +14,6 @@ from app.models.suggestion import Suggestion
 
 
 class UserRole(int, Enum):
-    NO_ROLE = 0
     COACH = 1
     ADMIN = 2
 
@@ -24,7 +23,7 @@ class User(SQLModel, table=True):
     email: str
     name: str = ""
     password: str = ""
-    role: UserRole = 0
+    role: UserRole = 1
     active: bool = False
     approved: bool = False
     disabled: bool = True

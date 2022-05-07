@@ -3,14 +3,29 @@ import React, {useEffect, useState} from "react";
 import SkillSelector from "./SkillSelector";
 import {api, Url} from "../../utils/ApiClient";
 
-
+/**
+ * When clicking on the button to assign a student to a project, this modal pops-up. If the selected student and project
+ * are a valid combination then you can select a skill and add the student to the project. Otherwise a modal screen pops-up
+ * with the reason why the student and project aren't a valid combination.
+ *
+ * @param props setSelectedStudent the setter for the currently selected student on the project page,
+ * selectedStudent the currently selected student on the project page,
+ * setSelectedProject the setter for the currently selected project on the project page,
+ * selectedProject the currently selected project on the project page
+ * @returns {JSX.Element}
+ * @constructor
+ */
 export default function AddStudentModal(props){
 
     const [selectedSkill, setSelectedSkill] = useState(undefined)
 
     const [skills, setSkills] = useState([])
-
+    /**
+     * This function gets called when props.selectedStudent or props.selectedProject changes. It finds the intersection
+     * of the required skills of the selected project and the skills of the selected student
+     */
     useEffect(() => {
+        setSelectedSkill(undefined)
         if(props.selectedStudent !== undefined && props.selectedProject !== undefined){
             let temp_dict = {}
             props.selectedProject.required_skills.map(skill => {
@@ -31,6 +46,11 @@ export default function AddStudentModal(props){
         }
     }, [props.selectedStudent, props.selectedProject])
 
+    /**
+     * Creates particpation of props.selectedStudent, props.selectedProject and selectedSkill.
+     * @returns {Promise<void>}
+     * @constructor
+     */
     async function AddStudentToProject() {
         if (props.selectedStudent !== undefined && props.selectedProject !== undefined && selectedSkill !== undefined) {
 
@@ -44,8 +64,13 @@ export default function AddStudentModal(props){
         }
     }
 
-    return(<div>
-        {(props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
+    /**
+     * this modal screen allows you to select a valid skill and create a participation of the selectedStudent, props.selectedProject
+     * and selectedSkill
+     * @returns {JSX.Element}
+     */
+    function getAddModal() {
+        return(
             <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
@@ -57,18 +82,70 @@ export default function AddStudentModal(props){
                     <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill} skills={skills}/>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => props.setShowAddStudent(false)}>
+                    <Button variant="secondary" onClick={() => {
+                        props.setShowAddStudent(false)
+                        setSelectedSkill(undefined)}}>
                         Dont add student to project
                     </Button>
                     <Button variant="primary" onClick={async () => {
                         await AddStudentToProject()
                         props.setShowAddStudent(false)
+                        setSelectedSkill(undefined)
                     }}>
                         Add student to project
                     </Button>
 
                 </Modal.Footer>
-            </Modal>: <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+            </Modal>)
+    }
+
+    /**
+     * this modal screen shows if the props.selectedStudent already has a particpation involving props.selectedProject
+     * @returns {JSX.Element}
+     */
+    function getAlreadyAddedModal(){
+        return(
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} can not be added to {props.selectedProject.name} project</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>The selected student already is assigned to the selected project.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={() => props.setShowAddStudent(false)}>
+                        Go back to the project tab
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    }
+
+    /**
+     * This modal shows if the props.selectedStudent doesn't have a skill required of the props.selectedProject
+     * @returns {JSX.Element}
+     */
+    function getMustHaveValidSkill(){
+        return(
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} has no required skills for the {props.selectedProject.name} project</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>A student must have a required skill of the selected project to be added to that project.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={() => props.setShowAddStudent(false)}>
+                        Go back to the project tab
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    }
+
+    /**
+     * This modal shows if either or both of props.selectedStudent, props.selectedProject are undefined
+     * @returns {JSX.Element}
+     */
+    function getMustSelect(){
+        return(
+            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>No selected {props.selectedStudent === undefined ? "student" : "project"}{(props.selectedStudent === undefined && props.selectedProject === undefined) ? " or project" : ""}</Modal.Title>
                 </Modal.Header>
@@ -79,7 +156,17 @@ export default function AddStudentModal(props){
                     </Button>
                 </Modal.Footer>
             </Modal>
-        }
+        )
+    }
 
+    /**
+     * returns the correct modal screen
+     */
+    return(<div>
+        {(props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
+            ((skills.length > 0 ) ?
+                    ((! props.selectedProject.participations.map(p => p.student).includes(props.selectedStudent.id)) ?
+                            getAddModal() : getAlreadyAddedModal()) : getMustHaveValidSkill()) : getMustSelect()
+        }
     </div>)
 }

@@ -19,20 +19,32 @@ export default function RouteGuard(props) {
         if (props.auth && !isUser) {
             router.push('/login') //Redirect to login
         } else if (isUser && props.auth && !websocketConn && !creatingConnection) {
-            // make a websocket connection
-            setCreatingConnection(true)
-            let newwebconn = new WebSocket((process.env.NEXT_API_URL + "/ws").replace("http", "ws").replace("https", "ws"))
-            newwebconn.addEventListener("message", (event) => {
-                cache.updateCache(event.data, session["userid"])
-            })
-            newwebconn.onopen = (event) => {
-                setCreatingConnection(false)
-                handleWebsocket(newwebconn);
-            }
-
+            connect();
         }
 
     }, [router, isUser, props.auth, status, websocketConn])
+
+    function connect() {
+        // make a websocket connection
+        setCreatingConnection(true)
+        let newwebconn = new WebSocket((process.env.NEXT_API_URL + "/ws").replace("http", "ws").replace("https", "ws"))
+        newwebconn.addEventListener("message", (event) => {
+            cache.updateCache(event.data, session["userid"])
+        })
+        newwebconn.onopen = (event) => {
+            setCreatingConnection(false)
+            handleWebsocket(newwebconn);
+        }
+        newwebconn.onclose = (event) => {
+            console.log('Socket is closed. Reconnect will be attempted in 1 second.', event.reason);
+            setTimeout(function () {
+                connect();
+            }, 1000);
+        }
+        newwebconn.onerror = (event) => {
+            newwebconn.close();
+        }
+    }
 
     if (isUser) {
         if (!props.auth) {
@@ -40,10 +52,10 @@ export default function RouteGuard(props) {
         } else {
 
             return (
-                <Container fluid>
+                <>
                     <NavHeader key="Navbar" className="navheader" />
                     {props.children}
-                </Container>
+                </>
             )
         }
     } else if (!props.auth && !isUser) {

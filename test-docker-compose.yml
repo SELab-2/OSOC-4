@@ -23,7 +23,8 @@ services:
       # Invite Settings
       INVITE_EXPIRE: 4320 #in minutes
       PASSWORDRESET_EXPIRE: 30 # in minutes
-
+      # Testing
+      TEST_EMAIL: osoc.groep4+test@gmail.com
 
   test-osoc-postgres:
     image: postgres:latest

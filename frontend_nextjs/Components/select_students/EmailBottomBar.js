@@ -4,6 +4,7 @@ import SendEmailsPopUpWindow from "../email-students/SendEmailsPopUpWindow";
 import arrowUp from "../../public/assets/arrow_up.svg";
 
 import Image from "next/image";
+import Hint from "../Hint";
 
 export default function StudentList(props) {
 
@@ -21,10 +22,23 @@ export default function StudentList(props) {
     return [
         <div className="email-bar">
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
-                students={props.selectedStudents} />
+                selectedStudents={props.selectedStudents} />
+            <Row style={{ height: "20px" }} className="nomargin align-items-center">
+                {!props.showEmailBar ?
+                    <Hint message="Open email students">
+                        <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
+                            <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="20px" />
+                        </button>
+                    </Hint>
+                    :
+                    <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
+                        <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="20px" />
+                    </button>
+                }
+            </Row>
             <Row className="nomargin align-items-center">
-                <button className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
-                    <Image className={`arrow-button ${props.showEmailBar ? 'down' : ''}`} src={arrowUp} height="25px" />
+                <button style={{ textAlign: "center", "font-size": "14px", "height": "20px", overflow: "hidden" }} className="table-button" onClick={() => props.setShowEmailBar(!props.showEmailBar)}>
+                    {props.showEmailBar ? "dismiss" : "send emails"}
                 </button>
             </Row>
 
@@ -37,7 +51,7 @@ export default function StudentList(props) {
                     onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button></Col>
             </Row>
 
-        </div>
+        </div >
     ]
 
 }

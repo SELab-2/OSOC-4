@@ -1,6 +1,6 @@
 from random import choice, randrange, sample
 
-from app.crud import clear_data, update
+from app.crud import clear_data
 from app.database import get_session
 from app.models.participation import Participation
 from app.models.project import Project, ProjectRequiredSkill
@@ -50,6 +50,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     #########
 
     user_generator = UserGenerator(session)
+    user_generator.generate_default_users()
 
     user_generator.generate_user(role=UserRole.COACH, active=False, approved=False, disabled=False),
     user_generator.generate_user(role=UserRole.COACH, active=True, approved=False, disabled=False),
@@ -74,10 +75,15 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     edition_generator = EditionGenerator(session)
     edition = edition_generator.generate_edition(2022, coaches)
+    edition_generator.add_to_db()
+    await session.commit()
+    for d in edition_generator.data:
+        await session.refresh(d)
+
+    user_generator.add_to_db()
 
     project = Project(
         name="Student Volunteer Project",
-        goals="Teach students about creating open source projects",
         description="Innovative open source projects, made by incredibly motivated students, coaches & organisations.",
         partner_name="UGent",
         partner_description="Universiteit Gent",
@@ -92,13 +98,12 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     project2 = Project(
         name="Cyberfest",
-        goals="Goal 1\nGoal 2",
         description="Hackers & Cyborgs",
         partner_name="HoGent",
         partner_description="Hogeschool Gent",
         coaches=coaches[2:],
         edition=edition.year)
-    await update(project, session)
+    session.add(project)
 
     project2_skills = [ProjectRequiredSkill(
         number=randrange(1, 8),
@@ -108,7 +113,8 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     student_generator = StudentGenerator(session, edition, skills)
     # generate students without suggestions
-    student_generator.generate_students(3)
+    student_generator.generate_students(50)
+    student_generator.add_to_db()
 
     suggestions = []
     participations = []
@@ -136,15 +142,13 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     for skill in project2_skills:
         session.add(skill)
 
-    await user_generator.add_to_db()
-    await edition_generator.add_to_db()
-    await student_generator.add_to_db()
-
     for suggestion in suggestions:
         session.add(suggestion)
 
     for participation in participations:
         session.add(participation)
+
+    await session.commit()
 
     return response(None, "Dummy data inserted")
 

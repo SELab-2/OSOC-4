@@ -1,7 +1,7 @@
 import {useSession} from "next-auth/react"
 import LoadingPage from "../Components/LoadingPage"
 import {api, Url} from "../utils/ApiClient";
-import {Button, Card, Carousel} from "react-bootstrap";
+import {Button, Card, Carousel, Col, Row} from "react-bootstrap";
 import Message from "../Components/dashboard/Message";
 import React, {useEffect, useState} from "react";
 
@@ -59,12 +59,12 @@ function Home() {
      */
     function showNewUsers() {
         if (newUsers && newUsers.length) {
-            return [(<h1 key="newly-joined-users-title">Newly joined users:</h1>), ...newUsers.map((user) => {
+            return [(<h1 key="newly-joined-users-title">Newly joined users:</h1>), ...newUsers.map(user => {
                 async function approveUser() {
                     const res = await Url.fromName(api.users).extend("/" + user.id + "/approve").post()
                     if (res.success) {
                         setNewUsers(prevState => {
-                            return [...prevState.filter(u => u.id === user.id)]
+                            return [...prevState.filter(u => String(u.id) !== String(user.id))]
                         })
                     }
                 }
@@ -73,18 +73,21 @@ function Home() {
                     const res = await Url.fromName(api.users).extend("/" + user.id).delete();
                     if (res.success) {
                         setNewUsers(prevState => {
-                            return [...prevState.filter(u => u.id !== user.id)]
+                            return [...prevState.filter(u => String(u.id) !== String(user.id))]
                         })
                     }
                 }
 
-                return (<Message key={user.id} title={`${user.name} has joined`}
-                                 subtitle="You can now approve or revoke the access to the application">
-                    <h4>{user.name}</h4>
-                    <h4>{user.email}</h4>
-                    <Button className="user-button-unapproved" onClick={approveUser}>Approve user</Button>
-                    <Button className="user-button-remove" onClick={deleteUser}>Revoke access</Button>
-                </Message>)
+                return (
+                    <Message key={user.id} title={`${user.name} has joined`}
+                             subtitle="You can now approve or revoke the access to the application">
+                        <h4>{user.name}</h4>
+                        <h4>{user.email}</h4>
+                        <Row>
+                            <Button className="approve-btn" onClick={approveUser}>Approve user</Button>
+                            <Button className="remove-btn" onClick={deleteUser}>Revoke access</Button>
+                        </Row>
+                    </Message>)
             })];
         }
     }
@@ -96,43 +99,45 @@ function Home() {
     if (isUser) {
         return (
             <>
-                <Card style={{width: "100%", height: "auto", margin: "auto"}}>
-                    <Card.Header>
-                        <h3 className={"index-header"}>Welcome back</h3>
-                    </Card.Header>
-
+                <Col>
+                    <Row>
+                        <h1 className={"index-header"}>Welcome back</h1>
+                    </Row>
                     {(currentEdition) ?
-                        <Carousel>
+                        <Row>
+                            <Carousel>
+                                <Carousel.Item interval={INTERVAL}>
+                                    <Card.Body>
+                                        <Card.Title className={"index-card-title"}><h1>{currentEdition}</h1>
+                                        </Card.Title>
+                                    </Card.Body>
+                                </Carousel.Item>
 
-                            <Carousel.Item interval={INTERVAL}>
-                                <Card.Body>
-                                    <Card.Title className={"index-card-title"}><h1>{currentEdition}</h1></Card.Title>
-                                </Card.Body>
-                            </Carousel.Item>
+                                <Carousel.Item interval={INTERVAL}>
+                                    <Card.Body>
+                                        <Card.Title className={"index-card-title"}><h1>{projectsLength} Projects</h1>
+                                        </Card.Title>
+                                    </Card.Body>
+                                </Carousel.Item>
 
-                            <Carousel.Item interval={INTERVAL}>
-                                <Card.Body>
-                                    <Card.Title className={"index-card-title"}><h1>{projectsLength} Projects</h1>
-                                    </Card.Title>
-                                </Card.Body>
-                            </Carousel.Item>
-
-                            <Carousel.Item interval={INTERVAL}>
-                                <Card.Body>
-                                    <Card.Title className={"index-card-title"}><h1>{studentsLength} Students</h1>
-                                    </Card.Title>
-                                </Card.Body>
-                            </Carousel.Item>
-
-                        </Carousel>
+                                <Carousel.Item interval={INTERVAL}>
+                                    <Card.Body>
+                                        <Card.Title className={"index-card-title"}><h1>{studentsLength} Students</h1>
+                                        </Card.Title>
+                                    </Card.Body>
+                                </Carousel.Item>
+                            </Carousel>
+                        </Row>
                         : null}
-
-                </Card>
+                </Col>
 
                 <hr/>
 
-                {showNewUsers()}
-
+                <Row>
+                    <Col className={"news-col"}>
+                        {showNewUsers()}
+                    </Col>
+                </Row>
 
             </>
         )

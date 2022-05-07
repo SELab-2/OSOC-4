@@ -2,6 +2,7 @@ import { Button, Col, Modal, ModalHeader, ModalTitle, Row } from "react-bootstra
 import StudentFilter from "../select_students/StudentFilter";
 import { useState, useEffect } from "react";
 import { cache } from "../../utils/ApiClient";
+import { api, Url } from "../../utils/ApiClient";
 
 /***
  * This element shows the pop up window when sending emails in the 'email students' tab.
@@ -19,10 +20,10 @@ export default function SendEmailsPopUpWindow(props) {
   const [students, setStudents] = useState([])
 
   useEffect(() => {
-    Promise.all(props.students.map(student => cache.getStudent(student, ""))).then(allstudents => {
+    Promise.all(props.selectedStudents.map(student => cache.getStudent(student, ""))).then(allstudents => {
       setStudents([...allstudents]);
     })
-  }, [props.students])
+  }, [props.selectedStudents])
 
   /***
    * This function is called when the pop-up window is closed
@@ -35,7 +36,9 @@ export default function SendEmailsPopUpWindow(props) {
    * This function is called on submitting the emails, it sends the emails and hides the pop-up window
    */
   function submitEmail() {
-    setPopUpShow(false);
+    Url.fromName(api.sendemails).extend("/decisions").setBody({ "emails": props.selectedStudents }).post().then(() => {
+      setPopUpShow(false);
+    })
   }
 
   // returns the html representation for the send emails pop up window
@@ -49,34 +52,12 @@ export default function SendEmailsPopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Send mails to...
+          {`Are you sure you want to send ${props.selectedStudents.length} decision emails?`}
         </ModalTitle>
       </ModalHeader>
-      <Modal.Body className="modalbody-margin">
-        <Row className="send-email-names">
-          {(students) ? students.map(student => student.mandatory["first name"] + " " +
-            student.mandatory["last name"]).join(", ") : null}
-        </Row>
-        <Row>
-          <h5 className="content-title">Content</h5>
-        </Row>
-        <StudentFilter filter_id="default-email" filter_text="Use default emails" value={defaultEmail}
-          onChange={ev => setDefaultEmail(true)} />
-        <StudentFilter filter_id="own-email" filter_text="Type your email here:" value={!defaultEmail}
-          onChange={ev => setDefaultEmail(false)} />
-        <Row>
-          <Col />
-          <Col md="auto" className={"email-help-text " + ((defaultEmail) ? "disabled-text" : null)}>
-            (Use @Name, @Firstname, @Lastname, @Decision to address the receiver)
-          </Col>
-        </Row>
-        <Row>
-          <textarea id="student-emails" className="fill_width send-emails" disabled={defaultEmail} />
-        </Row>
-      </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>Cancel</Button>
-        <Button variant="primary" onClick={submitEmail}>Submit</Button>
+        <Button variant="primary" onClick={submitEmail}>Yes</Button>
       </Modal.Footer>
     </Modal>
   );

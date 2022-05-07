@@ -1,27 +1,23 @@
-.navheader {
-    width: 100%;
-    height: 75px;
-    background-color: white;
-    padding: 0;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: var(--background-gray);
+.navbar {
+    padding-right: 1rem;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
 }
 
-.navbar-item {
-    padding-left: 50px;
-    padding-right: 50px;
-    align-self: center;
-    font-size: 20px;
-}
-
-.fill_parent {
-    height: 100%;
+.navbar-nav {
     width: 100%;
-    display: block;
+    margin: 0;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
 }
 
-.logo_header {
-    padding-left: 15px;
+.nav-link.active {
+    transition: 1s; /* Trick for preventing element from jumping before page load */
+    color: var(--dark_blue);
+    font-size: 1.2rem;
+}
+
+#logout-link {
+    color: var(--red);
 }

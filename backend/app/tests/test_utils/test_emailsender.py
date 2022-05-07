@@ -1,12 +1,12 @@
+import os
 import unittest
 
 from app.utils.mailsender import send_invite, send_password_reset
 
 
 class TestMailsender(unittest.TestCase):
-    email_receiver = "Stef.Vandenhaute+SEL2TEST@UGent.be"  # TODO config in env file
+    email_receiver = os.getenv("TEST_EMAIL")
 
-    @unittest.skip('Prevent email spam')
     def test_send_mail(self):
         send_invite(self.email_receiver, "test_invite_key")
         send_password_reset(self.email_receiver, "test_reset_key")

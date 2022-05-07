@@ -8,10 +8,10 @@ export function titlecase(text) {
 }
 
 /**
- *  Convert a url int the form /../../id to it's id
- * @param url
- * @returns {string}
+ *  convert a url with an id at the end of the url to an id
+ *  @param url
+ *  @returns string
  */
 export function getID(url){
-    return url.split("/").pop()
+    return url.split("/").pop();
 }

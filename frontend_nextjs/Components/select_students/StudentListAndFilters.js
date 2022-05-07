@@ -19,7 +19,7 @@ export default function StudentList(props) {
 
   const router = useRouter();
 
-  const listheights = { "emailstudents": "245px", "students": "178px", "projects": "146px" }
+  const listheights = { "emailstudents": "253px", "students": "186px", "projects": "146px" }
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
@@ -31,6 +31,7 @@ export default function StudentList(props) {
   let [sortby, setSortby] = useState("first name+asc,last name+asc");
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
+  const [ownSuggestion, setOwnSuggestion] = useState("")
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
@@ -63,22 +64,23 @@ export default function StudentList(props) {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will
       // provoke the second part of useEffect to filter the students again.
-      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills)) {
+      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion)) {
         setSearch(router.query.search);
         setSortby(router.query.sortby);
         setDecisions(router.query.decision);
         setSkills(router.query.skills);
+        setOwnSuggestion(router.query.own_suggestion)
 
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
           {
             decision: router.query.decision || "",
-            search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || ""
+            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || "", own_suggestion: router.query.own_suggestion || ""
           }
         ).get().then(res => {
           if (res.success) {
-            let p1 = res.data.slice(0, 10);
-            let p2 = res.data.slice(10);
+            let p1 = res.data.slice(0, 20);
+            let p2 = res.data.slice(20);
             setStudentUrls(p2);
             Promise.all(p1.map(studentUrl =>
               cache.getStudent(studentUrl, session["userid"])
@@ -89,7 +91,7 @@ export default function StudentList(props) {
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, search, sortby])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -120,6 +122,7 @@ export default function StudentList(props) {
           } else {
             let new_students = [...students]
             new_students[i]["decision"] = data["decision"]["decision"];
+            new_students[i]["email_sent"] = false;
             setStudents(new_students);
           }
           return true;
@@ -153,6 +156,7 @@ export default function StudentList(props) {
               // get the student from the cache + update the decision (needed when cache updated later than studentlis)
               let student = cache.getStudent(studentUrl, session["userid"])
               student["decision"] = data["decision"]["decision"];
+              student["email_sent"] = false;
               return student;
             }
             )).then(newstudents => {
@@ -170,6 +174,7 @@ export default function StudentList(props) {
               // get the student from the cache + update the decision (needed when cache updated later than studentlis)
               let student = cache.getStudent(studentUrl, session["userid"])
               student["decision"] = data["decision"]["decision"];
+              student["email_sent"] = false;
               return student;
             }
 
@@ -179,14 +184,26 @@ export default function StudentList(props) {
           }
         });
       }
+    } else if ("email_sent" in data) {
+
+      students.find((o, i) => {
+        if (o["id"] === data["id"]) {
+          let new_students = [...students]
+          new_students[i]["email_sent"] = data["email_sent"];
+          setStudents(new_students);
+          return true; // stop searching
+        }
+      });
+
+
     }
 
   }
 
   const fetchData = () => {
 
-    let p1 = studentUrls.slice(0, 10);
-    let p2 = studentUrls.slice(10);
+    let p1 = studentUrls.slice(0, 20);
+    let p2 = studentUrls.slice(20);
 
     Promise.all(p1.map(studentUrl =>
       cache.getStudent(studentUrl, session["userid"])
@@ -237,6 +254,7 @@ export default function StudentList(props) {
             "transition": "height 0.6s"
           }}
           dataLength={students.length} //This is important field to render the next data
+          height={1}
           next={fetchData}
           hasMore={studentUrls.length > 0}
           loader={<LoadingPage />}

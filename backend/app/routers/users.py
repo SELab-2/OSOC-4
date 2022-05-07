@@ -2,15 +2,12 @@ from typing import List
 
 from app.crud import read_all_where, read_where, update
 from app.database import db, get_session
-from app.exceptions.key_exceptions import InvalidResetKeyException
-from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
                                             UserNotFoundException)
 from app.models.edition import Edition
-from app.models.passwordreset import PasswordResetInput
 from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
                              UserCreate, UserMe, UserOut, UserOutSimple,
                              UserRole)
@@ -19,7 +16,7 @@ from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import response
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -66,6 +63,33 @@ async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
 
 
+@router.patch("/me/password", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def update_password(passwords: ChangePassword, Authorize: AuthJWT = Depends(),
+                          session: AsyncSession = Depends(get_session)):
+    """"update_password this changes the password of given user if previous password is given
+
+    :param passwords: current_password, new_password and confirm_password
+    :type passwords: ChangePassword
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    current_user_id = Authorize.get_jwt_subject()
+
+    if passwords.new_password != passwords.confirm_password:
+        raise PasswordsDoNotMatchException()
+
+    user = await read_where(User, User.id == int(current_user_id), session=session)
+
+    if not verify_password(passwords.current_password, user.password):
+        raise InvalidEmailOrPasswordException()
+
+    user.password = get_password_hash(passwords.new_password)
+    await update(user, session=session)
+    return response(None, "Updated password successfully")
+
+
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))],
              response_description="User data added into the database")
 async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_session)):
@@ -86,47 +110,6 @@ async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_se
     return response(UserOutSimple.parse_raw(new_user.json()), "User added successfully.")
 
 
-@router.post("/forgot/{reset_key}", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def change_password(reset_key: str, passwords: PasswordResetInput = Body(...), Authorize: AuthJWT = Depends(),
-                          session: AsyncSession = Depends(get_session)):
-    """change_password function that changes the user password
-
-    :param reset_key: the reset key
-    :type reset_key: str
-    :param passwords: password and validate_password are needed, defaults to Body(...)
-    :type passwords: PasswordResetInput, optional
-    :raises InvalidResetKeyException: invalid reset key
-    :raises PasswordsDoNotMatchException: passwords don't match
-    :raises NotPermittedException: Unauthorized
-    :return: message to check the emails
-    :rtype: dict
-    """
-
-    if reset_key[0] != "R":
-        raise InvalidResetKeyException()
-
-    userid = db.redis.get(reset_key)
-
-    if not userid:
-        raise InvalidResetKeyException()
-    elif passwords.password != passwords.validate_password:
-        raise PasswordsDoNotMatchException()
-
-    user = await read_where(User, User.id == int(userid), session=session)
-
-    Authorize.jwt_required()
-    current_user_id = Authorize.get_jwt_subject()
-
-    if not user or user.disabled or int(current_user_id) != int(userid):
-        raise NotPermittedException()
-
-    user.password = get_password_hash(passwords.password)
-    db.redis.delete(reset_key)
-    await update(user, session=session)
-
-    return response(None, "Password updated successfully")
-
-
 @router.get("/{id}")
 async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
                    session: AsyncSession = Depends(get_session)):
@@ -143,6 +126,7 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
         raise UserNotFoundException()
 
     if not role == UserRole.ADMIN and not user.approved:
+        # This can't be reached since access would be blocked for users matching this if
         raise UserBadStateException()
 
     return response(UserOut.parse_raw(user.json()), "User retrieved successfully")
@@ -166,12 +150,10 @@ async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession 
     if user is None:
         raise UserNotFoundException()
 
-    user.name = new_data.name
-    user.active = new_data.active
-    user.approved = new_data.approved
-    user.disabled = new_data.disabled
-    user.role = new_data.role
+    new_user_data = new_data.dict(exclude_unset=True)
 
+    for key, value in new_user_data.items():
+        setattr(user, key, value)
     user = await update(user, session=session)
 
     return response(UserOut.parse_raw(user.json()), "User updated successfully")
@@ -203,34 +185,6 @@ async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)
     return response(UserOut.parse_raw(user.json()), "User deleted successfully")
 
 
-@router.patch("/{user_id}/password", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_password(user_id: str, passwords: ChangePassword, session: AsyncSession = Depends(get_session)):
-    """"update_password this changes the password of given user if previous password is given
-        :param user_id: the user id
-    :type user_id: str
-    :param passwords: current_password, new_password and confirm_password
-    :type passwords: ChangePassword
-    :raises NotPermittedException: Unauthorized
-    :return: response
-    :rtype: success or error
-    """
-
-    if passwords.new_password != passwords.confirm_password:
-        raise PasswordsDoNotMatchException()
-
-    user = await read_where(User, User.id == int(user_id), session=session)
-
-    if user is None:
-        raise UserNotFoundException()
-
-    if not verify_password(passwords.current_password, user.password):
-        raise InvalidEmailOrPasswordException()
-
-    user.password = get_password_hash(passwords.new_password)
-    await update(user, session=session)
-    return response(None, "Updated password successfully")
-
-
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
 async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
     """invite_user this functions invites a user
@@ -251,7 +205,6 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
     if user.disabled:
         user.disabled = False
         await update(user, session=session)
-        # todo add user to latest edition, else it is useless that we invite him
 
         # get the latest edition
         stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())

@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import resetSearchIcon from "../../public/assets/reset-search.svg";
 import searchIcon from "../../public/assets/search.svg";
+import Hint from "../Hint";
 
 /**
  * This component displays the searchbar and sort dropdown in the 'select students' tab and the 'email students' tab.
@@ -62,12 +63,16 @@ export default function SearchSortBar() {
       </Col>
       <Col xs="auto" >
         <button className="reset-search-button" onClick={() => setSearch("")}>
-          <Image src={resetSearchIcon} />
+          <Hint message="Clear the search-bar">
+            <Image src={resetSearchIcon} />
+          </Hint>
         </button>
       </Col>
       <Col xs="auto">
         <button className="search-button" onClick={() => setSearch(() => doSearch())}>
-          <Image src={searchIcon} />
+          <Hint message="Search">
+            <Image src={searchIcon} />
+          </Hint>
         </button>
       </Col>
       <Col xs="auto" className="sortby-label">

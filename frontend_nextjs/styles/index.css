@@ -1,7 +1,92 @@
-.index-header {
-    margin-left: 10%;
+.index-header, .news-col, .carousel-inner {
+    margin-top: 2rem;
+    padding: 1% 4rem;
 }
 
-.index-card-title {
-    margin-left: 10%;
+.row {
+    margin: 0;
+}
+
+.carousel {
+    padding: 0;
+}
+
+.carousel-inner {
+    height: 130px; /* To accommodate for word wrapping in portrait mode */
+}
+
+.carousel-indicators {
+    visibility: hidden;
+}
+
+.carousel-control-prev, .carousel-control-prev:hover,
+.carousel-control-next, .carousel-control-next:hover {
+    opacity: 0 !important;
+}
+
+.message {
+    border-radius: 0.5em;
+    margin: 15pt;
+    max-width: 40rem; /* Delete when more columns are added*/
+}
+
+.message .card-title {
+    font-size: 1.5rem;
+}
+
+.message .row {
+    margin-top: 15pt;
+    justify-content: right;
+    padding: 0 10pt;
+}
+
+.approve-btn, .remove-btn {
+    max-width: 10em;
+    font-weight: bold;
+}
+
+.approve-btn {
+    background: var(--green);
+    border-color: var(--green);
+    margin-right: 12px;
+}
+
+.approve-btn:hover {
+    background: var(--green);
+    border-color: var(--green);
+
+    filter: saturate(300%);
+    transition: 500ms;
+}
+
+.remove-btn {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+.remove-btn:hover {
+    background: var(--red);
+    border-color: var(--red);
+
+    filter: saturate(300%);
+    transition: 500ms;
+}
+
+@media (orientation: portrait) {
+    .news-col {
+        padding: 1% 0;
+    }
+
+    .news-col h1 {
+        padding: 1% 4rem;
+    }
+
+    .message .row {
+        justify-content: center;
+    }
+
+    .approve-btn, .remove-btn {
+        width: 45%;
+        font-weight: bold;
+    }
 }

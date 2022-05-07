@@ -78,7 +78,6 @@ export default function StudentListelement(props) {
    */
   function selectStudent() {
     // if the selected student is this student then unselect the student
-    log(props.student)
     if (props.selectedStudents.includes(props.student.id)) {
       props.setSelectedStudents((prevState) => prevState.filter((o, i) => o !== props.student.id))
     } else {
@@ -116,13 +115,17 @@ export default function StudentListelement(props) {
         <Col xs="auto" className="nopadding">
           <Row xs="auto" className="nomargin">
             <Col className="suggestions" xs="auto">Suggestions:</Col>
-            <SuggestionsCount suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
+            <SuggestionsCount ownsuggestion={props.student["own_suggestion"]} suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
         </Col>
       </Row>
 
       <Row id="info" className="info">
         <GeneralInfo listelement={true} studentsTab={props.studentsTab} student={props.student} decision={getDecisionString(props.student.decision)} />
+        <Row key={"email_sent"} className="question-answer-row">
+          <Col md="auto" className="info-titles">{"Email sent"}</Col>
+          <Col md="auto" className="info-answers">{props.student["email_sent"] ? "Yes" : "No"}</Col>
+        </Row>
         <Col />
         <Col id="skills" align="right" className="skills" sm="auto">
           <ul className="nomargin">
