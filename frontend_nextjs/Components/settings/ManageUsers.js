@@ -156,7 +156,7 @@ export default function ManageUsers(props) {
                                 ) : (
                                     <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
                                 )}
-                                {(sending || sent) ? <br/> : null}
+                                {(sending || sent || fail) ? <br/> : null}
                                 {(sending)? <Form.Label>Trying to sent invites!</Form.Label>: null}
                                 {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
                                 {(fail)? <Form.Label>Something went wrong, please try again</Form.Label>: null}
@@ -169,8 +169,12 @@ export default function ManageUsers(props) {
                                 </Modal.Footer> 
                             ):(
                                 <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                    <Button variant={"primary"} type="submit">Invite users</Button>
+                                        <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                                        {(sending || fail) ? (
+                                            <Button variant={"primary"} type="submit" disabled>Invite users</Button>
+                                        ): (
+                                            <Button variant={"primary"} type="submit">Invite users</Button>
+                                        )}
                                 </Modal.Footer>
                             )}
                         </Form>
