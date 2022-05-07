@@ -26,6 +26,7 @@ export default function NewProjects() {
     const [skills, setSkills] = useState([])
     const [show, setShow] = useState(false);
     const [availableSkills, setAvailableSkills] = useState([])
+    const [users, setUsers] = useState([])
 
 
     const router = useRouter()
@@ -48,6 +49,18 @@ export default function NewProjects() {
 
         }
     }, [])
+
+    /**
+     * Gets called after successfully removing a user from a project.
+     * @param index
+     * @returns {Promise<void>}
+     */
+    async function deleteUser(index){
+        await setUsers(users.filter((_, i) => i !== index))
+    }
+
+    function addUser(){
+    }
 
     function addRequiredSkill(){
         setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
@@ -130,22 +143,40 @@ export default function NewProjects() {
 
                     <Form.Label>About project:</Form.Label>
                     <Form.Control as="textarea" rows={3} value={projectDescription} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectDescription(e.target.value)} />
+                    <Row>
+                        <Col>
+                            <Form.Label>Required skills:</Form.Label>
 
-                    <Form.Label>Required skills:</Form.Label>
+                            {(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (
+                                <RequiredSkillSelector className={"required-skill-selector-row"}
+                                                       availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
+                                                       key={index} index={index} skills={skills} requiredSkill={requiredSkill}
+                                                       setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
+                                />
+                            ))) : null}
 
-                    {(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (
-                        <RequiredSkillSelector className={"required-skill-selector-row"}
-                                               availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
-                                               key={index} index={index} skills={skills} requiredSkill={requiredSkill}
-                                               setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
-                        />
-                    ))) : null}
+                            <Hint message={"Add new required skill"} placement="top">
+                                <div className={"project-details-plus-skill"} >
+                                    <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addRequiredSkill()} />
+                                </div>
+                            </Hint>
+                        </Col>
+                        <Col>
+                            <Form.Label>Users:</Form.Label>
+                            <div className={"project-details-user-div"}>
+                                {(users.length) ?
+                                    users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>))
+                                    :
+                                    <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
+                            </div>
+                            <Hint message={"Add new coach / admin to the project"} >
+                                <div className={"project-details-plus-user"}>
+                                    <Image  width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addUser()} />
+                                </div>
+                            </Hint>
+                        </Col>
+                    </Row>
 
-                    <Hint message={"Add new required skill"} placement="top">
-                        <div className={"project-details-plus-skill"} >
-                            <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addRequiredSkill()} />
-                        </div>
-                    </Hint>
 
                     <div>
                         <Button type="submit">Create new project</Button>
