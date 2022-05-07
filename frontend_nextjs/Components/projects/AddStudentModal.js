@@ -88,16 +88,12 @@ export default function AddStudentModal(props){
      */
     async function AddStudentToProject() {
         if (props.selectedStudent !== undefined && props.selectedProject !== undefined && selectedSkill !== undefined) {
-            // currently you can't add "None" as skill so we have to skip this
-            if(selectedSkill.value === "None"){
-                return
-            }
             let response = await Url.fromName(api.participations)
                 .extend("/create")
                 .setBody({
                     "student_id": props.selectedStudent.id.split("/").pop(),
                     "project_id": props.selectedProject.id.split("/").pop(),
-                    "skill_name": selectedSkill.value})
+                    "skill_name": selectedSkill.value === "None" ? "" : selectedSkill.value})
                 .post()
         }
     }
@@ -119,8 +115,6 @@ export default function AddStudentModal(props){
                     </div>
                     <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
                                    options={options}
-                                   // studentSkills={props.selectedStudent.skills} projectNeededSkills={projectNeededSkills}
-                                   // skillsLeft={skillsLeft}
                     />
                 </Modal.Body>
                 <Modal.Footer>
@@ -160,26 +154,6 @@ export default function AddStudentModal(props){
             </Modal>
         )
     }
-
-    // /**
-    //  * This modal shows if the props.selectedStudent doesn't have a skill required of the props.selectedProject
-    //  * @returns {JSX.Element}
-    //  */
-    // function getMustHaveValidSkill(){
-    //     return(
-    //         <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
-    //             <Modal.Header closeButton>
-    //                 <Modal.Title>{props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} has no required skills for the {props.selectedProject.name} project</Modal.Title>
-    //             </Modal.Header>
-    //             <Modal.Body>A student must have a required skill of the selected project to be added to that project.</Modal.Body>
-    //             <Modal.Footer>
-    //                 <Button variant="primary" onClick={() => props.setShowAddStudent(false)}>
-    //                     Go back to the project tab
-    //                 </Button>
-    //             </Modal.Footer>
-    //         </Modal>
-    //     )
-    // }
 
     /**
      * This modal shows if either or both of props.selectedStudent, props.selectedProject are undefined
