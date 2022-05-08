@@ -483,9 +483,17 @@ In this section we'll explain a bit further the usage of the question-tags. When
 What are they used for? \
 Well you select students based on different things, and these "things" might differ from year to year, For example you had a question what they study last year, but you wanted to add a question how far along they are in their studies for this year's edition. With question-tags everything becomes a lot more customizale. And also as we don't want to show all info of every student in the list of students, you would rather see the information that you value the most (which might differ from year to year). In the settings of question-tags, you can select for each question-tag whether or not you want to see that piece of information for each student in the list of students.
 
-We'll give you an example, right now the list of students is very empty, for every student only their name and the decision is shown. \
-Lets say we value the language they're most fluent in a lot. We go to settings, edition setting, and open the question-tags tab. In here we add a new question-tag with the question being `What language are you most fluent in?` and the tag being `first language`, and click the save icon on the right. Now we also check the checkbox "show in students list". \
+We'll give you an example, right now the list of students is very empty, for every student only their name and the decision is shown. 
+
+![students list before](#screenshots/students_list_before.png)
+
+Lets say we value the language they're most fluent in a lot. We go to settings, edition setting, and open the question-tags tab. In here we add a new question-tag with the question being `What language are you most fluent in?` and the tag being `first language`, and click the save icon on the right. Now we also check the checkbox "show in students list".
+
+![students list before](#screenshots/students_list_firstlang_config.png)
+
 Now when we look at the students list, every student will have `first language: English` or whatever language they answered to that question.
+
+![students list before](#screenshots/students_list_after.png)
 
 #### 8.4.4. Managing users
 You'll only see these settings if you are an admin.
