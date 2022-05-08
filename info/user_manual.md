@@ -485,15 +485,15 @@ Well you select students based on different things, and these "things" might dif
 
 We'll give you an example, right now the list of students is very empty, for every student only their name and the decision is shown. 
 
-![students list before](#screenshots/students_list_before.png)
+![students list before](screenshots/students_list_before.png)
 
 Lets say we value the language they're most fluent in a lot. We go to settings, edition setting, and open the question-tags tab. In here we add a new question-tag with the question being `What language are you most fluent in?` and the tag being `first language`, and click the save icon on the right. Now we also check the checkbox "show in students list".
 
-![students list before](#screenshots/students_list_firstlang_config.png)
+![students list before](screenshots/students_list_firstlang_config.png)
 
 Now when we look at the students list, every student will have `first language: English` or whatever language they answered to that question.
 
-![students list before](#screenshots/students_list_after.png)
+![students list before](screenshots/students_list_after.png)
 
 #### 8.4.4. Managing users
 You'll only see these settings if you are an admin.
