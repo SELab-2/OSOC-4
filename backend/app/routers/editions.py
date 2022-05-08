@@ -125,7 +125,7 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
     # get the admins
     admins = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
     user_ids += [admin.id for admin in admins]
-    return [f"{config.api_url}users/{str(id)}" for id in user_ids]
+    return [f"{config.api_url}users/{str(id)}" for id in set(user_ids)]
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
