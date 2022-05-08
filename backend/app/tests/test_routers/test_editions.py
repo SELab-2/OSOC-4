@@ -53,16 +53,16 @@ class TestEditions(TestBase):
         edition_name = test_data["name"]
 
         if "name" in edition:
-            edtion_dict = edition
+            edition_dict = edition
         else:
-            edtion_dict = edition.dict()
+            edition_dict = edition.dict()
 
         # compare data
         for key, value in test_data.items():
-            self.assertEqual(edtion_dict[key], value,
+            self.assertEqual(edition_dict[key], value,
                              (f"{key} of edition '{edition_name}' did not match.\n"
                               f"Expected: {value}\n"
-                              f"Got: {edtion_dict[key]}"))
+                              f"Got: {edition_dict[key]}"))
 
     async def test_get_editions(self):
         edition2022 = await self.create_edition_in_db(2022)
@@ -94,7 +94,7 @@ class TestEditions(TestBase):
         self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
 
         # Compare response edition data with expected edition data
-        expected_edtion_data = {
+        expected_edition_data = {
             "uri": f"{config.api_url}editions/{edition.year}",
             "year": edition.year,
             "name": edition.name,
@@ -105,8 +105,8 @@ class TestEditions(TestBase):
             "questiontags": f"{config.api_url}editions/{edition.year}/questiontags"
         }
         for user_title in allowed_users:
-            edtion_data_from_response = json.loads(responses1.get(user_title).content)
-            self.assert_edition_equal(expected_edtion_data, edtion_data_from_response)
+            edition_data_from_response = json.loads(responses1.get(user_title).content)
+            self.assert_edition_equal(expected_edition_data, edition_data_from_response)
 
     async def test_get_edition_users(self):
         edition = await self.create_edition_in_db()
@@ -130,8 +130,8 @@ class TestEditions(TestBase):
 
         # Compare response edition data with expected edition data
         for user_title in allowed_users:
-            edtion_data_from_response = json.loads(responses1.get(user_title).content)
-            response_ids = [int(user_url.split('/')[-1]) for user_url in edtion_data_from_response]
+            edition_data_from_response = json.loads(responses1.get(user_title).content)
+            response_ids = [int(user_url.split('/')[-1]) for user_url in edition_data_from_response]
             response_ids.sort()
             self.assertEqual(test_users_ids, response_ids, f"Returned users of edition {edition.year} don't match expected value")
 
@@ -340,7 +340,7 @@ class TestEditions(TestBase):
         for user_title in allowed_users:
             edition_year_in_response_url = int(json.loads(responses1.get(user_title).content).split("/")[-1])
 
-        # Check edtion year in the response url
+        # Check edition year in the response url
         self.assertEqual(edition_year_in_response_url, new_edition["year"], f"Response url doesn't have the right edition year {new_edition['year']}")
 
         # Test whether created edition is in the database
@@ -374,7 +374,7 @@ class TestEditions(TestBase):
         for user_title in allowed_users:
             edition_year_in_response_url = int(json.loads(responses1.get(user_title).content).split("/")[-1])
 
-        # Check edtion year in the response url
+        # Check edition year in the response url
         self.assertEqual(edition_year_in_response_url, updated_edition["year"], f"Response url doesn't have the right edition year {updated_edition['year']}")
 
         # Test whether updated edition is in the database
