@@ -43,11 +43,17 @@
 
 [8.1. Interaction diagram](#81-interaction-diagram) \
 [8.2. Logging in](#82-logging-in) \
-[8.3. The navigation bar](#83-the-navigation-bar) \
-[8.4. The settings](#84-the-settings) \
+[8.3. Navigating the application](#83-navigating-the-application) \
+[8.4. Configuring settings](#84-configuring-settings) \
 [8.4.1. Personal settings](#841-personal-settings) \
-[8.4.2. Edition settings](#842-edition-settings) \
-[8.4.3. Manage users](#843-manage-users)
+[8.4.2. Changing the selected edition & configuring the current edition](#842-changing-the-selected-edition--configuring-the-current-edition) \
+[8.4.3. Managing users](#843-managing-users) \
+[8.4. Adding new users](#84-adding-new-users)
+
+
+
+
+
 
 
 ## 1. Introduction
@@ -486,5 +492,8 @@ Below the "Invite new users" you can see `Manage users`. In here you have a tabl
 ### 8.5. Adding new users
 We've chosen not to go with a classic register and login type of access-control for the application. Instead we work with an invite-system, where an admin must invite new coaches. The invite process goes as follows.
 
-Lets say Alice is an admin wishing to invite Bob. First Alice has to go to settings and then to manage users, where she clicks on the `Invite new users` button. In the popup window that showed up Alice types the email address of Bob, and clicks on `invite users`. Right now Bob will receive an email with a link he can click on. Bob will now be listed in manage users as unactivated. If Bob clicks on the link, he sees a page where he's asked to fill out his name (can be a nickname) and password, and click submit. Bob's account is now activited, he must now wait on Alice to approve him. Alice can go to the manage users again in settings, and for her convenience she clicks on the filter `not yet approved` to se aa list of users that have activated their account and wish to be approved. In this filtered list she finds Bob (recognised by the email address since he could have typed any name he wants), and clicks on approve to give him access to the application. Now Bob has an approved account, and is able to log in.
+Lets say Alice is an admin wishing to invite Bob. First Alice has to go to `settings` and then to `manage users`, where she clicks on the `Invite new users` button. In the popup window that showed up Alice types the `email address of Bob`, and clicks on `invite users`. Right now Bob will receive an email with a link he can click on. Bob will now be listed in manage users as unactivated. \
+If `Bob clicks on the link`, he sees a page where he's asked to `fill out` his `name` (can be a nickname) and `password`, and click `submit`. Bob's account is now activited, he must now wait on Alice to approve him. \
+Alice can go to the `manage users` again in settings, and for her convenience she clicks on the filter `not yet approved` to se aa list of users that have activated their account and wish to be approved. In this filtered list she finds Bob (recognised by the email address since he could have typed any name he wants), and clicks on `approve` to give him access to the application. \
+Now Bob has an approved account, and is able to log in.
 
