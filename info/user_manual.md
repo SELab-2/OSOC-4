@@ -473,8 +473,14 @@ If you click on `Create new edition` you'll see a form that you can fill in in o
 #### 8.4.3. Manage users
 You'll only see these settings if you are an admin.
 
-Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users". The `Invite users` can be used to send people an invite so they can join the application. You simply type the email addresses of the people you want to invite in the text-area, and click the send invites button. You'll get an alert when the emails have all been send. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line. 
+Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users".
+
+![setttings manageusers](screenshots/manageusers.png)
+
+The `Invite users` can be clicked on, if you do so you'll see a popup window where you can send people an invite so they can join the application. You simply type the email addresses of the people you want to invite in the text-area (every email address on a new line), and click the send invites button. You'll se the text change when the emails are sent. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line. 
+
+![invite users](screenshots/invite_users.png)
 
 Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invite but hasn't yet activated the account.
 
-![setttings manageusers](screenshots/manageusers.png)
+
