@@ -41,7 +41,6 @@ class SuggestionCreate(BaseModel):
     """the expected input model (in the body of a HTML POST request) for creating a Suggestion
     """
     decision: SuggestionOption
-    definitive: bool = False
     reason: str
 
     student_id: int
