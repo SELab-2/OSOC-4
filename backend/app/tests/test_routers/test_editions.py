@@ -111,7 +111,7 @@ class TestEditions(TestBase):
     async def test_get_edition_users(self):
         edition = await self.create_edition_in_db()
 
-        users = await read_all_where(User, User.active is True, User.approved is True, User.disabled is False, session=self.session)
+        users = await read_all_where(User, User.active, User.approved, User.disabled == False, session=self.session)
         for user in users:
             editionCoach = EditionCoach(edition=edition.year, coach_id=user.id)
             await update(editionCoach, self.session)
