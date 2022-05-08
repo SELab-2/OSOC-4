@@ -47,7 +47,8 @@
 [8.4. Configuring settings](#84-configuring-settings) \
 [8.4.1. Personal settings](#841-personal-settings) \
 [8.4.2. Edition settings](#842-edition-settings) \
-[8.4.3. Managing users](#843-managing-users) \
+[8.4.3. Question-tags](#843-question-tags) \
+[8.4.4. Managing users](#844-managing-users) \
 [8.5. Adding new users](#85-adding-new-users)
 
 
@@ -476,7 +477,7 @@ If you click on `Question tags` you'll see a list of the question tags for this 
 
 If you click on `Create new edition` you'll see a form that you can fill in in order to create the new edition. You'll need to provide the year, name and description of the new edition, and then press the "create edition" button below.
 
-#### 8.4.3 Question-tag
+#### 8.4.3. Question-tags
 In this section we'll explain a bit further the usage of the question-tags. When a student fills out the tally-form, the questions and answers get send to our application. In our application we needed a way to know what meaning a question has. For example the questions "What's you name?", "First name?" or "What is your first name?" are all different questions but they all have the name of the student as an answer, but how can we link more difficult questions to such an easy term like "name". That's exactly what questio-tags are for. In the settings page under edition settings, you'll find `Qestion-tags`, where you can configure them all. So basicly all you need to do is connect a question to a tag, hence the name question-tags. 
 
 But what are they usefull for? \
@@ -486,7 +487,7 @@ We'll give you an example, right now the list of students is very empty, for eve
 Lets say we value the language they're most fluent in a lot. We go to settings, edition setting, and open the question-tags tab. In here we add a new question-tag with the question being `What language are you most fluent in?` and the tag being `first language`, and click the save icon on the right. Now we also check the checkbox "show in students list". \
 Now when we look at the students list, every student will have `first language: English` or whatever language they answered to that question.
 
-#### 8.4.3. Managing users
+#### 8.4.4. Managing users
 You'll only see these settings if you are an admin.
 
 Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users".
