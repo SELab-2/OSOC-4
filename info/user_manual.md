@@ -441,14 +441,14 @@ The application (or website, or frontend) will then send a POST request to the A
 
 ![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
 
-### 8.3. The navigation bar
+### 8.3. Navigating the application
 The navigation bar, probably the most important part of any website. If you're logged in, the navigation bar will always be shown at the top of the page, no mather what page you're currently viewing. This component is used to switch between pages, for example if you click on the `select-students` text (this is a link), you will be redirected to the select-students page. The same goes for `projects` which bring you to the projects page and for `settings` which brings you to the settings page. If you wish to go back to the `dashboard` (the main page, the page you view after having logged in), you can click on the image / logo all the way on the left. If you wish to log out, you can simply click on the `Log out` text all the way on the right. Keep in mind that when you're logged out you won't see the navigation bar, as you're not allowed to navigate the application (you must be logged in for that).
 
 ![navigation component](screenshots/navigation_component.png)
 
 Clicking on any of these links will require some requests to the API as new data needs to be loaded.
 
-### 8.4. The settings
+### 8.4. Configuring settings
 The settings page, the place to configure (almost) everything! The page consists of multiple categories you can click on and will then open up to reveal the settings for that category. 
 
 #### 8.4.1. Personal settings
@@ -456,7 +456,7 @@ By default when you arrive on the settings page, the category `personal settings
 
 ![settings personal](screenshots/settings_personal.png)
 
-#### 8.4.2. Edition settings
+#### 8.4.2. Changing the selected edition & configuring the current edition
 You'll only see these settings if you are an admin.
 
 If you click on the `Edition settings` you'll see the title of the current (selected) edition, with underneath the description. Below that you'll see 3 more settings sub-categories that can be clicked on to open. \
@@ -470,7 +470,7 @@ If you click on `Question tags` you'll see a list of the question tags for this 
 
 If you click on `Create new edition` you'll see a form that you can fill in in order to create the new edition. You'll need to provide the year, name and description of the new edition, and then press the "create edition" button below.
 
-#### 8.4.3. Manage users
+#### 8.4.3. Managing users
 You'll only see these settings if you are an admin.
 
 Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users".
@@ -481,6 +481,10 @@ The `Invite users` can be clicked on, if you do so you'll see a popup window whe
 
 ![invite users](screenshots/invite_users.png)
 
-Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invite but hasn't yet activated the account.
+Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. This is the place you need to be if you want to make a coach an admin (or the other way around), revoke a user his access to the application, or approve them to the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invite but hasn't yet activated the account. 
 
+8.5. Adding new users
+We've chosen not to go with a classic register and login type of access-control for the application. Instead we work with an invite-system, where an admin must invite new coaches. The invite process goes as follows.
+
+Lets say Alice is an admin wishing to invite Bob. First Alice has to go to settings and then to manage users, where she clicks on the `Invite new users` button. In the popup window that showed up Alice types the email address of Bob, and clicks on ìnvite users`. Right now Bob will receive an email with a link he can click on. Bob will now be listed in manage users as unactivated. If Bob clicks on the link, he sees a page where he's asked to fill out his name (can be a nickname) and password, and click submit. Bob's account is now activited, he must now wait on Alice to approve him. Alice can go to the manage users again in settings, and for her convenience she clicks on the filter `not yet approved` to se aa list of users that have activated their account and wish to be approved. In this filtered list she finds Bob (recognised by the email address since he could have typed any name he wants), and clicks on approve to give him access to the application. Now Bob has an approved account, and is able to log in.
 
