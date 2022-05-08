@@ -1,20 +1,16 @@
 import json
 from typing import Dict, Set, List
-from unicodedata import name
 import uuid
-from httpcore import request
 from httpx import Response
 from app.config import config
 from app.crud import read_all_where, read_where, update
-from app.models.project import Project, ProjectCoach, ProjectRequiredSkill
+from app.models.project import Project, ProjectCoach
 from app.models.user import User, UserRole
 from app.tests.test_base import TestBase, Request
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
-from app.tests.utils_for_tests.UserGenerator import UserGenerator
 from app.models.edition import Edition, EditionCoach
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
-from app.models.skill import Skill
 from app.tests.utils_for_tests.ProjectGenerator import ProjectGenerator
 from app.models.participation import Participation
 from app.tests.utils_for_tests.QuestionTagGenerator import QuestionTagGenerator
@@ -24,16 +20,13 @@ from app.models.student import Student
 
 
 class TestEditions(TestBase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    async def create_edition_in_db(self, edition_year:int = 2022)->Edition:
+    async def create_edition_in_db(self, edition_year: int = 2022) -> Edition:
         edition_generator = EditionGenerator(self.session)
         edition = edition_generator.generate_edition(edition_year)
         await update(edition, self.session)
         return edition
 
-    async def create_students_in_db(self, edition:Edition, count:int=1)->List[Student]:
+    async def create_students_in_db(self, edition: Edition, count: int = 1) -> List[Student]:
         skill_generator = SkillGenerator(self.session)
         skill_generator.generate_skills()
         student_generator = StudentGenerator(self.session, edition=edition, skills=skill_generator.data)
@@ -42,14 +35,14 @@ class TestEditions(TestBase):
         await self.session.commit()
         return student_generator.data
 
-    async def create_projects_in_db(self, edition:Edition, count:int=1)->List[Project]:
+    async def create_projects_in_db(self, edition: Edition, count: int = 1) -> List[Project]:
         project_generator = ProjectGenerator(self.session, edition_year=edition.year)
         project_generator.generate_projects(count)
         project_generator.add_to_db()
         await self.session.commit()
         return project_generator.data
 
-    async def create_question_tags_in_db(self, edition:Edition)->List[QuestionTag]:
+    async def create_question_tags_in_db(self, edition: Edition) -> List[QuestionTag]:
         question_tag_generator = QuestionTagGenerator(self.session, edition)
         question_tag_generator.generate_question_tags()
         question_tag_generator.add_to_db()
@@ -76,11 +69,11 @@ class TestEditions(TestBase):
 
         # Send Get request
         path = "/editions"
-        allowed_users: Set[str] =  await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Check response data
-        self.assertGreater(len(responses1), 0,  "Expect at least one response from the endpoint")
+        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
         self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
 
         # Edition year from the response url in each response should be same as edition_year
@@ -93,11 +86,11 @@ class TestEditions(TestBase):
         edition = await self.create_edition_in_db()
         # Send Get request
         path = f'/editions/{edition.year}'
-        allowed_users: Set[str] =  await self.get_users_by([UserRole.ADMIN])
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Check response data
-        self.assertGreater(len(responses1), 0,  "Expect at least one response from the endpoint")
+        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
         self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
 
         # Compare response edition data with expected edition data
@@ -115,12 +108,10 @@ class TestEditions(TestBase):
             edtion_data_from_response = json.loads(responses1.get(user_title).content)
             self.assert_edition_equal(expected_edtion_data, edtion_data_from_response)
 
-
     async def test_get_edition_users(self):
-
         edition = await self.create_edition_in_db()
 
-        users = await read_all_where(User, User.active == True, User.approved == True, User.disabled == False, session=self.session)
+        users = await read_all_where(User, User.active is True, User.approved is True, User.disabled is False, session=self.session)
         for user in users:
             editionCoach = EditionCoach(edition=edition.year, coach_id=user.id)
             await update(editionCoach, self.session)
@@ -131,7 +122,7 @@ class TestEditions(TestBase):
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Check response data
-        self.assertGreater(len(responses1), 0,  "Expect at least one response from the endpoint")
+        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
         self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
 
         test_users_ids = [user.id for user in users]
@@ -142,8 +133,7 @@ class TestEditions(TestBase):
             edtion_data_from_response = json.loads(responses1.get(user_title).content)
             response_ids = [int(user_url.split('/')[-1]) for user_url in edtion_data_from_response]
             response_ids.sort()
-            self.assert_edition_equal(test_users_ids, response_ids, f"Returned users of edition {edition.year} don't match expected value")
-
+            self.assertEqual(test_users_ids, response_ids, f"Returned users of edition {edition.year} don't match expected value")
 
     async def test_get_edition_students(self):
 
@@ -155,8 +145,8 @@ class TestEditions(TestBase):
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
-         # Check response datas
-        self.assertGreater(len(responses1), 0,  "Expect at least one response from the endpoint")
+        # Check response data
+        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
         self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
 
         test_students_ids = [student.id for student in students]
@@ -171,7 +161,7 @@ class TestEditions(TestBase):
 
     async def test_get_edition_projects_user_admin_should_get_all_projects(self):
 
-        edition =  await self.create_edition_in_db()
+        edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
 
         # Send request
@@ -191,10 +181,10 @@ class TestEditions(TestBase):
     async def test_get_edition_projects_user_coach_should_get_no_projects_if_he_is_not_coach_for_any_projects(self):
         """Test GET /editions/{year}/projects with user_coach should get no projects if he is not coach for any projects."""
 
-        edition =  await self.create_edition_in_db()
+        edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
 
-         # Send request
+        # Send request
         path = f'/editions/{edition.year}/projects'
         response = await self.do_request(Request.GET, path, self.user_coach.name, access_token=await self.get_access_token(self.user_coach.name))
         edition_projects_from_response = json.loads(response.content)
@@ -210,7 +200,7 @@ class TestEditions(TestBase):
 
     async def test_get_edition_projects_user_coach_should_get_projects_if_he_is_coach_for_the_project(self):
 
-        edition =  await self.create_edition_in_db()
+        edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
 
         projectCoach = ProjectCoach(project_id=projects[0].id, coach_id=self.user_coach.id)
@@ -225,12 +215,12 @@ class TestEditions(TestBase):
         test_projects_ids = [project.id for project in projects]
         test_projects_ids.sort()
         response_ids = [int(project_url.split('/')[-1]) for project_url in edition_projects_from_response]
-        self.assertEquals(len(response_ids), 1, f"Expected 1 project for coach: {self.user_coach.name}")
-        self.assertEqual(projects[0].id, response_ids[0], f"Project id in the response url is not correct")
+        self.assertEqual(len(response_ids), 1, f"Expected 1 project for coach: {self.user_coach.name}")
+        self.assertEqual(projects[0].id, response_ids[0], "Project id in the response url is not correct")
 
     async def test_get_edition_resolving_conflict(self):
 
-        edition =  await self.create_edition_in_db()
+        edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
         students = await self.create_students_in_db(edition=edition, count=10)
 
@@ -258,11 +248,11 @@ class TestEditions(TestBase):
         conflict_student_Ids = [conflict_student_Id_1, conflict_student_Id_2]
         conflict_student_Ids.sort()
 
-        self.assertEqual(conflict_student_Ids, response_ids, f"Conflict students in the response url is not correct")
+        self.assertEqual(conflict_student_Ids, response_ids, "Conflict students in the response url is not correct")
 
     async def test_get_edition_question_tags(self):
 
-        edition =  await self.create_edition_in_db()
+        edition = await self.create_edition_in_db()
         question_tags = await self.create_question_tags_in_db(edition)
 
         # send request
@@ -274,13 +264,13 @@ class TestEditions(TestBase):
         response_tags = [question_tag.split('/')[-1] for question_tag in question_tags_from_response]
         response_tags.sort()
 
-        question_tags = [question_tag.tag for question_tag in  question_tags]
+        question_tags = [question_tag.tag for question_tag in question_tags]
         question_tags.sort()
 
-        self.assertEqual(question_tags, response_tags, f"Question tags in the response is not correct")
+        self.assertEqual(question_tags, response_tags, "Question tags in the response is not correct")
 
     async def test_get_edition_question_tags_tag(self):
-        edition =  await self.create_edition_in_db()
+        edition = await self.create_edition_in_db()
         question_tags = await self.create_question_tags_in_db(edition)
 
         question = Question(question="Just a question?", edition=edition.year)
@@ -292,7 +282,7 @@ class TestEditions(TestBase):
         question_tag.mandatory = True
         await update(question_tag, self.session)
 
-        #send request
+        # send request
         path = f'/editions/{edition.year}/questiontags/{question_tag.tag}'
         response = await self.do_request(Request.GET, path, self.user_admin.name, access_token=await self.get_access_token(self.user_admin.name))
         question_tag_detail_from_response = json.loads(response.content)
@@ -305,7 +295,7 @@ class TestEditions(TestBase):
 
     async def test_get_edition_question_tags_showinlist(self):
 
-        edition =  await self.create_edition_in_db()
+        edition = await self.create_edition_in_db()
         question_tags = await self.create_question_tags_in_db(edition)
 
         question = Question(question="Just a question?", edition=edition.year)
@@ -317,7 +307,7 @@ class TestEditions(TestBase):
         question_tag.mandatory = True
         await update(question_tag, self.session)
 
-        #send request
+        # send request
         path = f'/editions/{edition.year}/questiontags/showinlist'
         response = await self.do_request(Request.GET, path, self.user_admin.name, access_token=await self.get_access_token(self.user_admin.name))
         question_tag_detail_from_response = json.loads(response.content)
@@ -340,7 +330,7 @@ class TestEditions(TestBase):
         }
         edition_name = new_edition["name"]
 
-           # Send post create edition request
+        # Send post create edition request
         path = "/editions/create"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users,
@@ -351,7 +341,7 @@ class TestEditions(TestBase):
             edition_year_in_response_url = int(json.loads(responses1.get(user_title).content).split("/")[-1])
 
         # Check edtion year in the response url
-        self.assertEqual( edition_year_in_response_url, new_edition["year"], f"Response url doesn't have the right edition year {new_edition['year']}")
+        self.assertEqual(edition_year_in_response_url, new_edition["year"], f"Response url doesn't have the right edition year {new_edition['year']}")
 
         # Test whether created edition is in the database
         edition_in_db = await read_where(Edition, Edition.name == edition_name, session=self.session)
@@ -378,8 +368,7 @@ class TestEditions(TestBase):
         # Send patch request
         path = f"/editions/{edition.year}"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users,
-                                                                                updated_edition)
+        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users, updated_edition)
         # Get edition id from the response url
         edition_year_in_response_url = 0
         for user_title in allowed_users:
@@ -474,7 +463,7 @@ class TestEditions(TestBase):
             "mandatory": question_tag.mandatory
         }
         # tag can be changed if mandatory is false.
-        if updated_question_tag_request_body["mandatory"] == True:
+        if updated_question_tag_request_body["mandatory"]:
             new_question_tag = question_tag.tag
         else:
             new_question_tag = str(uuid.uuid1())
@@ -494,8 +483,8 @@ class TestEditions(TestBase):
 
         # Check questin tag field vaules in the database
         question_tag_in_db = await read_where(QuestionTag, QuestionTag.tag == new_question_tag, session=self.session)
-        self.assertEqual(question_tag_in_db.tag, new_question_tag, f"Question tag was not updated in database.")
+        self.assertEqual(question_tag_in_db.tag, new_question_tag, "Question tag was not updated in database.")
         # change mandatory field is not supported yet
         # self.assertEqual(question_tag_in_db.mandatory, updated_question_tag["mandatory"], f"Mandatory field was not updated in database.")
-        self.assertEqual(question_tag_in_db.showInList, updated_question_tag_request_body["showInList"], f"showInList was not updated in database.")
-        self.assertEqual(question_tag_in_db.question_id, question.id, f"Question id was not updated in database.")
+        self.assertEqual(question_tag_in_db.showInList, updated_question_tag_request_body["showInList"], "showInList was not updated in database.")
+        self.assertEqual(question_tag_in_db.question_id, question.id, "Question id was not updated in database.")

@@ -1,4 +1,3 @@
-import uuid
 from app.models.question_tag import QuestionTag
 from app.tests.utils_for_tests.DataGenerator import DataGenerator
 from app.models.edition import Edition
@@ -9,7 +8,7 @@ class QuestionTagGenerator(DataGenerator):
         super().__init__(session)
         self.edition_year = edition.year
 
-    def generate_default_question_tag(self):
+    def generate_question_tags(self):
         self.data += [
             QuestionTag(
                 edition=self.edition_year,
@@ -39,9 +38,3 @@ class QuestionTagGenerator(DataGenerator):
                 mandatory=True,
                 tag="first name"),
         ]
-
-    def generate_question_tags(self):
-        return self.generate_default_question_tag()
-
-    def add_to_db(self):
-        super().add_to_db()
