@@ -99,7 +99,7 @@ async def update_edition(year: int, edition: Edition = Body(...), role: RoleChec
         raise EditionNotFound()
 
     # check that the coach has access to that edition
-    if not role != UserRole.ADMIN:
+    if role != UserRole.ADMIN:
         edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
         user_ids = [coach.coach_id for coach in edition_coaches]
         if not Authorize.get_jwt_subject() in user_ids:
