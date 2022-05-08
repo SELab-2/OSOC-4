@@ -32,7 +32,6 @@ class Suggestion(SQLModel, table=True):
 
 class SuggestionCreate(BaseModel):
     decision: SuggestionOption
-    definitive: bool = False
     reason: str
 
     student_id: int
