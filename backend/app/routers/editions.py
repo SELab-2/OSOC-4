@@ -259,7 +259,7 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
     else:
         q = ""
 
-    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, showInList=qtag.showInList, question=q)
+    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, show_in_list=qtag.show_in_list, question=q)
 
 
 @router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker(update=True))], response_description="Tags retrieved")
@@ -273,7 +273,7 @@ async def get_showinlist_question_tags(year: int, session: AsyncSession = Depend
     :return: list of QuestionTags
     :rtype: list of QuestionTags
     """
-    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).where(QuestionTag.showInList == True).order_by(QuestionTag.tag))
+    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).where(QuestionTag.show_in_list is True).order_by(QuestionTag.tag))
     tags = res.all()
     return [tag.tag for (tag,) in tags]
 
@@ -360,7 +360,7 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     else:
         raise QuestionTagCantBeModified()
 
-    questiontag.showInList = tagupdate.showInList
+    questiontag.show_in_list = tagupdate.show_in_list
 
     if questiontag.question and questiontag.question.question != tagupdate.question:
 
