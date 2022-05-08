@@ -48,7 +48,7 @@
 [8.4.1. Personal settings](#841-personal-settings) \
 [8.4.2. Changing the selected edition & configuring the current edition](#842-changing-the-selected-edition--configuring-the-current-edition) \
 [8.4.3. Managing users](#843-managing-users) \
-[8.4. Adding new users](#84-adding-new-users)
+[8.5. Adding new users](#85-adding-new-users)
 
 
 
