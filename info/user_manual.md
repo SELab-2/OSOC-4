@@ -46,7 +46,7 @@
 [8.3. Navigating the application](#83-navigating-the-application) \
 [8.4. Configuring settings](#84-configuring-settings) \
 [8.4.1. Personal settings](#841-personal-settings) \
-[8.4.2. Changing the selected edition & configuring the current edition](#842-changing-the-selected-edition--configuring-the-current-edition) \
+[8.4.2. Edition settings](#842-edition-settings) \
 [8.4.3. Managing users](#843-managing-users) \
 [8.5. Adding new users](#85-adding-new-users)
 
@@ -462,7 +462,7 @@ By default when you arrive on the settings page, the category `personal settings
 
 ![settings personal](screenshots/settings_personal.png)
 
-#### 8.4.2. Changing the selected edition & configuring the current edition
+#### 8.4.2. Edition settings
 You'll only see these settings if you are an admin.
 
 If you click on the `Edition settings` you'll see the title of the current (selected) edition, with underneath the description. Below that you'll see 3 more settings sub-categories that can be clicked on to open. \
@@ -475,6 +475,16 @@ If you click on `Question tags` you'll see a list of the question tags for this 
 ![settings editions questiontags](screenshots/settings_editions_questiontags.png)
 
 If you click on `Create new edition` you'll see a form that you can fill in in order to create the new edition. You'll need to provide the year, name and description of the new edition, and then press the "create edition" button below.
+
+#### 8.4.3 Question-tag
+In this section we'll explain a bit further the usage of the question-tags. When a student fills out the tally-form, the questions and answers get send to our application. In our application we needed a way to know what meaning a question has. For example the questions "What's you name?", "First name?" or "What is your first name?" are all different questions but they all have the name of the student as an answer, but how can we link more difficult questions to such an easy term like "name". That's exactly what questio-tags are for. In the settings page under edition settings, you'll find `Qestion-tags`, where you can configure them all. So basicly all you need to do is connect a question to a tag, hence the name question-tags. 
+
+But what are they usefull for? \
+Well everyone selects students based on different things, some opt level of english more important than how far along they are in their studies. As we don't want to show all info of every student in the list of students. You would rather see the information that you value the most. In the settings of question-tags, you can select for each question-tag whether or not you want to see that piece of information for each student in the list of students.
+
+We'll give you an example, right now the list of students is very empty, for every student only their name and the decision is shown. \
+Lets say we value the language they're most fluent in a lot. We go to settings, edition setting, and open the question-tags tab. In here we add a new question-tag with the question being `What language are you most fluent in?` and the tag being `first language`, and click the save icon on the right. Now we also check the checkbox "show in students list". \
+Now when we look at the students list, every student will have `first language: English` or whatever language they answered to that question.
 
 #### 8.4.3. Managing users
 You'll only see these settings if you are an admin.
