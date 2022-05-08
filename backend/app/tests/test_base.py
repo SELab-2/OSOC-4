@@ -65,6 +65,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
         self.session: AsyncSession = self.sessionmaker()
+        await clear_data(self.session)
 
         user_generator = UserGenerator(self.session)
         user_generator.generate_default_users()
@@ -74,9 +75,10 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         user_generator.add_to_db()
         await self.session.commit()
 
-    async def asyncTearDown(self) -> None:
-        await clear_data(self.session)
+        self.user_coach = self.users["coach"]
+        self.user_admin = self.users["user_admin"]
 
+    async def asyncTearDown(self) -> None:
         await self.lf.__aexit__()
         await self.client.aclose()
         await self.session.close()
