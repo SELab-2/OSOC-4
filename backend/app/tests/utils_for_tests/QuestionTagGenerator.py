@@ -8,33 +8,17 @@ class QuestionTagGenerator(DataGenerator):
         super().__init__(session)
         self.edition_year = edition.year
 
-    def generate_question_tags(self):
+    def generate_question_tags(self, n=1):
         self.data += [
             QuestionTag(
                 edition=self.edition_year,
-                tag="studies"),
-            QuestionTag(
-                edition=self.edition_year,
-                tag="type of degree"),
-            QuestionTag(
-                edition=self.edition_year,
-                tag="level of english"),
-            QuestionTag(
-                edition=self.edition_year,
-                tag="first language"),
-            QuestionTag(
-                edition=self.edition_year,
-                tag="phone number"),
+                mandatory=False,
+                tag=f"tag{i+1}") for i in range(n)
+        ]
+
+        self.data += [
             QuestionTag(
                 edition=self.edition_year,
                 mandatory=True,
-                tag="email"),
-            QuestionTag(
-                edition=self.edition_year,
-                mandatory=True,
-                tag="last name"),
-            QuestionTag(
-                edition=self.edition_year,
-                mandatory=True,
-                tag="first name"),
+                tag=f"mandatory_tag{i+1}") for i in range(n)
         ]

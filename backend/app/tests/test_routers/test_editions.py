@@ -44,7 +44,7 @@ class TestEditions(TestBase):
 
     async def create_question_tags_in_db(self, edition: Edition) -> List[QuestionTag]:
         question_tag_generator = QuestionTagGenerator(self.session, edition)
-        question_tag_generator.generate_question_tags()
+        question_tag_generator.generate_question_tags(n=5)
         question_tag_generator.add_to_db()
         await self.session.commit()
         return question_tag_generator.data
@@ -70,16 +70,12 @@ class TestEditions(TestBase):
         # Send Get request
         path = "/editions"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
-
-        # Check response data
-        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
-        self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Edition year from the response url in each response should be same as edition_year
         edition_year_from_response_url = ""
         for user_title in allowed_users:
-            edition_year_from_response_url = json.loads(responses1.get(user_title).content)[0].split("/")[-1]
+            edition_year_from_response_url = json.loads(responses.get(user_title).content)[0].split("/")[-1]
             self.assertEqual(edition_year_from_response_url, str(edition2022.year), f"Returned editions of {edition2022.year} don't match expected value")
 
     async def test_get_editions_by_year(self):
@@ -87,11 +83,7 @@ class TestEditions(TestBase):
         # Send Get request
         path = f'/editions/{edition.year}'
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
-
-        # Check response data
-        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
-        self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Compare response edition data with expected edition data
         expected_edition_data = {
@@ -105,7 +97,7 @@ class TestEditions(TestBase):
             "questiontags": f"{config.api_url}editions/{edition.year}/questiontags"
         }
         for user_title in allowed_users:
-            edition_data_from_response = json.loads(responses1.get(user_title).content)
+            edition_data_from_response = json.loads(responses.get(user_title).content)
             self.assert_edition_equal(expected_edition_data, edition_data_from_response)
 
     async def test_get_edition_users(self):
@@ -119,18 +111,14 @@ class TestEditions(TestBase):
         # Send request
         path = f'/editions/{edition.year}/users'
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
-
-        # Check response data
-        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
-        self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         test_users_ids = [user.id for user in users]
         test_users_ids.sort()
 
         # Compare response edition data with expected edition data
         for user_title in allowed_users:
-            edition_data_from_response = json.loads(responses1.get(user_title).content)
+            edition_data_from_response = json.loads(responses.get(user_title).content)
             response_ids = [int(user_url.split('/')[-1]) for user_url in edition_data_from_response]
             response_ids.sort()
             self.assertEqual(test_users_ids, response_ids, f"Returned users of edition {edition.year} don't match expected value")
@@ -143,23 +131,19 @@ class TestEditions(TestBase):
         # Send request
         path = f'/editions/{edition.year}/students'
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
-
-        # Check response data
-        self.assertGreater(len(responses1), 0, "Expect at least one response from the endpoint")
-        self.assertEqual(len(allowed_users), len(responses1), "Number of responses should be same as number of users")
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         test_students_ids = [student.id for student in students]
         test_students_ids.sort()
 
         # Compare response edition data with expected edition data
         for user_title in allowed_users:
-            edition_students_from_response = json.loads(responses1.get(user_title).content)
+            edition_students_from_response = json.loads(responses.get(user_title).content)
             response_ids = [int(student_url.split('/')[-1]) for student_url in edition_students_from_response]
             response_ids.sort()
             self.assertEqual(test_students_ids, response_ids, f"Returned students don't match expected students for edition {edition.year}")
 
-    async def test_get_edition_projects_user_admin_should_get_all_projects(self):
+    async def test_get_edition_projects_user_admin(self):
 
         edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
@@ -178,8 +162,8 @@ class TestEditions(TestBase):
 
         self.assertEqual(test_projects_ids, response_ids, f"Returned projects don't match expected projects for edition {edition.year}")
 
-    async def test_get_edition_projects_user_coach_should_get_no_projects_if_he_is_not_coach_for_any_projects(self):
-        """Test GET /editions/{year}/projects with user_coach should get no projects if he is not coach for any projects."""
+    async def test_get_edition_projects_user_coach_no_projects(self):
+        """GET /editions/{year}/projects with user_coach should get no projects if he is not coach for any projects"""
 
         edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
@@ -198,7 +182,8 @@ class TestEditions(TestBase):
 
         self.assertEqual(len(response_ids), 0, f"No projects should be returned for coach {self.user_coach.name}")
 
-    async def test_get_edition_projects_user_coach_should_get_projects_if_he_is_coach_for_the_project(self):
+    async def test_get_edition_projects_user_coach_in_project(self):
+        """GET /editions/{year}/projects with user_coach should get a project if he is a coach for the project"""
 
         edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
@@ -333,12 +318,11 @@ class TestEditions(TestBase):
         # Send post create edition request
         path = "/editions/create"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users,
-                                                                              new_edition)
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, new_edition)
         # Get edition id from the response url
         edition_year_in_response_url = 0
         for user_title in allowed_users:
-            edition_year_in_response_url = int(json.loads(responses1.get(user_title).content).split("/")[-1])
+            edition_year_in_response_url = int(json.loads(responses.get(user_title).content).split("/")[-1])
 
         # Check edition year in the response url
         self.assertEqual(edition_year_in_response_url, new_edition["year"], f"Response url doesn't have the right edition year {new_edition['year']}")
@@ -368,11 +352,11 @@ class TestEditions(TestBase):
         # Send patch request
         path = f"/editions/{edition.year}"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users, updated_edition)
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.PATCH, path, allowed_users, updated_edition)
         # Get edition id from the response url
         edition_year_in_response_url = 0
         for user_title in allowed_users:
-            edition_year_in_response_url = int(json.loads(responses1.get(user_title).content).split("/")[-1])
+            edition_year_in_response_url = int(json.loads(responses.get(user_title).content).split("/")[-1])
 
         # Check edition year in the response url
         self.assertEqual(edition_year_in_response_url, updated_edition["year"], f"Response url doesn't have the right edition year {updated_edition['year']}")
@@ -398,12 +382,12 @@ class TestEditions(TestBase):
         # Send post new tag request
         path = f"/editions/{edition.year}/questiontags"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        responses1: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, post_body)
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.POST, path, allowed_users, post_body)
 
         # Get tag name from the response url
         tag_name_in_response_url = ""
         for user_title in allowed_users:
-            tag_name_in_response_url = json.loads(responses1.get(user_title).content).split("/")[-1]
+            tag_name_in_response_url = json.loads(responses.get(user_title).content).split("/")[-1]
 
         # Check question tag in the response url
         self.assertEqual(tag_name_in_response_url, new_question_tag_name, f"Response url doesn't have the right tag name {new_question_tag_name}")
@@ -431,7 +415,7 @@ class TestEditions(TestBase):
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
         await self.auth_access_request_test(Request.DELETE, path, allowed_users)
 
-        # Test whether question tag is created in the database
+        # Test whether question tag is deleted in the database
         question_tag_in_db = await read_where(QuestionTag, QuestionTag.tag == question_tag.tag, session=self.session)
         self.assertIsNone(question_tag_in_db, f"'{question_tag.tag}' was not deleted in the database.")
 
@@ -443,7 +427,8 @@ class TestEditions(TestBase):
         # Create a question tag
         question_tag = QuestionTag(
             edition=edition.year,
-            tag=str(uuid.uuid1())
+            tag=str(uuid.uuid1()),
+            mandatory=False
         )
         await update(question_tag, self.session)
 
@@ -455,36 +440,29 @@ class TestEditions(TestBase):
         # Prepare a question tag for update
         new_question_tag = str(uuid.uuid1())
         updated_question_tag_request_body = {
-            # tag can be changed if mandatory is false
-            "tag": question_tag.tag,
+            # tag can only be changed if mandatory is false
+            "tag": str(uuid.uuid1()),
             "question": question_text,
             "showInList": not question_tag.showInList,
-            # change mandatory field is not supported yet
+            # mandatory field can't be changed
             "mandatory": question_tag.mandatory
         }
-        # tag can be changed if mandatory is false.
-        if updated_question_tag_request_body["mandatory"]:
-            new_question_tag = question_tag.tag
-        else:
-            new_question_tag = str(uuid.uuid1())
 
         updated_question_tag_request_body["tag"] = new_question_tag
 
         # Send patch question tag request
         path = f"/editions/{edition.year}/questiontags/{question_tag.tag}"
         allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
-        responses1 = await self.auth_access_request_test(Request.PATCH, path, allowed_users, updated_question_tag_request_body)
+        responses = await self.auth_access_request_test(Request.PATCH, path, allowed_users, updated_question_tag_request_body)
 
         # Get tag name from the response url
         tag_name_in_response_url = ""
         for user_title in allowed_users:
-            tag_name_in_response_url = json.loads(responses1.get(user_title).content).split("/")[-1]
+            tag_name_in_response_url = json.loads(responses.get(user_title).content).split("/")[-1]
             self.assertEqual(tag_name_in_response_url, new_question_tag, f"Can't find question tag {new_question_tag} in respond url")
 
-        # Check questin tag field vaules in the database
+        # Check questin tag field values in the database
         question_tag_in_db = await read_where(QuestionTag, QuestionTag.tag == new_question_tag, session=self.session)
         self.assertEqual(question_tag_in_db.tag, new_question_tag, "Question tag was not updated in database.")
-        # change mandatory field is not supported yet
-        # self.assertEqual(question_tag_in_db.mandatory, updated_question_tag["mandatory"], f"Mandatory field was not updated in database.")
         self.assertEqual(question_tag_in_db.showInList, updated_question_tag_request_body["showInList"], "showInList was not updated in database.")
         self.assertEqual(question_tag_in_db.question_id, question.id, "Question id was not updated in database.")
