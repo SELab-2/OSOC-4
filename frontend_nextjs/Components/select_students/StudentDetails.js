@@ -11,6 +11,7 @@ import SuggestionPopUpWindow from "./SuggestionPopUpWindow"
 import DecisionPopUpWindow from "./DecisionPopUpWindow"
 import SendCustomEmailPopUp from "./SendCustomEmailPopUp";
 import deleteIcon from '../../public/assets/delete.svg';
+import alumniIcon from '../../public/assets/alumni-svgrepo-com.svg';
 import DeletePopUpWindow from "./DeletePopUpWindow";
 import { useRouter } from "next/router";
 import closeIcon from "../../public/assets/close.svg";
@@ -236,6 +237,12 @@ export default function StudentDetails(props) {
                 <Col md="auto">
                     <Row className="nomargin">
                         <Col xs="auto" className="name_big">
+                            {student["mandatory"]["alumni"] === "yes" ?
+                                <Hint message="Student claims to be an alumni">
+                                    <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon"/>
+                                </Hint>
+                                : <></>
+                            }
                             {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
                         </Col>
                         <Col>

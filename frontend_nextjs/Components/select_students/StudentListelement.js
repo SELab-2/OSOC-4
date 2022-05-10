@@ -7,6 +7,8 @@ import Image from "next/image";
 import selected from "../../public/assets/selected.svg";
 import not_selected from "../../public/assets/not_selected.svg";
 import { log } from "../../utils/logger";
+import Hint from "../Hint";
+import alumniIcon from "../../public/assets/alumni-svgrepo-com.svg";
 
 // get the decision for the student (yes, maybe, no or undecided)
 export function getDecisionString(value) {
@@ -119,7 +121,15 @@ export default function StudentListelement(props) {
       style={{ backgroundColor: getBackground(), borderColor: getBorder() }}
       onClick={() => props.studentsTab ? studentDetails() : selectStudent()}>
       <Row className="upper-layer">
-        <Col id="name" className="name" xs="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
+        <Col id="name" className="name" xs="auto">
+          {props.student["mandatory"]["alumni"] === "yes" ?
+              <Hint message="Student claims to be an alumni">
+                <Image src={alumniIcon} width="25pt" height="25pt" className="alumnicon"/>
+              </Hint>
+              : <></>
+          }
+          {props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}
+        </Col>
         <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
           No practical problems
         </Col>

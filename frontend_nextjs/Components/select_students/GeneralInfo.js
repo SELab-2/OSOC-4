@@ -39,6 +39,14 @@ export default function GeneralInfo(props) {
 
       let rows = [];
 
+      if (props.student["mandatory"]["student-coach"] === "yes") {
+        rows.push(
+          <Row className="question-answer-row">
+            <Col md="auto">Applied to be a student coach.</Col>
+          </Row>
+        )
+      }
+
       // props.students["listtags"] contains the (question,answer) pair that the user wants to show in the list of
       // students.
       Object.entries(props.student["listtags"]).map(([k, v]) => {
