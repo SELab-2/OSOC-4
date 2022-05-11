@@ -9,7 +9,7 @@ class QuestionTag(SQLModel, table=True):
     edition: int = Field(primary_key=True, foreign_key="edition.year")
     question_id: Optional[int] = Field(default=None, foreign_key="question.id")
     mandatory: bool = False
-    showInList: bool = False
+    show_in_list: bool = False
 
     question: "Question" = Relationship(back_populates="question_tags")
 
@@ -22,7 +22,7 @@ class QuestionTagSimpleOut(BaseModel):
     tag: str
     question: str
     mandatory: bool
-    showInList: bool
+    show_in_list: bool
 
     @validator("tag", pre=True, always=True)
     def check_tag(cls, tag):
@@ -43,5 +43,5 @@ class UnusedQuestionTagSimpleOut(BaseModel):
 class QuestionTagUpdate(BaseModel):
     tag: str
     question: str
-    showInList: bool
+    show_in_list: bool
     mandatory: bool

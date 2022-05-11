@@ -47,7 +47,7 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
             "email_sent": student.email_sent}
 
     # student info from tags
-    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer)
+    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.show_in_list, Answer.answer)
                               .select_from(Student)
                               .where(Student.id == int(student_id))
                               .join(QuestionAnswer)
@@ -56,8 +56,8 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     student_info = r.all()
 
     mandatory = {k: v for (k, mandatory, _, v) in student_info if mandatory}
-    listTags = {k: v for (k, mandatory, showInList, v) in student_info if showInList and not mandatory}
-    detailTags = {k: v for (k, mandatory, showInList, v) in student_info if not showInList and not mandatory}
+    listTags = {k: v for (k, mandatory, show_in_list, v) in student_info if show_in_list and not mandatory}
+    detailTags = {k: v for (k, mandatory, show_in_list, v) in student_info if not show_in_list and not mandatory}
 
     info["mandatory"] = mandatory
     info["listtags"] = listTags
