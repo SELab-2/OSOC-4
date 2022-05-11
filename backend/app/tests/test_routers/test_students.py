@@ -103,3 +103,28 @@ class TestStudents(TestBase):
         # assert student was updated
         student = await read_where(Student, Student.id == student_id, session=self.session)
         self.assertTrue(student.decision == body["decision"], "The student was not updated by user_admin.")
+
+    async def test_delete_student(self):
+        path = "/students/"
+
+        # Bad request with bad id
+        await self.do_request(Request.DELETE, f"{path}{self.bad_id}", "user_admin",
+                              expected_status=Status.NOT_FOUND)
+
+        # find a random student in the testdata
+        student: Student = await read_where(Student, session=self.session)
+        student_id: int = student.id
+
+        # Bad request with bad access right
+        await self.do_request(Request.DELETE, f"{path}{student_id}", "user_approved_coach",
+                              expected_status=Status.FORBIDDEN)
+        # assert student wasn't deleted
+        student = await read_where(Student, Student.id == student_id, session=self.session)
+        self.assertTrue(student is not None, "A student was updated by user_approved_coach.")
+
+        # good request
+        await self.do_request(Request.DELETE, f"{path}{student_id}", "user_admin",
+                              expected_status=Status.SUCCESS)
+        # assert student was updated
+        student = await read_where(Student, Student.id == student_id, session=self.session)
+        self.assertTrue(student is None, "The student was not updated by user_admin.")
