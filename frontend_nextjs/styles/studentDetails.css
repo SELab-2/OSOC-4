@@ -56,10 +56,6 @@
     margin-right: 4px;
 }
 
-.details-upper-layer {
-    margin: 0 0 0 20px;
-}
-
 .dropdown-decision {
     height: 100%;
     padding-top: 7px;
@@ -72,11 +68,6 @@
     width: 95%;
     font-size: 15px;
     padding-left: 7px;
-}
-
-.remaining-height-details {
-    margin-top: 30px;
-    margin-left: 20px;
 }
 
 .student-details-suggestions-line {
@@ -112,10 +103,8 @@
     border-left-color: lightgray;
 
     margin-left: 0;
-    padding-top: 15px;
-    padding-right: 25px;
-    padding-bottom: 25px;
     overflow-y: scroll;
+    padding: 15px 25px 25px 30px;
 }
 
 .backbutton-margin {
@@ -182,6 +171,8 @@
 
 .buttongroup-paddingtop{
     padding-top: 5px;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .margins-accordion {
