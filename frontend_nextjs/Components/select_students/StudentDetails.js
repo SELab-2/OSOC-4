@@ -232,8 +232,15 @@ export default function StudentDetails(props) {
             }
 
             <Row className="nomargin">
-                <Col xs="auto" className="name_big">
-                    {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
+                <Col xs="auto">
+                    <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}</h1>
+                    <Row className="nomargin" style={{marginBottom: "15px"}}>
+                        <ul className="nomargin nopadding">
+                            {(student["skills"]) && student["skills"].map((skill, index) =>
+                                <li className="skill" style={{ display: "inline-block" }}
+                                    key={index}>{skill["name"].toUpperCase()}</li>)}
+                        </ul>
+                    </Row>
                 </Col>
                 <Col>
                     <Hint message="Delete the student">
@@ -250,15 +257,8 @@ export default function StudentDetails(props) {
                     </Hint>
                 </Col>
             </Row>
-            <Row className="nomargin">
+            <Row className="info-and-buttons nomargin">
                 <Col md="auto">
-                    <Row className="nomargin" style={{marginBottom: "15px"}}>
-                        <ul className="nomargin nopadding">
-                            {(student["skills"]) && student["skills"].map((skill, index) =>
-                                <li className="skill" style={{ display: "inline-block" }}
-                                    key={index}>{skill["name"].toUpperCase()}</li>)}
-                        </ul>
-                    </Row>
                     <Row md="auto" className="decision nomargin">
                         <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
                     </Row>
@@ -269,7 +269,6 @@ export default function StudentDetails(props) {
                         </Button>
                     </Row>
                 </Col>
-                <Col />
                 <Col xs="auto" className="buttongroup-paddingtop">
                     <Row>
                         <Col xs="auto" className="nopadding">
