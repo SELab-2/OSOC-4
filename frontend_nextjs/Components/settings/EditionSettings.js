@@ -76,7 +76,7 @@ export default function EditionSettings() {
                             <p className="details-text">Changing this will affect the whole site.
                             </p>
                             <Dropdown>
-                                <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
+                                <Dropdown.Toggle variant="primary" id="dropdown-basic">
                                     {(edition) ? edition.name : null}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
