@@ -62,7 +62,9 @@ export default function DefaultEmail(props) {
                               <Form.Control size="sm" value={template.subject} disabled={! isOpen} onChange={(ev => setTemplate({ ...template, ["subject"]: ev.target.value }))}/>
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                              <Form.Label className="email-help-text">(Use @firstname, @lastname, @username to address the receiver)</Form.Label>
+                              {isOpen ? (
+                                <Form.Label className="email-help-text">(Use @firstname, @lastname, @username to address the receiver)</Form.Label>
+                              ) : null}
                               <Form.Control as="textarea" size="sm" className="email-content" value={template.template} disabled={! isOpen} onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))}/>
                             </Form.Group>
                           </Form>  

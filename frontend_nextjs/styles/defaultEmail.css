@@ -19,22 +19,25 @@
 .email-help-text {
     font-size: 13px;
     text-align: right;
-    margin: -10px;
+    margin-right: 5px;
+    margin-bottom: 0px;
     width: 100%;
 }
 
 .email-label{
     width: 100%;
     text-align: left;
+    margin-bottom: 2.5px;
 }
 
 .email-content{
-    height: 150px;
+    height: 160px;
 }
 
 /* hacky way to make close and change button same size */
 .email-button{
     min-width:150px;
     min-height:38px;
-    margin: 3px;
+    margin-left: 20px;
+    margin-top: 20px;
 }
