@@ -65,62 +65,62 @@ class QuestionAnswerGenerator(DataGenerator):
         self.question_first_name = Question(question="What is your first name?", field_id="", edition=edition.year)
         self.question_last_name = Question(question="What is your last name?", field_id="", edition=edition.year)
         self.question_email = Question(question="Your email address", field_id="", edition=edition.year)
+        self.question_alumni = Question(question="Have you participated in osoc before?", field_id="",
+                                        edition=edition.year)
+        self.question_student_coach = Question(question="Would you like to be a student coach this year?", field_id="",
+                                               edition=edition.year)
         self.question_phone_number = Question(question="Phone number", field_id="", edition=edition.year)
 
         self.questions_yes_no = \
             [Question(question=q, field_id="", edition=edition.year) for q in self.questionstrings_yes_no]
-
-        self.answers_yes_no = [[Answer(answer=yn) for yn in ["yes", "no"]]
-                               for question in self.questions_yes_no]
+        self.answers_yes_no = [Answer(answer=yn) for yn in ["yes", "no"]]
 
         self.questions_text = \
             [Question(question=q, field_id="", edition=edition.year) for q in self.questionstrings_text]
-
-        self.answers_text = [[Answer(answer=f"text{t}")
-                              for t in range(1, 4)] for question in self.questions_text]
+        self.answers_text = [[Answer(answer=f"text{t}") for t in range(1, 4)] for _ in self.questions_text]
 
         self.questions_multiple_choice = []
         self.answers_multiple_choice = []
 
         for qa in self.qa_multiple_choice:
             self.questions_multiple_choice.append(Question(question=qa[0], field_id="", edition=edition.year))
-            self.answers_multiple_choice.append(
-                [Answer(answer=answer_text) for answer_text in qa[1:]])
+            self.answers_multiple_choice.append([Answer(answer=answer_text) for answer_text in qa[1:]])
 
         self.questions_multiple_choice2 = []
         self.answers_multiple_choice2 = []
 
         for qa in self.qa_multiple_choice2:
             self.questions_multiple_choice2.append(Question(question=qa[0], field_id="", edition=edition.year))
-            self.answers_multiple_choice2.append(
-                [Answer(answer=answer_text) for answer_text in qa[1:]])
+            self.answers_multiple_choice2.append([Answer(answer=answer_text) for answer_text in qa[1:]])
 
-        self.question_tags = \
-            [QuestionTag(question=self.question_first_name,
-                         edition=self.edition.year, mandatory=True, tag="first name"),
-             QuestionTag(question=self.question_last_name,
-                         edition=self.edition.year, mandatory=True, tag="last name"),
-             QuestionTag(question=self.question_email,
-                         edition=self.edition.year, mandatory=True, tag="email"),
-             QuestionTag(question=self.question_phone_number,
-                         edition=self.edition.year, tag="phone number"),
-             QuestionTag(question=self.questions_multiple_choice[2],
-                         edition=self.edition.year, tag="first language"),
-             QuestionTag(question=self.questions_multiple_choice[3],
-                         edition=self.edition.year, tag="level of english"),
-             QuestionTag(question=self.questions_multiple_choice2[0],
-                         edition=self.edition.year, tag="studies"),
-             QuestionTag(question=self.questions_multiple_choice[4],
-                         edition=self.edition.year, tag="type of degree")]
+        self.question_tags = [QuestionTag(question=self.question_first_name,
+                                          edition=self.edition.year, mandatory=True, tag="first name"),
+                              QuestionTag(question=self.question_last_name,
+                                          edition=self.edition.year, mandatory=True, tag="last name"),
+                              QuestionTag(question=self.question_email,
+                                          edition=self.edition.year, mandatory=True, tag="email"),
+                              QuestionTag(question=self.question_alumni,
+                                          edition=self.edition.year, mandatory=True, tag="alumni"),
+                              QuestionTag(question=self.question_student_coach,
+                                          edition=self.edition.year, mandatory=True, tag="student-coach"),
+                              QuestionTag(question=self.question_phone_number,
+                                          edition=self.edition.year, tag="phone number"),
+                              QuestionTag(question=self.questions_multiple_choice[2],
+                                          edition=self.edition.year, tag="first language"),
+                              QuestionTag(question=self.questions_multiple_choice[3],
+                                          edition=self.edition.year, tag="level of english"),
+                              QuestionTag(question=self.questions_multiple_choice2[0],
+                                          edition=self.edition.year, tag="studies"),
+                              QuestionTag(question=self.questions_multiple_choice[4],
+                                          edition=self.edition.year, tag="type of degree")]
 
-        self.data = [self.question_first_name, self.question_last_name,
-                     self.question_email, self.question_phone_number] + \
-            self.questions_yes_no + self.questions_text + self.questions_multiple_choice + \
-            self.questions_multiple_choice2 + self.question_tags + \
-            [answer for answers in self.answers_yes_no for answer in answers] + \
-            [answer for answers in self.answers_text for answer in answers] + \
-            [answer for answers in self.answers_multiple_choice for answer in answers] + \
-            [answer for answers in self.answers_multiple_choice2 for answer in answers]
+        self.data = [self.question_first_name, self.question_last_name, self.question_email, self.question_alumni,
+                     self.question_phone_number, self.question_student_coach, *self.questions_yes_no,
+                     *self.questions_text, *self.questions_multiple_choice, *self.questions_multiple_choice2,
+                     *self.question_tags,
+                     *self.answers_yes_no,
+                     *(answer for answers in (*self.answers_text, *self.answers_multiple_choice,
+                                              *self.answers_multiple_choice2) for answer in answers)]
 
     def generate_question_answers(self, student):
         first_name = choice(self.first_names)
@@ -129,11 +129,9 @@ class QuestionAnswerGenerator(DataGenerator):
         answer_first_name = Answer(answer=first_name)
         answer_last_name = Answer(answer=last_name)
         answer_email = Answer(answer=f"{first_name.lower()}.{last_name.lower()}@{choice(self.emails)}")
-        # answer_email = Answer(answer=f"your email")
         answer_phone_number = Answer(answer=f"04{randrange(100):0>2} {randrange(1000):0>3} {randrange(1000):0>3}")
 
-        self.other_answers += [answer_first_name, answer_last_name,
-                               answer_email, answer_phone_number]
+        self.other_answers += [answer_first_name, answer_last_name, answer_email, answer_phone_number]
 
         qa = [QuestionAnswer(student=student,
                              question=self.question_first_name,
@@ -145,12 +143,18 @@ class QuestionAnswerGenerator(DataGenerator):
                              question=self.question_email,
                              answer=answer_email),
               QuestionAnswer(student=student,
+                             question=self.question_alumni,
+                             answer=choice(self.answers_yes_no)),
+              QuestionAnswer(student=student,
+                             question=self.question_student_coach,
+                             answer=choice(self.answers_yes_no)),
+              QuestionAnswer(student=student,
                              question=self.question_phone_number,
                              answer=answer_phone_number)]
 
         qa += [QuestionAnswer(student=student,
                               question=self.questions_yes_no[i],
-                              answer=choice(self.answers_yes_no[i]))
+                              answer=choice(self.answers_yes_no))
                for i in range(len(self.questions_yes_no))]
         qa += [QuestionAnswer(student=student,
                               question=self.questions_text[i],
