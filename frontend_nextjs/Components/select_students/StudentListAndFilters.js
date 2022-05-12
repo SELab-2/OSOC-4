@@ -1,7 +1,6 @@
-import { Col, Row } from "react-bootstrap";
+import {Button, Row} from "react-bootstrap";
 import StudentsFilters from "./StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
-import HamburgerMenu from "react-hamburger-menu";
 import SearchSortBar from "./SearchSortBar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StudentListelement from "./StudentListelement";
@@ -14,6 +13,8 @@ import { cache } from "../../utils/ApiClient"
 import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
 import EmailStudentListElement from "../email-students/EmailStudentListelement"
+import filterIcon from "../../public/assets/show-filter-svgrepo-com.svg"
+import Image from "next/image";
 
 export default function StudentList(props) {
 
@@ -215,7 +216,7 @@ export default function StudentList(props) {
 
   return [
     !((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
-    <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
+    <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
       <StudentsFilters />
     </CheeseburgerMenu>
     ,
@@ -225,27 +226,15 @@ export default function StudentList(props) {
     <div className={(props.studentsTab) ? "col nomargin student-list-positioning" :
       ((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) ?
         "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
-      <Row className="nomargin">
         {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
-          <Col md="auto">
-            <div className="hamburger">
-              <HamburgerMenu
-                isOpen={showFilter}
-                menuClicked={() => setShowFilter(!showFilter)}
-                width={18}
-                height={15}
-                strokeWidth={1}
-                rotate={0}
-                color='black'
-                borderRadius={0}
-                animationDuration={0.5}
-              />
-            </div>
-          </Col>
-
+          <Row className="nomargin">
+            <Button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
+              <Image className="test" width="20%" height="20%" src={filterIcon} placeholder="empty"/>
+              <span>Filters</span>
+            </Button>
+          </Row>
         }
-        <Col><SearchSortBar /></Col>
-      </Row>
+      <SearchSortBar />
       <Row className="infinite-scroll">
         <InfiniteScroll
           style={{
