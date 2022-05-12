@@ -35,7 +35,32 @@ export default function DefaultEmail(props) {
 
   return (
     <>
-      <Row className="emails-margin">
+      <Row className="nomargin email-title">
+        {props.value} email
+      </Row>
+        {template.subject !== "" && template.template !== "" ? (
+          <div>
+            <Row className="nomargin">
+              Subject: <input value={template.subject} disabled></input>
+            </Row>
+            <Row className="nomargin">
+              Content
+              <textarea id="yes-email" disabled className="send-emails" value={template.template}
+                onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))} />
+            </Row>
+            <Row>
+              <Button className="send-emails-button save-button" onClick={saveDefaultEmails}>Change</Button>
+            </Row>
+          </div>
+        ): (
+          <Row>
+            No current default
+          </Row>
+          
+        )}
+
+
+      <Row>
         <Col className="nomargin email-title" md="auto">
           {props.value} email
         </Col>
