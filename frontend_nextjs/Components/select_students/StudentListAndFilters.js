@@ -20,7 +20,7 @@ export default function StudentList(props) {
 
   const router = useRouter();
 
-  const listheights = { "emailstudents": "253px", "students": "196px", "projects": "146px" }
+  const listheights = { "students": "201px"} // The custom height for the studentlist for the page of key
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
@@ -235,35 +235,37 @@ export default function StudentList(props) {
           </Row>
         }
       <SearchSortBar />
-      <Row className="infinite-scroll">
-        <InfiniteScroll
-          style={{
-            "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 146px)",
-            "position": "relative",
-            "transition": "height 0.6s"
-          }}
-          dataLength={students.length} //This is important field to render the next data
-          height={1}
-          next={fetchData}
-          hasMore={studentUrls.length > 0}
-          loader={<LoadingPage />}
-          endMessage={
-            <p style={{ textAlign: 'center' }}>
-              <b>Yay! You have seen it all</b>
-            </p>
+      <InfiniteScroll
+        style={{
+          // TODO find a better way to do this
+          // TODO fix for portrait screens, test for non 1080p screens
+          // ATTENTION THIS ONLY WORKS FOR SCREENS IN LANDSCAPE MODE
+          // listheights[props.category] contains the custom offset for a given category. Default 153px for projects
+          "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 153px)",
+          "position": "relative",
+          "transition": "height 0.6s"
+        }}
+        dataLength={students.length} //This is important field to render the next data
+        height={1}
+        next={fetchData}
+        hasMore={studentUrls.length > 0}
+        loader={<LoadingPage />}
+        endMessage={
+          <p style={{ textAlign: 'center' }}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+      >
+        {students.map((i, index) => {
+
+          if (props.category === "emailstudents") {
+            return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
+          } else {
+            return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
           }
-        >
-          {students.map((i, index) => {
 
-            if (props.category === "emailstudents") {
-              return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
-            } else {
-              return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
-            }
-
-          })}
-        </InfiniteScroll>
-      </Row>
+        })}
+      </InfiniteScroll>
     </div>
 
   ]

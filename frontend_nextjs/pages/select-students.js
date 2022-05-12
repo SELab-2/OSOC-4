@@ -54,9 +54,7 @@ export default function SelectStudents() {
             }
             {
                 (router.query.studentId) &&
-                (<Col>
-                    <StudentDetails />
-                </Col>)
+                <StudentDetails />
             }
         </Row >
     )

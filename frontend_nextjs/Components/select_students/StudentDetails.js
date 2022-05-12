@@ -219,7 +219,7 @@ export default function StudentDetails(props) {
     }
 
     return (
-        <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)" }}>
+        <Col className="student-details-window fill_height scroll-overflow fill_width">
             {student["mandatory"] &&
                 <div>
                     <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow}
