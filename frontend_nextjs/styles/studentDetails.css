@@ -1,8 +1,3 @@
-.name_big {
-    font-size: 40px;
-    padding-left: 0;
-}
-
 .suggest-button {
     font-size: 13px;
     width: 80px;
@@ -56,10 +51,6 @@
     margin-right: 4px;
 }
 
-.details-upper-layer {
-    margin: 0 0 0 20px;
-}
-
 .dropdown-decision {
     height: 100%;
     padding-top: 7px;
@@ -72,11 +63,6 @@
     width: 95%;
     font-size: 15px;
     padding-left: 7px;
-}
-
-.remaining-height-details {
-    margin-top: 30px;
-    margin-left: 20px;
 }
 
 .student-details-suggestions-line {
@@ -112,10 +98,8 @@
     border-left-color: lightgray;
 
     margin-left: 0;
-    padding-top: 15px;
-    padding-right: 25px;
-    padding-bottom: 25px;
     overflow-y: scroll;
+    padding: 15px 25px 25px 30px;
 }
 
 .backbutton-margin {
@@ -180,8 +164,14 @@
     font-size: 15px;
 }
 
-.buttongroup-paddingtop{
-    padding-top: 5px;
+.info-and-buttons {
+    justify-content: space-between;
+    flex-wrap: wrap-reverse;
+}
+
+.buttongroup-paddingtop {
+    padding: 5pt 0 5pt 0;
+    margin-left: -3.5pt;
 }
 
 .margins-accordion {
