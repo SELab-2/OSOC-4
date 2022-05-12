@@ -11,9 +11,6 @@ table {
     height:0;
 }
 
-card{
-}
-
 .column-icon{
     width:5%;
 }
@@ -29,7 +26,7 @@ card{
 
 /* hacky way to make close and change button same size */
 .button{
-    min-width:150px;
+    min-width:81px;
     min-height:38px;
 }
 

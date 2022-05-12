@@ -1,0 +1,40 @@
+.email-table {
+    width: 100%;
+    text-align: center;
+}
+
+.email-tr{
+    border-style:hidden;
+}
+
+.email-column-text{
+    text-align:center;
+    width:90%;
+}
+
+.email-card-title{
+    font-weight: bold;
+}
+
+.email-help-text {
+    font-size: 13px;
+    text-align: right;
+    margin: -10px;
+    width: 100%;
+}
+
+.email-label{
+    width: 100%;
+    text-align: left;
+}
+
+.email-content{
+    height: 150px;
+}
+
+/* hacky way to make close and change button same size */
+.email-button{
+    min-width:150px;
+    min-height:38px;
+    margin: 3px;
+}

@@ -1,7 +1,6 @@
 import { Button, Col, Row, Form } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import { api, Url } from "../../utils/ApiClient";
-import DefaultEmailCard from "./DefaulEmailCard";
 import { Card } from "react-bootstrap";
 
 /***
@@ -48,39 +47,38 @@ export default function DefaultEmail(props) {
   return (
     <>
       <Row>
-        <Card >
+        <Card>
           <Card.Body>
-              <table className="table">
+              <table className="email-table">
                   <tbody>
-                  <tr className={"tr"}>
-                      <td className="column-text">
-                        <p className="card-title">{props.value} email</p>
+                  <tr className={"email-tr"}>
+                      <td className="email-column-text">
+                        <p className="email-card-title">{props.value} email</p>
                         {((template.subject !== "" && template.template !== "") || isOpen) ? (
                           <div>
                             <Form>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                              <Form.Label>Subject</Form.Label>
-                              <Form.Control value={template.subject} disabled={! isOpen} onChange={(ev => setTemplate({ ...template, ["subject"]: ev.target.value }))}/>
+                              <Form.Label className="email-label">Subject</Form.Label>
+                              <Form.Control size="sm" value={template.subject} disabled={! isOpen} onChange={(ev => setTemplate({ ...template, ["subject"]: ev.target.value }))}/>
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                              <Form.Label>Content</Form.Label>
                               <Form.Label className="email-help-text">(Use @firstname, @lastname, @username to address the receiver)</Form.Label>
-                              <Form.Control as="textarea" value={template.template} disabled={! isOpen} className="send-emails" onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))}/>
+                              <Form.Control as="textarea" size="sm" className="email-content" value={template.template} disabled={! isOpen} onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))}/>
                             </Form.Group>
                           </Form>  
                           </div>
                         ) : (
-                          <p className="card-subtitle">Currently no default</p>
+                          <p className="card-subtitle">Currently no default {props.value} email</p>
                         )}
                       </td>
                       <td className="column-button">
                         {isOpen ? (
-                          <Button className="button" variant="primary" onClick={saveDefaultEmails}>Save</Button>
+                          <Button className="email-button" variant="primary" onClick={saveDefaultEmails}>Save</Button>
                         ) : null} 
                         {(template.subject !== "" && template.template !== "") ? (
-                          <Button className="button" variant="primary" onClick={changeDefault}>{isOpen ? "Close" : "Change default" }</Button>
+                          <Button className="email-button" variant="primary" onClick={changeDefault}>{isOpen ? "Close" : "Change default" }</Button>
                         ) : (
-                            <Button className="button" variant="primary" onClick={addDefault}>{isOpen ? "Close" : "Add default" }</Button>
+                            <Button className="email-button" variant="primary" onClick={addDefault}>{isOpen ? "Close" : "Add default" }</Button>
                         )}    
                       </td>
                   </tr>
@@ -89,41 +87,6 @@ export default function DefaultEmail(props) {
           </Card.Body>
         </Card>
       </Row>
-    
-      {/* <Row>
-        <Col className="nomargin email-title" md="auto">
-          {props.value} email
-        </Col>
-        <Col>
-          <Row className="nomargin">
-            <Form>
-              <Form.Label>Email Subject</Form.Label>
-              <Form.Control type="text" placeholder="Enter email subject" value={template.subject} onChange={(ev => setTemplate({ ...template, ["subject"]: ev.target.value }))} />
-            </Form>
-          </Row>
-
-          <Row className="nomargin">
-            <Col />
-            <Col md="auto" className="email-help-text">
-              (Use @firstname, @lastname, @username to address the receiver)
-            </Col>
-          </Row>
-          <Row className="nomargin">
-            <textarea id="yes-email" className="send-emails" value={template.template}
-              onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))} />
-          </Row>
-        </Col>
-      </Row>
-      {prevTemplate !== template &&
-        <Row>
-          <Col />
-          <Col md="auto" className="change-emails-savebutton">
-            <Button className="send-emails-button save-button"
-              onClick={saveDefaultEmails}>Save</Button>
-          </Col>
-        </Row>
-      } */}
-
     </>
   )
 }
