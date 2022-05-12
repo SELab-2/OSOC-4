@@ -12,3 +12,11 @@
 .errormessage {
     -webkit-text-fill-color: red;
 }
+
+.table-head {
+    font-size: 18px;
+}
+
+.email-students-cell {
+    font-size: 18px;
+}

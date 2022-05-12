@@ -118,9 +118,7 @@ function Settings() {
                             <h3>Default emails</h3>
                         </AccordionHeader>
                         <AccordionBody>
-                            <div className="manage-users-settings">
-                                <DefaultEmails />
-                            </div>
+                            <DefaultEmails/>
                         </AccordionBody>
                     </AccordionItem>) : null}
 

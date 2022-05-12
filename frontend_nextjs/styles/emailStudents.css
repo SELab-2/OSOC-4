@@ -5,92 +5,42 @@
     height: 75vh;
 }
 
-.email-students-cell {
-    font-size: 18px;
-}
-
-.table-head {
-    font-size: 18px;
-}
-
-.send-emails-button {
-    font-size: 20px;
-    padding: 8px 15px;
-}
-
-.send-emails-positioning {
-    margin-top: 15px;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-
-.change-emails-positioning {
-    align-self: center;
-    margin-top: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-
-.content-title {
-    padding-left: 0;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.send-emails {
-    height: 180px;
-}
-
-.email-help-text {
-    font-size: 13px;
-    margin-top: -10px;
-}
-
-.send-email-names {
-    font-size: 18px;
-}
-
-.back-button {
-    background-color: rgba(0, 0, 0, 0);
-    border-width: 0;
-    margin-left: 40px;
-    margin-top: 10px;
-}
-
 .emails-margin {
-    margin: 20px 150px 30px;
-}
-
-.emails-title-margin {
-    margin: 0 150px 50px;
-}
-
-.nopadding {
-    padding: 0
-}
-
-.title-bottom-margin {
-    margin-bottom: 20px;
+    margin: 20pt 0;
 }
 
 .email-title {
     font-weight: bold;
-    font-size: 20px;
-    width: 300px;
+    font-size: 1.4em;
+    width: 200pt;
+}
+
+.email-subject {
+    align-items: center;
+}
+
+.email-subject form {
+    max-width: 300pt;
+    padding: 0;
+}
+
+.email-help-text {
+    font-size: 0.9em;
+    margin-top: 10pt;
+    justify-content: end;
+    flex-wrap: wrap;
+}
+
+.send-emails {
+    height: 150pt;
 }
 
 .change-emails-savebutton {
-    margin-right: 160px;
+    margin: 10pt 0;
+    justify-content: end;
 }
 
-.cancel-button {
-    margin-right: 20px;
-    width: 100px;
-}
-
-.save-button {
-    width: 100px;
-}
+/* Select students email-bar from here */
 
 .email-bar {
     border-radius: 15px 15px 0 0;
