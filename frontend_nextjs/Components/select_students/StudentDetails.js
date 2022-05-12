@@ -234,40 +234,26 @@ export default function StudentDetails(props) {
 
             <Row className="details-upper-layer nomargin">
                 <Col md="auto">
-                    <Row className="nomargin">
-                        <Col xs="auto" className="name_big">
-                            {student["mandatory"]["alumni"] === "yes" ?
-                                <Hint message="Student claims to be an alumni">
-                                    <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon"/>
-                                </Hint>
-                                : <></>
-                            }
-                            {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
-                        </Col>
-                        <Col>
-                            <Hint message="Delete the student">
-                                <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                                    <Image src={deleteIcon} className="delete-icon" />
-                                </button>
+                    <div className="name nomargin">
+                        {student["mandatory"]["alumni"] === "yes" ?
+                            <Hint message="Student claims to be an alumni">
+                                <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon"/>
                             </Hint>
-                        </Col>
-                    </Row>
-                    <Row className="nomargin">
-                        <ul className="nomargin nopadding">
-                            {(student["skills"]) && student["skills"].map((skill, index) =>
-                                <li className="skill" style={{ display: "inline-block" }}
-                                    key={index}>{skill["name"].toUpperCase()}</li>)}
-                        </ul>
-                    </Row>
+                            : <></>
+                        }
+                    <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}</h1>
+                        <Hint message="Delete the student">
+                            <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
+                                <Image src={deleteIcon} className="delete-icon" />
+                            </button>
+                        </Hint>
+                    </div>
+                    <ul className="nomargin nopadding">
+                        {(student["skills"]) && student["skills"].map((skill, index) =>
+                            <li className="skill" style={{ display: "inline-block" }}
+                                key={index}>{skill["name"].toUpperCase()}</li>)}
+                    </ul>
                 </Col>
-                <Col>
-                    <Hint message="Delete the student">
-                        <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                            <Image src={deleteIcon} className="delete-icon" />
-                        </button>
-                    </Hint>
-                </Col>
-                <Col />
                 <Col xs="auto" className="close-button">
                     <Hint message="Close the details">
                         <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
