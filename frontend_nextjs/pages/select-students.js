@@ -33,11 +33,11 @@ export default function SelectStudents() {
 
     return (
 
-        <Row>
+        <Row style={{height: "calc(100vh - 86px)"}}>
 
             {
                 ((width > 1500) || (width > 1000 && !router.query.studentId)) &&
-                <Col md="auto" key="studentFilters">
+                <Col className="fill_height" md="auto" key="studentFilters">
                     <StudentsFilters />
                 </Col>
             }
