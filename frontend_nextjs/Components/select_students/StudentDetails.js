@@ -232,7 +232,6 @@ export default function StudentDetails(props) {
                 </div>
             }
 
-
             <Row className="details-upper-layer nomargin">
                 <Col md="auto">
                     <Row className="nomargin">
@@ -261,7 +260,33 @@ export default function StudentDetails(props) {
                         </ul>
                     </Row>
                 </Col>
+                <Col>
+                    <Hint message="Delete the student">
+                        <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
+                            <Image src={deleteIcon} className="delete-icon" />
+                        </button>
+                    </Hint>
+                </Col>
                 <Col />
+                <Col xs="auto" className="close-button">
+                    <Hint message="Close the details">
+                        <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
+                               src={closeIcon} alt="close-icon" width="25px" height="25px" objectFit={'contain'} />
+                    </Hint>
+                </Col>
+            </Row>
+            <Row className="info-and-buttons nomargin">
+                <Col md="auto">
+                    <Row md="auto" className="decision nomargin">
+                        <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
+                    </Row>
+                    <Row md="auto" className="nomargin">
+                        <Button className="send-email-button"
+                                onClick={() => setEmailPopUpShow(true)}>
+                            Send email
+                        </Button>
+                    </Row>
+                </Col>
                 <Col xs="auto" className="buttongroup-paddingtop">
                     <Row>
                         <Col xs="auto" className="nopadding">
@@ -277,12 +302,6 @@ export default function StudentDetails(props) {
                         <Col xs="auto" className="nopadding">
                             <Hint message="Suggest no">
                                 <button className="suggest-no-button suggest-button" onClick={() => suggest(0)}>No</button>
-                            </Hint>
-                        </Col>
-                        <Col xs="auto" className="close-button">
-                            <Hint message="Close the details">
-                                <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
-                                    src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
                             </Hint>
                         </Col>
                     </Row>
@@ -307,17 +326,8 @@ export default function StudentDetails(props) {
                     </Row>
                 </Col>
             </Row>
-            <Row className="remaining-height-details" md="auto" style={{}}>
+            <Row className="nomargin" md="auto" style={{}}>
                 <Col className="fill_height scroll-overflow">
-                    <Row md="auto" className="decision nomargin">
-                        <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
-                    </Row>
-                    <Row md="auto" className="nomargin">
-                        <Button className="send-email-button"
-                            onClick={() => setEmailPopUpShow(true)}>
-                            Send email
-                        </Button>
-                    </Row>
 
                     <Row md="auto" className="h2-titles student-details-suggestions-line nomargin">
                         <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>

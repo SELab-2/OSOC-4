@@ -20,7 +20,7 @@ export default function StudentList(props) {
     }
 
     return [
-        <div className="email-bar">
+        <Row className="email-bar">
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow} setPopUpShow={setSendEmailsPopUpShow}
                 selectedStudents={props.selectedStudents} />
             <Row style={{ height: "20px" }} className="nomargin align-items-center">
@@ -51,7 +51,7 @@ export default function StudentList(props) {
                     onClick={() => setSendEmailsPopUpShow(true)}>Send emails</Button></Col>
             </Row>
 
-        </div >
+        </Row >
     ]
 
 }

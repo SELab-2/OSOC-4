@@ -49,7 +49,7 @@ export default function QuestionTag(props) {
 
         let newQuestionTag = {...previousTag};
         newQuestionTag[name] = checked;
-        Url.fromUrl(questionTag["url"]).setBody(newQuestionTag).patch().then(res => {
+        Url.fromUrl(previousTag["url"]).setBody(newQuestionTag).patch().then(res => {
             setPreviousTag(newQuestionTag);
             cache.clear();
         })
@@ -65,9 +65,9 @@ export default function QuestionTag(props) {
      */
     const deleteTag = (event) => {
         event.preventDefault();
-        Url.fromUrl(questionTag["url"]).delete().then(res => {
+        Url.fromUrl(previousTag["url"]).delete().then(res => {
             if (res.success) {
-                props.deleteTag(questionTag["url"])
+                props.deleteTag(previousTag["url"])
                 cache.clear()
             }
         })
@@ -107,7 +107,7 @@ export default function QuestionTag(props) {
     return (
         <tr key={props.questionTag["url"]}>
             <td>
-                {(questionTag["mandatory"] || !props.edited) ? (
+                {(previousTag["mandatory"] || !props.edited) ? (
                     <p>{previousTag["tag"]}</p>
                 ) : (
                     <input name="tag" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange}/>
@@ -123,18 +123,19 @@ export default function QuestionTag(props) {
             <td>
                 {(!questionTag["mandatory"]) &&
                 <Hint message="Show in the students list">
-                    <input name="showInList" type="checkbox" checked={questionTag["showInList"]}
+                    <input name="show_in_list" type="checkbox" checked={questionTag["show_in_list"]}
                            onChange={handleCheckboxChange}/>
                 </Hint>
                 }
             </td>
             <td>
-                {(!questionTag["mandatory"]) &&
+                {
                     ((!props.edited) ?
                         <Hint message="Edit question-tag">
                             <button className="table-button" onClick={(ev) => {
                                 props.setNewQuestionTag(undefined);
-                                props.setEdited(previousTag["url"])
+                                props.setEdited(previousTag["url"]);
+                                setQuestionTag(previousTag);
                             }}>
                                 <Image src={editIcon} height="30px"/>
                             </button>
@@ -146,7 +147,7 @@ export default function QuestionTag(props) {
                             </button>
                         </Hint>)
                 }
-                {(!questionTag["mandatory"]) &&
+                {(!previousTag["mandatory"]) &&
                     <Hint message="Delete question-tag">
                         <button onClick={deleteTag} className="table-button">
                             <Image src={deleteIcon} height="30px"/>
