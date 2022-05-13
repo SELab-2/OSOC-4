@@ -73,6 +73,8 @@ export default function DefaultEmail(props) {
                           <p className="card-subtitle">Currently no default {props.value} email</p>
                         )}
                       </td>
+                      </tr>
+                      <tr>
                       <td className="column-button">
                         {isOpen ? (
                           <Button className="email-button" variant="primary" onClick={saveDefaultEmails}>Save</Button>
@@ -83,7 +85,7 @@ export default function DefaultEmail(props) {
                             <Button className="email-button" variant="primary" onClick={addDefault}>{isOpen ? "Close" : "Add default" }</Button>
                         )}    
                       </td>
-                  </tr>
+                      </tr>
                   </tbody>
               </table>
           </Card.Body>
