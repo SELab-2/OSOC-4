@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Accordion, Dropdown} from "react-bootstrap";
+import {Accordion, Container, Dropdown, Table} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -7,6 +7,11 @@ import AccordionBody from "react-bootstrap/AccordionBody";
 import QuestionTags from "./QuestionTags";
 import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
+import { Row, Col} from "react-bootstrap";
+import editIcon from '../../public/assets/edit.svg';
+import saveIcon from '../../public/assets/save.svg';
+import Image from "next/image";
+import Hint from "../Hint";
 
 /**
  * This component displays a settings-screen for all settings regarding editions.
@@ -64,8 +69,35 @@ export default function EditionSettings() {
     }
     return (
         <div className="body-editiondetail">
-            <h1>{edition.name}</h1>
-            <p>{(edition.description) ? edition.description : "No description available"}</p>
+            <Table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <h1>{edition.name}</h1>
+                            <p>{(edition.description) ? edition.description : "No description available"}</p>
+                        </td>
+                        <td>
+                            <Hint message="Edit edition">
+                                <button className="table-button" onClick={(ev) => {
+                                    alert("Gelukt");
+                                }}>
+                                    <Image src={editIcon} height="30px"/>
+                                </button>
+                            </Hint>
+                        </td>
+                    </tr>
+                </tbody>
+            </Table>
+
+
+            <Container fluid>
+                <Row>
+                    <Col>
+                        <h1>{edition.name}</h1>
+                        <p>{(edition.description) ? edition.description : "No description available"}</p>
+                    </Col>
+                </Row>
+            </Container>
             <Accordion>
                 <AccordionItem eventKey="0">
                     <AccordionHeader>
