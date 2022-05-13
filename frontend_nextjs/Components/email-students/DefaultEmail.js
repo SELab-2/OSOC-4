@@ -4,9 +4,9 @@ import { api, Url } from "../../utils/ApiClient";
 import { Card } from "react-bootstrap";
 
 /***
- * This element makes a TextField with a title on the left, to change a default email
- * @param props the props contain email and setEmail, which represent the value of the textfield
- * @returns {JSX.Element} An element that represents a title (for example 'Yes' email) with a textField
+ * This element makes a From with a title on the left, to change a default email
+ * @param props the props contain templateName and the value ("Yes", "No", "Maybe", "Undecided")
+ * @returns {JSX.Element} An element that represents a 
  */
 export default function DefaultEmail(props) {
 
@@ -27,19 +27,24 @@ export default function DefaultEmail(props) {
     })
   }, [])
 
+    /**
+   * This function is called when the Change default button is clicked, it makes the subject and content field editable
+   */
   function changeDefaultEmail(){
     setPrevTemplate(template);
     setIsOpen(! isOpen);
   }
 
+  /**
+   * This function is called when the Add default button is clicked, it reveals the subject and content field
+   */
   function addDefaultEmail(){
     setPrevTemplate(template);
     setIsOpen(! isOpen);
   }
 
   /**
- * This function is called when the save button is clicked, it saves the emails in the database and goes back to the
- * 'email students' page
+ * This function is called when the save button is clicked, it saves the emails in the database
  */
   function saveDefaultEmails() {
     setIsChanging(true);
@@ -51,6 +56,9 @@ export default function DefaultEmail(props) {
     setIsOpen(false);
   }
 
+  /**
+   * This function is called when the close button is clicked, it closes the edible window and discard all changes to the default emails
+   */
   function close(){
     setTemplate(prevTemplate);
     setIsOpen(false);
@@ -83,22 +91,22 @@ export default function DefaultEmail(props) {
             )}
             {isChanging ? (
               <div>
-                <Form.Text>Trying to change default {props.value} email!</Form.Text>
+                <Form.Label>Trying to change default {props.value} email!</Form.Label>
                 <br/>
               </div>) : null}
             {isChanged ? (
               <div>
-                <Form.Text>Default {props.value} email has been changed!</Form.Text>
+                <Form.Label>Default {props.value} email has been changed!</Form.Label>
                 <br/>
               </div>
             ) : null}
             {(isOpen && ! isChanged)? (
-              <Button variant="primary" onClick={saveDefaultEmails}>Save</Button>
+              <Button variant="primary" className="email-button" onClick={saveDefaultEmails}>Save</Button>
             ) : null}
             {(template.subject !== "" && template.template !== "") ? (
-              <Button variant="primary" onClick={(isOpen || isChanged)? close : changeDefaultEmail}>{(isOpen || isChanged) ? "Close" : "Change default" }</Button>
+              <Button variant="primary" className="email-button" onClick={(isOpen || isChanged)? close : changeDefaultEmail}>{(isOpen || isChanged) ? "Close" : "Change default" }</Button>
             ) : (
-                <Button variant="primary" onClick={isOpen? close : addDefaultEmail}>{isOpen ? "Close" : "Add default" }</Button>
+                <Button variant="primary" className="email-button" onClick={isOpen? close : addDefaultEmail}>{isOpen ? "Close" : "Add default" }</Button>
             )}    
           </Card.Body>
         </Card>
