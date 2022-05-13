@@ -22,6 +22,7 @@ export default function EditionSettings() {
     const [edition, setEdition] = useState(undefined);
     const [editionList, setEditionList] = useState(undefined);
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
+    const [edited, setEdited] = useState(false);
 
     // fetch the current edition and all the other editions
     useEffect(() => {
@@ -54,6 +55,10 @@ export default function EditionSettings() {
         setEditionList([edition, ...editionList]);
     }
 
+    const handleSubmit = (event) => {
+        setEdited(false);
+    }
+
     /**
      * Changes the current edition
      * @param edition the edition (dictionary with at least the name and the year) to change to
@@ -63,7 +68,6 @@ export default function EditionSettings() {
         await setEdition({"year": edition.year, "name": edition.name});
     }
 
-
     if (loading) {
         return (<LoadingPage/>);
     }
@@ -71,33 +75,33 @@ export default function EditionSettings() {
         <div className="body-editiondetail">
             <Table>
                 <tbody>
-                    <tr>
+                    <tr className="settings-row">
                         <td>
                             <h1>{edition.name}</h1>
                             <p>{(edition.description) ? edition.description : "No description available"}</p>
                         </td>
                         <td>
-                            <Hint message="Edit edition">
-                                <button className="table-button" onClick={(ev) => {
-                                    alert("Gelukt");
-                                }}>
-                                    <Image src={editIcon} height="30px"/>
-                                </button>
-                            </Hint>
+                            {!edited ? (
+                                <Hint message="Edit edition">
+                                    <button className="table-button" onClick={(ev) => {
+                                        setEdited(true);
+                                        alert("TODO");
+                                    }}>
+                                        <Image src={editIcon} height="30px"/>
+                                    </button>
+                                </Hint>
+                            ) : (
+                                <Hint message="Save">
+                                    <button className="table-button" onClick={handleSubmit}>
+                                        <Image src={saveIcon} height="30px"/>
+                                    </button>
+                                </Hint>
+                            )}
+                            
                         </td>
                     </tr>
                 </tbody>
             </Table>
-
-
-            <Container fluid>
-                <Row>
-                    <Col>
-                        <h1>{edition.name}</h1>
-                        <p>{(edition.description) ? edition.description : "No description available"}</p>
-                    </Col>
-                </Row>
-            </Container>
             <Accordion>
                 <AccordionItem eventKey="0">
                     <AccordionHeader>
