@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Accordion, Container, Dropdown, Table} from "react-bootstrap";
+import {Accordion, Dropdown, Table} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -7,12 +7,11 @@ import AccordionBody from "react-bootstrap/AccordionBody";
 import QuestionTags from "./QuestionTags";
 import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
-import { Row, Col} from "react-bootstrap";
 import editIcon from '../../public/assets/edit.svg';
 import saveIcon from '../../public/assets/save.svg';
 import Image from "next/image";
 import Hint from "../Hint";
-
+import { Row } from "react-bootstrap";
 /**
  * This component displays a settings-screen for all settings regarding editions.
  * @returns {JSX.Element}
@@ -22,7 +21,11 @@ export default function EditionSettings() {
     const [edition, setEdition] = useState(undefined);
     const [editionList, setEditionList] = useState(undefined);
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
-    const [edited, setEdited] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [prevEditionName, setPrevEditionName] = useState("");
+    const [prevEditonDescription, setPrevEditionDescription] = useState("");
+    const [currEditionName, setCurrEditionName] = useState("");
+    const [currEditionDescription, setCurrEditionDescription] = useState("");
 
     // fetch the current edition and all the other editions
     useEffect(() => {
@@ -32,6 +35,10 @@ export default function EditionSettings() {
                 console.log("edition")
                 console.log(res.data)
                 await setEdition(res.data);
+                await setPrevEditionName(res.data.name);
+                await setPrevEditionDescription(res.data.description);
+                console.log("--------\n---------\n" + edition.name + "\n" + edition.description);
+                console.log(prevEditionName + prevEditonDescription);
             }
             let resList = await Url.fromName(api.editions).get();
             if (resList.success) {
@@ -55,8 +62,18 @@ export default function EditionSettings() {
         setEditionList([edition, ...editionList]);
     }
 
-    const handleSubmit = (event) => {
-        setEdited(false);
+    const handleChange = (event) => {
+        
+    }
+
+    const handleSaved = (event) => {
+        setEditing(false);
+    }
+
+    const handleChangeClicked = (event) => {
+        setPrevEditionName(edition.name);
+        setPrevEditionDescription(edition.description);
+        setEditing(true);
     }
 
     /**
@@ -77,22 +94,28 @@ export default function EditionSettings() {
                 <tbody>
                     <tr className="settings-row">
                         <td>
-                            <h1>{edition.name}</h1>
-                            <p>{(edition.description) ? edition.description : "No description available"}</p>
+                            {(! editing) ? (
+                                <div>
+                                    <h1>{edition.name}</h1>
+                                    <p>{(edition.description) ? edition.description : "No description available"}</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <tr><input placeholder="Enter new name" value={currEditionName} onChange={handleChange}/></tr>
+                                    <tr><input placeholder="Enter new description" value={currEditionDescription} onChange={handleChange}/></tr>
+                                </div>  
+                            )}
                         </td>
                         <td>
-                            {!edited ? (
+                            {!editing ? (
                                 <Hint message="Edit edition">
-                                    <button className="table-button" onClick={(ev) => {
-                                        setEdited(true);
-                                        alert("TODO");
-                                    }}>
+                                    <button className="table-button" onClick={handleChangeClicked}>
                                         <Image src={editIcon} height="30px"/>
                                     </button>
                                 </Hint>
                             ) : (
                                 <Hint message="Save">
-                                    <button className="table-button" onClick={handleSubmit}>
+                                    <button className="table-button" onClick={handleSaved}>
                                         <Image src={saveIcon} height="30px"/>
                                     </button>
                                 </Hint>
