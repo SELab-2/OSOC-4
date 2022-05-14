@@ -42,10 +42,9 @@ export default function StudentList(props) {
 
             <Row className={`bottombar ${props.showEmailBar ? "nomargin" : "nomargin down"}`}>
                 <Col className="text-center">
-                    <h style={{
-                        "font-weight": 'bold',
-                        "font-size": "25px"
-                    }}>{props.selectedStudents.length} / {props.students.length}</h>
+                    <h style={{ "font-weight": 'bold', "font-size": "25px" }}>
+                        {props.selectedStudents.length} / {props.students.length}
+                    </h>
                 </Col>
                 <Col><Button className="send-emails-button"
                              onClick={selectAll}>

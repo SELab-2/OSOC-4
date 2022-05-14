@@ -233,7 +233,7 @@ export default function StudentDetails(props) {
             }
 
             <Row className="details-upper-layer nomargin">
-                <Col md="auto">
+                <Col>
                     <div className="name nomargin">
                         {student["mandatory"]["alumni"] === "yes" ?
                             <Hint message="Student claims to be an alumni">
@@ -301,14 +301,12 @@ export default function StudentDetails(props) {
                                 <option value={2}>Yes</option>
                             </select>
                         </Col>
-                        <Col md="auto">
-                            <Hint message="Confirms the decision">
-                                <Button className="suggest-confirm-button" disabled={decideField == decision}
-                                    onClick={() => setDecisionPopUpShow(true)}>
-                                    Confirm
-                                </Button>
-                            </Hint>
-                        </Col>
+                        <Hint message="Confirms the decision">
+                            <Button className="suggest-confirm-button" disabled={decideField === decision}
+                                onClick={() => setDecisionPopUpShow(true)}>
+                                Confirm
+                            </Button>
+                        </Hint>
                     </Row>
                 </Col>
             </Row>
