@@ -17,7 +17,7 @@ import Hint from "../Components/Hint";
 export default function Projects() {
 
     const [selectedProject, setSelectedProject] = useState(undefined);
-    const [selectedStudent, setSelectedStudent] = useState(undefined);
+    const [selectedStudents, setSelectedStudents] = useState([]);
     const [showAddStudent, setShowAddStudent] = useState(false)
     const { height, width } = useWindowDimensions();
 
@@ -28,18 +28,18 @@ export default function Projects() {
                     ((width > 1500)) &&
                     <StudentsFilters />
                 }
-                <StudentListAndFilters setSelectedStudent={setSelectedStudent} selectedStudent={selectedStudent} studentsTab={false} />
+                <StudentListAndFilters setSelectedStudents={setSelectedStudents} selectedStudents={selectedStudents} elementType="projects" />
                 <Col md="auto" style={{ marginLeft: "0" }}>
                     <div style={{ paddingTop: "40vh" }} className="fill_height">
                         <div className="button-match-student-project">
                             <Hint message="Add the selected student(s) to the selected project">
                                 <Image onClick={() => setShowAddStudent(true)} src={matchIcon} alt="match student to project" width={80} />
                             </Hint>
-                            <AddStudentModal selectedProject={selectedProject} selectedStudent={selectedStudent} setShowAddStudent={setShowAddStudent} showAddStudent={showAddStudent} />
+                            <AddStudentModal selectedProject={selectedProject} selectedStudent={selectedStudents[0]} setShowAddStudent={setShowAddStudent} showAddStudent={showAddStudent} />
                         </div>
                     </div>
                 </Col>
-                <ProjectsList selectedStudent={selectedStudent} setSelectedProject={setSelectedProject} selectedProject={selectedProject} />
+                <ProjectsList setSelectedProject={setSelectedProject} selectedProject={selectedProject} />
             </Row>
         </>
     )

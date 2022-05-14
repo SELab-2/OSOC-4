@@ -107,6 +107,7 @@ export default function AddStudentModal(props){
         return(
             <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
+                    {console.log(props)}
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
