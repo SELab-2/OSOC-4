@@ -86,8 +86,7 @@ export default function GeneralInfo(props) {
       // add the decision of the student to the general info
       rows.push(
         <Row key={"Decision"} className="question-answer-row">
-          <Col md="auto" className="info-titles">{"Decision"}</Col>
-          <Col md="auto" className="info-answers">{decision}</Col>
+          <Col md="auto" className="info-titles">Decision: <b>{decision}</b></Col>
         </Row>
       )
 
