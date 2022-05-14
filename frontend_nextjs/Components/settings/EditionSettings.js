@@ -11,7 +11,7 @@ import editIcon from '../../public/assets/edit.svg';
 import saveIcon from '../../public/assets/save.svg';
 import Image from "next/image";
 import Hint from "../Hint";
-import { Row } from "react-bootstrap";
+
 /**
  * This component displays a settings-screen for all settings regarding editions.
  * @returns {JSX.Element}
@@ -22,8 +22,8 @@ export default function EditionSettings() {
     const [editionList, setEditionList] = useState(undefined);
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
     const [editing, setEditing] = useState(false);
-    const [prevEdition, setPrevEdition] = useState({"name": "", "description": ""});
     const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
+    const [failed, setFailed] = useState(false);
 
     // fetch the current edition and all the other editions
     useEffect(() => {
@@ -60,33 +60,22 @@ export default function EditionSettings() {
         event.preventDefault();
         Url.fromName(api.current_edition).setBody(newEdition).patch().then(res =>{
             if(res.success){
-                console.log(res);
-                // console.log("edition1");
-                // console.log(edition);
-
+                let newEdition2 = {...edition};
+                newEdition2["name"] = newEdition.name;
+                newEdition2["description"] = newEdition.description;
+                setEdition(newEdition2);
+            } else {
+                setFailed(true);
             }
-        }).then( res => {
-            // console.log("newName: " + newEdition.name + " newDesc: " + newEdition.description);
-            // setEdition({"name": newEdition.name, "description": newEdition.description});
-            // console.log("edition2");
-            // console.log(edition);
-            let newEdition2 = {...edition};
-            newEdition2["name"] = newEdition.name;
-            newEdition2["description"] = newEdition.description;
-            setEdition(newEdition2);
-        });
+        })
         console.log("edition uiteindelijk");
         console.log(edition);
         setEditing(false);
     }
 
-    const handleChangeClicked = (event) => {
-        setPrevEdition({"name": edition.name, "description": edition.description});
+    const changeClicked = (event) => {
         setNewEdition({"name": "", "description": "", "year": edition.year});
-        console.log("prevEdition: ");
-        console.log(prevEdition);
-        console.log("newEdition: ");
-        console.log(newEdition);
+        setFailed(false);
         setEditing(true);
     }
 
@@ -110,8 +99,9 @@ export default function EditionSettings() {
                         <td>
                             {(! editing) ? (
                                 <div>
-                                    <h1>{edition.name}</h1>
+                                    <h1>{(edition.name) ? edition.name : "No name available"}</h1>
                                     <p>{(edition.description) ? edition.description : "No description available"}</p>
+                                    {failed &&<tr>Something went wrong, please try again</tr>}
                                 </div>
                             ) : (
                                 <div>
@@ -123,7 +113,7 @@ export default function EditionSettings() {
                         <td>
                             {!editing ? (
                                 <Hint message="Edit edition">
-                                    <button className="table-button" onClick={handleChangeClicked}>
+                                    <button className="table-button" onClick={changeClicked}>
                                         <Image src={editIcon} height="30px"/>
                                     </button>
                                 </Hint>
