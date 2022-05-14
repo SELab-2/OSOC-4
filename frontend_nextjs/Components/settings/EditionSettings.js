@@ -22,10 +22,8 @@ export default function EditionSettings() {
     const [editionList, setEditionList] = useState(undefined);
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
     const [editing, setEditing] = useState(false);
-    const [prevEditionName, setPrevEditionName] = useState("");
-    const [prevEditonDescription, setPrevEditionDescription] = useState("");
-    const [currEditionName, setCurrEditionName] = useState("");
-    const [currEditionDescription, setCurrEditionDescription] = useState("");
+    const [prevEdition, setPrevEdition] = useState({"name": "", "description": ""});
+    const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
 
     // fetch the current edition and all the other editions
     useEffect(() => {
@@ -35,10 +33,6 @@ export default function EditionSettings() {
                 console.log("edition")
                 console.log(res.data)
                 await setEdition(res.data);
-                await setPrevEditionName(res.data.name);
-                await setPrevEditionDescription(res.data.description);
-                console.log("--------\n---------\n" + edition.name + "\n" + edition.description);
-                console.log(prevEditionName + prevEditonDescription);
             }
             let resList = await Url.fromName(api.editions).get();
             if (resList.success) {
@@ -62,17 +56,37 @@ export default function EditionSettings() {
         setEditionList([edition, ...editionList]);
     }
 
-    const handleChange = (event) => {
-        
-    }
+    async function handleSaved(event) {
+        event.preventDefault();
+        Url.fromName(api.current_edition).setBody(newEdition).patch().then(res =>{
+            if(res.success){
+                console.log(res);
+                // console.log("edition1");
+                // console.log(edition);
 
-    const handleSaved = (event) => {
+            }
+        }).then( res => {
+            // console.log("newName: " + newEdition.name + " newDesc: " + newEdition.description);
+            // setEdition({"name": newEdition.name, "description": newEdition.description});
+            // console.log("edition2");
+            // console.log(edition);
+            let newEdition2 = {...edition};
+            newEdition2["name"] = newEdition.name;
+            newEdition2["description"] = newEdition.description;
+            setEdition(newEdition2);
+        });
+        console.log("edition uiteindelijk");
+        console.log(edition);
         setEditing(false);
     }
 
     const handleChangeClicked = (event) => {
-        setPrevEditionName(edition.name);
-        setPrevEditionDescription(edition.description);
+        setPrevEdition({"name": edition.name, "description": edition.description});
+        setNewEdition({"name": "", "description": "", "year": edition.year});
+        console.log("prevEdition: ");
+        console.log(prevEdition);
+        console.log("newEdition: ");
+        console.log(newEdition);
         setEditing(true);
     }
 
@@ -101,8 +115,8 @@ export default function EditionSettings() {
                                 </div>
                             ) : (
                                 <div>
-                                    <tr><input placeholder="Enter new name" value={currEditionName} onChange={handleChange}/></tr>
-                                    <tr><input placeholder="Enter new description" value={currEditionDescription} onChange={handleChange}/></tr>
+                                    <tr><input placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/></tr>
+                                    <tr><input placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/></tr>
                                 </div>  
                             )}
                         </td>
