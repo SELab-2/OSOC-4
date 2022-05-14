@@ -1,4 +1,4 @@
-import { Button, Col, Form, Row } from "react-bootstrap";
+import {ButtonGroup, Form, Row} from "react-bootstrap";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -49,7 +49,7 @@ export default function SearchSortBar() {
    */
   return (
     <Row className="nomargin">
-      <Col>
+      <ButtonGroup>
         <Form onSubmit={ev => {
           ev.preventDefault();
           doSearch();
@@ -60,25 +60,19 @@ export default function SearchSortBar() {
             </Form.Control>
           </Form.Group>
         </Form>
-      </Col>
-      <Col xs="auto" >
         <button className="reset-search-button" onClick={() => setSearch("")}>
           <Hint message="Clear the search-bar">
             <Image src={resetSearchIcon} />
           </Hint>
         </button>
-      </Col>
-      <Col xs="auto">
         <button className="search-button" onClick={() => setSearch(() => doSearch())}>
           <Hint message="Search">
             <Image src={searchIcon} />
           </Hint>
         </button>
-      </Col>
-      <Col xs="auto" className="sortby-label">
+      </ButtonGroup>
+      <div className="sortby-label">
         Sort by:
-      </Col>
-      <Col xs="auto" className="align-self-center">
         <select className="dropdown-sortby" id="dropdown-decision" value={sortby}
           onChange={(ev) => sort(ev.target.value)}>
           <option value={"first name+asc,last name+asc"}>Name A-Z</option>
@@ -86,7 +80,7 @@ export default function SearchSortBar() {
           <option value={"id+asc"}>Old-New</option>
           <option value={"id+desc"}>New-Old</option>
         </select>
-      </Col>
+      </div>
     </Row>
   )
 }
