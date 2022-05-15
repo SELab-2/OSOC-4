@@ -5,10 +5,6 @@ import {useRouter} from "next/router";
 import {api, Url} from "../../utils/ApiClient";
 import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
-import InfiniteScroll from "react-infinite-scroll-component";
-import LoadingPage from "../LoadingPage";
-import EmailStudentListElement from "../email-students/EmailStudentListelement";
-import StudentListelement from "../select_students/StudentListelement";
 
 /**
  * Lists all of the projects that a user is allowed to view.
