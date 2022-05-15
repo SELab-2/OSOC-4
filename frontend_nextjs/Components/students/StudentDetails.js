@@ -312,7 +312,7 @@ export default function StudentDetails(props) {
                 <Col className="fill_height scroll-overflow">
 
                     <Row md="auto" className="h2-titles student-details-suggestions-line nomargin">
-                        <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
+                        <h2 className="suggestions-title">Suggestions</h2>
                         <SuggestionsCount ownsuggestion={student["own_suggestion"]} suggestionsYes={getSuggestionsCount(2)}
                             suggestionsMaybe={getSuggestionsCount(1)}
                             suggestionsNo={getSuggestionsCount(0)} />

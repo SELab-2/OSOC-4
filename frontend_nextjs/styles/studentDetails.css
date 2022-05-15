@@ -70,7 +70,8 @@
 }
 
 .suggestions-title {
-    margin-right: 25px;
+    padding-left: 0;
+    width: auto;
 }
 
 .suggestions-circle-red {
