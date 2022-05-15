@@ -1,4 +1,4 @@
-import {ButtonGroup, Form, Row} from "react-bootstrap";
+import {ButtonGroup, Col, Form, Row} from "react-bootstrap";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -49,7 +49,7 @@ export default function SearchSortBar() {
    */
   return (
     <Row className="nomargin">
-      <ButtonGroup>
+      <ButtonGroup className="nopadding">
         <Form onSubmit={ev => {
           ev.preventDefault();
           doSearch();
@@ -71,7 +71,8 @@ export default function SearchSortBar() {
           </Hint>
         </button>
       </ButtonGroup>
-      <div className="sortby-label">
+      <Col/>
+      <div className="sortby-label nopadding">
         Sort by:
         <select className="dropdown-sortby" id="dropdown-decision" value={sortby}
           onChange={(ev) => sort(ev.target.value)}>

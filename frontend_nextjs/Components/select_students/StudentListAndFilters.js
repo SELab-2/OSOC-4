@@ -20,7 +20,7 @@ export default function StudentList(props) {
 
   const router = useRouter();
 
-  const listheights = { "students": "201px"} // The custom height for the studentlist for the page of key
+  const listheights = { "students": "195px", "emailstudents": "264px"} // The custom height for the studentlist for the page of key
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
@@ -223,9 +223,10 @@ export default function StudentList(props) {
 
     (width > 800 || (!router.query.studentId && props.studentsTab)) &&
 
-    <div className={(props.studentsTab) ? "col nomargin student-list-positioning" :
+    <div className={(props.studentsTab) ? "col nomargin student-list-positioning fill_height" :
       ((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) ?
-        "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
+        "col-4 nomargin student-list-positioning fill_height" :
+        "col-5 nomargin student-list-positioning fill_height"} key="studentList">
         {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
           <Row className="nomargin">
             <Button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
@@ -240,8 +241,8 @@ export default function StudentList(props) {
           // TODO find a better way to do this
           // TODO fix for portrait screens, test for non 1080p screens
           // ATTENTION THIS ONLY WORKS FOR SCREENS IN LANDSCAPE MODE
-          // listheights[props.category] contains the custom offset for a given category. Default 153px for projects
-          "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 153px)",
+          // listheights[props.category] contains the custom offset for a given category. Default 155px for projects
+          "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 155px)",
           "position": "relative",
           "transition": "height 0.6s"
         }}
