@@ -146,11 +146,35 @@
     -webkit-text-fill-color: gray;
 }
 
+.details-upper-layer {
+    justify-content: space-between;
+}
+
+.name {
+    display: flex;
+    align-content: center;
+}
+
+.name > .image-button {
+    padding-right: 10pt;
+}
+
+.alumnicon {
+    cursor: default;
+}
+
+.name > h1 {
+    padding-right: 10pt;
+}
+
+.close-button {
+    padding: 0;
+}
+
 .delete-button {
     padding: 0;
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
-    margin-top: 20px;
 }
 
 .student-details-question {

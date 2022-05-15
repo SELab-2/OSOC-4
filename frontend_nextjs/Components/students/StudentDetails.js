@@ -219,7 +219,7 @@ export default function StudentDetails(props) {
     }
 
     return (
-        <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)" }}>
+        <Col className="student-details-window fill_height scroll-overflow fill_width">
             {student["mandatory"] &&
                 <div>
                     <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow}
@@ -233,41 +233,27 @@ export default function StudentDetails(props) {
             }
 
             <Row className="details-upper-layer nomargin">
-                <Col md="auto">
-                    <Row className="nomargin">
-                        <Col xs="auto" className="name_big">
-                            {student["mandatory"]["alumni"] === "yes" ?
-                                <Hint message="Student claims to be an alumni">
-                                    <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon"/>
-                                </Hint>
-                                : <></>
-                            }
-                            {student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}
-                        </Col>
-                        <Col>
-                            <Hint message="Delete the student">
-                                <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                                    <Image src={deleteIcon} className="delete-icon" />
-                                </button>
-                            </Hint>
-                        </Col>
-                    </Row>
-                    <Row className="nomargin">
-                        <ul className="nomargin nopadding">
-                            {(student["skills"]) && student["skills"].map((skill, index) =>
-                                <li className="skill" style={{ display: "inline-block" }}
-                                    key={index}>{skill["name"].toUpperCase()}</li>)}
-                        </ul>
-                    </Row>
-                </Col>
                 <Col>
-                    <Hint message="Delete the student">
-                        <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                            <Image src={deleteIcon} className="delete-icon" />
-                        </button>
-                    </Hint>
+                    <div className="name nomargin">
+                        {student["mandatory"]["alumni"] === "yes" ?
+                            <Hint message="Student claims to be an alumni">
+                                <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon"/>
+                            </Hint>
+                            : <></>
+                        }
+                    <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}</h1>
+                        <Hint message="Delete the student">
+                            <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
+                                <Image src={deleteIcon} className="delete-icon" />
+                            </button>
+                        </Hint>
+                    </div>
+                    <ul className="nomargin nopadding">
+                        {(student["skills"]) && student["skills"].map((skill, index) =>
+                            <li className="skill" style={{ display: "inline-block" }}
+                                key={index}>{skill["name"].toUpperCase()}</li>)}
+                    </ul>
                 </Col>
-                <Col />
                 <Col xs="auto" className="close-button">
                     <Hint message="Close the details">
                         <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
@@ -315,14 +301,12 @@ export default function StudentDetails(props) {
                                 <option value={2}>Yes</option>
                             </select>
                         </Col>
-                        <Col md="auto">
-                            <Hint message="Confirms the decision">
-                                <Button className="suggest-confirm-button" disabled={decideField == decision}
-                                    onClick={() => setDecisionPopUpShow(true)}>
-                                    Confirm
-                                </Button>
-                            </Hint>
-                        </Col>
+                        <Hint message="Confirms the decision">
+                            <Button className="suggest-confirm-button" disabled={decideField === decision}
+                                onClick={() => setDecisionPopUpShow(true)}>
+                                Confirm
+                            </Button>
+                        </Hint>
                     </Row>
                 </Col>
             </Row>

@@ -123,3 +123,9 @@
 .nomargin {
     margin: 0;
 }
+
+@media (max-width: 500pt) {
+    .suggestions {
+        display: none;
+    }
+}
