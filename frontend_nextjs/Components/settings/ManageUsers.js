@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {Button, Form, Modal, Table} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
-import { getSelectStudentsPath } from "../../routes";
 
 /**
  * This component displays a settings-screen where you can manage the users in the application
