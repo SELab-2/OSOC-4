@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Button, Col, Row } from "react-bootstrap";
 import Image from 'next/image'
 import ProjectsList from "../Components/projects/ProjectsList";
-import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
+import StudentListAndFilters from "../Components/students/StudentListAndFilters";
 import matchIcon from "/public/assets/arrow-right-svgrepo-com.svg"
 import AddStudentModal from "../Components/projects/AddStudentModal";
 import useWindowDimensions from "../utils/WindowDimensions";
-import StudentsFilters from "../Components/select_students/StudentsFilters";
+import StudentsFilters from "../Components/students/StudentsFilters";
 import Hint from "../Components/Hint";
 
 /**
