@@ -16,10 +16,8 @@
 }
 
 .remaining_height {
-    position: absolute;
-    top: 75px;
-    bottom: 0;
     width: 100%;
+    height: calc(100vh - 85px);
 }
 
 .studentlist-topmargin {
@@ -59,7 +57,8 @@
 }
 
 .student-list-positioning {
-    margin: 20pt 10pt 0;
+    margin: 0 10pt 0;
+    padding-top: 20px;
 }
 
 .search-button {

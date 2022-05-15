@@ -23,7 +23,7 @@ export default function Projects() {
 
     return (
         <>
-            <Row className="remaining_height fill_width">
+            <Row className="fill_height fill_width remaining_height">
                 {
                     ((width > 1500)) &&
                     <StudentsFilters />
