@@ -1,5 +1,5 @@
 import { Button, Col, Modal, ModalHeader, ModalTitle, Row } from "react-bootstrap";
-import StudentFilter from "../select_students/StudentFilter";
+import StudentFilter from "../students/StudentFilter";
 import { useState, useEffect } from "react";
 import { cache } from "../../utils/ApiClient";
 import { api, Url } from "../../utils/ApiClient";
