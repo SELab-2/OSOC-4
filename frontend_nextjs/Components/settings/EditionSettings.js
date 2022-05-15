@@ -11,6 +11,7 @@ import editIcon from '../../public/assets/edit.svg';
 import saveIcon from '../../public/assets/save.svg';
 import Image from "next/image";
 import Hint from "../Hint";
+import { Form, Button, Row} from "react-bootstrap";
 
 /**
  * This component displays a settings-screen for all settings regarding editions.
@@ -95,7 +96,7 @@ export default function EditionSettings() {
         <div className="body-editiondetail">
             <Table>
                 <tbody>
-                    <tr className="settings-row">
+                    <tr>
                         <td>
                             {(! editing) ? (
                                 <div>
@@ -104,23 +105,33 @@ export default function EditionSettings() {
                                     {failed &&<tr>Something went wrong, please try again</tr>}
                                 </div>
                             ) : (
+                                // <div>
+                                //     <tr><input placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/></tr>
+                                //     <tr><input placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/></tr>
+                                // </div>  
                                 <div>
-                                    <tr><input placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/></tr>
-                                    <tr><input placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/></tr>
-                                </div>  
+                                    <Form className="form-edition-detail">
+                                        <Form.Group className="mb-3">
+                                            <Form.Control type="text" name="name" placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3" >
+                                            <Form.Control type="text" name="description" placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
+                                        </Form.Group>               
+                                    </Form>
+                                    <Button variant="primary" onClick={handleSaved} className="button-edition-detail">
+                                        Save
+                                    </Button>
+                                    <Button variant="primary" >
+                                        Cancel
+                                    </Button>
+                                </div>
                             )}
                         </td>
                         <td>
-                            {!editing ? (
+                            {!editing && (
                                 <Hint message="Edit edition">
                                     <button className="table-button" onClick={changeClicked}>
                                         <Image src={editIcon} height="30px"/>
-                                    </button>
-                                </Hint>
-                            ) : (
-                                <Hint message="Save">
-                                    <button className="table-button" onClick={handleSaved}>
-                                        <Image src={saveIcon} height="30px"/>
                                     </button>
                                 </Hint>
                             )}

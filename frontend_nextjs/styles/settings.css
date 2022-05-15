@@ -8,12 +8,16 @@
     background-color: var(--color-background);
     border-width: 0;
     margin-left: 15px;
-
 }
 
 .errormessage {
     -webkit-text-fill-color: red;
 }
 
-.settings-row{
+.button-edition-detail{
+    margin-right: 15px;
+}
+
+.form-edition-detail{
+    width: 100%;
 }
