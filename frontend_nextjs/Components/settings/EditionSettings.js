@@ -97,7 +97,7 @@ export default function EditionSettings() {
             <Table>
                 <tbody>
                     <tr>
-                        <td>
+                        <td >
                             {(! editing) ? (
                                 <div>
                                     <h1>{(edition.name) ? edition.name : "No name available"}</h1>
@@ -121,18 +121,20 @@ export default function EditionSettings() {
                                     <Button variant="primary" onClick={handleSaved} className="button-edition-detail">
                                         Save
                                     </Button>
-                                    <Button variant="primary" >
+                                    <Button variant="primary" onClick={(ev) => {
+                                        setEditing(false);
+                                    }} >
                                         Cancel
                                     </Button>
                                 </div>
                             )}
                         </td>
-                        <td>
+                        <td className="form-column">
                             {!editing && (
                                 <Hint message="Edit edition">
-                                    <button className="table-button" onClick={changeClicked}>
-                                        <Image src={editIcon} height="30px"/>
-                                    </button>
+                                    <Button onClick={changeClicked}>
+                                        Edit
+                                    </Button>
                                 </Hint>
                             )}
                             

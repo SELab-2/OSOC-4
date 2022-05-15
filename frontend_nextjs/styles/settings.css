@@ -21,3 +21,7 @@
 .form-edition-detail{
     width: 100%;
 }
+
+.form-column{
+    text-align: right;
+}
