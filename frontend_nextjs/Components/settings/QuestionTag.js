@@ -23,7 +23,6 @@ export default function QuestionTag(props) {
 
     useEffect(() => {
         setPreviousTag(props.questionTag);
-        setQuestionTag(props.questionTag);
     }, [props.questionTag]);
 
     /**
@@ -124,7 +123,7 @@ export default function QuestionTag(props) {
             <td>
                 {(!questionTag["mandatory"]) &&
                 <Hint message="Show in the students list">
-                    <input name="show_in_list" type="checkbox" checked={questionTag["show_in_list"]}
+                    <input name="show_in_list" type="checkbox" checked={previousTag["show_in_list"]}
                            onChange={handleCheckboxChange}/>
                 </Hint>
                 }
