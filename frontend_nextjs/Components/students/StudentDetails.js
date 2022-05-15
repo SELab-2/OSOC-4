@@ -291,23 +291,21 @@ export default function StudentDetails(props) {
                             </Hint>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col>
+                    <div>
                         <select className="dropdown-decision" id="dropdown-decision"
                                 onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
                                 <option value={-1}>Undecided</option>
                                 <option value={0}>No</option>
                                 <option value={1}>Maybe</option>
                                 <option value={2}>Yes</option>
-                            </select>
-                        </Col>
+                        </select>
                         <Hint message="Confirms the decision">
                             <Button className="suggest-confirm-button" disabled={decideField === decision}
                                 onClick={() => setDecisionPopUpShow(true)}>
                                 Confirm
                             </Button>
                         </Hint>
-                    </Row>
+                    </div>
                 </Col>
             </Row>
             <Row className="nomargin" md="auto" style={{}}>
