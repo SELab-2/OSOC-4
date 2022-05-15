@@ -7,9 +7,6 @@ import AccordionBody from "react-bootstrap/AccordionBody";
 import QuestionTags from "./QuestionTags";
 import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
-import editIcon from '../../public/assets/edit.svg';
-import saveIcon from '../../public/assets/save.svg';
-import Image from "next/image";
 import Hint from "../Hint";
 import { Form, Button, Row} from "react-bootstrap";
 
@@ -104,11 +101,7 @@ export default function EditionSettings() {
                                     <p>{(edition.description) ? edition.description : "No description available"}</p>
                                     {failed &&<tr>Something went wrong, please try again</tr>}
                                 </div>
-                            ) : (
-                                // <div>
-                                //     <tr><input placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/></tr>
-                                //     <tr><input placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/></tr>
-                                // </div>  
+                            ) : ( 
                                 <div>
                                     <Form className="form-edition-detail">
                                         <Form.Group className="mb-3">
