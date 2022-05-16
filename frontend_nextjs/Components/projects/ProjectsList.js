@@ -95,6 +95,23 @@ export default function ProjectsList(props) {
                     return true; // stop searching
                 }
             })
+        } else {
+            visibleProjects.find((p, i) => {
+                if (p["id_int"] === data["projectId"]) {
+                    let new_projects = [...visibleProjects]
+                    delete new_projects[i]["conflicts"][data["studentId"]]
+                    setVisibleProjects([...new_projects])
+                    return true; // stop searching
+                }
+            })
+            allProjects.find((p, i) => {
+                if (p["id_int"] === data["projectId"]) {
+                    let new_projects = [...allProjects]
+                    delete new_projects[i]["conflicts"][data["studentId"]]
+                    setAllProjects([...new_projects])
+                    return true; // stop searching
+                }
+            })
         }
     }
 
