@@ -12,3 +12,15 @@
 .errormessage {
     -webkit-text-fill-color: red;
 }
+
+.button-edition-detail{
+    margin-right: 15px;
+}
+
+.form-edition-detail{
+    width: 100%;
+}
+
+.form-column{
+    text-align: right;
+}

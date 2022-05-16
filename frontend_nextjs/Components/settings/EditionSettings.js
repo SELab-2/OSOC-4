@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Accordion, Dropdown} from "react-bootstrap";
+import {Accordion, Dropdown, Table} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -7,6 +7,8 @@ import AccordionBody from "react-bootstrap/AccordionBody";
 import QuestionTags from "./QuestionTags";
 import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
+import Hint from "../Hint";
+import { Form, Button, Row} from "react-bootstrap";
 
 /**
  * This component displays a settings-screen for all settings regarding editions.
@@ -17,6 +19,9 @@ export default function EditionSettings() {
     const [edition, setEdition] = useState(undefined);
     const [editionList, setEditionList] = useState(undefined);
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
+    const [editing, setEditing] = useState(false);
+    const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
+    const [failed, setFailed] = useState(false);
 
     // fetch the current edition and all the other editions
     useEffect(() => {
@@ -49,6 +54,29 @@ export default function EditionSettings() {
         setEditionList([edition, ...editionList]);
     }
 
+    async function handleSaved(event) {
+        event.preventDefault();
+        Url.fromName(api.current_edition).setBody(newEdition).patch().then(res =>{
+            if(res.success){
+                let newEdition2 = {...edition};
+                newEdition2["name"] = newEdition.name;
+                newEdition2["description"] = newEdition.description;
+                setEdition(newEdition2);
+            } else {
+                setFailed(true);
+            }
+        })
+        console.log("edition uiteindelijk");
+        console.log(edition);
+        setEditing(false);
+    }
+
+    const changeClicked = (event) => {
+        setNewEdition({"name": "", "description": "", "year": edition.year});
+        setFailed(false);
+        setEditing(true);
+    }
+
     /**
      * Changes the current edition
      * @param edition the edition (dictionary with at least the name and the year) to change to
@@ -58,14 +86,55 @@ export default function EditionSettings() {
         await setEdition({"year": edition.year, "name": edition.name});
     }
 
-
     if (loading) {
         return (<LoadingPage/>);
     }
     return (
         <div className="body-editiondetail">
-            <h1>{edition.name}</h1>
-            <p>{(edition.description) ? edition.description : "No description available"}</p>
+            <Table>
+                <tbody>
+                    <tr>
+                        <td >
+                            {(! editing) ? (
+                                <div>
+                                    <h1>{(edition.name) ? edition.name : "No name available"}</h1>
+                                    <p>{(edition.description) ? edition.description : "No description available"}</p>
+                                    {failed &&<tr>Something went wrong, please try again</tr>}
+                                </div>
+                            ) : ( 
+                                <div>
+                                    <Form className="form-edition-detail">
+                                        <Form.Group className="mb-3">
+                                            <Form.Control type="text" name="name" placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3" >
+                                            <Form.Control type="text" name="description" placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
+                                        </Form.Group>               
+                                    </Form>
+                                    <Button variant="primary" onClick={handleSaved} className="button-edition-detail">
+                                        Save
+                                    </Button>
+                                    <Button variant="primary" onClick={(ev) => {
+                                        setEditing(false);
+                                    }} >
+                                        Cancel
+                                    </Button>
+                                </div>
+                            )}
+                        </td>
+                        <td className="form-column">
+                            {!editing && (
+                                <Hint message="Edit edition">
+                                    <Button onClick={changeClicked}>
+                                        Edit
+                                    </Button>
+                                </Hint>
+                            )}
+                            
+                        </td>
+                    </tr>
+                </tbody>
+            </Table>
             <Accordion>
                 <AccordionItem eventKey="0">
                     <AccordionHeader>
