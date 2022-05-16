@@ -96,15 +96,15 @@ export default function StudentListelement(props) {
     // if the selected student is this student then unselect the student
     if (props.elementType === "emailstudents") {
       if (isSelected(props.student)) {
-        props.setSelectedStudents(prevState => prevState.filter((o, i) => o !== props.student))
+        props.setSelectedStudents(prevState => prevState.filter((o, i) => o !== props.student.id))
       } else {
-        props.setSelectedStudents(prevState => [...prevState, props.student])
+        props.setSelectedStudents(prevState => [...prevState, props.student.id])
       }
     } else {
-      if (isSelected(props.student.id)) {
+      if (isSelected(props.student)) {
         props.setSelectedStudents([])
       } else {
-        props.setSelectedStudents([props.student.id])
+        props.setSelectedStudents([props.student])
       }
     }
   }
