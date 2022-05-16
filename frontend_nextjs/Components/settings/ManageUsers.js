@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Button, Form, Modal, Table} from "react-bootstrap";
+import {Button, Form, Modal, Table, Spinner} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
 
@@ -30,10 +30,17 @@ export default function ManageUsers(props) {
 
     const handleClose = () => {
         setFail(false);
-        setToInvite("");
-        setShow(false);
         setSent(false);
         setSending(false);
+        setShow(false);
+        setToInvite("");
+    }
+
+    const handleTryAgain = () => {
+        setFail(false);
+        setSent(false);
+        setSending(false);
+        setToInvite("");
     }
 
     const handleShow = () => setShow(true);
@@ -91,6 +98,9 @@ export default function ManageUsers(props) {
                             setFail(true);
                         }
                     });
+                } else {
+                    setSending(false);
+                    setFail(true);
                 }
             }))
         );
@@ -147,31 +157,40 @@ export default function ManageUsers(props) {
                         <Modal.Title>Invite users</Modal.Title>
                     </Modal.Header>
                         <Form id="invite-users" onSubmit={handleSubmitInvite}>
-                        <Modal.Body>
-                            <Form.Group controlId="inviteUserTextarea">
-                                <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
-                                {(sent || sending || fail) ? (
-                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
-                                ) : (
-                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
-                                )}
-                                {(sending || sent) ? <br/> : null}
-                                {(sending)? <Form.Label>Trying to sent invites!</Form.Label>: null}
-                                {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
-                                {(fail)? <Form.Label>Something went wrong, please try again</Form.Label>: null}
-                            </Form.Group>
-                        </Modal.Body>
-                            {(sent) ? 
-                            (
-                                <Modal.Footer>
-                                    <Button variant={"primary"} onClick={handleClose}>Close</Button>
-                                </Modal.Footer> 
-                            ):(
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                    <Button variant={"primary"} type="submit">Invite users</Button>
-                                </Modal.Footer>
-                            )}
+                            <Modal.Body>
+                                <Form.Group controlId="inviteUserTextarea">
+                                    <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
+                                    {(sent || sending || fail) ? (
+                                        <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
+                                    ) : (
+                                        <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                                    )}
+                                    {(sent || fail) && <br/>}
+                                    {(fail) && <Form.Label>Something went wrong, please try again</Form.Label>}
+                                    {(sent) && <Form.Label>Invites have been sent!</Form.Label>}
+                                </Form.Group>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                {sent && <Button variant={"primary"} onClick={handleClose}>Close</Button>}
+                                {fail && <Button variant={"primary"} onClick={handleTryAgain}>Try again</Button>} 
+                                {sending && 
+                                    <Button variant="primary" disabled className="invite-button">
+                                        Sending invites...
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                        />
+                                    </Button>
+                                }
+                                {!sent && !fail && !sending && 
+                                    <div>
+                                        <Button variant={"secondary"} onClick={handleClose}>Close</Button>
+                                        <Button variant={"primary"} type="submit" className="invite-button">Invite users</Button>
+                                    </div>}
+                            </Modal.Footer> 
                         </Form>
                 </Modal>
 
