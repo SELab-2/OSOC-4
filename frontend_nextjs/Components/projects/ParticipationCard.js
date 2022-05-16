@@ -1,9 +1,11 @@
 import {Card, Col, Row} from "react-bootstrap";
 import SkillCard from "./SkillCard";
 import {useEffect, useState} from "react";
-import Image from 'next/image'
-import {Url} from "../../utils/ApiClient";
-import red_cross from "/public/assets/wrong.svg"
+import Image from 'next/image';
+import red_cross from "/public/assets/wrong.svg";
+import {api, Url} from "../../utils/ApiClient";
+import {getID} from "../../utils/string";
+
 
 /**
  * Card like representation of the given participation, which also allows the deletion of the participation
@@ -14,6 +16,8 @@ import red_cross from "/public/assets/wrong.svg"
 export default function ParticipationCard(props){
 
     const [student, setStudent] = useState({})
+    const [deletedCard, setDeletedCard] = useState(false);
+
     /**
      * Loads once after the component mounts, it sets the student state.
      */
@@ -30,9 +34,19 @@ export default function ParticipationCard(props){
      */
     function deleteStudentFromProject(){
         // delete participation
+        Url.fromName(api.participations)
+            .setParams({project_id:getID(props.project.id), student_id:getID(props.participation.student)})
+            .delete().then(res => {
+                //TODO remove when using websockets
+                if (res.success){
+                    setDeletedCard(true)
+                }
+        })
     }
 
     return(
+        <div>
+            {! deletedCard ?
         <Card className={"participation-card"} key={props.participation}>
             <div className={"participation-div"}>
                 <Row>
@@ -50,6 +64,7 @@ export default function ParticipationCard(props){
                 </Row>
             </div>
 
-        </Card>
+                </Card>  : null}
+    </div>
     )
 }

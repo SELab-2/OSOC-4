@@ -31,10 +31,7 @@ export default function AddStudentModal(props) {
      * This function gets called when props.selectedStudent or props.selectedProject changes. It finds the intersection
      * of the required skills of the selected project and the skills of the selected student
      */
-
-
     useEffect(() => {
-        setSelectedSkill(undefined)
         if (props.selectedProject !== undefined) {
             let temp_dict = {}
             props.selectedProject.required_skills.map(skill => {
@@ -56,7 +53,6 @@ export default function AddStudentModal(props) {
     useEffect(() => {
         Url.fromName(api.skills).get().then(res => {
             if (res.success) {
-                log("skills halen lunkt")
                 setSkills(res.data)
             }
         })
@@ -65,9 +61,6 @@ export default function AddStudentModal(props) {
     useEffect(() => {
         if (skills.length !== 0 && props.selectedStudent !== undefined && projectNeededSkills.length !== 0) {
             let studentClean = props.selectedStudent.skills.map(value => value.name)
-            log("student clean")
-            log(studentClean)
-            log(props.selectedStudent.skills)
             let overlap = StringListToOptionsList(studentClean.filter(skill => projectNeededSkills.includes(skill)))
             let studentSkills = StringListToOptionsList(studentClean.filter(skill => !projectNeededSkills.includes(skill)))
             let projectSkills = StringListToOptionsList(projectNeededSkills.filter(skill => !studentClean.includes(skill)))
