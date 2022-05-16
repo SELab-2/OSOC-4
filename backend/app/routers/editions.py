@@ -156,7 +156,6 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
     if filters:
         for filter in filters.split(","):
-            print(filter)
             student_query = student_query.join(QuestionAnswer, student_alias.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == filter).join(Answer).where(Answer.answer == "yes")
             student_alias = aliased(student_alias, student_query.subquery())
             student_query = select(student_alias)
