@@ -174,23 +174,20 @@ export default function ManageUsers(props) {
                                 {sent && <Button variant={"primary"} onClick={handleClose}>Close</Button>}
                                 {fail && <Button variant={"primary"} onClick={handleTryAgain}>Try again</Button>} 
                                 {sending && 
-                                    <div>
-                                        <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                        <Button variant="primary" disabled>
-                                            Sending invites...
-                                            <Spinner
-                                                as="span"
-                                                animation="border"
-                                                size="sm"
-                                                role="status"
-                                                aria-hidden="true"
-                                            />
-                                        </Button>
-                                    </div>
+                                    <Button variant="primary" disabled className="invite-button">
+                                        Sending invites...
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                        />
+                                    </Button>
                                 }
                                 {!sent && !fail && !sending && 
                                     <div>
-                                        <Button variant={"primary"} onClick={handleClose}>Close</Button>
+                                        <Button variant={"secondary"} onClick={handleClose}>Close</Button>
                                         <Button variant={"primary"} type="submit" className="invite-button">Invite users</Button>
                                     </div>}
                             </Modal.Footer> 
