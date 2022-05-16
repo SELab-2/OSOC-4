@@ -175,7 +175,7 @@ export default function ManageUsers(props) {
                                 {fail && 
                                 <div>
                                     <Button variant="secondary" onClick={handleClose}>Close</Button>
-                                    <Button variant={"primary"} onClick={handleTryAgain} className="invite-button">Try again</Button>
+                                    <Button variant="primary" onClick={handleTryAgain} className="invite-button">Try again</Button>
                                 </div>} 
                                 {sending && 
                                     <Button variant="primary" disabled className="invite-button">
