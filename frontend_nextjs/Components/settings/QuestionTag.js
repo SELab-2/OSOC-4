@@ -128,7 +128,7 @@ export default function QuestionTag(props) {
                 </Hint>
                 }
             </td>
-            <td>
+            <td className="questionTag-cell">
                 {
                     ((!props.edited) ?
                         <Hint message="Edit question-tag">
@@ -137,20 +137,20 @@ export default function QuestionTag(props) {
                                 props.setEdited(previousTag["url"]);
                                 setQuestionTag(previousTag);
                             }}>
-                                <Image src={editIcon} height="30px"/>
+                                <Image src={editIcon} className="questionTag-image"/>
                             </button>
                         </Hint>
                         :
                         <Hint message="Save">
                             <button className="table-button" onClick={handleSubmit}>
-                                <Image src={saveIcon} height="30px"/>
+                                <Image src={saveIcon} className="questionTag-image"/>
                             </button>
                         </Hint>)
                 }
                 {(!previousTag["mandatory"]) &&
                     <Hint message="Delete question-tag">
                         <button onClick={deleteTag} className="table-button">
-                            <Image src={deleteIcon} height="30px"/>
+                            <Image src={deleteIcon} className="questionTag-image"/>
                         </button>
                     </Hint>
                 }
