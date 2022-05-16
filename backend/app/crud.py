@@ -108,6 +108,19 @@ async def update_all(models: List[T], session: AsyncSession) -> Optional[List[T]
     return models
 
 
+async def delete(model: T, session: AsyncSession) -> None:
+    """Deletes the given model from the database
+
+    :param model: an instance of the model to delete
+    :type model: SQLModel
+    :return: None
+    :rtype: None
+    """
+
+    await session.delete(model)
+    await session.commit()
+
+
 async def clear_data(session: AsyncSession = get_session()):
     # Get all tables
     conn = await session.connection()

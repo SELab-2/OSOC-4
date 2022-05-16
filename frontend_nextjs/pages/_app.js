@@ -7,7 +7,7 @@ import "../styles/settings.css"
 import "../styles/settingcards.css"
 import "../styles/manageusers.css"
 import "../styles/studentListelement.css"
-import "../styles/select-students.css"
+import "../styles/students.css"
 import "../styles/filters.css"
 import "../styles/navheader.css"
 import "../styles/studentDetails.css"
@@ -15,6 +15,7 @@ import "../styles/emailStudents.css"
 import "../styles/projects.css"
 import "../styles/projectDetails.css"
 import "../styles/requiredSkillSelector.css"
+import "../styles/defaultEmail.css"
 
 import { ThemeProvider } from "react-bootstrap";
 import { SessionProvider } from 'next-auth/react';

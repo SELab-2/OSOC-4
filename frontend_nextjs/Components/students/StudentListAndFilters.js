@@ -1,4 +1,4 @@
-import {Button, Row} from "react-bootstrap";
+import { Button, Row } from "react-bootstrap";
 import StudentsFilters from "./StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
 import SearchSortBar from "./SearchSortBar";
@@ -19,7 +19,7 @@ export default function StudentList(props) {
 
   const router = useRouter();
 
-  const listheights = { "students": "201px"} // The custom height for the studentlist for the page of key
+  const listheights = { "students": "195px", "emailstudents": "264px" } // The custom height for the studentlist for the page of key
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
@@ -32,6 +32,7 @@ export default function StudentList(props) {
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
   const [ownSuggestion, setOwnSuggestion] = useState("")
+  const [filters, setFilters] = useState("")
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
@@ -64,18 +65,23 @@ export default function StudentList(props) {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will
       // provoke the second part of useEffect to filter the students again.
-      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion)) {
+      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion) || (router.query.filters !== filters)) {
         setSearch(router.query.search);
         setSortby(router.query.sortby);
         setDecisions(router.query.decision);
         setSkills(router.query.skills);
         setOwnSuggestion(router.query.own_suggestion)
+        setFilters(router.query.filters);
 
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
           {
             decision: router.query.decision || "",
-            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || "", own_suggestion: router.query.own_suggestion || ""
+            search: router.query.search || "",
+            orderby: router.query.sortby || "first name+asc,last name+asc",
+            skills: router.query.skills || "",
+            own_suggestion: router.query.own_suggestion || "",
+            filters: router.query.filters || ""
           }
         ).get().then(res => {
           if (res.success) {
@@ -91,7 +97,7 @@ export default function StudentList(props) {
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby, router.query.filters])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -222,25 +228,26 @@ export default function StudentList(props) {
 
     (width > 800 || (!router.query.studentId && props.elementType === "students")) &&
 
-    <div className={(props.elementType === "students") ? "col nomargin student-list-positioning" :
+    <div className={(props.elementType === "students") ? "col nomargin student-list-positioning fill_height" :
       ((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) ?
-        "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
-        {!((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) &&
-          <Row className="nomargin">
-            <Button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
-              <Image className="test" width="20%" height="20%" src={filterIcon} placeholder="empty"/>
-              <span>Filters</span>
-            </Button>
-          </Row>
-        }
+        "col-4 nomargin student-list-positioning fill_height" :
+        "col-5 nomargin student-list-positioning fill_height"} key="studentList">
+      {!((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) &&
+        <Row className="nomargin">
+          <Button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
+            <Image className="test" width="20%" height="20%" src={filterIcon} placeholder="empty" />
+            <span>Filters</span>
+          </Button>
+        </Row>
+      }
       <SearchSortBar />
       <InfiniteScroll
         style={{
           // TODO find a better way to do this
           // TODO fix for portrait screens, test for non 1080p screens
           // ATTENTION THIS ONLY WORKS FOR SCREENS IN LANDSCAPE MODE
-          // listheights[props.category] contains the custom offset for a given category. Default 153px for projects
-          "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 153px)",
+          // listheights[props.category] contains the custom offset for a given category. Default 155px for projects
+          "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 155px)",
           "position": "relative",
           "transition": "height 0.6s"
         }}

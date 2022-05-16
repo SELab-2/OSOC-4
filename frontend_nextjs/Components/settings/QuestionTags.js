@@ -125,7 +125,7 @@ export default function QuestionTags(props) {
      */
     return (
         <div>
-            <Table>
+            <Table responsive>
                 <thead>
                     <tr className="table-head">
                         <th>

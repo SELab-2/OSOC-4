@@ -16,7 +16,7 @@
 
 .project-card-div{
     padding: 0;
-    margin-top: 15px;
+    margin-top: 7px;
 }
 
 .center-component{
@@ -121,4 +121,8 @@
     line-height: 36px;
     -webkit-appearance: none;
     height: 20px;
+}
+
+.projects-positioning {
+    padding-top: 20px;
 }
