@@ -33,6 +33,7 @@ export default function StudentList(props) {
   const [skills, setSkills] = useState("");
   const [ownSuggestion, setOwnSuggestion] = useState("")
   const [filters, setFilters] = useState("")
+  const [unmatched, setUnmatched] = useState("")
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
@@ -65,13 +66,14 @@ export default function StudentList(props) {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will
       // provoke the second part of useEffect to filter the students again.
-      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion) || (router.query.filters !== filters)) {
+      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion) || (router.query.filters !== filters) || (router.query.unmatched !== unmatched)) {
         setSearch(router.query.search);
         setSortby(router.query.sortby);
         setDecisions(router.query.decision);
         setSkills(router.query.skills);
         setOwnSuggestion(router.query.own_suggestion)
         setFilters(router.query.filters);
+        setUnmatched(router.query.unmatched)
 
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
@@ -81,7 +83,8 @@ export default function StudentList(props) {
             orderby: router.query.sortby || "first name+asc,last name+asc",
             skills: router.query.skills || "",
             own_suggestion: router.query.own_suggestion || "",
-            filters: router.query.filters || ""
+            filters: router.query.filters || "",
+            unmatched: router.query.unmatched || ""
           }
         ).get().then(res => {
           if (res.success) {
@@ -97,7 +100,7 @@ export default function StudentList(props) {
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby, router.query.filters])
+  }, [session, students, studentUrls, router.query, search, sortby])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -202,6 +205,7 @@ export default function StudentList(props) {
 
 
     } else if ("deleted_student" in data) {
+      // TODO #481 check reload the students -> maybe the deleted student must be shown in the list
       students.find((o, i) => {
         if (o["id"] === data["deleted_student"]) {
           let new_students = [...students]
@@ -278,7 +282,7 @@ export default function StudentList(props) {
       >
         {students.map((i, index) => {
           if (props.category === "emailstudents") {
-            return <StudentListelement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} elementType="emailstudents"/>
+            return <StudentListelement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} elementType="emailstudents" />
           } else {
             return <StudentListelement selectedStudents={props.selectedStudents} setSelectedStudents={props.setSelectedStudents} key={i.id} student={i} elementType={props.elementType} />// elementType is projects or students
           }

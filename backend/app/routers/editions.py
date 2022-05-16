@@ -14,6 +14,7 @@ from app.exceptions.questiontag_exceptions import (
 from app.models.answer import Answer
 from app.models.edition import (Edition, EditionCoach, EditionOutExtended,
                                 EditionOutSimple)
+from app.models.participation import Participation
 from app.models.project import Project, ProjectCoach, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
@@ -129,7 +130,7 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", filters: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", filters: str = "", unmatched: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
@@ -163,6 +164,10 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
         student_query = student_query.where(student_alias.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
     if skills:
         student_query = student_query.join(StudentSkill).where(StudentSkill.skill_name.in_(skills.split(",")))
+    if unmatched == "true":
+        student_query = student_query.outerjoin(Participation, Participation.student_id == student_alias.id).where(Participation.student_id.is_(None))
+        student_alias = aliased(student_alias, student_query.distinct().subquery())
+        student_query = select(student_alias)
     if search:
         student_query = student_query.join(QuestionAnswer).join(Answer)
         student_query = student_query.where(Answer.answer.ilike("%" + search.replace(" ", "%") + "%"))
