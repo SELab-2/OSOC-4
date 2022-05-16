@@ -78,36 +78,40 @@ export default function ProjectsList(props) {
 
     const updateDetailsFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
+        const studentid = parseInt(data["studentId"])
+        const projectid = parseInt(data["projectId"])
+
         if ("participation" in data) {
             visibleProjects.find((p, i) => {
-                if (p["id_int"] === data["projectId"]) {
+                if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
-                    new_projects[i]["participations"][data["studentId"]] = data["participation"]
+                    new_projects[i]["participations"][studentid] = data["participation"]
                     setVisibleProjects([...new_projects])
                     return true; // stop searching
                 }
             })
             allProjects.find((p, i) => {
-                if (p["id_int"] === data["projectId"]) {
+                if (p["id_int"] === projectid) {
                     let new_projects = [...allProjects]
-                    new_projects[i]["participations"][data["studentId"]] = data["participation"]
+                    new_projects[i]["participations"][studentid] = data["participation"]
                     setAllProjects([...new_projects])
                     return true; // stop searching
                 }
             })
         } else {
             visibleProjects.find((p, i) => {
-                if (p["id_int"] === data["projectId"]) {
+                if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
-                    delete new_projects[i]["conflicts"][data["studentId"]]
+                    delete new_projects[i]["participations"][studentid]
+                    console.log(new_projects)
                     setVisibleProjects([...new_projects])
                     return true; // stop searching
                 }
             })
             allProjects.find((p, i) => {
-                if (p["id_int"] === data["projectId"]) {
+                if (p["id_int"] === projectid) {
                     let new_projects = [...allProjects]
-                    delete new_projects[i]["conflicts"][data["studentId"]]
+                    delete new_projects[i]["participations"][studentid]
                     setAllProjects([...new_projects])
                     return true; // stop searching
                 }
