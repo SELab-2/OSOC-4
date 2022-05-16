@@ -45,7 +45,10 @@ export default function Students() {
             {(width > 800 || !router.query.studentId) &&
                 <Col>
                     <Row className="nomargin">
-                        <StudentListAndFilters selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} setStudents={setStudents} category={showEmailBar ? "emailstudents" : "students"} studentsTab={true} />
+                        <StudentListAndFilters selectedStudents={selectedStudents}
+                                               setSelectedStudents={setSelectedStudents} setStudents={setStudents}
+                                               category={showEmailBar ? "emailstudents" : "students"}
+                                               elementType="students" />
                     </Row>
                     {(me && me.role === 2) &&
                         <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />

@@ -4,7 +4,7 @@ import CheeseburgerMenu from "cheeseburger-menu";
 import SearchSortBar from "./SearchSortBar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StudentListelement from "./StudentListelement";
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useWindowDimensions from "../../utils/WindowDimensions";
 import { api, Url } from "../../utils/ApiClient";
 import { useSession } from "next-auth/react";
@@ -12,7 +12,6 @@ import { useRouter } from "next/router";
 import { cache } from "../../utils/ApiClient"
 import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
-import EmailStudentListElement from "../email-students/EmailStudentListelement"
 import filterIcon from "../../public/assets/show-filter-svgrepo-com.svg"
 import Image from "next/image";
 
@@ -221,19 +220,19 @@ export default function StudentList(props) {
   }
 
   return [
-    !((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
+    !((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) &&
     <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
       <StudentsFilters />
     </CheeseburgerMenu>
     ,
 
-    (width > 800 || (!router.query.studentId && props.studentsTab)) &&
+    (width > 800 || (!router.query.studentId && props.elementType === "students")) &&
 
-    <div className={(props.studentsTab) ? "col nomargin student-list-positioning fill_height" :
-      ((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) ?
+    <div className={(props.elementType === "students") ? "col nomargin student-list-positioning fill_height" :
+      ((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) ?
         "col-4 nomargin student-list-positioning fill_height" :
         "col-5 nomargin student-list-positioning fill_height"} key="studentList">
-      {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
+      {!((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) &&
         <Row className="nomargin">
           <Button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
             <Image className="test" width="20%" height="20%" src={filterIcon} placeholder="empty" />
@@ -264,16 +263,13 @@ export default function StudentList(props) {
         }
       >
         {students.map((i, index) => {
-
           if (props.category === "emailstudents") {
-            return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
+            return <StudentListelement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} elementType="emailstudents"/>
           } else {
-            return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
+            return <StudentListelement selectedStudents={props.selectedStudents} setSelectedStudents={props.setSelectedStudents} key={i.id} student={i} elementType={props.elementType} />// elementType is projects or students
           }
-
         })}
       </InfiniteScroll>
     </div>
-
   ]
 }
