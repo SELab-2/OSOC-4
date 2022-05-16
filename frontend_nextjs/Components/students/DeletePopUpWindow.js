@@ -1,4 +1,6 @@
-import {Button, Modal, ModalHeader, ModalTitle} from "react-bootstrap";
+import { Button, Modal, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Url, api, cache } from "../../utils/ApiClient";
+import { useRouter } from "next/router";
 
 /**
  * This element shows the pop up window when deleting a student.
@@ -11,6 +13,7 @@ export default function DeletePopUpWindow(props) {
 
   // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
+  const router = useRouter();
 
   /**
    * This function is called when the pop up window is closed.
@@ -23,7 +26,22 @@ export default function DeletePopUpWindow(props) {
    * This function is called on submitting the deletion.
    */
   function submitDelete() {
-    setPopUpShow(false);
+    // delete participation
+    Url.fromUrl(props.student.id).delete().then(res => {
+      //TODO remove when using websockets
+      if (res.success) {
+        cache.remove_student(props.student.id);
+        let newQuery = router.query;
+        delete newQuery["studentId"];
+        router.push({
+          pathname: router.pathname,
+          query: newQuery
+        }, undefined, { shallow: true })
+        setPopUpShow(false);
+      }
+    })
+
+
   }
 
   // returns the html representation for the pop up window
@@ -38,7 +56,7 @@ export default function DeletePopUpWindow(props) {
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
           Are you sure you want to delete {props.student.mandatory["first name"] + " " +
-          props.student.mandatory["last name"]}
+            props.student.mandatory["last name"]}
         </ModalTitle>
       </ModalHeader>
       <Modal.Footer>
