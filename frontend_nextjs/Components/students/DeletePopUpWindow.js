@@ -1,6 +1,5 @@
 import { Button, Modal, ModalHeader, ModalTitle } from "react-bootstrap";
 import { Url, api, cache } from "../../utils/ApiClient";
-import { useRouter } from "next/router";
 
 /**
  * This element shows the pop up window when deleting a student.
@@ -13,7 +12,6 @@ export default function DeletePopUpWindow(props) {
 
   // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
-  const router = useRouter();
 
   /**
    * This function is called when the pop up window is closed.
@@ -31,12 +29,6 @@ export default function DeletePopUpWindow(props) {
       //TODO remove when using websockets
       if (res.success) {
         cache.remove_student(props.student.id);
-        let newQuery = router.query;
-        delete newQuery["studentId"];
-        router.push({
-          pathname: router.pathname,
-          query: newQuery
-        }, undefined, { shallow: true })
         setPopUpShow(false);
       }
     })

@@ -1,5 +1,5 @@
 from app.config import config
-from app.crud import read_where, update, delete, read_all_where
+from app.crud import delete, read_all_where, read_where, update
 from app.database import get_session, websocketManager
 from app.exceptions.edition_exceptions import StudentNotFoundException
 from app.models.answer import Answer
@@ -160,5 +160,7 @@ async def delete_student(student_id: str, session: AsyncSession = Depends(get_se
             await session.delete(obj)
 
         await session.commit()
+
+    await websocketManager.broadcast({"deleted_student": config.api_url + "students/" + str(student_id)})
 
     return response(None, "Student deleted successfully")
