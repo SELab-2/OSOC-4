@@ -1,5 +1,5 @@
 from app.config import config
-from app.crud import read_where, update
+from app.crud import read_where, update, delete
 from app.database import get_session, websocketManager
 from app.exceptions.edition_exceptions import StudentNotFoundException
 from app.models.answer import Answer
@@ -121,3 +121,24 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
         return response(None, "Student updated succesfully")
 
     raise StudentNotFoundException()
+
+
+@router.delete("/{student_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def delete_student(student_id: str, session: AsyncSession = Depends(get_session)):
+    """delete_student this deletes a student
+
+    :param student_id: the user id
+    :type student_id: str
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    student = await read_where(Student, Student.id == int(student_id), session=session)
+
+    if student is None:
+        raise StudentNotFoundException()
+    else:
+        await delete(student, session)
+
+    return response(None, "Student deleted successfully")
