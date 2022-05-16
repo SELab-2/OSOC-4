@@ -387,7 +387,7 @@ const Project = () => {
                                 <div>
                                     <div className={"project-card-title"}>Assigned students</div>
                                     {(Object.values(project.participations).length) ?
-                                        Object.values(project.participations).map(participation => (<ParticipationCard key={participation.student} participation={participation} />)) :
+                                        Object.values(project.participations).map(participation => (<ParticipationCard key={participation.student} participation={participation} project={project} />)) :
                                         <div className={"project-empty-list-col"}>Currently there are no assigned students</div>
                                     }
                                 </div>

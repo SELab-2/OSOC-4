@@ -1,10 +1,10 @@
-import {Card, Col, Row} from "react-bootstrap";
+import { Card, Col, Row } from "react-bootstrap";
 import SkillCard from "./SkillCard";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Image from 'next/image';
 import red_cross from "/public/assets/wrong.svg";
-import {api, Url} from "../../utils/ApiClient";
-import {getID} from "../../utils/string";
+import { api, Url } from "../../utils/ApiClient";
+import { getID } from "../../utils/string";
 
 
 /**
@@ -13,7 +13,7 @@ import {getID} from "../../utils/string";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function ParticipationCard(props){
+export default function ParticipationCard(props) {
 
     const [student, setStudent] = useState({})
     const [deletedCard, setDeletedCard] = useState(false);
@@ -23,7 +23,7 @@ export default function ParticipationCard(props){
      */
     useEffect(() => {
         Url.fromUrl(props.participation.student).get().then(response => {
-            if(response.success){
+            if (response.success) {
                 setStudent(response.data)
             }
         })
@@ -32,39 +32,39 @@ export default function ParticipationCard(props){
     /**
      * deletes props.participation
      */
-    function deleteStudentFromProject(){
+    function deleteStudentFromProject() {
         // delete participation
         Url.fromName(api.participations)
-            .setParams({project_id:getID(props.project.id), student_id:getID(props.participation.student)})
+            .setParams({ project_id: props.project.id_int, student_id: getID(props.participation.student) })
             .delete().then(res => {
                 //TODO remove when using websockets
-                if (res.success){
+                if (res.success) {
                     setDeletedCard(true)
                 }
-        })
+            })
     }
 
-    return(
+    return (
         <div>
-            {! deletedCard ?
-        <Card className={"participation-card"} key={props.participation}>
-            <div className={"participation-div"}>
-                <Row>
-                    <Col className={"participation-info"}>
-                        <div className={"participation-name"}>
-                            {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null }
-                        </div>
-                        <SkillCard number={0} skill_name={props.participation.skill}/>
-                    </Col>
-                    <Col xs={"auto"} className={"participation-remove-student"}>
-                        <div className={"participation-delete"}>
-                            <Image  alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25}/>
-                        </div>
-                    </Col>
-                </Row>
-            </div>
+            {!deletedCard ?
+                <Card className={"participation-card"} key={props.participation}>
+                    <div className={"participation-div"}>
+                        <Row>
+                            <Col className={"participation-info"}>
+                                <div className={"participation-name"}>
+                                    {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null}
+                                </div>
+                                <SkillCard number={0} skill_name={props.participation.skill} />
+                            </Col>
+                            <Col xs={"auto"} className={"participation-remove-student"}>
+                                <div className={"participation-delete"}>
+                                    <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25} />
+                                </div>
+                            </Col>
+                        </Row>
+                    </div>
 
-                </Card>  : null}
-    </div>
+                </Card> : null}
+        </div>
     )
 }
