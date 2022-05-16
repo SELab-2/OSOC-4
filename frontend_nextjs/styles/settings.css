@@ -13,3 +13,7 @@
 .errormessage {
     -webkit-text-fill-color: red;
 }
+
+.invite-button{
+    margin-left: 15px;
+}
