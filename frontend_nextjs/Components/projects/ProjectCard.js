@@ -1,9 +1,9 @@
-import {Card, Col, Row} from "react-bootstrap";
-import {log} from "../../utils/logger";
-import {useRouter} from "next/router";
+import { Card, Col, Row } from "react-bootstrap";
+import { log } from "../../utils/logger";
+import { useRouter } from "next/router";
 import SkillCard from "./SkillCard";
 import AdminCard from "./AdminCard";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import ParticipationCard from "./ParticipationCard";
 import Image from 'next/image'
 import details from "/public/assets/details.svg"
@@ -51,17 +51,17 @@ export default function ProjectCard(props) {
             temp_dict[skill.skill_name] = skill.number
         })
 
-        props.project.participations.map(participation => {
-            temp_dict[participation.skill] = temp_dict[participation.skill] - 1 ;
+        Object.values(props.project.participations).map(participation => {
+            temp_dict[participation.skill] = temp_dict[participation.skill] - 1;
         })
         let temp_list = []
         Object.keys(temp_dict).map(name => {
-            temp_list.push({"amount": temp_dict[name], "name": name})
+            temp_list.push({ "amount": temp_dict[name], "name": name })
         })
         setSkills(temp_list)
     }, [])
 
-    return(
+    return (
         <div className={"project-card-div"}>
             <Card className={"project-card" + ((props.project === props.selectedProject) ? "-selected" : "")}>
                 <Card.Body className={"card-body"}>
@@ -72,39 +72,39 @@ export default function ProjectCard(props) {
                         <Col xs={"auto"}>
                             <div className={"project-show-detail"}>
                                 <Hint message="Select project">
-                                    <Image src={props.project === props.selectedProject ? selected : not_selected} height={25} width={25} onClick={selectProject}/>
+                                    <Image src={props.project === props.selectedProject ? selected : not_selected} height={25} width={25} onClick={selectProject} />
                                 </Hint>
                             </div>
                         </Col>
                         <Col xs={"auto"}>
                             <div className={"project-show-detail"}>
                                 <Hint message="Show details">
-                                    <Image src={details} height={25} width={25} onClick={toProjectDetails}/>
+                                    <Image src={details} height={25} width={25} onClick={toProjectDetails} />
                                 </Hint>
                             </div>
                         </Col>
                     </Row>
                     <div className={"partner-title"} >{props.project.partner_name}</div>
                     {/*todo make this clickable with link to partner?*/}
-                    <br/>
+                    <br />
 
                     <Row>
-                        {(props.project.users.length) ? props.project.users.map(item => (<AdminCard key={item} user={item}/>)) : null }
+                        {(props.project.users.length) ? props.project.users.map(item => (<AdminCard key={item} user={item} />)) : null}
                     </Row>
-                    <br/>
+                    <br />
                     <Row>
                         <Col>
                             <div className={"project-title-list"}>
                                 <div className={"project-card-title"}>Required skills</div>
-                                { (skills.length) ? (skills.map(skill =>
-                                    (skill.amount > 0 ? <SkillCard key={`${skill.amount}${skill.name}`} skill_name={skill.name} number={skill.amount} /> : null))): <div className={"project-empty-list"}>Currently there are no required skills</div>}
+                                {(skills.length) ? (skills.map(skill =>
+                                    (skill.amount > 0 ? <SkillCard key={`${skill.amount}${skill.name}`} skill_name={skill.name} number={skill.amount} /> : null))) : <div className={"project-empty-list"}>Currently there are no required skills</div>}
                             </div>
                         </Col>
                         <Col>
                             <div className={"project-title-list"}>
                                 <div className={"project-card-title"}>Assigned students</div>
-                                {(props.project.participations.length) ?
-                                    props.project.participations.map(participation => (<ParticipationCard key={participation.student} participation={participation}/>)) :
+                                {(Object.values(props.project.participations).length) ?
+                                    Object.values(props.project.participations).map(participation => (<ParticipationCard key={participation.student} participation={participation} />)) :
                                     <div className={"project-empty-list"}>Currently there are no assigned students</div>
                                 }
                             </div>

@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from "react";
-import {log} from "../../utils/logger";
-import {Button, Col, Container, Form, Row, Table} from "react-bootstrap";
-import {useRouter} from "next/router";
-import {api, Url} from "../../utils/ApiClient";
+import React, { useEffect, useState } from "react";
+import { log } from "../../utils/logger";
+import { Button, Col, Container, Form, Row, Table } from "react-bootstrap";
+import { useRouter } from "next/router";
+import { api, Url } from "../../utils/ApiClient";
 import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
+import { useWebsocketContext } from "../WebsocketProvider"
 
 /**
  * Lists all of the projects that a user is allowed to view.
@@ -21,12 +22,13 @@ export default function ProjectsList(props) {
     const [visibleProjects, setVisibleProjects] = useState([])
     const [me, setMe] = useState(undefined)
     const router = useRouter()
+    const { websocketConn } = useWebsocketContext();
 
     /**
      * Gets called once after mounting the Component and gets all the projects
      */
     useEffect(() => {
-        if (! allProjects.length && ! loaded) {
+        if (!allProjects.length && !loaded) {
             Url.fromName(api.edition_projects).get().then(res => {
                 if (res.success) {
                     const projects = res.data;
@@ -36,14 +38,13 @@ export default function ProjectsList(props) {
                                 log(project.data)
                                 if (project.data) {
                                     log(project.data.users)
-                                    await setAllProjects(prevState => [...prevState, project.data]);
+                                    setAllProjects(prevState => [...prevState, project.data]);
                                     // TODO clean this up (currently only works if updated here
-                                    await setVisibleProjects(prevState => [...prevState, project.data])
+                                    setVisibleProjects(prevState => [...prevState, project.data])
                                 }
                             }
                         });
                     }
-                    changeVisibleProjects()
                     setLoaded(true);
                 }
             })
@@ -63,18 +64,53 @@ export default function ProjectsList(props) {
         });
     }, [])
 
+    useEffect(() => {
+
+        if (websocketConn) {
+            websocketConn.addEventListener("message", updateDetailsFromWebsocket)
+
+            return () => {
+                websocketConn.removeEventListener('message', updateDetailsFromWebsocket)
+            }
+        }
+
+    }, [websocketConn, visibleProjects, allProjects, router.query])
+
+    const updateDetailsFromWebsocket = (event) => {
+        let data = JSON.parse(event.data)
+        if ("participation" in data) {
+            visibleProjects.find((p, i) => {
+                if (p["id_int"] === data["projectId"]) {
+                    let new_projects = [...visibleProjects]
+                    new_projects[i]["participations"][data["studentId"]] = data["participation"]
+                    setVisibleProjects([...new_projects])
+                    return true; // stop searching
+                }
+            })
+            allProjects.find((p, i) => {
+                if (p["id_int"] === data["projectId"]) {
+                    let new_projects = [...allProjects]
+                    new_projects[i]["participations"][data["studentId"]] = data["participation"]
+                    setAllProjects([...new_projects])
+                    return true; // stop searching
+                }
+            })
+        }
+    }
+
     /**
      * Applies the search filter and "people needed" (only projects who have required skills)
      */
-    function changeVisibleProjects(){
+    function changeVisibleProjects() {
         log("change projects")
         log(peopleNeeded)
         setVisibleProjects(allProjects.filter(project => {
             let sum = 0;
-            if(! peopleNeeded){
+            if (!peopleNeeded) {
                 project.required_skills.forEach(skill => {
                     log(skill);
-                    sum += skill.number});
+                    sum += skill.number
+                });
             }
             return project.name.toLowerCase().includes(search.toLowerCase())
                 && ((peopleNeeded) || sum > project.participations.length);
@@ -96,7 +132,7 @@ export default function ProjectsList(props) {
      * @param event
      * @returns {Promise<void>}
      */
-    async function changePeopleNeeded(event){
+    async function changePeopleNeeded(event) {
         setPeopleNeeded(event.target.checked)
         changeVisibleProjects()
     }
@@ -109,9 +145,9 @@ export default function ProjectsList(props) {
         router.push("/new-project")
     }
 
-    return(
+    return (
         <Col className="fill_height fill_width projects-positioning">
-            <Row className="nomargin" style={{ marginBottom: "12px"}}>
+            <Row className="nomargin" style={{ marginBottom: "12px" }}>
                 <Col>
                     <Form onSubmit={handleSearchSubmit}>
                         <Form.Group controlId="searchProjects">
@@ -120,22 +156,22 @@ export default function ProjectsList(props) {
                     </Form>
                 </Col>
                 <Col xs="auto" className={"project-people-needed"}>
-                    <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded}/>
+                    <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded} />
                 </Col >
                 <Col xs="auto" >
                     <ConflictCard />
                 </Col>
-                { me !== undefined && me.role === 2 ?
+                {me !== undefined && me.role === 2 ?
                     <Col xs="auto" >
                         <Button className={"center"} onClick={handleNewProject}>New project</Button>
                     </Col> : null
                 }
 
             </Row>
-            <Row className="nomargin scroll-overflow" style={{"height": "calc(100vh - 155px)"}}>
-                    {
-                        visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject}/>))) : null
-                    }
+            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 155px)" }}>
+                {
+                    visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
+                }
             </Row>
         </Col>
     )

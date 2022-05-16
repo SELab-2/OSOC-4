@@ -1,13 +1,16 @@
 from app.config import config
 from app.crud import read_where, update
-from app.database import get_session
-from app.models.student import Student
+from app.database import get_session, websocketManager
+from app.exceptions.participation_exceptions import (
+    InvalidParticipationException, ParticipationNotFoundException)
+from app.models.participation import (Participation, ParticipationCreate,
+                                      ParticipationOutProject)
 from app.models.project import Project
-from app.models.participation import Participation, ParticipationCreate
+from app.models.student import Student
 from app.models.user import UserRole
-from app.exceptions.participation_exceptions import ParticipationNotFoundException, InvalidParticipationException
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -54,6 +57,8 @@ async def create_participation(participation: ParticipationCreate,
         old_participation = Participation.parse_raw(participation.json())
 
     await update(old_participation, session)
+
+    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
 
     return f"{config.api_url}students/{old_participation.student_id}"
 
