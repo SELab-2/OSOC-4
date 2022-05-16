@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import GeneralInfo from "../select_students/GeneralInfo"
+import GeneralInfo from "../students/GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
-import SuggestionsCount from "../select_students/SuggestionsCount";
+import SuggestionsCount from "../students/SuggestionsCount";
 import Image from "next/image";
 import selected from "../../public/assets/selected.svg";
 import not_selected from "../../public/assets/not_selected.svg";

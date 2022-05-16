@@ -43,11 +43,18 @@
 
 [8.1. Interaction diagram](#81-interaction-diagram) \
 [8.2. Logging in](#82-logging-in) \
-[8.3. The navigation bar](#83-the-navigation-bar) \
-[8.4. The settings](#84-the-settings) \
+[8.3. Navigating the application](#83-navigating-the-application) \
+[8.4. Configuring settings](#84-configuring-settings) \
 [8.4.1. Personal settings](#841-personal-settings) \
 [8.4.2. Edition settings](#842-edition-settings) \
-[8.4.3. Manage users](#843-manage-users)
+[8.4.3. Question-tags](#843-question-tags) \
+[8.4.4. Managing users](#844-managing-users) \
+[8.5. Adding new users](#85-adding-new-users)
+
+
+
+
+
 
 
 ## 1. Introduction
@@ -441,14 +448,14 @@ The application (or website, or frontend) will then send a POST request to the A
 
 ![login interaction diagram](interaction_diagrams/interaction_login.drawio.svg)
 
-### 8.3. The navigation bar
+### 8.3. Navigating the application
 The navigation bar, probably the most important part of any website. If you're logged in, the navigation bar will always be shown at the top of the page, no mather what page you're currently viewing. This component is used to switch between pages, for example if you click on the `select-students` text (this is a link), you will be redirected to the select-students page. The same goes for `projects` which bring you to the projects page and for `settings` which brings you to the settings page. If you wish to go back to the `dashboard` (the main page, the page you view after having logged in), you can click on the image / logo all the way on the left. If you wish to log out, you can simply click on the `Log out` text all the way on the right. Keep in mind that when you're logged out you won't see the navigation bar, as you're not allowed to navigate the application (you must be logged in for that).
 
 ![navigation component](screenshots/navigation_component.png)
 
 Clicking on any of these links will require some requests to the API as new data needs to be loaded.
 
-### 8.4. The settings
+### 8.4. Configuring settings
 The settings page, the place to configure (almost) everything! The page consists of multiple categories you can click on and will then open up to reveal the settings for that category. 
 
 #### 8.4.1. Personal settings
@@ -470,11 +477,42 @@ If you click on `Question tags` you'll see a list of the question tags for this 
 
 If you click on `Create new edition` you'll see a form that you can fill in in order to create the new edition. You'll need to provide the year, name and description of the new edition, and then press the "create edition" button below.
 
-#### 8.4.3. Manage users
+#### 8.4.3. Question-tags
+In this section we'll explain a bit further the usage of the question-tags. When a student fills out the tally-form, the questions and answers get send to our application. In our application we needed a way to know what meaning a question has. For example the questions "What's you name?", "First name?" or "What is your first name?" are all different questions but they all have the name of the student as an answer, but how can we link more difficult questions to such an easy term like "name". That's exactly what question-tags are for. In the settings page under edition settings, you'll find `Question-tags`, where you can configure them. So basically all you need to do is connect a question to a tag, hence the name question-tags. 
+
+What are they used for? \
+Well you select students based on different things, and these "things" might differ from year to year, For example you had a question what they study last year, but you wanted to add a question how far along they are in their studies for this year's edition. With question-tags everything becomes a lot more customizable. And also as we don't want to show all info of every student in the list of students, you would rather see the information that you value the most (which might differ from year to year). In the settings of question-tags, you can select for each question-tag whether or not you want to see that piece of information for each student in the list of students.
+
+We'll give you an example, right now the list of students is very empty, for every student only their name and the decision is shown. 
+
+![students list before](screenshots/students_list_before.png)
+
+Lets say we value the language they're most fluent in a lot. We go to settings, edition setting, and open the question-tags tab. In here we add a new question-tag with the question being `What language are you most fluent in?` and the tag being `first language`, and click the save icon on the right. Now we also check the checkbox "show in students list".
+
+![students list before](screenshots/students_list_firstlang_config.png)
+
+Now when we look at the students list, every student will have `first language: English` or whatever language they answered to that question.
+
+![students list before](screenshots/students_list_after.png)
+
+#### 8.4.4. Managing users
 You'll only see these settings if you are an admin.
 
-Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users". The `Invite users` can be used to send people an invite so they can join the application. You simply type the email addresses of the people you want to invite in the text-area, and click the send invites button. You'll get an alert when the emails have all been send. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line. 
-
-Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invite but hasn't yet activated the account.
+Below the edition settings you can find the `Manage users` settings. If you click on that, you'll see two main items, "Invite new users" and "Manage users".
 
 ![setttings manageusers](screenshots/manageusers.png)
+
+The `Invite users` can be clicked on, if you do so you'll see a popup window where you can send people an invite so they can join the application. You simply type the email addresses of the people you want to invite in the text-area (every email address on a new line), and click the send invites button. You'll see the text change when the emails are sent. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line. 
+
+![invite users](screenshots/invite_users.png)
+
+Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. This is the place you need to be if you want to make a coach an admin (or the other way around), revoke a user his access to the application, or approve them to the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invite but hasn't yet activated the account. 
+
+### 8.5. Adding new users
+We've chosen not to go with a classic register and login type of access-control for the application. Instead we work with an invite-system, where an admin must invite new coaches. The invite process goes as follows.
+
+Lets say Alice is an admin wishing to invite Bob. First Alice has to go to `settings` and then to `manage users`, where she clicks on the `Invite new users` button. In the popup window that showed up Alice types the `email address of Bob`, and clicks on `invite users`. Right now Bob will receive an email with a link he can click on. Bob will now be listed in manage users as unactivated. \
+If `Bob clicks on the link`, he sees a page where he's asked to `fill out` his `name` (can be a nickname) and `password`, and click `submit`. Bob's account is now activited, he must now wait on Alice to approve him. \
+Alice can go to the `manage users` again in settings, and for her convenience she clicks on the filter `not yet approved` to see a list of users that have activated their account and wish to be approved. In this filtered list she finds Bob (recognised by the email address since he could have typed any name he wants), and clicks on `approve` to give him access to the application. \
+Now Bob has an approved account, and is able to log in.
+

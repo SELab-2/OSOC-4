@@ -41,11 +41,6 @@
     height: 180px;
 }
 
-.email-help-text {
-    font-size: 13px;
-    margin-top: -10px;
-}
-
 .send-email-names {
     font-size: 18px;
 }
@@ -93,7 +88,7 @@
 }
 
 .email-bar {
-    border-radius: 15px 15px 0px 0px;
+    border-radius: 15px 15px 0 0;
     background-color: rgb(245, 234, 140);
 }
 
@@ -111,14 +106,13 @@
 .bottombar {
     transition-timing-function: ease-in;
     transition: 0.2s;
-    padding: 5px 0px 14px 0px;
-    max-height: auto;
+    padding: 5px 0 14px;
 }
 
 .bottombar.down {
     overflow: hidden;
     max-height: 0;
-    padding: 0px 0px 0px 0px;
+    padding: 0;
     visibility: hidden;
     transition: max-height 0s 1s;
 }

@@ -1,5 +1,5 @@
 from app.config import config
-from app.crud import read_where, update
+from app.crud import read_where, update, delete
 from app.database import get_session, websocketManager
 from app.exceptions.edition_exceptions import StudentNotFoundException
 from app.models.answer import Answer
@@ -47,7 +47,7 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
             "email_sent": student.email_sent}
 
     # student info from tags
-    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer)
+    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.show_in_list, Answer.answer)
                               .select_from(Student)
                               .where(Student.id == int(student_id))
                               .join(QuestionAnswer)
@@ -56,8 +56,8 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     student_info = r.all()
 
     mandatory = {k: v for (k, mandatory, _, v) in student_info if mandatory}
-    listTags = {k: v for (k, mandatory, showInList, v) in student_info if showInList and not mandatory}
-    detailTags = {k: v for (k, mandatory, showInList, v) in student_info if not showInList and not mandatory}
+    listTags = {k: v for (k, mandatory, show_in_list, v) in student_info if show_in_list and not mandatory}
+    detailTags = {k: v for (k, mandatory, show_in_list, v) in student_info if not show_in_list and not mandatory}
 
     info["mandatory"] = mandatory
     info["listtags"] = listTags
@@ -121,3 +121,24 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
         return response(None, "Student updated succesfully")
 
     raise StudentNotFoundException()
+
+
+@router.delete("/{student_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def delete_student(student_id: str, session: AsyncSession = Depends(get_session)):
+    """delete_student this deletes a student
+
+    :param student_id: the user id
+    :type student_id: str
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    student = await read_where(Student, Student.id == int(student_id), session=session)
+
+    if student is None:
+        raise StudentNotFoundException()
+    else:
+        await delete(student, session)
+
+    return response(None, "Student deleted successfully")

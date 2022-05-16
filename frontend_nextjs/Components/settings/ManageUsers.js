@@ -195,68 +195,72 @@ export default function ManageUsers(props) {
                 </Modal>
 
             <h4>Manage users</h4>
-            <Table className={"table-manage-users"}>
-                <thead>
-                    <tr>
-                        <div key={`inline-radio`} className="mb-3">
-                            <Form.Check
-                                label="All users"
-                                name="group-users"
-                                type="radio"
-                                id="show-all-users"
-                                checked={filters["show-all-users"]}
-                                onClick={updateFilters}
-                            />
-                            <Form.Check
-                                label="Approved users"
-                                name="group-users"
-                                type="radio"
-                                id="show-approved"
-                                checked={filters["show-approved"]}
-                                onClick={updateFilters}
-                            />
-                            <Form.Check
-                                label="Not yet approved users"
-                                name="group-users"
-                                type="radio"
-                                id="show-unapproved"
-                                checked={filters["show-unapproved"]}
-                                onClick={updateFilters}
-                            />
-                            <Form.Check
-                                label="Not yet active users"
-                                name="group-users"
-                                type="radio"
-                                id="show-inactive"
-                                checked={filters["show-inactive"]}
-                                onClick={updateFilters}
-                            />
-                        </div>
-                    </tr>
-                    <tr>
-                        <th>
-                            <Form onSubmit={handleSearchSubmit}>
-                                <Form.Group controlId="searchTable">
-                                    <Form.Control type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
-                                </Form.Group>
-                            </Form>
-                        </th>
-                        <th>
-                            <p>
-                                e-mailadres
-                            </p>
-                        </th>
-                        <th>
-                            <p>
-                                account status
-                            </p>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr isMe={item.email === props.me.email} key={item.id} user={item} />))) : null}
-                </tbody>
-            </Table>
+                <Table className={"table-manage-users"}>
+                    <thead>
+                        <tr>
+                            <div key={`inline-radio`} className="mb-3">
+                                <Form.Check
+                                    label="All users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-all-users"
+                                    checked={filters["show-all-users"]}
+                                    onClick={updateFilters}
+                                />
+                                <Form.Check
+                                    label="Approved users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-approved"
+                                    checked={filters["show-approved"]}
+                                    onClick={updateFilters}
+                                />
+                                <Form.Check
+                                    label="Not yet approved users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-unapproved"
+                                    checked={filters["show-unapproved"]}
+                                    onClick={updateFilters}
+                                />
+                                <Form.Check
+                                    label="Not yet active users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-inactive"
+                                    checked={filters["show-inactive"]}
+                                    onClick={updateFilters}
+                                />
+                            </div>
+                        </tr>
+                        </thead>
+                </Table>
+                <Table responsive>
+                    <thead>
+                        <tr>
+                            <th>
+                                <Form onSubmit={handleSearchSubmit}>
+                                    <Form.Group controlId="searchTable">
+                                        <Form.Control type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
+                                    </Form.Group>
+                                </Form>
+                            </th>
+                            <th>
+                                <p>
+                                    e-mailadres
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    account status
+                                </p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr isMe={item.email === props.me.email} key={item.id} user={item} />))) : null}
+                    </tbody>
+                </Table>
         </div>
     );
 }

@@ -65,7 +65,7 @@ export default function QuestionTags(props) {
      * This function is called when clicking the save button of the new question tag. First it checks or the tag name
      * and question of the new question tag are not empty and unique. Then It posts the new question tag. Only the tag
      * name will be inserted in the database in the post. We follow the post by a patch that inserts the question,
-     * mandatory and showInList variables of the new question tag.
+     * mandatory and show_in_list variables of the new question tag.
      * @param event The event of clicking the save button
      * @returns {Promise<void>}
      */
@@ -125,7 +125,7 @@ export default function QuestionTags(props) {
      */
     return (
         <div>
-            <Table>
+            <Table responsive>
                 <thead>
                     <tr className="table-head">
                         <th>
@@ -180,7 +180,7 @@ export default function QuestionTags(props) {
 
             <Button variant="primary" onClick={(ev) => {
                 setEdited(undefined);
-                setNewQuestionTag({ "tag": "", "question": "", "mandatory": false, "showInList": false });
+                setNewQuestionTag({ "tag": "", "question": "", "mandatory": false, "show_in_list": false });
             }}>
                 New question tag
             </Button>

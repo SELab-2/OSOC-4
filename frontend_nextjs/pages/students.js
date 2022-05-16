@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
-import StudentDetails from "../Components/select_students/StudentDetails";
-import StudentListAndFilters from "../Components/select_students/StudentListAndFilters";
+import StudentDetails from "../Components/students/StudentDetails";
+import StudentListAndFilters from "../Components/students/StudentListAndFilters";
 import useWindowDimensions from "../utils/WindowDimensions";
-import StudentsFilters from "../Components/select_students/StudentsFilters";
-import EmailBottomBar from "../Components/select_students/EmailBottomBar";
+import StudentsFilters from "../Components/students/StudentsFilters";
+import EmailBottomBar from "../Components/students/EmailBottomBar";
 import { api, Url } from "../utils/ApiClient";
 
 
 /**
- * The page corresponding with the 'select students' tab.
- * @returns {JSX.Element} A component corresponding with the 'select students' tab.
+ * The page corresponding with the 'students' tab.
+ * @returns {JSX.Element} A component corresponding with the 'students' tab.
  */
-export default function SelectStudents() {
+export default function Students() {
     const router = useRouter();
     const { height, width } = useWindowDimensions();
     const [showEmailBar, setShowEmailBar] = useState(false);
@@ -33,11 +33,11 @@ export default function SelectStudents() {
 
     return (
 
-        <Row>
+        <Row style={{height: "calc(100vh - 86px)"}}>
 
             {
                 ((width > 1500) || (width > 1000 && !router.query.studentId)) &&
-                <Col md="auto" key="studentFilters">
+                <Col className="fill_height" md="auto" key="studentFilters">
                     <StudentsFilters />
                 </Col>
             }
@@ -54,9 +54,7 @@ export default function SelectStudents() {
             }
             {
                 (router.query.studentId) &&
-                (<Col>
-                    <StudentDetails />
-                </Col>)
+                <StudentDetails />
             }
         </Row >
     )

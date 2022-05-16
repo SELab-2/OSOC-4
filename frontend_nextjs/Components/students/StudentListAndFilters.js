@@ -1,7 +1,6 @@
-import { Col, Row } from "react-bootstrap";
+import { Button, Row } from "react-bootstrap";
 import StudentsFilters from "./StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
-import HamburgerMenu from "react-hamburger-menu";
 import SearchSortBar from "./SearchSortBar";
 import InfiniteScroll from "react-infinite-scroll-component";
 import StudentListelement from "./StudentListelement";
@@ -14,12 +13,14 @@ import { cache } from "../../utils/ApiClient"
 import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
 import EmailStudentListElement from "../email-students/EmailStudentListelement"
+import filterIcon from "../../public/assets/show-filter-svgrepo-com.svg"
+import Image from "next/image";
 
 export default function StudentList(props) {
 
   const router = useRouter();
 
-  const listheights = { "emailstudents": "253px", "students": "186px", "projects": "146px" }
+  const listheights = { "students": "195px", "emailstudents": "264px" } // The custom height for the studentlist for the page of key
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]);
@@ -32,6 +33,7 @@ export default function StudentList(props) {
   const [decisions, setDecisions] = useState("");
   const [skills, setSkills] = useState("");
   const [ownSuggestion, setOwnSuggestion] = useState("")
+  const [filters, setFilters] = useState("")
 
   const { data: session, status } = useSession()
   const { height, width } = useWindowDimensions();
@@ -64,18 +66,23 @@ export default function StudentList(props) {
       // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
       // variables and update the students list. If the list is updated, we change the local filters. This will
       // provoke the second part of useEffect to filter the students again.
-      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion)) {
+      if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.own_suggestion !== ownSuggestion) || (router.query.filters !== filters)) {
         setSearch(router.query.search);
         setSortby(router.query.sortby);
         setDecisions(router.query.decision);
         setSkills(router.query.skills);
         setOwnSuggestion(router.query.own_suggestion)
+        setFilters(router.query.filters);
 
         // the urlManager returns the url for the list of students
         Url.fromName(api.editions_students).setParams(
           {
             decision: router.query.decision || "",
-            search: router.query.search || "", orderby: router.query.sortby || "first name+asc,last name+asc", skills: router.query.skills || "", own_suggestion: router.query.own_suggestion || ""
+            search: router.query.search || "",
+            orderby: router.query.sortby || "first name+asc,last name+asc",
+            skills: router.query.skills || "",
+            own_suggestion: router.query.own_suggestion || "",
+            filters: router.query.filters || ""
           }
         ).get().then(res => {
           if (res.success) {
@@ -91,7 +98,7 @@ export default function StudentList(props) {
         });
       }
     }
-  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby])
+  }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, router.query.skills, router.query.own_suggestion, search, sortby, router.query.filters])
 
 
   const updateDetailsFromWebsocket = (event) => {
@@ -215,66 +222,57 @@ export default function StudentList(props) {
 
   return [
     !((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
-    <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)} key="hamburger">
+    <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
       <StudentsFilters />
     </CheeseburgerMenu>
     ,
 
     (width > 800 || (!router.query.studentId && props.studentsTab)) &&
 
-    <div className={(props.studentsTab) ? "col nomargin student-list-positioning" :
+    <div className={(props.studentsTab) ? "col nomargin student-list-positioning fill_height" :
       ((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) ?
-        "col-4 nomargin student-list-positioning" : "col-5 nomargin student-list-positioning"} key="studentList" >
-      <Row className="nomargin">
-        {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
-          <Col md="auto">
-            <div className="hamburger">
-              <HamburgerMenu
-                isOpen={showFilter}
-                menuClicked={() => setShowFilter(!showFilter)}
-                width={18}
-                height={15}
-                strokeWidth={1}
-                rotate={0}
-                color='black'
-                borderRadius={0}
-                animationDuration={0.5}
-              />
-            </div>
-          </Col>
-
+        "col-4 nomargin student-list-positioning fill_height" :
+        "col-5 nomargin student-list-positioning fill_height"} key="studentList">
+      {!((width > 1500) || (width > 1000 && !router.query.studentId && props.studentsTab)) &&
+        <Row className="nomargin">
+          <Button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
+            <Image className="test" width="20%" height="20%" src={filterIcon} placeholder="empty" />
+            <span>Filters</span>
+          </Button>
+        </Row>
+      }
+      <SearchSortBar />
+      <InfiniteScroll
+        style={{
+          // TODO find a better way to do this
+          // TODO fix for portrait screens, test for non 1080p screens
+          // ATTENTION THIS ONLY WORKS FOR SCREENS IN LANDSCAPE MODE
+          // listheights[props.category] contains the custom offset for a given category. Default 155px for projects
+          "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 155px)",
+          "position": "relative",
+          "transition": "height 0.6s"
+        }}
+        dataLength={students.length} //This is important field to render the next data
+        height={1}
+        next={fetchData}
+        hasMore={studentUrls.length > 0}
+        loader={<LoadingPage />}
+        endMessage={
+          <p style={{ textAlign: 'center' }}>
+            <b>Yay! You have seen it all</b>
+          </p>
         }
-        <Col><SearchSortBar /></Col>
-      </Row>
-      <Row className="infinite-scroll">
-        <InfiniteScroll
-          style={{
-            "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 146px)",
-            "position": "relative",
-            "transition": "height 0.6s"
-          }}
-          dataLength={students.length} //This is important field to render the next data
-          height={1}
-          next={fetchData}
-          hasMore={studentUrls.length > 0}
-          loader={<LoadingPage />}
-          endMessage={
-            <p style={{ textAlign: 'center' }}>
-              <b>Yay! You have seen it all</b>
-            </p>
+      >
+        {students.map((i, index) => {
+
+          if (props.category === "emailstudents") {
+            return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
+          } else {
+            return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
           }
-        >
-          {students.map((i, index) => {
 
-            if (props.category === "emailstudents") {
-              return <EmailStudentListElement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} />
-            } else {
-              return <StudentListelement selectedStudent={props.selectedStudent} setSelectedStudent={props.setSelectedStudent} key={i.id} student={i} studentsTab={props.studentsTab} />
-            }
-
-          })}
-        </InfiniteScroll>
-      </Row>
+        })}
+      </InfiniteScroll>
     </div>
 
   ]

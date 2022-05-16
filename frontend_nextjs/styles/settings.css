@@ -7,7 +7,6 @@
 .table-button {
     background-color: var(--color-background);
     border-width: 0;
-
 }
 
 .errormessage {
@@ -16,4 +15,24 @@
 
 .invite-button{
     margin-left: 15px;
+
+.button-edition-detail{
+    margin-right: 15px;
+}
+
+.form-edition-detail{
+    width: 100%;
+}
+
+.form-column{
+    text-align: right;
+}
+
+/* Hacky way to make sure the edit and delete image don't get smaller when the screen get's smaller (on phones, tablets...)*/
+.questionTag-cell{
+    min-width: 70px;
+}
+
+.questionTag-image{
+    height: 30px;
 }

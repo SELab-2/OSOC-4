@@ -1,7 +1,7 @@
 import { Col, Row } from "react-bootstrap";
-import StudentFilter from "../select_students/StudentFilter";
+import StudentFilter from "../students/StudentFilter";
 import {useRouter} from "next/router";
-import {addFilterGlobal} from "../select_students/StudentsFilters";
+import {addFilterGlobal} from "../students/StudentsFilters";
 
 /***
  * This element makes the filters for students in the email students tab

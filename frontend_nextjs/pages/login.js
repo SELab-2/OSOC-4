@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import logoScreen from '../public/assets/osoc-screen.png';
 import LoadingPage from "../Components/LoadingPage";
 import {api, Url} from "../utils/ApiClient";
+import { Form, Button } from 'react-bootstrap';
 
 const Login = props => {
     const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ const Login = props => {
     const [emailForgot, setEmailForgot] = useState("")
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
-    const router = useRouter()
+    const router = useRouter();
     // let from = useLocation().state?.from?.pathname || "/";
     // const navigate = useNavigate()
 
@@ -68,16 +69,12 @@ const Login = props => {
                     <div className="login-container">
                         <p className="welcome-message">Please provide login credentials to proceed</p>
                         <div className="login-form">
-
-                            <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address" />
-                            <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
-
-                            <button className="submit" onClick={handleLogin}>
-                                Login
-                            </button>
-
+                            <Form onSubmit={handleLogin}>
+                                <Form.Control type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="Email address" />
+                                <Form.Control type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
+                                <Button className="submit" type="submit">Log in</Button>
+                            </Form>
                         </div>
-
                         <p>{message}</p>
                         <br/>
                         <a href="#" onClick={() => { setEmailForgot(email); setShowForgot(true); }} >Forgot your password?</a>
@@ -85,10 +82,10 @@ const Login = props => {
                 ) : (
                     <div className="login-container">
                         <p className="welcome-message">Please provide your email address to proceed</p>
-                        <form onSubmit={handleSubmitForgot}>
-                            <input type="email" name="email" value={emailForgot} onChange={handleChangeEmailForgot} placeholder="Email address" />
-                            <input className="submit" type="submit" name="submit" value="Reset my password" />
-                        </form>
+                        <Form onSubmit={handleSubmitForgot}>
+                            <Form.Control type="email" name="email" value={emailForgot} onChange={handleChangeEmailForgot} placeholder="Email address" />
+                            <Button className="submit" type="submit">Reset my password</Button>
+                        </Form>
                         <a href="#" onClick={() => { setShowForgot(false); }} >Just want to log in?</a>
                     </div>
                 )}

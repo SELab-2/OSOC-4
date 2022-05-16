@@ -4,6 +4,7 @@
 
 .checkbox-filters {
     margin-right: 13px;
+    width: auto;
 }
 
 .filter-row {
@@ -29,18 +30,16 @@
 .more-or-less-button {
     background-color: white;
     border-width: 0;
-    -webkit-text-fill-color: blue;
-    text-underline-color: blue;
+    -webkit-text-fill-color: cornflowerblue;
+    text-underline-color: cornflowerblue;
 }
 
 .filters {
     margin-left: 10px;
-    padding-top: 20px;
-    padding-right: 35px;
-    padding-left: 30px;
     border-right-width: 1px;
     border-right-color: var(--background-gray);
     border-right-style: solid;
+    padding: 20px 35px 20px 30px;
 }
 
 .reset-filters-button {

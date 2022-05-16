@@ -99,7 +99,7 @@ async def update_edition(year: int, edition: Edition = Body(...), role: RoleChec
         raise EditionNotFound()
 
     # check that the coach has access to that edition
-    if not role != UserRole.ADMIN:
+    if role != UserRole.ADMIN:
         edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
         user_ids = [coach.coach_id for coach in edition_coaches]
         if not Authorize.get_jwt_subject() in user_ids:
@@ -129,7 +129,7 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", filters: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
@@ -153,6 +153,12 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
         student_alias = aliased(Student, student_query.distinct().subquery())
         student_query = select(student_alias)
+
+    if filters:
+        for filter in filters.split(","):
+            student_query = student_query.join(QuestionAnswer, student_alias.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == filter).join(Answer).where(Answer.answer == "yes")
+            student_alias = aliased(student_alias, student_query.subquery())
+            student_query = select(student_alias)
     if decision:
         student_query = student_query.where(student_alias.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
     if skills:
@@ -246,6 +252,22 @@ async def get_question_tags(year: int, session: AsyncSession = Depends(get_sessi
     return [f"{config.api_url}editions/{str(year)}/questiontags/{tag.tag}" for (tag,) in tags]
 
 
+@router.get("/{year}/questiontags/show_in_list", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker(update=True))], response_description="Tags retrieved")
+async def get_showinlist_question_tags(year: int, session: AsyncSession = Depends(get_session)):
+    """get_showinlist_question_tags return list of questiontags that must be shown in the listview
+
+    :param year: edition year
+    :type year: int
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: list of QuestionTags
+    :rtype: list of QuestionTags
+    """
+    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).where(QuestionTag.show_in_list is True).order_by(QuestionTag.tag))
+    tags = res.all()
+    return [tag.tag for (tag,) in tags]
+
+
 @router.get("/{year}/questiontags/{tag}")
 async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
     try:
@@ -259,23 +281,7 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
     else:
         q = ""
 
-    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, showInList=qtag.showInList, question=q)
-
-
-@router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker(update=True))], response_description="Tags retrieved")
-async def get_showinlist_question_tags(year: int, session: AsyncSession = Depends(get_session)):
-    """get_showinlist_question_tags return list of qusetiontags that must be shown in the listview
-
-    :param year: edition year
-    :type year: int
-    :param session: _description_, defaults to Depends(get_session)
-    :type session: AsyncSession, optional
-    :return: list of QuestionTags
-    :rtype: list of QuestionTags
-    """
-    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).where(QuestionTag.showInList == True).order_by(QuestionTag.tag))
-    tags = res.all()
-    return [tag.tag for (tag,) in tags]
+    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, show_in_list=qtag.show_in_list, question=q)
 
 
 @router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))], response_description="Added question tag")
@@ -360,7 +366,7 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     else:
         raise QuestionTagCantBeModified()
 
-    questiontag.showInList = tagupdate.showInList
+    questiontag.show_in_list = tagupdate.show_in_list
 
     if questiontag.question and questiontag.question.question != tagupdate.question:
 
