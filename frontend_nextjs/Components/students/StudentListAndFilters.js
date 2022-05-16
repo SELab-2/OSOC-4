@@ -202,6 +202,21 @@ export default function StudentList(props) {
       });
 
 
+    } else if ("deleted_student" in data) {
+      students.find((o, i) => {
+        if (o["id"] === data["deleted_student"]) {
+          let new_students = [...students]
+          new_students.splice(i, 1);
+          setStudents(new_students);
+          let newQuery = router.query;
+          delete newQuery["studentId"];
+          router.push({
+            pathname: router.pathname,
+            query: newQuery
+          }, undefined, { shallow: true })
+          return true; // stop searching
+        }
+      });
     }
 
   }

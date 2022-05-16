@@ -115,7 +115,7 @@ export class Url {
 
                 return { success: true, data: res }
             }
-            const resp = await axios.get(this._url, { "headers": this._headers});
+            const resp = await axios.get(this._url, { "headers": this._headers });
             return { success: true, data: resp.data };
         } catch (e) {
             console.log(e)
@@ -132,7 +132,7 @@ export class Url {
         try {
             await this._setupRequest(context);
             log(`API: POST ${this._url}`)
-            const resp = await axios.post(this._url, this._body, { "headers": this._headers});
+            const resp = await axios.post(this._url, this._body, { "headers": this._headers });
             return { success: true, data: resp.data };
         } catch (e) {
             return { success: false, error: e };
@@ -417,6 +417,12 @@ class Cache {
 
     async clear() {
         Object.keys(cache).map(key => delete cache[key]);
+    }
+
+    async remove_student(url) {
+        if (url in cache) {
+            delete cache[url];
+        }
     }
 
 }
