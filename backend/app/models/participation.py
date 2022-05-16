@@ -1,7 +1,8 @@
 from typing import Optional
+
 from app.config import config
-from sqlmodel import Field, SQLModel, Relationship
 from pydantic import BaseModel
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class Participation(SQLModel, table=True):
@@ -23,7 +24,6 @@ class ParticipationCreate(BaseModel):
 
     def __init__(self, **data):
         data["skill_name"] = None if data["skill_name"] == "" else data["skill_name"]
-        data["reason"] = None if data["reason"] == "" else data["reason"]
         super().__init__(**data)
 
 

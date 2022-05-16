@@ -1,15 +1,15 @@
 from app.config import config
-from app.crud import read_where, read_all_where, update, update_all
+from app.crud import read_all_where, read_where, update, update_all
 from app.database import get_session
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.project_exceptions import ProjectNotFoundException
-from app.models.project import (Project, ProjectCoach, ProjectCreate,
-                                ProjectOutExtended, ProjectOutSimple)
 from app.models.participation import Participation, ParticipationOutProject
-from app.models.user import UserRole, User
+from app.models.project import (Project, ProjectCoach, ProjectCreate,
+                                ProjectOutExtended, ProjectOutSimple,
+                                ProjectRequiredSkill, RequiredSkillOut)
+from app.models.user import User, UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.response import response
-from app.models.project import ProjectRequiredSkill, RequiredSkillOut
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -71,7 +71,7 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
     projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
     projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]
     projectParticipations = await session.execute(select(Participation).where(Participation.project_id == int(id)))
-    projectOutExtended.participations = [ParticipationOutProject.parse_raw(s.json()) for (s,) in projectParticipations.all()]
+    projectOutExtended.participations = {s.student_id: ParticipationOutProject.parse_raw(s.json()) for (s,) in projectParticipations.all()}
     return projectOutExtended
 
 
