@@ -172,7 +172,11 @@ export default function ManageUsers(props) {
                             </Modal.Body>
                             <Modal.Footer>
                                 {sent && <Button variant={"primary"} onClick={handleClose}>Close</Button>}
-                                {fail && <Button variant={"primary"} onClick={handleTryAgain}>Try again</Button>} 
+                                {fail && 
+                                <div>
+                                    <Button variant="secondary" onClick={handleClose}>Close</Button>
+                                    <Button variant={"primary"} onClick={handleTryAgain} className="invite-button">Try again</Button>
+                                </div>} 
                                 {sending && 
                                     <Button variant="primary" disabled className="invite-button">
                                         Sending invites...
