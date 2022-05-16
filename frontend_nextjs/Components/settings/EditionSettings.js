@@ -9,6 +9,7 @@ import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
 import Hint from "../Hint";
 import { Form, Button, Row} from "react-bootstrap";
+import {log} from "../../utils/logger";
 
 /**
  * This component displays a settings-screen for all settings regarding editions.
@@ -28,15 +29,15 @@ export default function EditionSettings() {
         async function fetch() {
             const res = await Url.fromName(api.current_edition).get()
             if (res.success) {
-                console.log("edition")
-                console.log(res.data)
+                log("edition")
+                log(res.data)
                 await setEdition(res.data);
             }
             let resList = await Url.fromName(api.editions).get();
             if (resList.success) {
                 resList = await Promise.all(resList.data.map(editionUrl => Url.fromUrl(editionUrl).get().then(r => (r.success)? r.data : null)));
-                console.log("edition list")
-                console.log(resList)
+                log("edition list")
+                log(resList)
                 setEditionList(resList)
             }
             setLoading(false);
@@ -49,8 +50,8 @@ export default function EditionSettings() {
      * @param edition
      */
     function addToEditionList(edition) {
-        console.log("create")
-        console.log((edition))
+        log("create")
+        log((edition))
         setEditionList([edition, ...editionList]);
     }
 
@@ -66,8 +67,8 @@ export default function EditionSettings() {
                 setFailed(true);
             }
         })
-        console.log("edition uiteindelijk");
-        console.log(edition);
+        log("edition after all");
+        log(edition);
         setEditing(false);
     }
 
