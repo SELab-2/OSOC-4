@@ -1,5 +1,5 @@
 from app.config import config
-from app.crud import delete, read_all_where, read_where, update
+from app.crud import read_all_where, read_where, update
 from app.database import get_session, websocketManager
 from app.exceptions.edition_exceptions import StudentNotFoundException
 from app.models.answer import Answer
