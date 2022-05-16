@@ -22,21 +22,18 @@ export default function EditionSettings() {
     const [editing, setEditing] = useState(false);
     const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
     const [failed, setFailed] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     // fetch the current edition and all the other editions
     useEffect(() => {
         async function fetch() {
             const res = await Url.fromName(api.current_edition).get()
             if (res.success) {
-                console.log("edition")
-                console.log(res.data)
                 await setEdition(res.data);
             }
             let resList = await Url.fromName(api.editions).get();
             if (resList.success) {
                 resList = await Promise.all(resList.data.map(editionUrl => Url.fromUrl(editionUrl).get().then(r => (r.success)? r.data : null)));
-                console.log("edition list")
-                console.log(resList)
                 setEditionList(resList)
             }
             setLoading(false);
@@ -49,26 +46,25 @@ export default function EditionSettings() {
      * @param edition
      */
     function addToEditionList(edition) {
-        console.log("create")
-        console.log((edition))
         setEditionList([edition, ...editionList]);
     }
 
     async function handleSaved(event) {
         event.preventDefault();
+        setSaving(true);
         Url.fromName(api.current_edition).setBody(newEdition).patch().then(res =>{
             if(res.success){
                 let newEdition2 = {...edition};
                 newEdition2["name"] = newEdition.name;
                 newEdition2["description"] = newEdition.description;
                 setEdition(newEdition2);
+                setSaving(false);
+                setEditing(false);
             } else {
+                setSaving(false);
                 setFailed(true);
             }
         })
-        console.log("edition uiteindelijk");
-        console.log(edition);
-        setEditing(false);
     }
 
     const changeClicked = (event) => {
