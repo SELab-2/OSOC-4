@@ -60,7 +60,7 @@
     border-radius: 5px;
     margin-left: 4px;
     margin-right: 5px;
-    width: 95%;
+    width: 56%;
     font-size: 15px;
     padding-left: 7px;
 }
@@ -70,7 +70,8 @@
 }
 
 .suggestions-title {
-    margin-right: 25px;
+    padding-left: 0;
+    width: auto;
 }
 
 .suggestions-circle-red {
