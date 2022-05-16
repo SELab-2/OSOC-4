@@ -129,7 +129,7 @@ async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depen
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", filters: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
@@ -153,6 +153,13 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
         student_alias = aliased(Student, student_query.distinct().subquery())
         student_query = select(student_alias)
+
+    if filters:
+        for filter in filters.split(","):
+            print(filter)
+            student_query = student_query.join(QuestionAnswer, student_alias.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == filter).join(Answer).where(Answer.answer == "yes")
+            student_alias = aliased(student_alias, student_query.subquery())
+            student_query = select(student_alias)
     if decision:
         student_query = student_query.where(student_alias.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
     if skills:

@@ -1,3 +1,6 @@
+import { set } from "cypress/types/lodash";
+import { useState } from "react";
+
 export default function StudentFilter(props) {
     const router = useRouter();
 
@@ -11,11 +14,7 @@ export default function StudentFilter(props) {
     let [sortby, setSortby] = useState("first name+asc,last name+asc");
     const [decisions, setDecisions] = useState("");
     const [skills, setSkills] = useState("");
-
-    // These constants represent the filters
-    const filters = [(router.query.filters) ? router.query.filters.split(",") : [],
-    (router.query.skills) ? router.query.skills.split(",") : [],
-    (router.query.decision) ? router.query.decision.split(",") : []]
+    const [filters, setFilters] = useState("")
 
     const { data: session, status } = useSession()
 
@@ -25,17 +24,21 @@ export default function StudentFilter(props) {
             // Check if the search or sortby variable has changed from the search/sortby in the url. If so, update the
             // variables and update the students list. If the list is updated, we change the local filters. This will
             // provoke the second part of useEffect to filter the students again.
-            if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills)) {
+            if ((!studentUrls) || (router.query.search !== search) || (router.query.sortby !== sortby) || (router.query.decision !== decisions) || (router.query.skills !== skills) || (router.query.filters !== filters)) {
                 setSearch(router.query.search);
                 setSortby(router.query.sortby);
                 setDecisions(router.query.decision);
                 setSkills(router.query.skills);
+                setFilters(router.query.filters);
 
                 // the urlManager returns the url for the list of students
                 Url.fromName(api.editions_students).setParams(
                     {
                         decision: router.query.decision || "",
-                        search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || ""
+                        search: router.query.search || "",
+                        orderby: router.query.sortby || "",
+                        skills: router.query.skills || "",
+                        filters: router.query.filters || "",
                     }
                 ).get().then(res => {
                     if (res.success) {
@@ -53,6 +56,6 @@ export default function StudentFilter(props) {
                 });
             }
         }
-    }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, filters])
+    }, [session, students, studentUrls, router.query.search, router.query.sortby, router.query.decision, search, sortby, router.query.filters])
 
 }
