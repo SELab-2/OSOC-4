@@ -1,0 +1,39 @@
+.email-table {
+    width: 100%;
+    text-align: center;
+}
+
+.email-tr{
+    border-style:hidden;
+}
+
+.email-column-text{
+    text-align:center;
+    width:90%;
+}
+
+.email-card-title{
+    font-weight: bold;
+}
+
+.email-help-text {
+    font-size: 13px;
+    text-align: right;
+    margin-right: 5px;
+    margin-bottom: 0px;
+    width: 100%;
+}
+
+.email-label{
+    width: 100%;
+    text-align: left;
+    margin-bottom: 2.5px;
+}
+
+.email-content{
+    height: 160px;
+}
+
+.email-button{
+    margin-right: 10px;
+}

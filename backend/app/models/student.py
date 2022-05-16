@@ -26,11 +26,15 @@ class Student(SQLModel, table=True):
     decision: Optional[DecisionOption] = DecisionOption.UNDECIDED
     email_sent: bool = False
 
-    suggestions: List[Suggestion] = Relationship(back_populates="student")
-    participations: List[Participation] = Relationship(back_populates="student")
-    question_answers: List[QuestionAnswer] = Relationship(back_populates="student")
+    suggestions: List[Suggestion] = Relationship(sa_relationship_kwargs={"cascade": "delete"},
+                                                 back_populates="student")
+    participations: List[Participation] = Relationship(sa_relationship_kwargs={"cascade": "delete"},
+                                                       back_populates="student")
+    question_answers: List[QuestionAnswer] = Relationship(sa_relationship_kwargs={"cascade": "delete"},
+                                                          back_populates="student")
 
-    skills: List[Skill] = Relationship(back_populates="students", link_model=StudentSkill)
+    skills: List[Skill] = Relationship(sa_relationship_kwargs={"cascade": "delete"},
+                                       back_populates="students", link_model=StudentSkill)
 
 
 class StudentOutSimple(BaseModel):

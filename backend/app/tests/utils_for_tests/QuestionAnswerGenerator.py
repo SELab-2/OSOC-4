@@ -13,8 +13,6 @@ class QuestionAnswerGenerator(DataGenerator):
         "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
         "Would you like to be called by a different name than your birth name?",
         "Would you like to add your pronouns?",
-        "Have you participated in osoc before?",
-        "Would you like to be a student coach this year?"
     ]
 
     questionstrings_text = [

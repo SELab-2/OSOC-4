@@ -60,7 +60,7 @@ import {api, Url} from "../../utils/ApiClient";
                 <Form.Label>Description</Form.Label>
                 <Form.Control type="text" placeholder="Description" value={editionDescription} onChange={handleChangeEditionDescription}/>
             </Form.Group>
-            <Button variant="outline-secondary" type="submit">Create edition</Button>
+            <Button variant="primary" type="submit">Create edition</Button>
             <Form.Group>
                 {(changedSuccess)? (<Form.Text className="text-muted">Edition created!</Form.Text>) : null}
             </Form.Group>

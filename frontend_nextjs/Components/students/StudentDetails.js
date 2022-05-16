@@ -291,30 +291,28 @@ export default function StudentDetails(props) {
                             </Hint>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col>
+                    <div>
                         <select className="dropdown-decision" id="dropdown-decision"
                                 onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
                                 <option value={-1}>Undecided</option>
                                 <option value={0}>No</option>
                                 <option value={1}>Maybe</option>
                                 <option value={2}>Yes</option>
-                            </select>
-                        </Col>
+                        </select>
                         <Hint message="Confirms the decision">
                             <Button className="suggest-confirm-button" disabled={decideField === decision}
                                 onClick={() => setDecisionPopUpShow(true)}>
                                 Confirm
                             </Button>
                         </Hint>
-                    </Row>
+                    </div>
                 </Col>
             </Row>
             <Row className="nomargin" md="auto" style={{}}>
                 <Col className="fill_height scroll-overflow">
 
                     <Row md="auto" className="h2-titles student-details-suggestions-line nomargin">
-                        <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
+                        <h2 className="suggestions-title">Suggestions</h2>
                         <SuggestionsCount ownsuggestion={student["own_suggestion"]} suggestionsYes={getSuggestionsCount(2)}
                             suggestionsMaybe={getSuggestionsCount(1)}
                             suggestionsNo={getSuggestionsCount(0)} />

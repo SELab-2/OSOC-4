@@ -70,6 +70,7 @@
     outline: none;
     border-radius: 7px;
     font-size: 1.1em;
+    align-items: center;
 }
 
 .login-container input {
@@ -97,6 +98,7 @@
     background-color: var(--dark_blue) !important;
     border-color: var(--dark_blue);
     cursor: pointer;
+    width: 100%;
     transition: opacity 0.4s;
 }
 
