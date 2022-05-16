@@ -143,7 +143,6 @@ export default function StudentList(props) {
         const laststudent = students.at(-1);
         const lastindex = students.length - 1;
 
-        console.log("getting new urls")
         // get the new studenturls
         Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
           if (res.success) {

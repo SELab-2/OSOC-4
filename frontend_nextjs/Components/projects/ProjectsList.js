@@ -103,7 +103,6 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
                     delete new_projects[i]["participations"][studentid]
-                    console.log(new_projects)
                     setVisibleProjects([...new_projects])
                     return true; // stop searching
                 }
