@@ -1,3 +1,7 @@
+.projects-controls > * {
+    margin: 12pt 0;
+}
+
 .btn-conflicts{
     color:white;
     background-color: red;
@@ -122,8 +126,4 @@
     line-height: 36px;
     -webkit-appearance: none;
     height: 20px;
-}
-
-.projects-positioning {
-    padding-top: 20px;
 }
