@@ -82,7 +82,7 @@ export default function DefaultEmail(props) {
             <Card.Title>
               {props.value} email
             </Card.Title>
-            {((template.subject !== "" && template.template !== "") || editing || fail) ? (
+            {((template.subject !== "" || template.template !== "") || editing || fail) ? (
               <Form>
               <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Form.Label className="email-label">Subject</Form.Label>
@@ -121,7 +121,7 @@ export default function DefaultEmail(props) {
                 <Button variant="primary" onClick={saveDefaultEmails}>Save</Button>
                 <Button variant="secondary" className="invite-button" onClick={close}>Close</Button>
               </div>}
-            {(template.subject !== "" && template.template !== "") && ! editing && ! fail && <Button variant="primary" onClick={changeDefaultEmail}>Change default</Button>}
+            {(template.subject !== "" || template.template !== "") && ! editing && ! fail && <Button variant="primary" onClick={changeDefaultEmail}>Change default</Button>}
             {fail && 
               <div>
                 <p>Something went wrong, please try again</p>
