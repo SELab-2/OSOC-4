@@ -104,125 +104,41 @@ export default function StudentList(props) {
     }
   ).get();
 
-  const updateDetailsFromWebsocket = (event) => {
+  const refreshStudents = () => {
+    const studentsLength = students.length < 20 ? 20 : students.length;
+    fetchStudents().then(res => {
+      if (res.success) {
+        let p1 = res.data.slice(0, studentsLength);
+        let p2 = res.data.slice(studentsLength);
+        setStudentUrls(p2);
+        Promise.all(p1.map(studentUrl =>
+          cache.getStudent(studentUrl, session["userid"])
+        )).then(newstudents => {
+          setStudents([...newstudents]);
+        })
+      }
+    });
+  }
+
+  const updateDetailsFromWebsocket = async (event) => {
     let data = JSON.parse(event.data)
-    if ("suggestion" in data) {
-      students.find((o, i) => {
-        if (o["id"] === data["suggestion"]["student_id"]) {
-          let new_students = [...students]
-          new_students[i]["suggestions"][data["id"]] = data["suggestion"];
-          if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
-            new_students[i]["own_suggestion"] = data["suggestion"];
-          }
-          setStudents(new_students);
-          return true; // stop searching
-        }
-      });
+    await cache.updateCache(event.data, session["userid"]);
+    refreshStudents();
 
-    } else if ("decision" in data) {
-      let found = students.find((o, i) => {
-        if (o["id"] === data["id"]) {
-
-          // if filtered on decisions
-          if (decisions && !decisions.includes(["no", "maybe", "yes", "undecided"][data["decision"]["decision"]])) {
-            // remove the student
-            let students_copy = [...students];
-            students_copy.splice(i, 1);
-            setStudents(students_copy)
-          } else {
-            let new_students = [...students]
-            new_students[i]["decision"] = data["decision"]["decision"];
-            new_students[i]["email_sent"] = false;
-            setStudents(new_students);
-          }
-          return true;
-        }
-
-      })
-      if (found) {
-        return true;
+    // if users student details is the deleted student => close the details page
+    if ("deleted_student" in data) {
+      let newQuery = router.query;
+      if (newQuery.studentId.toString() === data["student_int"].toString()) {
+        delete newQuery["studentId"];
+        router.push({
+          pathname: router.pathname,
+          query: newQuery
+        }, undefined, { shallow: true })
       }
-      // get last shown user and index of the user as fallback
-      if (students) {
-        const laststudent = students.at(-1);
-        const lastindex = students.length - 1;
-
-        // get the new studenturls
-        fetchStudents().then(res => {
-          if (res.success) {
-            // find the index of the laststudent in the new url list
-            let foundstudent = res.data.indexOf(laststudent.id)
-            if (foundstudent === -1) {
-              foundstudent = lastindex;
-            }
-            if (foundstudent < 10) {
-              foundstudent = 10;
-            }
-            let p1 = res.data.slice(0, foundstudent);
-            let p2 = res.data.slice(foundstudent);
-            setStudentUrls(p2);
-            Promise.all(p1.map(studentUrl => {
-              // get the student from the cache + update the decision (needed when cache updated later than studentlis)
-              let student = cache.getStudent(studentUrl, session["userid"])
-              student["decision"] = data["decision"]["decision"];
-              student["email_sent"] = false;
-              return student;
-            }
-            )).then(newstudents => {
-              setStudents([...newstudents]);
-            })
-          }
-        });
-      } else {
-        fetchStudents().get().then(res => {
-          if (res.success) {
-            let p1 = res.data.slice(0, 10);
-            let p2 = res.data.slice(10);
-            setStudentUrls(p2);
-            Promise.all(p1.map(studentUrl => {
-              // get the student from the cache + update the decision (needed when cache updated later than studentlis)
-              let student = cache.getStudent(studentUrl, session["userid"])
-              student["decision"] = data["decision"]["decision"];
-              student["email_sent"] = false;
-              return student;
-            }
-
-            )).then(newstudents => {
-              setStudents([...newstudents]);
-            })
-          }
-        });
-      }
-    } else if ("email_sent" in data) {
-
-      students.find((o, i) => {
-        if (o["id"] === data["id"]) {
-          let new_students = [...students]
-          new_students[i]["email_sent"] = data["email_sent"];
-          setStudents(new_students);
-          return true; // stop searching
-        }
-      });
-
-
-    } else if ("deleted_student" in data) {
-      students.find((o, i) => {
-        if (o["id"] === data["deleted_student"]) {
-          let new_students = [...students]
-          new_students.splice(i, 1);
-          setStudents(new_students);
-          let newQuery = router.query;
-          delete newQuery["studentId"];
-          router.push({
-            pathname: router.pathname,
-            query: newQuery
-          }, undefined, { shallow: true })
-          return true; // stop searching
-        }
-      });
     }
 
   }
+
 
   const fetchData = () => {
 

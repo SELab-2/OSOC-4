@@ -413,6 +413,10 @@ class Cache {
                 new_student["email_sent"] = data["email_sent"];
                 cache[data["id"]] = new_student;
             }
+        } else if ("deleted_student" in data) {
+            if (data["deleted_student"] in cache) {
+                delete cache[data["deleted_student"]];
+            }
         }
     }
 
