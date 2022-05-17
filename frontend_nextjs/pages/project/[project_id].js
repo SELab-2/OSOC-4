@@ -138,6 +138,8 @@ const Project = () => {
 
     //TODO make this delete project
     async function deleteProject() {
+        await Url.fromName(api.projects).extend("/" + project.id_int).delete();
+        alert("The project '" + project.name + "' was successfully deleted.");
     }
 
     /**
