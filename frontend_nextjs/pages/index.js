@@ -8,7 +8,7 @@ import {useRouter} from "next/router";
  */
 function Home() {
     const router = useRouter();
-    router.push("/select-students");
+    router.push("/students");
     return null;
 }
 
