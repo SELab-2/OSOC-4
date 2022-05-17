@@ -77,7 +77,7 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
     new_edition = await update(Edition.parse_obj(edition), session=session)
 
     if prev_edition:
-        prev_edition = sorted(prev_edition, key=lambda x: x.year, reverse=True)[0] 
+        prev_edition = sorted(prev_edition, key=lambda x: x.year, reverse=True)[0]
         # make prev edition read-only
         prev_edition.read_only = True
         await update(prev_edition, session=session)
@@ -89,7 +89,7 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
             await update(new_q, session=session)
             new_qt = QuestionTag(edition=new_edition.year, tag=qt.tag, question=new_q, mandatory=qt.mandatory, show_in_list=qt.show_in_list)
             await update(new_qt, session=session)
-    
+
     return EditionOutSimple.parse_raw(new_edition.json()).uri
 
 
