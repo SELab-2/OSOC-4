@@ -5,6 +5,7 @@ import Image from 'next/image';
 import red_cross from "/public/assets/wrong.svg";
 import { api, Url } from "../../utils/ApiClient";
 import { getID } from "../../utils/string";
+import Hint from "../Hint";
 
 
 /**
@@ -16,6 +17,7 @@ import { getID } from "../../utils/string";
 export default function ParticipationCard(props) {
 
     const [student, setStudent] = useState({})
+    const [reason, setReason] = useState(props.participation.reason || "No reason was given");
     const [deletedCard, setDeletedCard] = useState(false);
 
     /**
@@ -50,17 +52,22 @@ export default function ParticipationCard(props) {
                 <Card className={"participation-card"} key={props.participation}>
                     <div className={"participation-div"}>
                         <Row>
-                            <Col className={"participation-info"}>
-                                <div className={"participation-name"}>
-                                    {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null}
-                                </div>
-                                <SkillCard number={0} skill_name={props.participation.skill} />
-                            </Col>
+                            <Hint message={reason}>
+                                <Col className={"participation-info"}>
+                                    <div className={"participation-name"}>
+                                        {(Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null}
+                                    </div>
+                                    <SkillCard number={0} skill_name={props.participation.skill} />
+                                </Col>
+                            </Hint>
                             <Col xs={"auto"} className={"participation-remove-student"}>
                                 <div className={"participation-delete"}>
-                                    <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25} />
+                                    <Hint message="Remove from this project">
+                                        <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25} />
+                                    </Hint>
                                 </div>
                             </Col>
+                            
                         </Row>
                     </div>
 
