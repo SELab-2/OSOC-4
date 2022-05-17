@@ -29,15 +29,11 @@ export default function EditionSettings() {
         async function fetch() {
             const res = await Url.fromName(api.current_edition).get()
             if (res.success) {
-                log("edition")
-                log(res.data)
-                await setEdition(res.data);
+                setEdition(res.data);
             }
             let resList = await Url.fromName(api.editions).get();
             if (resList.success) {
                 resList = await Promise.all(resList.data.map(editionUrl => Url.fromUrl(editionUrl).get().then(r => (r.success)? r.data : null)));
-                log("edition list")
-                log(resList)
                 setEditionList(resList)
             }
             setLoading(false);
@@ -50,8 +46,6 @@ export default function EditionSettings() {
      * @param edition
      */
     function addToEditionList(edition) {
-        log("create")
-        log((edition))
         setEditionList([edition, ...editionList]);
     }
 
@@ -67,13 +61,11 @@ export default function EditionSettings() {
                 setFailed(true);
             }
         })
-        log("edition after all");
-        log(edition);
         setEditing(false);
     }
 
     const changeClicked = (event) => {
-        setNewEdition({"name": "", "description": "", "year": edition.year});
+        setNewEdition({"name": edition.name, "description": edition.description, "year": edition.year});
         setFailed(false);
         setEditing(true);
     }
