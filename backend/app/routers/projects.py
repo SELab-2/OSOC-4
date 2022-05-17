@@ -1,7 +1,6 @@
 from app.config import config
 from app.crud import read_all_where, read_where, update, update_all
 from app.database import get_session
-from app.exceptions.permissions import NotPermittedException
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.participation import Participation, ParticipationOutProject
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
@@ -46,8 +45,8 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
     return response(ProjectOutSimple.parse_raw(new_project.json()), "Project added successfully.")
 
 
-@router.get("/{id}", response_description="Project with id retrieved")
-async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Project with id retrieved")
+async def get_project_with_id(id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
     """get_project_with_id get Project instance with id from the database
 
     :return: project with id
@@ -61,11 +60,6 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
     projectUsers = (
         await session.execute(select(User.id).join(ProjectCoach).where(ProjectCoach.project_id == int(id)))
     ).all()
-
-    if role == UserRole.COACH:
-        current_user_id = Authorize.get_jwt_subject()
-        if (current_user_id,) not in projectUsers:
-            raise NotPermittedException()
 
     projectOutExtended = ProjectOutExtended.parse_raw(project.json())
     projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers]
