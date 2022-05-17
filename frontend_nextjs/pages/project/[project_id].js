@@ -138,8 +138,13 @@ const Project = () => {
 
     //TODO make this delete project
     async function deleteProject() {
-        await Url.fromName(api.projects).extend("/" + project.id_int).delete();
-        alert("The project '" + project.name + "' was successfully deleted.");
+        let resp = await Url.fromName(api.projects).extend("/" + project.id_int).delete();
+        if (resp.success) {
+            alert("Success: the project '" + project.name + "' was successfully deleted.");
+            router.push("/projects");
+        } else {
+            alert("Error: the project '" + project.name + "' couldn't be deleted.");
+        }
     }
 
     /**
@@ -342,7 +347,6 @@ const Project = () => {
                                             <Button variant="primary" onClick={() => {
                                                 setShowDelete(false)
                                                 deleteProject()
-                                                router.push("/projects")
                                             }}>
                                                 Delete project
                                             </Button>
