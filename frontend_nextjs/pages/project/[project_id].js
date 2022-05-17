@@ -139,10 +139,11 @@ const Project = () => {
     async function deleteProject() {
         Url.fromUrl(project.id)
             .delete().then(res => {
-                //TODO remove when using websockets
                 if (res.success) {
                     setShowDelete(false);
                     router.push('/projects')
+                } else {
+                    alert("Error: the project '" + project.name + "' couldn't be deleted.");
                 }
             })
     }
