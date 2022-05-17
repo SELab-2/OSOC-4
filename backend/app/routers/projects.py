@@ -1,7 +1,6 @@
 from app.config import config
 from app.crud import read_all_where, read_where, update, update_all
 from app.database import get_session, websocketManager
-from app.exceptions.permissions import NotPermittedException
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.participation import Participation, ParticipationOutProject
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
