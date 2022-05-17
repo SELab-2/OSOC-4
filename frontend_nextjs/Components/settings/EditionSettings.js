@@ -69,10 +69,8 @@ export default function EditionSettings() {
     }
 
     const editClicked = (event) => {
-        setNewEdition({"name": "", "description": "", "year": edition.year});
+        setNewEdition({"name": edition.name, "description": edition.description, "year": edition.year});
         setEditing(false);
-    }
-
         setFailed(false);
         setEditing(true);
     }
@@ -93,6 +91,7 @@ export default function EditionSettings() {
     if (loading) {
         return (<LoadingPage/>);
     }
+
     return (
         <div className="body-editiondetail">
             <Table>
