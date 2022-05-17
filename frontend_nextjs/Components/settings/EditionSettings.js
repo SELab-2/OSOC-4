@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Accordion, Dropdown, Table} from "react-bootstrap";
+import {Accordion, Dropdown, Table, Spinner} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -23,13 +23,14 @@ export default function EditionSettings() {
     const [editing, setEditing] = useState(false);
     const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
     const [failed, setFailed] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     // fetch the current edition and all the other editions
     useEffect(() => {
         async function fetch() {
             const res = await Url.fromName(api.current_edition).get()
             if (res.success) {
-                setEdition(res.data);
+                await setEdition(res.data);
             }
             let resList = await Url.fromName(api.editions).get();
             if (resList.success) {
@@ -51,24 +52,32 @@ export default function EditionSettings() {
 
     async function handleSaved(event) {
         event.preventDefault();
+        setSaving(true);
         Url.fromName(api.current_edition).setBody(newEdition).patch().then(res =>{
             if(res.success){
                 let newEdition2 = {...edition};
                 newEdition2["name"] = newEdition.name;
                 newEdition2["description"] = newEdition.description;
                 setEdition(newEdition2);
+                setSaving(false);
+                setEditing(false);
             } else {
+                setSaving(false);
                 setFailed(true);
             }
         })
-        setEditing(false);
     }
 
-    const changeClicked = (event) => {
+    const editClicked = (event) => {
         setNewEdition({"name": edition.name, "description": edition.description, "year": edition.year});
+        setEditing(false);
         setFailed(false);
         setEditing(true);
     }
+
+    const handleTryAgain = (event) => {
+        setFailed(false)
+    } 
 
     /**
      * Changes the current edition
@@ -82,6 +91,7 @@ export default function EditionSettings() {
     if (loading) {
         return (<LoadingPage/>);
     }
+
     return (
         <div className="body-editiondetail">
             <Table>
@@ -92,33 +102,56 @@ export default function EditionSettings() {
                                 <div>
                                     <h1>{(edition.name) ? edition.name : "No name available"}</h1>
                                     <p>{(edition.description) ? edition.description : "No description available"}</p>
-                                    {failed &&<tr>Something went wrong, please try again</tr>}
                                 </div>
                             ) : ( 
                                 <div>
                                     <Form className="form-edition-detail">
                                         <Form.Group className="mb-3">
-                                            <Form.Control type="text" name="name" placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
+                                            <Form.Control type="text" name="name" disabled={saving || failed} placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
                                         </Form.Group>
                                         <Form.Group className="mb-3" >
-                                            <Form.Control type="text" name="description" placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
+                                            <Form.Control type="text" name="description" disabled={saving || failed} placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
                                         </Form.Group>               
                                     </Form>
-                                    <Button variant="primary" onClick={handleSaved} className="button-edition-detail">
-                                        Save
-                                    </Button>
-                                    <Button variant="primary" onClick={(ev) => {
-                                        setEditing(false);
-                                    }} >
-                                        Cancel
-                                    </Button>
+                                    {saving &&
+                                        <Button variant="primary" disabled>
+                                            Saving...
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                            />
+                                        </Button>}
+                                    {failed && 
+                                        <div>
+                                            <Form.Label>Something went wrong, please try again</Form.Label>
+                                            <br/>
+                                            <Button variant={"primary"} onClick={handleTryAgain} className="button-edition-detail">Try again</Button>
+                                            <Button variant="secondary" onClick={(ev) => {
+                                                setEditing(false);
+                                            }} >
+                                                Cancel
+                                            </Button>
+                                        </div>}
+                                    {!saving && !failed &&
+                                        <div>
+                                            <Button variant="primary" onClick={handleSaved} className="button-edition-detail">Save</Button>
+                                            <Button variant="secondary" onClick={(ev) => {
+                                                setEditing(false);
+                                            }} >
+                                                Cancel
+                                            </Button>
+                                        </div>    
+                                    }
                                 </div>
                             )}
                         </td>
                         <td className="form-column">
                             {!editing && (
                                 <Hint message="Edit edition">
-                                    <Button onClick={changeClicked}>
+                                    <Button onClick={editClicked}>
                                         Edit
                                     </Button>
                                 </Hint>

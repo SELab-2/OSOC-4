@@ -1,4 +1,4 @@
-import { Button, Col, Row, Form } from "react-bootstrap";
+import { Button, Spinner, Row, Form } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import { api, Url } from "../../utils/ApiClient";
 import { Card } from "react-bootstrap";
@@ -12,17 +12,15 @@ export default function DefaultEmail(props) {
 
   const [template, setTemplate] = useState({ "subject": "", "template": "" });
   const [prevTemplate, setPrevTemplate] = useState({ "subject": "", "template": "" });
-  const [isOpen, setIsOpen] = useState(false);
-  const [isChanging, setIsChanging] = useState(false);
-  const [isChanged, setIsChanged] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [fail, setFail] = useState(false);
 
   useEffect(() => {
     Url.fromName(api.emailtemplates).extend("/" + props.templatename).get().then(res => {
       if (res.success) {
-        res = res.data;
-        setTemplate(res);
-        setPrevTemplate(res);
+        setTemplate(res.data);
+        setPrevTemplate(res.data);
       }
     })
   }, [])
@@ -32,7 +30,7 @@ export default function DefaultEmail(props) {
    */
   function changeDefaultEmail(){
     setPrevTemplate(template);
-    setIsOpen(! isOpen);
+    setEditing(! editing);
   }
 
   /**
@@ -40,20 +38,31 @@ export default function DefaultEmail(props) {
    */
   function addDefaultEmail(){
     setPrevTemplate(template);
-    setIsOpen(! isOpen);
+    setEditing(! editing);
   }
 
   /**
  * This function is called when the save button is clicked, it saves the emails in the database
  */
   function saveDefaultEmails() {
-    setIsChanging(true);
+    setSaving(true);
     Url.fromName(api.emailtemplates).extend("/" + props.templatename).setBody(template).patch().then(async res => {
-      setPrevTemplate(template);
+      if (res.success){
+          setPrevTemplate(template);
+          setSaving(false);
+      } else {
+        setSaving(false);
+        setFail(true);
+      }
+      setEditing(false);
     })
-    setIsChanging(false);
-    setIsChanged(true);
-    setIsOpen(false);
+    
+  }
+
+  const handleTryAgain = (event) => {
+    setTemplate(prevTemplate);
+    setEditing(true);
+    setFail(false);
   }
 
   /**
@@ -61,8 +70,8 @@ export default function DefaultEmail(props) {
    */
   function close(){
     setTemplate(prevTemplate);
-    setIsOpen(false);
-    setIsChanged(false);
+    setEditing(false);
+    setFail(false);
   }
 
   return (
@@ -73,41 +82,52 @@ export default function DefaultEmail(props) {
             <Card.Title>
               {props.value} email
             </Card.Title>
-            {((template.subject !== "" && template.template !== "") || isOpen) ? (
+            {((template.subject !== "" || template.template !== "") || editing || fail) ? (
               <Form>
               <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                 <Form.Label className="email-label">Subject</Form.Label>
-                <Form.Control size="sm" value={template.subject} disabled={! isOpen} onChange={(ev => setTemplate({ ...template, ["subject"]: ev.target.value }))}/>
+                <Form.Control size="sm" value={template.subject} disabled={! editing} onChange={(ev => setTemplate({ ...template, ["subject"]: ev.target.value }))}/>
               </Form.Group>
               <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                {isOpen ? (
-                  <Form.Label className="email-help-text">(Use @firstname, @lastname, @username to address the receiver)</Form.Label>
-                ) : null}
-                <Form.Control as="textarea" size="sm" className="email-content" value={template.template} disabled={! isOpen} onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))}/>
+                {(editing || saving) &&
+                  <Form.Label className="email-help-text">(Use @firstname, @lastname, @username to address the receiver)</Form.Label>}
+                <Form.Control as="textarea" size="sm" className="email-content" value={template.template} disabled={! editing} onChange={(ev => setTemplate({ ...template, ["template"]: ev.target.value }))}/>
               </Form.Group>
             </Form>
             ) : (
-              <Card.Text>Currently no default email</Card.Text> 
+              <div>
+                <Card.Text>Currently no default email</Card.Text> 
+                <Button variant="primary" className="email-button" onClick={addDefaultEmail}>{"Add default" }</Button>
+              </div>
+              
             )}
-            {isChanging ? (
+            {saving &&
               <div>
-                <Form.Label>Trying to change default {props.value} email!</Form.Label>
-                <br/>
-              </div>) : null}
-            {isChanged ? (
-              <div>
-                <Form.Label>Default {props.value} email has been changed!</Form.Label>
+                <Button variant="primary" disabled>
+                  Saving...
+                  <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                  />
+                </Button>
                 <br/>
               </div>
-            ) : null}
-            {(isOpen && ! isChanged)? (
-              <Button variant="primary" className="email-button" onClick={saveDefaultEmails}>Save</Button>
-            ) : null}
-            {(template.subject !== "" && template.template !== "") ? (
-              <Button variant="primary" className="email-button" onClick={(isOpen || isChanged)? close : changeDefaultEmail}>{(isOpen || isChanged) ? "Close" : "Change default" }</Button>
-            ) : (
-                <Button variant="primary" className="email-button" onClick={isOpen? close : addDefaultEmail}>{isOpen ? "Close" : "Add default" }</Button>
-            )}    
+              }
+            {editing && ! saving &&
+              <div>
+                <Button variant="primary" onClick={saveDefaultEmails}>Save</Button>
+                <Button variant="secondary" className="invite-button" onClick={close}>Close</Button>
+              </div>}
+            {(template.subject !== "" || template.template !== "") && ! editing && ! fail && <Button variant="primary" onClick={changeDefaultEmail}>Change default</Button>}
+            {fail && 
+              <div>
+                <p>Something went wrong, please try again</p>
+                <Button variant="primary" onClick={handleTryAgain}>Try again</Button>
+                <Button variant="secondary" onClick={close} className="invite-button">Close</Button>
+              </div>}
           </Card.Body>
         </Card>
       </Row>
