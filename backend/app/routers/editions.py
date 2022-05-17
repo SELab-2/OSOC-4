@@ -70,7 +70,26 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
     if await read_where(Edition, Edition.year == edition.year, session=session):
         raise AlreadyEditionWithYearException(edition.year)
 
+    # get the previous edition, we need it to transfer some information to the new edition for convenience
+    prev_edition = await read_all_where(Edition, session=session)
+
+    # make the new edition
     new_edition = await update(Edition.parse_obj(edition), session=session)
+
+    if prev_edition:
+        prev_edition = sorted(prev_edition, key=lambda x: x.year, reverse=True)[0] 
+        # make prev edition read-only
+        prev_edition.read_only = True
+        await update(prev_edition, session=session)
+        # add the questiontags (and corresponding questions) from last edition
+        qts = await read_all_where(QuestionTag, QuestionTag.edition == prev_edition.year, session=session)
+        for qt in qts:
+            q = await read_where(Question, Question.id == qt.question_id, session=session)
+            new_q = Question(edition=new_edition.year, question=q.question)
+            await update(new_q, session=session)
+            new_qt = QuestionTag(edition=new_edition.year, tag=qt.tag, question=new_q, mandatory=qt.mandatory, show_in_list=qt.show_in_list)
+            await update(new_qt, session=session)
+    
     return EditionOutSimple.parse_raw(new_edition.json()).uri
 
 
