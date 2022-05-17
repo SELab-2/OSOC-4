@@ -197,7 +197,7 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     return [config.api_url + "students/" + str(id) for id in students]
 
 
-@router.get("/{year}/projects",  dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Projects retrieved")
+@router.get("/{year}/projects", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Projects retrieved")
 async def get_edition_projects(year: int, session: AsyncSession = Depends(get_session)):
     """get_projects get all the Project instances from the database
 
