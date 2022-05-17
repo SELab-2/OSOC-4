@@ -198,20 +198,15 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
 
 
 @router.get("/{year}/projects", response_description="Projects retrieved")
-async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
     """get_projects get all the Project instances from the database
 
     :return: list of projects
     :rtype: dict
     """
-    if role == UserRole.ADMIN:
-        results = await read_all_where(Project, Project.edition == year, session=session)
-    else:
-        Authorize.jwt_required()
-        current_user_id = Authorize.get_jwt_subject()
-        stat = select(Project).select_from(ProjectCoach).where(ProjectCoach.coach_id == int(current_user_id)).join(Project).where(Project.edition == int(year))
-        res = await session.execute(stat)
-        results = [r for (r,) in res.all()]
+    stat = select(Project).where(Project.edition == int(year))
+    res = await session.execute(stat)
+    results = [r for (r,) in res.all()]
     return [ProjectOutSimple.parse_raw(r.json()).id for r in results]
 
 

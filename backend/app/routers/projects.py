@@ -62,11 +62,6 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
         await session.execute(select(User.id).join(ProjectCoach).where(ProjectCoach.project_id == int(id)))
     ).all()
 
-    if role == UserRole.COACH:
-        current_user_id = Authorize.get_jwt_subject()
-        if (current_user_id,) not in projectUsers:
-            raise NotPermittedException()
-
     projectOutExtended = ProjectOutExtended.parse_raw(project.json())
     projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers]
     projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
