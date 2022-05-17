@@ -115,7 +115,7 @@ export class Url {
 
                 return { success: true, data: res }
             }
-            const resp = await axios.get(this._url, { "headers": this._headers });
+            const resp = await axios.get(this._url, { "headers": this._headers, "params": this._params });
             return { success: true, data: resp.data };
         } catch (e) {
             console.log(e)
