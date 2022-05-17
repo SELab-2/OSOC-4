@@ -45,8 +45,8 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
     return response(ProjectOutSimple.parse_raw(new_project.json()), "Project added successfully.")
 
 
-@router.get("/{id}", response_description="Project with id retrieved")
-async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Project with id retrieved")
+async def get_project_with_id(id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
     """get_project_with_id get Project instance with id from the database
 
     :return: project with id
