@@ -7,6 +7,7 @@ from app.models.participation import Participation, ParticipationOutProject
 from app.models.project import (Project, ProjectCoach, ProjectCreate,
                                 ProjectOutExtended, ProjectOutSimple,
                                 ProjectRequiredSkill, RequiredSkillOut)
+from app.models.suggestion import Suggestion
 from app.models.user import User, UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.response import response
@@ -118,3 +119,37 @@ async def update_project_with_id(id: int, updated_project: ProjectCreate, sessio
     await update_all(users, session=session)
 
     return response(None, "Project updated succesfully")
+
+
+@router.delete("/{id}", response_description="Project with id deleted")
+async def delete_project_with_id(id: int, role: RoleChecker(UserRole.ADMIN) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+    """delete_project_with_id delete Project instance with id from the database
+            also deletes the participations, requiredskills, projectcoaches, suggestions
+    """
+    project = await read_where(Project, Project.id == id, session=session)
+    if not project:
+        raise ProjectNotFoundException()
+
+    # remove participations
+    participations = await read_all_where(Participation, Participation.project_id == int(id), session=session)
+    for participation in participations:
+        await session.delete(participation)
+
+    # remove skills
+    skills = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(id), session=session)
+    for skill in skills:
+        await session.delete(skill)
+
+    # remove users
+    users = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(id), session=session)
+    for user in users:
+        await session.delete(user)
+
+    # remove suggestions
+    suggestions = await read_all_where(Suggestion, Suggestion.project_id == int(id), session=session)
+    for suggestion in suggestions:
+        await session.delete(suggestion)
+
+    await session.delete(project)
+
+    await session.commit()
