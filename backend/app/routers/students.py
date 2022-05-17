@@ -161,6 +161,6 @@ async def delete_student(student_id: str, session: AsyncSession = Depends(get_se
 
         await session.commit()
 
-    await websocketManager.broadcast({"deleted_student": config.api_url + "students/" + str(student_id)})
+    await websocketManager.broadcast({"deleted_student": config.api_url + "students/" + str(student_id), "student_int": student_id})
 
     return response(None, "Student deleted successfully")
