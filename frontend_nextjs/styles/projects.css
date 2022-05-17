@@ -4,9 +4,6 @@
     font-weight: bold;
 }
 
-.project-card{
-}
-
 .project-card-selected{
     border-width: 6px;
     border-style: solid;
@@ -56,8 +53,17 @@
     margin-top: 20px;
 }
 
-.project-people-needed{
-    margin-top: 5px;
+.search-project {
+    min-width: 120pt;
+}
+
+.center-content {
+    display: flex;
+    justify-content: center;
+}
+
+.center-content > * {
+    align-self: center;
 }
 
 .project-empty-list{
@@ -74,16 +80,6 @@
 
 .project-show-detail{
     cursor: pointer;
-}
-
-.col-match-student-btn {
-    display: flex;
-}
-
-.col-match-student-btn > div {
-    align-self: center;
-    cursor: pointer;
-    border: none;
 }
 
 .select-search__options {

@@ -35,7 +35,7 @@ export default function Projects() {
                 <StudentListAndFilters setSelectedStudents={setSelectedStudents} selectedStudents={selectedStudents}
                                        elementType="projects" fullview={fullView}/>
             </Col>
-            <Col className="col-match-student-btn" md="auto" style={{marginLeft: "0"}}>
+            <Col className="center-content" md="auto" style={{marginLeft: "0"}}>
                 <div>
                     <Hint message="Add the selected student(s) to the selected project">
                         <Image onClick={() => setShowAddStudent(true)} src={matchIcon} alt="match student to project"
