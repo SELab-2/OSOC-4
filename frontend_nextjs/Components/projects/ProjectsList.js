@@ -78,10 +78,11 @@ export default function ProjectsList(props) {
 
     const updateDetailsFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
-        const studentid = parseInt(data["studentId"])
-        const projectid = parseInt(data["projectId"])
 
         if ("participation" in data) {
+            const studentid = parseInt(data["studentId"])
+            const projectid = parseInt(data["projectId"])
+
             visibleProjects.find((p, i) => {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
@@ -99,6 +100,9 @@ export default function ProjectsList(props) {
                 }
             })
         } else if ("deleted_participation" in data) {
+            const studentid = parseInt(data["studentId"])
+            const projectid = parseInt(data["projectId"])
+
             visibleProjects.find((p, i) => {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
@@ -115,6 +119,18 @@ export default function ProjectsList(props) {
                     return true; // stop searching
                 }
             })
+        } else if ("deleted_project" in data) {
+            const projectid = data["deleted_project"];
+
+            let new_projects = visibleProjects.filter((p, i) => {
+                return p.id !== projectid
+            })
+            setVisibleProjects([...new_projects])
+
+            new_projects = allProjects.filter((p, i) => {
+                return p.id !== projectid
+            })
+            setAllProjects([...new_projects])
         }
     }
 
