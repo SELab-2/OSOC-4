@@ -82,7 +82,7 @@ export default function NavHeader(props) {
 
 
     const menu = [
-        {title: 'Select Students', path: '/select-students'},
+        {title: 'Students', path: '/students'},
         {title: 'Projects', path: '/projects'},
         {title: 'Settings', path: '/settings'},
     ]

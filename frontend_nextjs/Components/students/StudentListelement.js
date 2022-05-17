@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
-import GeneralInfo from "../select_students/GeneralInfo"
+import React from "react";
+import GeneralInfo from "./GeneralInfo"
 import { Col, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
-import SuggestionsCount from "../select_students/SuggestionsCount";
+import SuggestionsCount from "./SuggestionsCount";
 import Image from "next/image";
-import selected from "../../public/assets/selected.svg";
-import not_selected from "../../public/assets/not_selected.svg";
-import { log } from "../../utils/logger";
+import Hint from "../Hint";
+import alumniIcon from "../../public/assets/alumni-svgrepo-com.svg";
 
 // get the decision for the student (yes, maybe, no or undecided)
 export function getDecisionString(value) {
@@ -37,7 +36,6 @@ export default function StudentListelement(props) {
     )
   }
 
-
   /**
    * get the background color of the student, based on the decision
    * @returns {string} the background color of the student, based on the decision
@@ -52,7 +50,9 @@ export default function StudentListelement(props) {
 
 
   function getBorder() {
-    if (!props.selectedStudents.includes(props.student.id)) { return "var(--not-selected-gray)" }
+    if (!isSelected(props.student)) {
+      return "var(--not-selected-gray)"
+    }
     if (props.student.decision === -1) {
       return "grey";
     }
@@ -72,18 +72,51 @@ export default function StudentListelement(props) {
     return "var(--no_red_65)"
   }
 
+  /**
+   * a function to open the details of a student, it changes the studentId in the url.
+   */
+  function studentDetails() {
+    let i = props.student.id.lastIndexOf('/');
+    let id = props.student.id.substring(i + 1);
+
+    let newQuery = router.query;
+    newQuery["studentId"] = id;
+
+    // the path is not changed, but there is a query added which contains the id of the student
+    router.push({
+      pathname: router.pathname,
+      query: newQuery
+    }, undefined, { shallow: true })
+  }
 
   /**
    * a function to change the selected student
    */
   function selectStudent() {
     // if the selected student is this student then unselect the student
-    if (props.selectedStudents.includes(props.student.id)) {
-      props.setSelectedStudents((prevState) => prevState.filter((o, i) => o !== props.student.id))
+    if (props.elementType === "emailstudents") {
+      if (isSelected(props.student)) {
+        props.setSelectedStudents(prevState => prevState.filter((o, i) => o !== props.student.id))
+      } else {
+        props.setSelectedStudents(prevState => [...prevState, props.student.id])
+      }
     } else {
-      props.setSelectedStudents(prevState => [...prevState, props.student.id])
+      if (isSelected(props.student)) {
+        props.setSelectedStudents([])
+      } else {
+        props.setSelectedStudents([props.student])
+      }
     }
+  }
 
+  /**
+   * Indicates whether a student is included in the selection.
+   *
+   * @param student
+   * @returns boolean
+   */
+  function isSelected(student) {
+    return props.selectedStudents.includes(student) || props.selectedStudents.includes(student.id)
   }
 
   /**
@@ -103,11 +136,19 @@ export default function StudentListelement(props) {
    */
   return (
     <Container id="list-element"
-      className={"list-element" + (props.selectedStudents.includes(props.student.id) ? "-selected" : "")}
+      className={"list-element" + (isSelected(props.student) ? "-selected" : "")}
       style={{ backgroundColor: getBackground(), borderColor: getBorder() }}
-      onClick={selectStudent}>
+      onClick={() => props.elementType === "students" ? studentDetails() : selectStudent()}>
       <Row className="upper-layer">
-        <Col id="name" className="name" xs="auto">{props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}</Col>
+        <Col id="name" className="name" xs="auto">
+          {props.student["mandatory"]["alumni"] === "yes" ?
+              <Hint message="Student claims to be an alumni">
+                <Image src={alumniIcon} width="25pt" height="25pt" className="alumnicon"/>
+              </Hint>
+              : <></>
+          }
+          {props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}
+        </Col>
         <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
           No practical problems
         </Col>
@@ -115,17 +156,21 @@ export default function StudentListelement(props) {
         <Col xs="auto" className="nopadding">
           <Row xs="auto" className="nomargin">
             <Col className="suggestions" xs="auto">Suggestions:</Col>
-            <SuggestionsCount ownsuggestion={props.student["own_suggestion"]} suggestionsYes={getSuggestions(2)} suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
+            <SuggestionsCount ownsuggestion={props.student["own_suggestion"]} suggestionsYes={getSuggestions(2)}
+                              suggestionsMaybe={getSuggestions(1)} suggestionsNo={getSuggestions(0)} />
           </Row>
         </Col>
       </Row>
 
       <Row id="info" className="info">
-        <GeneralInfo listelement={true} studentsTab={props.studentsTab} student={props.student} decision={getDecisionString(props.student.decision)} />
-        <Row key={"email_sent"} className="question-answer-row">
-          <Col md="auto" className="info-titles">{"Email sent"}</Col>
-          <Col md="auto" className="info-answers">{props.student["email_sent"] ? "Yes" : "No"}</Col>
-        </Row>
+        <GeneralInfo listelement={true} elementType={props.elementType} student={props.student}
+                     decision={getDecisionString(props.student.decision)} />
+        {props.elementType === "emailstudents" ?
+          <Row key={"email_sent"} className="question-answer-row">
+            <Col md="auto" className="info-titles">Email sent</Col>
+            <Col md="auto" className="info-answers">{props.student["email_sent"] ? "Yes" : "No"}</Col>
+          </Row> : <></>
+        }
         <Col />
         <Col id="skills" align="right" className="skills" sm="auto">
           <ul className="nomargin">

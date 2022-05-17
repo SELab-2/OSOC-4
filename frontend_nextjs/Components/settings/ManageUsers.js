@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {Button, Form, Modal, Table} from "react-bootstrap";
+import {Button, Form, Modal, Table, Spinner} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
-import { getSelectStudentsPath } from "../../routes";
 
 /**
  * This component displays a settings-screen where you can manage the users in the application
@@ -31,10 +30,17 @@ export default function ManageUsers(props) {
 
     const handleClose = () => {
         setFail(false);
-        setToInvite("");
-        setShow(false);
         setSent(false);
         setSending(false);
+        setShow(false);
+        setToInvite("");
+    }
+
+    const handleTryAgain = () => {
+        setFail(false);
+        setSent(false);
+        setSending(false);
+        setToInvite("");
     }
 
     const handleShow = () => setShow(true);
@@ -92,6 +98,9 @@ export default function ManageUsers(props) {
                             setFail(true);
                         }
                     });
+                } else {
+                    setSending(false);
+                    setFail(true);
                 }
             }))
         );
@@ -148,97 +157,110 @@ export default function ManageUsers(props) {
                         <Modal.Title>Invite users</Modal.Title>
                     </Modal.Header>
                         <Form id="invite-users" onSubmit={handleSubmitInvite}>
-                        <Modal.Body>
-                            <Form.Group controlId="inviteUserTextarea">
-                                <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
-                                {(sent || sending || fail) ? (
-                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
-                                ) : (
-                                    <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
-                                )}
-                                {(sending || sent) ? <br/> : null}
-                                {(sending)? <Form.Label>Trying to sent invites!</Form.Label>: null}
-                                {(sent)? <Form.Label>Invites have been sent!</Form.Label>: null}
-                                {(fail)? <Form.Label>Something went wrong, please try again</Form.Label>: null}
-                            </Form.Group>
-                        </Modal.Body>
-                            {(sent) ? 
-                            (
-                                <Modal.Footer>
-                                    <Button variant={"primary"} onClick={handleClose}>Close</Button>
-                                </Modal.Footer> 
-                            ):(
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                    <Button variant={"primary"} type="submit">Invite users</Button>
-                                </Modal.Footer>
-                            )}
+                            <Modal.Body>
+                                <Form.Group controlId="inviteUserTextarea">
+                                    <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
+                                    {(sent || sending || fail) ? (
+                                        <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
+                                    ) : (
+                                        <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
+                                    )}
+                                    {(sent || fail) && <br/>}
+                                    {(fail) && <Form.Label>Something went wrong, please try again</Form.Label>}
+                                    {(sent) && <Form.Label>Invites have been sent!</Form.Label>}
+                                </Form.Group>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                {sent && <Button variant={"primary"} onClick={handleClose}>Close</Button>}
+                                {fail && <Button variant={"primary"} onClick={handleTryAgain}>Try again</Button>} 
+                                {sending && 
+                                    <Button variant="primary" disabled className="invite-button">
+                                        Sending invites...
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                        />
+                                    </Button>
+                                }
+                                {!sent && !fail && !sending && 
+                                    <div>
+                                        <Button variant={"secondary"} onClick={handleClose}>Close</Button>
+                                        <Button variant={"primary"} type="submit" className="invite-button">Invite users</Button>
+                                    </div>}
+                            </Modal.Footer> 
                         </Form>
                 </Modal>
 
             <h4>Manage users</h4>
-            <Table className={"table-manage-users"}>
-                <thead>
-                    <tr>
-                        <div key={`inline-radio`} className="mb-3">
-                            <Form.Check
-                                label="All users"
-                                name="group-users"
-                                type="radio"
-                                id="show-all-users"
-                                checked={filters["show-all-users"]}
-                                onClick={updateFilters}
-                            />
-                            <Form.Check
-                                label="Approved users"
-                                name="group-users"
-                                type="radio"
-                                id="show-approved"
-                                checked={filters["show-approved"]}
-                                onClick={updateFilters}
-                            />
-                            <Form.Check
-                                label="Not yet approved users"
-                                name="group-users"
-                                type="radio"
-                                id="show-unapproved"
-                                checked={filters["show-unapproved"]}
-                                onClick={updateFilters}
-                            />
-                            <Form.Check
-                                label="Not yet active users"
-                                name="group-users"
-                                type="radio"
-                                id="show-inactive"
-                                checked={filters["show-inactive"]}
-                                onClick={updateFilters}
-                            />
-                        </div>
-                    </tr>
-                    <tr>
-                        <th>
-                            <Form onSubmit={handleSearchSubmit}>
-                                <Form.Group controlId="searchTable">
-                                    <Form.Control type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
-                                </Form.Group>
-                            </Form>
-                        </th>
-                        <th>
-                            <p>
-                                e-mailadres
-                            </p>
-                        </th>
-                        <th>
-                            <p>
-                                account status
-                            </p>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr isMe={item.email === props.me.email} key={item.id} user={item} />))) : null}
-                </tbody>
-            </Table>
+                <Table className={"table-manage-users"}>
+                    <thead>
+                        <tr>
+                            <div key={`inline-radio`} className="mb-3">
+                                <Form.Check
+                                    label="All users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-all-users"
+                                    checked={filters["show-all-users"]}
+                                    onClick={updateFilters}
+                                />
+                                <Form.Check
+                                    label="Approved users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-approved"
+                                    checked={filters["show-approved"]}
+                                    onClick={updateFilters}
+                                />
+                                <Form.Check
+                                    label="Not yet approved users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-unapproved"
+                                    checked={filters["show-unapproved"]}
+                                    onClick={updateFilters}
+                                />
+                                <Form.Check
+                                    label="Not yet active users"
+                                    name="group-users"
+                                    type="radio"
+                                    id="show-inactive"
+                                    checked={filters["show-inactive"]}
+                                    onClick={updateFilters}
+                                />
+                            </div>
+                        </tr>
+                        </thead>
+                </Table>
+                <Table responsive>
+                    <thead>
+                        <tr>
+                            <th>
+                                <Form onSubmit={handleSearchSubmit}>
+                                    <Form.Group controlId="searchTable">
+                                        <Form.Control type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
+                                    </Form.Group>
+                                </Form>
+                            </th>
+                            <th>
+                                <p>
+                                    e-mailadres
+                                </p>
+                            </th>
+                            <th>
+                                <p>
+                                    account status
+                                </p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr isMe={item.email === props.me.email} key={item.id} user={item} />))) : null}
+                    </tbody>
+                </Table>
         </div>
     );
 }

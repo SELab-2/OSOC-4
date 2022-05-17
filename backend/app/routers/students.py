@@ -1,5 +1,5 @@
 from app.config import config
-from app.crud import read_where, update
+from app.crud import read_all_where, read_where, update
 from app.database import get_session, websocketManager
 from app.exceptions.edition_exceptions import StudentNotFoundException
 from app.models.answer import Answer
@@ -7,6 +7,7 @@ from app.models.participation import Participation, ParticipationOutStudent
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
+from app.models.skill import StudentSkill
 from app.models.student import Student, StudentUpdate
 from app.models.suggestion import Suggestion, SuggestionExtended
 from app.models.user import UserRole
@@ -47,7 +48,7 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
             "email_sent": student.email_sent}
 
     # student info from tags
-    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.showInList, Answer.answer)
+    r = await session.execute(select(QuestionTag.tag, QuestionTag.mandatory, QuestionTag.show_in_list, Answer.answer)
                               .select_from(Student)
                               .where(Student.id == int(student_id))
                               .join(QuestionAnswer)
@@ -56,8 +57,8 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     student_info = r.all()
 
     mandatory = {k: v for (k, mandatory, _, v) in student_info if mandatory}
-    listTags = {k: v for (k, mandatory, showInList, v) in student_info if showInList and not mandatory}
-    detailTags = {k: v for (k, mandatory, showInList, v) in student_info if not showInList and not mandatory}
+    listTags = {k: v for (k, mandatory, show_in_list, v) in student_info if show_in_list and not mandatory}
+    detailTags = {k: v for (k, mandatory, show_in_list, v) in student_info if not show_in_list and not mandatory}
 
     info["mandatory"] = mandatory
     info["listtags"] = listTags
@@ -121,3 +122,45 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
         return response(None, "Student updated succesfully")
 
     raise StudentNotFoundException()
+
+
+@router.delete("/{student_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+async def delete_student(student_id: str, session: AsyncSession = Depends(get_session)):
+    """delete_student this deletes a student
+
+    :param student_id: the user id
+    :type student_id: str
+    :raises NotPermittedException: Unauthorized
+    :return: response
+    :rtype: success or error
+    """
+
+    student = await read_where(Student, Student.id == int(student_id), session=session)
+    student_id = int(student_id)
+
+    if student is None:
+        raise StudentNotFoundException()
+    else:
+        # order of deletion should be:
+        # questionanswer
+        # studentskill
+        # suggestion
+        # participation
+        # student
+        # Sorry figuring out how to cascade was hard.
+        for obj in await read_all_where(QuestionAnswer, QuestionAnswer.student_id == student_id, session=session):
+            await session.delete(obj)
+        for obj in await read_all_where(StudentSkill, StudentSkill.student_id == student_id, session=session):
+            await session.delete(obj)
+        for obj in await read_all_where(Suggestion, Suggestion.student_id == student_id, session=session):
+            await session.delete(obj)
+        for obj in await read_all_where(Participation, Participation.student_id == student_id, session=session):
+            await session.delete(obj)
+        for obj in await read_all_where(Student, Student.id == student_id, session=session):
+            await session.delete(obj)
+
+        await session.commit()
+
+    await websocketManager.broadcast({"deleted_student": config.api_url + "students/" + str(student_id)})
+
+    return response(None, "Student deleted successfully")

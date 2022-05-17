@@ -1,4 +1,4 @@
-import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
+import {Button, Form, Modal} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {api, Url} from "../utils/ApiClient";
@@ -118,9 +118,9 @@ export default function NewProjects() {
 
                 <Form.Label>Required skills:</Form.Label>
 
-                {(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (
-                    <RequiredSkillSelector className={"required-skill-selector-row"} key={index} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} index={index} requiredSkills={requiredSkills} skills={skills}/>
-                ))) : null}
+                {/*{(requiredSkills.length) ? (requiredSkills.map((requiredSkill,index) => (*/}
+                {/*    <RequiredSkillSelector className={"required-skill-selector-row"} key={index} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} index={index} requiredSkills={requiredSkills} skills={skills}/>*/}
+                {/*))) : null}*/}
 
                 <Button onClick={AddStudent}> Add extra student role</Button>
                 <Button type="submit">Create new project</Button>
