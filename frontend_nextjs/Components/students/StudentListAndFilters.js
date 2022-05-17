@@ -76,17 +76,7 @@ export default function StudentList(props) {
         setUnmatched(router.query.unmatched)
 
         // the urlManager returns the url for the list of students
-        Url.fromName(api.editions_students).setParams(
-          {
-            decision: router.query.decision || "",
-            search: router.query.search || "",
-            orderby: router.query.sortby || "first name+asc,last name+asc",
-            skills: router.query.skills || "",
-            own_suggestion: router.query.own_suggestion || "",
-            filters: router.query.filters || "",
-            unmatched: router.query.unmatched || ""
-          }
-        ).get().then(res => {
+        fetchStudents().then(res => {
           if (res.success) {
             let p1 = res.data.slice(0, 20);
             let p2 = res.data.slice(20);
@@ -102,6 +92,17 @@ export default function StudentList(props) {
     }
   }, [session, students, studentUrls, router.query, search, sortby])
 
+  const fetchStudents = () => Url.fromName(api.editions_students).setParams(
+    {
+      decision: router.query.decision || "",
+      search: router.query.search || "",
+      orderby: router.query.sortby || "first name+asc,last name+asc",
+      skills: router.query.skills || "",
+      own_suggestion: router.query.own_suggestion || "",
+      filters: router.query.filters || "",
+      unmatched: router.query.unmatched || ""
+    }
+  ).get();
 
   const updateDetailsFromWebsocket = (event) => {
     let data = JSON.parse(event.data)
@@ -147,7 +148,7 @@ export default function StudentList(props) {
         const lastindex = students.length - 1;
 
         // get the new studenturls
-        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+        fetchStudents().then(res => {
           if (res.success) {
             // find the index of the laststudent in the new url list
             let foundstudent = res.data.indexOf(laststudent.id)
@@ -173,7 +174,7 @@ export default function StudentList(props) {
           }
         });
       } else {
-        Url.fromName(api.editions_students).setParams({ decision: router.query.decision || "", search: router.query.search || "", orderby: router.query.sortby || "", skills: router.query.skills || "" }).get().then(res => {
+        fetchStudents().get().then(res => {
           if (res.success) {
             let p1 = res.data.slice(0, 10);
             let p2 = res.data.slice(10);
@@ -205,7 +206,6 @@ export default function StudentList(props) {
 
 
     } else if ("deleted_student" in data) {
-      // TODO #481 check reload the students -> maybe the deleted student must be shown in the list
       students.find((o, i) => {
         if (o["id"] === data["deleted_student"]) {
           let new_students = [...students]
