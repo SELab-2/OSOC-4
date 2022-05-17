@@ -43,6 +43,7 @@ export default function StudentsFilters(props) {
     const chosenSkills = (router.query.skills) ? router.query.skills.split(",") : []
     const decision = (router.query.decision) ? router.query.decision.split(",") : []
     const own_suggestion = (router.query.own_suggestion) ? router.query.own_suggestion.split(",") : []
+    const unmatched = router.query.unmatched || ""
 
     useEffect(() => {
         Url.fromName(api.skills).get().then(async res => {
@@ -149,7 +150,7 @@ export default function StudentsFilters(props) {
      * The HTML representation of the filters in the 'Select students' tab
      */
     return (
-        <Col md="auto" className="filters fill_height scroll-overflow">
+        <Col md="auto" className="filters fill_height scroll-overflow" key="studentFilters">
             <Row className="title-row-filters">
                 <Col>
                     <h2 className="filters-title">Filters</h2>
@@ -168,8 +169,8 @@ export default function StudentsFilters(props) {
                 value={filters.includes("student-coach")}
                 onChange={(ev) => addFilter("filters", filters, "student-coach", ev.target.checked)} />
             <StudentsFilter filter_id="unmatched-students-checkbox" filter_text="Only unmatched students"
-                value={filters.includes("unmatched")}
-                onChange={(ev) => addFilter("filters", filters, "unmatched", ev.target.checked)} />
+                value={(unmatched === "true")}
+                onChange={(ev) => addFilter("unmatched", [], "true", ev.target.checked)} />
 
             <Row className="filter-title">
                 <Col><h3>Skills</h3></Col>

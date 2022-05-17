@@ -9,6 +9,7 @@ import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
 import Hint from "../Hint";
 import { Form, Button, Row} from "react-bootstrap";
+import {log} from "../../utils/logger";
 
 /**
  * This component displays a settings-screen for all settings regarding editions.
@@ -69,6 +70,9 @@ export default function EditionSettings() {
 
     const editClicked = (event) => {
         setNewEdition({"name": "", "description": "", "year": edition.year});
+        setEditing(false);
+    }
+
         setFailed(false);
         setEditing(true);
     }

@@ -148,7 +148,7 @@ export class Url {
         try {
             await this._setupRequest(context);
             log(`API: PATCH ${this._url}`)
-            const resp = await axios.patch(this._url, this._body, { "headers": this._headers });
+            const resp = await axios.patch(this._url, this._body, { "headers": this._headers, "params": this._params });
             return { success: true, data: resp.data };
         } catch (e) {
             return { success: false, error: e };
@@ -164,7 +164,7 @@ export class Url {
         try {
             await this._setupRequest(context);
             log(`API: DELETE ${this._url}`)
-            const resp = await axios.delete(this._url, { "headers": this._headers });
+            const resp = await axios.delete(this._url, { "headers": this._headers, params: this._params });
             return { success: true, data: resp.data };
         } catch (e) {
             return { success: false, error: e };
@@ -365,7 +365,8 @@ class Cache {
 
         student = Url.fromUrl(url).get().then(res => {
             if (res.success) {
-                console.log(res)
+                log("GET student was successful:")
+                log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
                     if (item["suggested_by_id"] === userid) {
@@ -412,11 +413,21 @@ class Cache {
                 new_student["email_sent"] = data["email_sent"];
                 cache[data["id"]] = new_student;
             }
+        } else if ("deleted_student" in data) {
+            if (data["deleted_student"] in cache) {
+                delete cache[data["deleted_student"]];
+            }
         }
     }
 
     async clear() {
         Object.keys(cache).map(key => delete cache[key]);
+    }
+
+    async remove_student(url) {
+        if (url in cache) {
+            delete cache[url];
+        }
     }
 
 }

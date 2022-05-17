@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from app.config import config
 from app.models.participation import Participation, ParticipationOutProject
@@ -68,16 +68,19 @@ class ProjectOutSimple(BaseModel):
 
 class ProjectOutExtended(BaseModel):
     id: str
+    id_int: int
     name: str
     description: str
     partner_name: str
     partner_description: str
     required_skills: List[RequiredSkillOut] = []
     users: List[str] = []
-    participations: List[ParticipationOutProject] = []
+    participations: Dict[int, ParticipationOutProject] = {}
     edition: str
 
     def __init__(self, **data):
+        i = data["id"]
         data["id"] = config.api_url + "projects/" + str(data["id"])
+        data["id_int"] = i
         data["edition"] = config.api_url + "editions/" + str(data["edition"])
         super().__init__(**data)

@@ -77,17 +77,19 @@ export default function StudentDetails(props) {
             setPrevStudentid(router.query.studentId)
             setDetailLoading(true)
             Url.fromName(api.students).extend(`/${router.query.studentId}`).get(null, true).then(retrieved_student => {
-                setStudent(retrieved_student.data);
-                setDecision(retrieved_student.data["decision"])
-                setDecideField(retrieved_student.data["decision"])
-                setSuggestions(retrieved_student.data["suggestions"]);
-                // Fill in the questionAnswers
-                Url.fromUrl(retrieved_student.data["question-answers"]).get().then(res => {
-                    if (res.success) {
-                        setQuestionAnswers(res["data"]);
-                    }
-                })
-                setDetailLoading(false)
+                if (retrieved_student.data) {
+                    setStudent(retrieved_student.data);
+                    setDecision(retrieved_student.data["decision"])
+                    setDecideField(retrieved_student.data["decision"])
+                    setSuggestions(retrieved_student.data["suggestions"]);
+                    // Fill in the questionAnswers
+                    Url.fromUrl(retrieved_student.data["question-answers"]).get().then(res => {
+                        if (res.success) {
+                            setQuestionAnswers(res["data"]);
+                        }
+                    })
+                    setDetailLoading(false)
+                }
             })
         }
 
@@ -237,11 +239,11 @@ export default function StudentDetails(props) {
                     <div className="name nomargin">
                         {student["mandatory"]["alumni"] === "yes" ?
                             <Hint message="Student claims to be an alumni">
-                                <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon"/>
+                                <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon" />
                             </Hint>
                             : <></>
                         }
-                    <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}</h1>
+                        <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}</h1>
                         <Hint message="Delete the student">
                             <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
                                 <Image src={deleteIcon} className="delete-icon" />
@@ -257,7 +259,7 @@ export default function StudentDetails(props) {
                 <Col xs="auto" className="close-button">
                     <Hint message="Close the details">
                         <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
-                               src={closeIcon} alt="close-icon" width="25px" height="25px" objectFit={'contain'} />
+                            src={closeIcon} alt="close-icon" width="25px" height="25px" objectFit={'contain'} />
                     </Hint>
                 </Col>
             </Row>
@@ -268,7 +270,7 @@ export default function StudentDetails(props) {
                     </Row>
                     <Row md="auto" className="nomargin">
                         <Button className="send-email-button"
-                                onClick={() => setEmailPopUpShow(true)}>
+                            onClick={() => setEmailPopUpShow(true)}>
                             Send email
                         </Button>
                     </Row>
@@ -293,11 +295,11 @@ export default function StudentDetails(props) {
                     </Row>
                     <div>
                         <select className="dropdown-decision" id="dropdown-decision"
-                                onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
-                                <option value={-1}>Undecided</option>
-                                <option value={0}>No</option>
-                                <option value={1}>Maybe</option>
-                                <option value={2}>Yes</option>
+                            onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
+                            <option value={-1}>Undecided</option>
+                            <option value={0}>No</option>
+                            <option value={1}>Maybe</option>
+                            <option value={2}>Yes</option>
                         </select>
                         <Hint message="Confirms the decision">
                             <Button className="suggest-confirm-button" disabled={decideField === decision}

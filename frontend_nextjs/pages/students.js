@@ -17,6 +17,7 @@ export default function Students() {
     const router = useRouter();
     const { height, width } = useWindowDimensions();
     const [showEmailBar, setShowEmailBar] = useState(false);
+    const [fullView, setFullView] = useState(false);
 
     const [students, setStudents] = useState([]);
     const [selectedStudents, setSelectedStudents] = useState([]);
@@ -31,12 +32,16 @@ export default function Students() {
         });
     }, []);
 
+    useEffect(() => {
+        setFullView(width > 1500 || (width > 1000 && !router.query.studentId));
+    }, [width, router]);
+
     return (
 
         <Row style={{height: "calc(100vh - 86px)"}}>
 
             {
-                ((width > 1500) || (width > 1000 && !router.query.studentId)) &&
+                fullView &&
                 <Col className="fill_height" md="auto" key="studentFilters">
                     <StudentsFilters />
                 </Col>
@@ -45,7 +50,10 @@ export default function Students() {
             {(width > 800 || !router.query.studentId) &&
                 <Col>
                     <Row className="nomargin">
-                        <StudentListAndFilters selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} setStudents={setStudents} category={showEmailBar ? "emailstudents" : "students"} studentsTab={true} />
+                        <StudentListAndFilters selectedStudents={selectedStudents}
+                                               setSelectedStudents={setSelectedStudents} setStudents={setStudents}
+                                               category={showEmailBar ? "emailstudents" : "students"}
+                                               elementType="students" fullview={fullView}/>
                     </Row>
                     {(me && me.role === 2) &&
                         <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />

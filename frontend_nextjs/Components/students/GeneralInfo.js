@@ -72,7 +72,7 @@ export default function GeneralInfo(props) {
       }
 
       // add the project of the student to the general info
-      if (! props.listelement || ! props.studentsTab) {
+      if (!props.listelement || props.elementType !== "students") {
         rows.push(
           <Row key={"Project"} className="question-answer-row">
             <Col md="auto" className="info-titles">{"Project"}</Col>

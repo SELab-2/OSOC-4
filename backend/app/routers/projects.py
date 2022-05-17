@@ -1,15 +1,15 @@
 from app.config import config
-from app.crud import read_where, read_all_where, update, update_all
-from app.database import get_session
-from app.exceptions.permissions import NotPermittedException
+from app.crud import read_all_where, read_where, update, update_all
+from app.database import get_session, websocketManager
 from app.exceptions.project_exceptions import ProjectNotFoundException
-from app.models.project import (Project, ProjectCoach, ProjectCreate,
-                                ProjectOutExtended, ProjectOutSimple)
 from app.models.participation import Participation, ParticipationOutProject
-from app.models.user import UserRole, User
+from app.models.project import (Project, ProjectCoach, ProjectCreate,
+                                ProjectOutExtended, ProjectOutSimple,
+                                ProjectRequiredSkill, RequiredSkillOut)
+from app.models.suggestion import Suggestion
+from app.models.user import User, UserRole
 from app.utils.checkers import RoleChecker
 from app.utils.response import response
-from app.models.project import ProjectRequiredSkill, RequiredSkillOut
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,8 +45,8 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
     return response(ProjectOutSimple.parse_raw(new_project.json()), "Project added successfully.")
 
 
-@router.get("/{id}", response_description="Project with id retrieved")
-async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+@router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Project with id retrieved")
+async def get_project_with_id(id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
     """get_project_with_id get Project instance with id from the database
 
     :return: project with id
@@ -61,17 +61,12 @@ async def get_project_with_id(id: int, role: RoleChecker(UserRole.COACH) = Depen
         await session.execute(select(User.id).join(ProjectCoach).where(ProjectCoach.project_id == int(id)))
     ).all()
 
-    if role == UserRole.COACH:
-        current_user_id = Authorize.get_jwt_subject()
-        if (current_user_id,) not in projectUsers:
-            raise NotPermittedException()
-
     projectOutExtended = ProjectOutExtended.parse_raw(project.json())
     projectOutExtended.users = [f"{config.api_url}users/{id}" for (id,) in projectUsers]
     projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
     projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]
     projectParticipations = await session.execute(select(Participation).where(Participation.project_id == int(id)))
-    projectOutExtended.participations = [ParticipationOutProject.parse_raw(s.json()) for (s,) in projectParticipations.all()]
+    projectOutExtended.participations = {s.student_id: ParticipationOutProject.parse_raw(s.json()) for (s,) in projectParticipations.all()}
     return projectOutExtended
 
 
@@ -118,3 +113,39 @@ async def update_project_with_id(id: int, updated_project: ProjectCreate, sessio
     await update_all(users, session=session)
 
     return response(None, "Project updated succesfully")
+
+
+@router.delete("/{id}", response_description="Project with id deleted")
+async def delete_project_with_id(id: int, role: RoleChecker(UserRole.ADMIN) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+    """delete_project_with_id delete Project instance with id from the database
+            also deletes the participations, requiredskills, projectcoaches, suggestions
+    """
+    project = await read_where(Project, Project.id == id, session=session)
+    if not project:
+        raise ProjectNotFoundException()
+
+    # remove participations
+    participations = await read_all_where(Participation, Participation.project_id == int(id), session=session)
+    for participation in participations:
+        await session.delete(participation)
+
+    # remove skills
+    skills = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(id), session=session)
+    for skill in skills:
+        await session.delete(skill)
+
+    # remove users
+    users = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(id), session=session)
+    for user in users:
+        await session.delete(user)
+
+    # remove suggestions
+    suggestions = await read_all_where(Suggestion, Suggestion.project_id == int(id), session=session)
+    for suggestion in suggestions:
+        await session.delete(suggestion)
+
+    await session.delete(project)
+
+    await session.commit()
+
+    await websocketManager.broadcast({"deleted_project": config.api_url + "projects/" + str(id)})
