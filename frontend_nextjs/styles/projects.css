@@ -76,8 +76,13 @@
     cursor: pointer;
 }
 
-.button-match-student-project {
-     cursor: pointer;
+.col-match-student-btn {
+    display: flex;
+}
+
+.col-match-student-btn > div {
+    align-self: center;
+    cursor: pointer;
     border: none;
 }
 
