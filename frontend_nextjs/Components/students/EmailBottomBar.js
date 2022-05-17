@@ -21,7 +21,8 @@ export default function StudentList(props) {
         <Row className="email-bar">
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow}
                                    setPopUpShow={setSendEmailsPopUpShow}
-                                   selectedStudents={props.selectedStudents}/>
+                                   selectedStudents={props.selectedStudents}
+                                   setSelectedStudents={props.setSelectedStudents}/>
             <Row style={{height: "20px"}} className="nomargin align-items-center">
                 <button className="table-button" onClick={() => {
                     props.setSelectedStudents([]);

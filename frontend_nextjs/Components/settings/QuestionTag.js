@@ -19,7 +19,8 @@ import Hint from "../Hint";
 export default function QuestionTag(props) {
     const [previousTag, setPreviousTag] = useState({});
     const [questionTag, setQuestionTag] = useState({});
-
+    const [saving, setSaving] = useState(false);
+    const [fail, setFail] = useState(false);
 
     useEffect(() => {
         setPreviousTag(props.questionTag);
@@ -80,6 +81,7 @@ export default function QuestionTag(props) {
      */
     const handleSubmit = (event) => {
         event.preventDefault();
+        setSaving(true);
         let requirements = [questionTag["tag"].length > 0,
             props.questionTags.every(qt => qt["tag"] !== questionTag["tag"] || qt["url"] === questionTag["url"]),
             questionTag["question"].length > 0,
@@ -99,6 +101,7 @@ export default function QuestionTag(props) {
                 "Question must not be empty", "Question must be unique"];
             props.setErrorMessage(messages[requirements.indexOf(false)]);
         }
+        setSaving(false);
     }
 
     /**
@@ -128,8 +131,26 @@ export default function QuestionTag(props) {
                 </Hint>
                 }
             </td>
-            <td className="questionTag-cell">
-                {
+            <td>
+                {(!props.edited) &&
+                    <Hint message="Edit question-tag">
+                        <button className="table-button" onClick={(ev) => {
+                            props.setNewQuestionTag(undefined);
+                            props.setEdited(previousTag["url"]);
+                            setQuestionTag(previousTag);
+                        }}>
+                            <Image src={editIcon} height="30px"/>
+                        </button>
+                    </Hint>}
+                {saving && <p>Saving</p>}
+                {props.edited && 
+                    <Hint message="Save">
+                    <button className="table-button" onClick={handleSubmit}>
+                        <Image src={saveIcon} height="30px"/>
+                    </button>
+                    </Hint>}
+
+                {/* {
                     ((!props.edited) ?
                         <Hint message="Edit question-tag">
                             <button className="table-button" onClick={(ev) => {
@@ -140,13 +161,13 @@ export default function QuestionTag(props) {
                                 <Image src={editIcon} className="questionTag-image"/>
                             </button>
                         </Hint>
-                        :
+                        : 
                         <Hint message="Save">
                             <button className="table-button" onClick={handleSubmit}>
                                 <Image src={saveIcon} className="questionTag-image"/>
                             </button>
                         </Hint>)
-                }
+                } */}
                 {(!previousTag["mandatory"]) &&
                     <Hint message="Delete question-tag">
                         <button onClick={deleteTag} className="table-button">

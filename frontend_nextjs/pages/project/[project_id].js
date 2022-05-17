@@ -18,7 +18,7 @@ import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
 import { log } from "../../utils/logger";
-import { useWebsocketContext } from "../../Components/WebsocketProvider"
+import { useWebsocketContext } from "../../Components/WebsocketProvider";
 
 function Input(props) {
     return null;
@@ -135,9 +135,16 @@ const Project = () => {
 
     }
 
-
-    //TODO make this delete project
     async function deleteProject() {
+        Url.fromUrl(project.id)
+            .delete().then(res => {
+                if (res.success) {
+                    setShowDelete(false);
+                    router.push('/projects')
+                } else {
+                    alert("Error: the project '" + project.name + "' couldn't be deleted.");
+                }
+            })
     }
 
     /**

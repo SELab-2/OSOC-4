@@ -57,6 +57,7 @@
 }
 
 .student-list-positioning {
+    width: auto;
     margin: 0 10pt 0;
     padding-top: 20px;
 }
