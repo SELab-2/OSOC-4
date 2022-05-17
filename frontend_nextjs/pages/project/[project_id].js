@@ -135,7 +135,6 @@ const Project = () => {
 
     }
 
-
     async function deleteProject() {
         Url.fromUrl(project.id)
             .delete().then(res => {

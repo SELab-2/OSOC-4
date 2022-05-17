@@ -1,6 +1,6 @@
 from app.config import config
 from app.crud import read_all_where, read_where, update, update_all
-from app.database import get_session
+from app.database import get_session, websocketManager
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.project_exceptions import ProjectNotFoundException
 from app.models.participation import Participation, ParticipationOutProject
@@ -153,3 +153,5 @@ async def delete_project_with_id(id: int, role: RoleChecker(UserRole.ADMIN) = De
     await session.delete(project)
 
     await session.commit()
+
+    await websocketManager.broadcast({"deleted_project": config.api_url + "projects/" + str(id)})
