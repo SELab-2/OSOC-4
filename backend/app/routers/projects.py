@@ -129,7 +129,7 @@ async def delete_project_with_id(id: int, role: RoleChecker(UserRole.ADMIN) = De
     project = await read_where(Project, Project.id == id, session=session)
     if not project:
         raise ProjectNotFoundException()
-    
+
     # remove participations
     participations = await read_all_where(Participation, Participation.project_id == int(id), session=session)
     for participation in participations:
@@ -144,12 +144,11 @@ async def delete_project_with_id(id: int, role: RoleChecker(UserRole.ADMIN) = De
     users = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(id), session=session)
     for user in users:
         await session.delete(user)
-    
+
     # remove suggestions
     suggestions = await read_all_where(Suggestion, Suggestion.project_id == int(id), session=session)
     for suggestion in suggestions:
         await session.delete(suggestion)
-
 
     await session.delete(project)
 
