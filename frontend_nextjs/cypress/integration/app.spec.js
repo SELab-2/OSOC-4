@@ -6,14 +6,14 @@ describe('Navigation', () => {
             {redirect: false, email: "user_admin@test.be", password: "Test123!user_admin"});
     });
 
-    it('should navigate to the select students page', () => {
+    it('should navigate to the students page', () => {
         cy.visit("/");
-        cy.contains("a", "select students", {matchCase: false}).click();
+        cy.contains("a", "students", {matchCase: false}).click();
         cy.url().should("contain", "students");
     });
 
     // uncaught application error
-    it.skip('should navigate to the projects page', () => {
+    it('should navigate to the projects page', () => {
         cy.visit("/");
         cy.contains("a", "projects", {matchCase: false}).click();
         cy.url().should("contain", "projects");
