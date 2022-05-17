@@ -122,8 +122,6 @@ export default function ProjectsList(props) {
         } else if ("deleted_project" in data) {
             const projectid = data["deleted_project"];
 
-            console.log("deleted project", projectid)
-
             let new_projects = visibleProjects.filter((p, i) => {
                 return p.id !== projectid
             })
