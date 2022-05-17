@@ -18,6 +18,7 @@ import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
 import { log } from "../../utils/logger";
+import { useWebsocketContext } from "../../Components/WebsocketProvider"
 
 function Input(props) {
     return null;
@@ -48,6 +49,8 @@ const Project = () => {
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
     const [availableSkills, setAvailableSkills] = useState([])
+
+    const { websocketConn } = useWebsocketContext();
 
     useEffect(() => {
         if (!loaded) {
@@ -100,6 +103,38 @@ const Project = () => {
             setAvailableSkills(skills.filter(skill => !skillNames.includes(skill.value)).map(skill => skill.value))
         }
     }, [requiredSkills, skills])
+
+    useEffect(() => {
+
+        if (websocketConn) {
+            websocketConn.addEventListener("message", updateDetailsFromWebsocket)
+
+            return () => {
+                websocketConn.removeEventListener('message', updateDetailsFromWebsocket)
+            }
+        }
+
+    }, [websocketConn, project, router.query])
+
+    const updateDetailsFromWebsocket = (event) => {
+        let data = JSON.parse(event.data)
+        const studentid = parseInt(data["studentId"])
+        const projectid = parseInt(data["projectId"])
+
+        if (projectid === project.id_int) {
+            if ("participation" in data) {
+                let new_project = project;
+                new_project.participations[studentid] = data["participation"];
+                setProject({ ...new_project });
+            } else if ("deleted_participation" in data) {
+                let new_project = project;
+                delete new_project.participations[studentid];
+                setProject({ ...new_project });
+            }
+        }
+
+    }
+
 
     //TODO make this delete project
     async function deleteProject() {

@@ -90,7 +90,7 @@ async def delete_participation(student_id: str,
 
     await session.delete(participation)
     await session.commit()
-    await websocketManager.broadcast({"projectId": project_id, "studentId": student_id})
+    await websocketManager.broadcast({"projectId": project_id, "studentId": student_id, "deleted_participation": True})
 
 
 @router.patch("", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Participation edited")

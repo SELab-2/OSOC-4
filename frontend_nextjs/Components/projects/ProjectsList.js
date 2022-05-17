@@ -98,7 +98,7 @@ export default function ProjectsList(props) {
                     return true; // stop searching
                 }
             })
-        } else {
+        } else if ("deleted_participation" in data) {
             visibleProjects.find((p, i) => {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
