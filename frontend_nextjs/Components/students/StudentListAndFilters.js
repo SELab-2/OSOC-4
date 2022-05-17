@@ -1,4 +1,4 @@
-import { Button, Row } from "react-bootstrap";
+import {Button, Col, Row} from "react-bootstrap";
 import StudentsFilters from "./StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
 import SearchSortBar from "./SearchSortBar";
@@ -139,7 +139,6 @@ export default function StudentList(props) {
 
   }
 
-
   const fetchData = () => {
 
     let p1 = studentUrls.slice(0, 20);
@@ -154,19 +153,16 @@ export default function StudentList(props) {
   }
 
   return [
-    !((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) &&
     <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
       <StudentsFilters />
     </CheeseburgerMenu>
     ,
 
-    (width > 800 || (!router.query.studentId && props.elementType === "students")) &&
-
-    <div className={(props.elementType === "students") ? "col nomargin student-list-positioning fill_height" :
+    <Col className={(props.elementType === "students") ? "col nomargin student-list-positioning fill_height" :
       ((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) ?
         "col-4 nomargin student-list-positioning fill_height" :
         "col-5 nomargin student-list-positioning fill_height"} key="studentList">
-      {!((width > 1500) || (width > 1000 && !router.query.studentId && props.elementType === "students")) &&
+      {!props.fullview &&
         <Row className="nomargin">
           <Button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>
             <Image className="test" width="20%" height="20%" src={filterIcon} placeholder="empty" />
@@ -204,6 +200,6 @@ export default function StudentList(props) {
           }
         })}
       </InfiniteScroll>
-    </div>
+    </Col>
   ]
 }

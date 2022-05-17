@@ -23,9 +23,5 @@ export default function ConflictCard() {
     /**
      * returns the current amount of conflicts
      */
-    return(
-        <div>
-            <Button variant={"conflicts"}>conflicts {conflicts.length}</Button>
-        </div>
-    )
+    return(<Button variant={"conflicts"}>conflicts {conflicts.length}</Button>)
 }

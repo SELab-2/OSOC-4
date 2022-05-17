@@ -166,16 +166,18 @@ export default function ProjectsList(props) {
     }
 
     return (
-        <Col className="fill_height fill_width projects-positioning">
-            <Row className="nomargin" style={{ marginBottom: "12px" }}>
-                <Col>
+        <Col className="fill_height fill_width">
+            <Row className="center-content projects-controls">
+                <Col className="search-project">
                     <Form onSubmit={handleSearchSubmit}>
                         <Form.Group controlId="searchProjects">
-                            <Form.Control type="text" value={search} placeholder={"Search projects"} onChange={e => handleSearch(e.target.value)} />
+                            <Form.Control type="text" value={search}
+                                          placeholder={"Search projects"}
+                                          onChange={e => handleSearch(e.target.value)} />
                         </Form.Group>
                     </Form>
                 </Col>
-                <Col xs="auto" className={"project-people-needed"}>
+                <Col xs="auto">
                     <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded} />
                 </Col >
                 <Col xs="auto" >
