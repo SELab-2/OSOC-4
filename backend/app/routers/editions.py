@@ -15,7 +15,7 @@ from app.models.answer import Answer
 from app.models.edition import (Edition, EditionCoach, EditionOutExtended,
                                 EditionOutSimple)
 from app.models.participation import Participation
-from app.models.project import Project, ProjectCoach, ProjectOutSimple
+from app.models.project import Project, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
