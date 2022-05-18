@@ -1,3 +1,6 @@
+""" This module includes the functions used to hash and verify passwords
+"""
+
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

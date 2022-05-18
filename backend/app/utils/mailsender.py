@@ -1,3 +1,6 @@
+""" This module includes the functions used to send emails to the students
+"""
+
 import os
 import smtplib
 import ssl
