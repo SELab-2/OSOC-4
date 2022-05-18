@@ -19,15 +19,13 @@ export default function Suggestion(props) {
    * This function is called when suggestionBy is empty, this is when the component is made.
    */
   useEffect( () => {
-    if (suggestedBy === "") {
-      Url.fromUrl(props.suggestion["suggested_by_id"]).get().then(res =>  {
-        if (res.success) {
-          res = res.data;
-          setSuggestedBy(res.data["name"]);
-        }
-      });
-    }
-  }, [suggestedBy]);
+    Url.fromUrl(props.suggestion["suggested_by_id"]).get().then(res =>  {
+      if (res.success) {
+        res = res.data;
+        setSuggestedBy(res.data["name"]);
+      }
+    });
+  }, [props.suggestion]);
 
   /**
    * returns the html representation of a suggestion

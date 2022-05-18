@@ -1,3 +1,5 @@
+""" This module includes the send emails endpoints """
+
 from app.crud import read_where
 from app.database import get_session, websocketManager
 from app.models.sendemails import SendCustomEmail, SendEmails
@@ -13,7 +15,16 @@ router = APIRouter(prefix="/sendemails")
 
 
 @router.post("/decisions", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def send_decision_emails(data: SendEmails, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def send_decision_emails(data: SendEmails, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)) -> None:
+    """send_decision_emails sends emails based on the decision for the students
+
+    :param data: the students to send emails to
+    :type data: SendEmails
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    """
 
     user_id = Authorize.get_jwt_subject()
 
@@ -28,7 +39,16 @@ async def send_decision_emails(data: SendEmails, Authorize: AuthJWT = Depends(),
 
 
 @router.post("/custom", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def send_custom_email(custom_email: SendCustomEmail, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def send_custom_email(custom_email: SendCustomEmail, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)) -> None:
+    """send_custom_email sends a custom email to a student
+
+    :param custom_email: the data of who to send an email to and what email to send
+    :type custom_email: SendCustomEmail
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    """
     studentid = custom_email.student.split("/")[-1]
     student = await read_where(Student, Student.id == int(studentid), session=session)
 

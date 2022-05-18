@@ -1,3 +1,5 @@
+""" This module includes all the email template endpoints """
+
 from app.crud import read_where, update
 from app.database import get_session
 from app.exceptions.emailtemplate_exceptions import \
@@ -13,7 +15,17 @@ router = APIRouter(prefix="/emailtemplates")
 
 
 @router.get("/{name}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def get_email_template(name: str, session: AsyncSession = Depends(get_session)):
+async def get_email_template(name: str, session: AsyncSession = Depends(get_session)) -> dict:
+    """get_email_template
+
+    :param name: the name of the template
+    :type name: str
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises EmailTemplateNotFoundException: raised when no template with that name is found
+    :return: the template
+    :rtype: dict
+    """
 
     if name not in EmailTemplateName.__members__:
         raise EmailTemplateNotFoundException()
@@ -28,7 +40,17 @@ async def get_email_template(name: str, session: AsyncSession = Depends(get_sess
 
 
 @router.patch("/{name}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_email_template(name: str, newtemplate: EmailTemplatePatch, session: AsyncSession = Depends(get_session)):
+async def update_email_template(name: str, newtemplate: EmailTemplatePatch, session: AsyncSession = Depends(get_session)) -> None:
+    """update_email_template
+
+    :param name: the name of the email template
+    :type name: str
+    :param newtemplate: the data to update the template with
+    :type newtemplate: EmailTemplatePatch
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises EmailTemplateNotFoundException: raised when the template isn't found
+    """
     # check if valid template name
 
     if name not in EmailTemplateName.__members__:

@@ -1,4 +1,7 @@
-from typing import List, Optional
+""" This module includes all the models for projects
+"""
+
+from typing import Dict, List, Optional
 
 from app.config import config
 from app.models.participation import Participation, ParticipationOutProject
@@ -8,11 +11,19 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class ProjectCoach(SQLModel, table=True):
+    """represents a ProjectCoach from the database
+        a project-coach is the relationship between a project and a coach,
+        it defines which coach belongs to what project
+    """
     project_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="project.id")
     coach_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="user.id")
 
 
 class ProjectRequiredSkill(SQLModel, table=True):
+    """represents a ProjectRequiredSkill from the database
+        a project-required-skill is the relationship between a project and a skill,
+        it defines what skill is needed in which project and how many times that skill is needed there
+    """
     project_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="project.id")
     skill_name: Optional[str] = Field(default=None, primary_key=True, foreign_key="skill.name")
 
@@ -23,6 +34,8 @@ class ProjectRequiredSkill(SQLModel, table=True):
 
 
 class Project(SQLModel, table=True):
+    """represents a Project from the database
+    """
     id: Optional[int] = Field(default=None, primary_key=True)
     edition: int = Field(foreign_key="edition.year")
 
@@ -38,17 +51,16 @@ class Project(SQLModel, table=True):
     participations: List[Participation] = Relationship(back_populates="project")
 
 
-class PartnerOut(BaseModel):
-    name: str
-    about: str
-
-
 class RequiredSkillOut(BaseModel):
+    """an output model for ProjectRequiredSkill
+    """
     skill_name: str
     number: int
 
 
 class ProjectCreate(BaseModel):
+    """the expected input model (in the body of a HTML POST request) for creating a new project
+    """
     name: str
     description: str
     required_skills: List[RequiredSkillOut]
@@ -59,25 +71,38 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectOutSimple(BaseModel):
+    """an output model for Project
+    """
     id: str
 
     def __init__(self, **data):
+        """the constructor
+            the kwargs in "data" are used to initialize the attributes of this class
+        """
         data["id"] = config.api_url + "projects/" + str(data["id"])
         super().__init__(**data)
 
 
 class ProjectOutExtended(BaseModel):
+    """an extended output model for Project (gives more info)
+    """
     id: str
+    id_int: int
     name: str
     description: str
     partner_name: str
     partner_description: str
     required_skills: List[RequiredSkillOut] = []
     users: List[str] = []
-    participations: List[ParticipationOutProject] = []
+    participations: Dict[int, ParticipationOutProject] = {}
     edition: str
 
     def __init__(self, **data):
+        """the constructor
+            the kwargs in "data" are used to initialize the attributes of this class
+        """
+        i = data["id"]
         data["id"] = config.api_url + "projects/" + str(data["id"])
+        data["id_int"] = i
         data["edition"] = config.api_url + "editions/" + str(data["edition"])
         super().__init__(**data)

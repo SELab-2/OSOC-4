@@ -1,3 +1,6 @@
+""" This module includes the functions used generate the different keys
+"""
+
 import os
 import random
 import string

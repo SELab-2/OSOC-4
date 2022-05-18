@@ -1,3 +1,6 @@
+""" This module includes the functions used to validate the email and password
+"""
+
 import re
 
 

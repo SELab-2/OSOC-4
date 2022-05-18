@@ -1,3 +1,5 @@
+""" This module includes the function for the database connection """
+
 import os
 import time
 
@@ -27,6 +29,8 @@ engine = create_async_engine(DATABASE_URL)
 
 
 async def init_db():
+    """init_db init the database connection
+    """
     db.redis = Redis(host=REDIS_URL, port=REDIS_PORT, db=0, decode_responses=True, password=REDIS_PASSWORD)
 
     connection = False
@@ -48,6 +52,13 @@ async def init_db():
 
 
 async def get_session() -> AsyncSession:
+    """get_session return a new session
+
+    :return: a new session
+    :rtype: AsyncSession
+    :yield: a new session
+    :rtype: Iterator[AsyncSession]
+    """
     async_session = sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
     )
@@ -56,6 +67,8 @@ async def get_session() -> AsyncSession:
 
 
 class Database:
+    """ object with redis connection
+    """
     redis: Redis = None
 
 
@@ -64,5 +77,7 @@ websocketManager = WebSocketManager()
 
 
 async def disconnect_db():
+    """disconnect_db disconnect the database
+    """
     await engine.dispose()
     db.redis.close()

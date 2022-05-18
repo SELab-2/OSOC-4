@@ -1,10 +1,17 @@
-from typing import Optional, List
-from sqlalchemy import Index
-from sqlmodel import Field, SQLModel, Relationship
+""" This module includes the Answer model
+"""
+
+from typing import List, Optional
+
 from app.models.question_answer import QuestionAnswer
+from sqlalchemy import Index
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class Answer(SQLModel, table=True):
+    """represents an answer from the database
+    """
+
     id: Optional[int] = Field(default=None, primary_key=True)
     answer: str
 

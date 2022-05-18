@@ -23,7 +23,7 @@ export default function SettingCards(props) {
                                 <p className="card-subtitle">{props.subtitle}</p>
                             </td>
                             <td className="column-button">
-                                <Button className={"button"} variant="outline-secondary" onClick={() => setIsOpen(! isOpen)} enabled="true">{isOpen ? "Close" : "Change" }</Button>
+                                <Button className={"button"} variant="primary" onClick={() => setIsOpen(! isOpen)} enabled="true">{isOpen ? "Close" : "Change" }</Button>
                             </td>
                         </tr>
                         </tbody>

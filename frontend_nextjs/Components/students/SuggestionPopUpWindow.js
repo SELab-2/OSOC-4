@@ -92,7 +92,7 @@ export default function SuggestionPopUpWindow(props) {
       </ModalHeader>
       <Modal.Body>
         <h4>Why are you making this decision?</h4>
-        <input id="suggestin-reason" name="reason" type="text" className="fill_width suggestion-reason" onChange={handleChange} value={suggestion["reason"]} />
+        <input id="suggestin-reason" name="reason" type="text" className="fill_width suggestion-reason" onChange={handleChange} value={suggestion["reason"]} placeholder="Your reason"/>
         A reason is not required, but will open up discussion and help us and your fellow coaches to understand.
       </Modal.Body>
       <Modal.Footer>

@@ -1,3 +1,6 @@
+""" This module includes all the models for the student suggestions
+"""
+
 from enum import Enum
 from typing import Optional
 
@@ -7,12 +10,16 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class SuggestionOption(int, Enum):
+    """represents the different types of suggestions you can make
+    """
     NO = 0
     MAYBE = 1
     YES = 2
 
 
 class Suggestion(SQLModel, table=True):
+    """represents a Suggestion from the database
+    """
     # mail_sent: bool = Field(default=False)
     id: Optional[int] = Field(default=None, primary_key=True)
     decision: SuggestionOption
@@ -31,6 +38,8 @@ class Suggestion(SQLModel, table=True):
 
 
 class SuggestionCreate(BaseModel):
+    """the expected input model (in the body of a HTML POST request) for creating a Suggestion
+    """
     decision: SuggestionOption
     reason: str
 
@@ -41,6 +50,8 @@ class SuggestionCreate(BaseModel):
 
 
 class SuggestionExtended(BaseModel):
+    """an output model for a Suggestion
+    """
     decision: int
     reason: str
 
@@ -50,6 +61,9 @@ class SuggestionExtended(BaseModel):
     # skill_name: str
 
     def __init__(self, **data):
+        """the constructor
+            the kwargs in "data" are used to initialize the attributes of this class
+        """
         data["student_id"] = f"{config.api_url}students/{str(data['student_id'])}"
         data["suggested_by_id"] = f"{config.api_url}users/{str(data['suggested_by_id'])}"
         if data['project_id']:

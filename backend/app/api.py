@@ -1,3 +1,5 @@
+""" This module includes the api main """
+
 import inspect
 import re
 
@@ -33,11 +35,15 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
+    """startup and connect database
+    """
     await init_db()
 
 
 @app.on_event("shutdown")
 async def shutdown():
+    """shutdown and disconnect database
+    """
     await disconnect_db()
 
 app.include_router(ddd.router)
@@ -58,16 +64,39 @@ app.include_router(users.router)
 
 @app.exception_handler(BaseException)
 async def my_exception_handler(request: Request, exception: BaseException):
+    """my_exception_handler handler for the raised exceptions
+
+    :param request: the request
+    :type request: Request
+    :param exception: the raised exception
+    :type exception: BaseException
+    :return: the exception in json format
+    :rtype: JSONResponse
+    """
     return exception.json()
 
 
 @app.exception_handler(AuthJWTException)
 async def auth_exception_handler(request: Request, exception: AuthJWTException):
+    """auth_exception_handler handler for the raised exceptions
+
+    :param request: the request
+    :type request: Request
+    :param exception: the raised exception
+    :type exception: AuthJWTException
+    :return: the exception in json format
+    :rtype: JSONResponse
+    """
     return JSONResponse(status_code=exception.status_code, content={"message": exception.message})
 
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    """websocket_endpoint the endpoint used to create a websocket connection
+
+    :param websocket: the websocket connection
+    :type websocket: WebSocket
+    """
     await websocketManager.connect(websocket)
     try:
         while True:
@@ -78,6 +107,12 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 def custom_openapi():
+    """custom_openapi generate the custom swagger api documentation
+
+    :return: custom openapi_schema
+    :rtype: openapi_schema
+    """
+
     if app.openapi_schema:
         return app.openapi_schema
 

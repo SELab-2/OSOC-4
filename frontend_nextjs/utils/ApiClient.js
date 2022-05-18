@@ -148,7 +148,7 @@ export class Url {
         try {
             await this._setupRequest(context);
             log(`API: PATCH ${this._url}`)
-            const resp = await axios.patch(this._url, this._body, { "headers": this._headers });
+            const resp = await axios.patch(this._url, this._body, { "headers": this._headers, "params": this._params });
             return { success: true, data: resp.data };
         } catch (e) {
             return { success: false, error: e };
@@ -164,7 +164,7 @@ export class Url {
         try {
             await this._setupRequest(context);
             log(`API: DELETE ${this._url}`)
-            const resp = await axios.delete(this._url, { "headers": this._headers });
+            const resp = await axios.delete(this._url, { "headers": this._headers, params: this._params });
             return { success: true, data: resp.data };
         } catch (e) {
             return { success: false, error: e };
@@ -184,9 +184,6 @@ class API {
     forgot = "forgot";
     invite = "invite";
     resetpassword = "resetpassword";
-
-    // the year of the current edition
-    year = null;
 
     // the api.[name] fields
     me = "me";
@@ -321,15 +318,15 @@ class API {
             this._paths.emailtemplates = res.data[this.emailtemplates];
             this._paths.sendemails = res.data[this.sendemails];
             this._paths.myself = res.data[this.myself];
-            if (this.year) {
-                this._paths.current_edition = this._paths.editions + "/" + this.year;
+            if (this._getYear()) {
+                this._paths.current_edition = this._paths.editions + "/" + this._getYear();
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
                 this._paths.current_edition = (res.data.length) ? res.data[0] : null;
             }
             if (this._paths.current_edition) {
                 let editionData = await axios.get(this._paths.current_edition, config);
-                this.year = editionData.data["year"];
+                this._setYear(editionData.data["year"]);
                 this._paths.editions_students = editionData.data[this.students];
                 this._paths.editions_projects = editionData.data[this.projects];
                 this._paths.editions_questiontags = editionData.data["questiontags"];
@@ -347,8 +344,16 @@ class API {
      */
     setCurrentEdition(year = null) {
         log("API: changing edition to: " + year)
-        this.year = year;
+        this._setYear(year);
         this.invalidate();
+    }
+
+    _getYear() {
+        return localStorage.getItem("api_year");
+    }
+
+    _setYear(year) {
+        localStorage.setItem("api_year", year);
     }
 }
 
@@ -365,7 +370,8 @@ class Cache {
 
         student = Url.fromUrl(url).get().then(res => {
             if (res.success) {
-                console.log(res)
+                log("GET student was successful:")
+                log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
                     if (item["suggested_by_id"] === userid) {
@@ -412,11 +418,21 @@ class Cache {
                 new_student["email_sent"] = data["email_sent"];
                 cache[data["id"]] = new_student;
             }
+        } else if ("deleted_student" in data) {
+            if (data["deleted_student"] in cache) {
+                delete cache[data["deleted_student"]];
+            }
         }
     }
 
     async clear() {
         Object.keys(cache).map(key => delete cache[key]);
+    }
+
+    async remove_student(url) {
+        if (url in cache) {
+            delete cache[url];
+        }
     }
 
 }

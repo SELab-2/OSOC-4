@@ -1,3 +1,6 @@
+""" This module includes the functions used to send emails to the students
+"""
+
 import os
 import smtplib
 import ssl
@@ -12,6 +15,7 @@ from app.models.question_tag import QuestionTag
 from app.models.student import DecisionOption, Student
 from app.models.user import User
 from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 load_dotenv()
@@ -77,7 +81,16 @@ def send_invite(email: str, invitekey: str):
         server.sendmail(SENDER_EMAIL, receiver_email, text)
 
 
-async def send_decision_template_email(student, userid, session):
+async def send_decision_template_email(student: Student, userid: str, session: AsyncSession):
+    """send_decision_template_email send an email to the student with the decision template
+
+    :param student: student object
+    :type student: Student
+    :param userid: the userid of the user that sends the email
+    :type userid: str
+    :param session: session used to perform database operations
+    :type session: AsyncSession
+    """
 
     # get the decision template
     if student.decision == DecisionOption.YES:
@@ -99,8 +112,20 @@ async def send_decision_template_email(student, userid, session):
     await send_email(template_subject, template_body, student, userid, session=session)
 
 
-async def send_email(subject, email_body, student, userid, session):
+async def send_email(subject: str, email_body: str, student: Student, userid: str, session: AsyncSession):
+    """send_email send an ematil to student with subject and body
 
+    :param subject: the subject for the email
+    :type subject: str
+    :param email_body: the email body
+    :type email_body: str
+    :param student: the Student receiver
+    :type student: Student
+    :param userid: the userid of the user that sends the email
+    :type userid: str
+    :param session: the session used to perform database operations
+    :type session: AsyncSession
+    """
     r = await session.execute(select(QuestionTag.tag, Answer.answer).where(QuestionTag.tag.in_(["first name", "last name", "email"])).select_from(Student).where(Student.id == int(student.id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
     student_info = r.all()
 
