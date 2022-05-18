@@ -1,3 +1,6 @@
+""" This module includes the input models for Email and Password
+"""
+
 from app.exceptions.validator_exeptions import (InvalidEmailException,
                                                 InvalidPasswordException)
 from app.utils.validators import valid_email, valid_password

@@ -1,3 +1,6 @@
+""" This module includes all the Question model
+"""
+
 from typing import List, Optional
 
 from app.models.question_answer import QuestionAnswer

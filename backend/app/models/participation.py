@@ -1,3 +1,6 @@
+""" This module includes all the models for the student participations with a project
+"""
+
 from typing import Optional
 
 from app.config import config

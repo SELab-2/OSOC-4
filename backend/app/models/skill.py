@@ -1,3 +1,6 @@
+""" This module includes all the models for the skills
+"""
+
 from typing import List, Optional
 
 from app.models.participation import Participation

@@ -1,3 +1,6 @@
+""" This module includes all the models for the question tags
+"""
+
 from typing import Optional
 
 from pydantic import BaseModel, validator
