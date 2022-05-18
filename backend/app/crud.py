@@ -130,7 +130,6 @@ async def clear_data(session: AsyncSession = get_session()):
     :type session: AsyncSession, optional
     """
 
-
     # Get all tables
     conn = await session.connection()
     tables = await conn.run_sync(
