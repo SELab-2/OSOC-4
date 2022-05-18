@@ -36,6 +36,8 @@ class User(SQLModel, table=True):
     suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
     class Config:
+        """configuration for sqlmodels
+        """
         validate_assignment = True
 
     @validator('email')
@@ -77,6 +79,9 @@ class UserOutSimple(BaseModel):
     id: str
 
     def __init__(self, **data):
+        """the constructor
+            the kwargs in "data" are used to initialize the attributes of this class
+        """
         data["id"] = config.api_url + "users/" + str(data["id"])
         super().__init__(**data)
 
