@@ -17,7 +17,6 @@ export default function ParticipationCard(props) {
 
     const [student, setStudent] = useState({})
     const [project, setProject] = useState({})
-    const [deletedCard, setDeletedCard] = useState(false);
 
     /**
      * Loads once after the component mounts, it sets the student state.
@@ -40,47 +39,42 @@ export default function ParticipationCard(props) {
             })
             setStudent(props.student);
         }
-    }, [])
+    }, [props.participation])
 
     /**
      * deletes props.participation
      */
-    function deleteStudentFromProject() {
+    function deleteStudentFromProject(ev) {
+        ev.stopPropagation();
         // delete participation
         Url.fromName(api.participations)
-            .setParams({ project_id: project.id_int, student_id: student.id_int })
-            .delete().then(res => {
-                //TODO remove when using websockets
-                if (res.success) {
-                    setDeletedCard(true)
-                }
-            })
-    }
+          .setParams({project_id: project.id_int, student_id: student.id_int})
+          .delete().then();
+     }
 
     return (
         <div>
-            {!deletedCard ?
-                <Card className={"participation-card"} key={props.participation}>
-                    <div className={"participation-div"}>
-                        <Row>
-                            <Col className={"participation-info"}>
-                                <div className={"participation-name"}>
-                                    { (props.project)?
-                                      ((Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null)
-                                      : project.name
-                                    }
-                                </div>
-                                <SkillCard number={0} skill_name={props.participation.skill} />
-                            </Col>
-                            <Col xs={"auto"} className={"participation-remove-student"}>
-                                <div className={"participation-delete"}>
-                                    <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25} />
-                                </div>
-                            </Col>
-                        </Row>
-                    </div>
+            <Card className={"participation-card"} key={props.participation}>
+                <div className={"participation-div"}>
+                    <Row>
+                        <Col className={"participation-info"}>
+                            <div className={"participation-name"}>
+                                { (props.project)?
+                                  ((Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null)
+                                  : project.name
+                                }
+                            </div>
+                            <SkillCard number={0} skill_name={props.participation.skill} />
+                        </Col>
+                        <Col xs={"auto"} className={"participation-remove-student"}>
+                            <div className={"participation-delete"}>
+                                <Image alt={"delete student from project button"} onClick={ev => deleteStudentFromProject(ev)} src={red_cross} width={25} height={25} />
+                            </div>
+                        </Col>
+                    </Row>
+                </div>
 
-                </Card> : null}
+            </Card>
         </div>
     )
 }

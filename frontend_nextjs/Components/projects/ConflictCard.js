@@ -8,21 +8,8 @@ import ConflictsPopUpWindow from "./ConflictsPopUpWindow";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function ConflictCard() {
-    const [conflicts, setConflicts] = useState([])
-
+export default function ConflictCard(props) {
     const [conflictsShow, setConflictsShow] = useState(false);
-
-    /**
-     * Loads once after the component mounts, it sets the conflicts state.
-     */
-    useEffect(() => {
-        Url.fromName(api.current_edition).extend("/resolving_conflicts").get().then(res => {
-            if(res.success){
-                setConflicts(res.data)
-            }
-        })
-    }, [])
   
     /**
      * returns the current amount of conflicts
@@ -30,8 +17,9 @@ export default function ConflictCard() {
     return(
         <div>
             <ConflictsPopUpWindow popUpShow={conflictsShow} setPopUpShow={setConflictsShow}
-                                   conflicts={conflicts} />
-            <Button variant={"conflicts"} onClick={() => setConflictsShow(true)}>conflicts {conflicts.length}</Button>
+                                   conflicts={props.conflicts} />
+            <Button variant={"conflicts"} onClick={() => setConflictsShow(true)}
+                    disabled={props.conflicts.length === 0}>conflicts {props.conflicts.length}</Button>
         </div>
     )
 }

@@ -16,17 +16,21 @@ export default function ConflictsPopUpWindow(props) {
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
   const [currentStudentIndex, setCurrentStudentIndex] = useState(0);
-  const [currentStudent, setCurrentStudent] = useState({});
+  const [currentStudent, setCurrentStudent] = useState(undefined);
 
   /**
    * This function is called when currentStudent changes
    */
   useEffect(() => {
+    if (currentStudentIndex >= props.conflicts.length || currentStudentIndex < 0) {
+      setCurrentStudentIndex(props.conflicts.length - 1);
+    }
     if (props.conflicts[currentStudentIndex]) {
       Url.fromUrl(props.conflicts[currentStudentIndex]).get(null, true).then(student => {
         setCurrentStudent(student.data);
-        console.log(student.data);
       });
+    } else {
+      setCurrentStudent(undefined);
     }
   }, [currentStudentIndex, props.conflicts])
 
@@ -34,6 +38,7 @@ export default function ConflictsPopUpWindow(props) {
    * This function is called when the pop up window is closed.
    */
   function onHide() {
+    setCurrentStudentIndex(0);
     setPopUpShow(false);
   }
 
@@ -74,20 +79,26 @@ export default function ConflictsPopUpWindow(props) {
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
-        <Row>
-          <Col md="auto">
-            <h4>{
-              currentStudent["mandatory"] ? currentStudent["mandatory"]["first name"] : ""
-            } {
-              currentStudent["mandatory"] ? currentStudent["mandatory"]["last name"] : ""
-            }</h4>
-          </Col>
-          <Col />
-          <Col md="auto">
-            {currentStudentIndex + 1} / {props.conflicts.length}
-          </Col>
-        </Row>
-        {getParticipations()}
+        {(currentStudent)?
+          [<Row>
+            <Col md="auto">
+              <h4>{
+                currentStudent["mandatory"] ? currentStudent["mandatory"]["first name"] : ""
+              } {
+                currentStudent["mandatory"] ? currentStudent["mandatory"]["last name"] : ""
+              }</h4>
+            </Col>
+            <Col />
+            <Col md="auto">
+              {currentStudentIndex + 1} / {props.conflicts.length}
+            </Col>
+          </Row>,
+            currentStudent.participations.map(
+              participation =>
+                <ParticipationCard key={participation.project} participation={participation} student={currentStudent}/>)
+          ]
+          : "No conflicts"
+        }
         <Row style={{marginTop: "10px"}} >
           <Col/>
           <Col md="auto"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Col>

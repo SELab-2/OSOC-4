@@ -20,7 +20,9 @@ export default function ProjectsList(props) {
     const [search, handleSearch] = useState("")
     const [peopleNeeded, setPeopleNeeded] = useState(false)
     const [visibleProjects, setVisibleProjects] = useState([])
-    const [me, setMe] = useState(undefined)
+    const [me, setMe] = useState(undefined);
+    const [conflicts, setConflicts] = useState([]);
+
     const router = useRouter()
     const { websocketConn } = useWebsocketContext();
 
@@ -64,6 +66,17 @@ export default function ProjectsList(props) {
         });
     }, [])
 
+    /**
+     * It sets the conflicts state.
+     */
+    useEffect(() => {
+        Url.fromName(api.current_edition).extend("/resolving_conflicts").get().then(res => {
+            if(res.success){
+                setConflicts(res.data)
+            }
+        })
+    }, [allProjects]);
+
     useEffect(() => {
 
         if (websocketConn) {
@@ -88,7 +101,6 @@ export default function ProjectsList(props) {
                     let new_projects = [...visibleProjects]
                     new_projects[i]["participations"][studentid] = data["participation"]
                     setVisibleProjects([...new_projects])
-                    return true; // stop searching
                 }
             })
             allProjects.find((p, i) => {
@@ -108,7 +120,6 @@ export default function ProjectsList(props) {
                     let new_projects = [...visibleProjects]
                     delete new_projects[i]["participations"][studentid]
                     setVisibleProjects([...new_projects])
-                    return true; // stop searching
                 }
             })
             allProjects.find((p, i) => {
@@ -197,7 +208,7 @@ export default function ProjectsList(props) {
                     <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded} />
                 </Col >
                 <Col xs="auto" >
-                    <ConflictCard />
+                    <ConflictCard conflicts={conflicts}/>
                 </Col>
                 {me !== undefined && me.role === 2 ?
                     <Col xs="auto" >
