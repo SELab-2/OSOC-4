@@ -1,3 +1,6 @@
+""" This module includes the BaseException
+"""
+
 import json
 
 from fastapi.responses import JSONResponse

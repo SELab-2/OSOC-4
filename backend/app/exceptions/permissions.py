@@ -1,3 +1,6 @@
+""" This module includes the NotPermittedException
+"""
+
 from app.exceptions.base_exception import BaseException
 from fastapi import status
 

@@ -1,3 +1,6 @@
+""" This module includes all the suggestion exceptions
+"""
+
 from app.exceptions.base_exception import BaseException
 
 

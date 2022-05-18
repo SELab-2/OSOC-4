@@ -1,3 +1,6 @@
+""" This module includes all the validation exceptions
+"""
+
 from app.exceptions.base_exception import BaseException
 
 
