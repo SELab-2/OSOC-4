@@ -19,12 +19,14 @@ router = APIRouter(prefix="/projects")
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Project data added into the database")
-async def add_project_data(project: ProjectCreate, session: AsyncSession = Depends(get_session)):
+async def add_project_data(project: ProjectCreate, session: AsyncSession = Depends(get_session)) -> dict:
     """add_project_data add a new project
 
-    :param project: defaults to Body(...)
-    :type project: ProjectCreate, optional
-    :return: data of new created project
+    :param project: the input data for the new project
+    :type project: ProjectCreate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: the new project
     :rtype: dict
     """
 
@@ -34,10 +36,10 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
 
     new_project = await update(Project.parse_obj(project_data), session=session)
 
-    skills = [ProjectRequiredSkill(project=new_project,
-                                   skill_name=required_skill["skill_name"],
-                                   number=required_skill["number"])
-              for required_skill in required_skills]
+    skills : [ProjectRequiredSkill ]= [ProjectRequiredSkill(project=new_project,
+                                                            skill_name=required_skill["skill_name"],
+                                                            number=required_skill["number"])
+                                        for required_skill in required_skills]
     users = [ProjectCoach(project_id=new_project.id, coach_id=user_id) for user_id in user_ids]
 
     await update_all(skills, session=session)
@@ -49,8 +51,15 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
 async def get_project_with_id(id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
     """get_project_with_id get Project instance with id from the database
 
-    :return: project with id
-    :rtype: ProjectOutExtended
+    :param id: the id of the project
+    :type id: int
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises ProjectNotFoundException: raised when the project isn't found
+    :return: the project
+    :rtype: dict
     """
 
     project = await read_where(Project, Project.id == int(id), session=session)
