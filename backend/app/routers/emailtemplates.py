@@ -1,3 +1,5 @@
+""" This module includes all the email template endpoints """
+
 from app.crud import read_where, update
 from app.database import get_session
 from app.exceptions.emailtemplate_exceptions import \

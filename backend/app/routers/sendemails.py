@@ -1,3 +1,5 @@
+""" This module includes the send emails endpoints """
+
 from app.crud import read_where
 from app.database import get_session, websocketManager
 from app.models.sendemails import SendCustomEmail, SendEmails

@@ -1,3 +1,5 @@
+""" This module includes the user endpoints """
+
 from typing import List
 
 from app.crud import read_all_where, read_where, update

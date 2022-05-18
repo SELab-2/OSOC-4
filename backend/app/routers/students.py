@@ -1,4 +1,7 @@
+""" This module includes the student endpoints """
+
 from typing import List
+
 from app.config import config
 from app.crud import read_all_where, read_where, update
 from app.database import get_session, websocketManager

@@ -1,3 +1,5 @@
+""" This module includes the create, read, update and delete functions for the models """
+
 from typing import List, Optional, Type, TypeVar
 
 from sqlalchemy import inspect
@@ -122,6 +124,13 @@ async def delete(model: T, session: AsyncSession) -> None:
 
 
 async def clear_data(session: AsyncSession = get_session()):
+    """clear_data clear the data from the database
+
+    :param session: session used to perform database operations, defaults to get_session()
+    :type session: AsyncSession, optional
+    """
+
+
     # Get all tables
     conn = await session.connection()
     tables = await conn.run_sync(

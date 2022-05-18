@@ -1,13 +1,14 @@
-from typing import List
+""" This module includes the skill endpoints """
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List
 
 from app.crud import read_all_where
 from app.database import get_session
 from app.models.skill import Skill
 from app.models.user import UserRole
 from app.utils.checkers import RoleChecker
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/skills")
 
