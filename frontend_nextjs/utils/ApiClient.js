@@ -185,9 +185,6 @@ class API {
     invite = "invite";
     resetpassword = "resetpassword";
 
-    // the year of the current edition
-    year = null;
-
     // the api.[name] fields
     me = "me";
     students = "students"
@@ -321,15 +318,15 @@ class API {
             this._paths.emailtemplates = res.data[this.emailtemplates];
             this._paths.sendemails = res.data[this.sendemails];
             this._paths.myself = res.data[this.myself];
-            if (this.year) {
-                this._paths.current_edition = this._paths.editions + "/" + this.year;
+            if (this._getYear()) {
+                this._paths.current_edition = this._paths.editions + "/" + this._getYear();
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
                 this._paths.current_edition = (res.data.length) ? res.data[0] : null;
             }
             if (this._paths.current_edition) {
                 let editionData = await axios.get(this._paths.current_edition, config);
-                this.year = editionData.data["year"];
+                this._setYear(editionData.data["year"]);
                 this._paths.editions_students = editionData.data[this.students];
                 this._paths.editions_projects = editionData.data[this.projects];
                 this._paths.editions_questiontags = editionData.data["questiontags"];
@@ -347,8 +344,16 @@ class API {
      */
     setCurrentEdition(year = null) {
         log("API: changing edition to: " + year)
-        this.year = year;
+        this._setYear(year);
         this.invalidate();
+    }
+
+    _getYear() {
+        return localStorage.getItem("api_year");
+    }
+
+    _setYear(year) {
+        localStorage.setItem("api_year", year);
     }
 }
 
