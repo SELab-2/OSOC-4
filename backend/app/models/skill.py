@@ -7,15 +7,17 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class StudentSkill(SQLModel, table=True):
-    student_id: Optional[int] = Field(
-        default=None, foreign_key="student.id", primary_key=True
-    )
-    skill_name: Optional[str] = Field(
-        default=None, foreign_key="skill.name", primary_key=True
-    )
+    """represents a StudentSkill from the database
+        a student-skill is a relationship between a student and a skill,
+        it defines what skill which student has
+    """
+    student_id: Optional[int] = Field(default=None, foreign_key="student.id", primary_key=True)
+    skill_name: Optional[str] = Field(default=None, foreign_key="skill.name", primary_key=True)
 
 
 class Skill(SQLModel, table=True):
+    """represents a skill from the database
+    """
     name: str = Field(primary_key=True)
 
     projects: List[ProjectRequiredSkill] = Relationship(back_populates="skill")
