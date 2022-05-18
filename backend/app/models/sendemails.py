@@ -1,3 +1,6 @@
+""" This module includes all the models for send emails
+"""
+
 from typing import List
 
 from pydantic import BaseModel

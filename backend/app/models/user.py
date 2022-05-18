@@ -1,16 +1,19 @@
+""" This module includes all the models for the users
+"""
+
 from enum import Enum
-from typing import Optional, List
+from typing import List, Optional
 
 from app.config import config
 from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
                                                 InvalidPasswordException)
+from app.models.edition import Edition, EditionCoach
+from app.models.project import Project, ProjectCoach
+from app.models.suggestion import Suggestion
 from app.utils.validators import valid_email, valid_password
 from pydantic import BaseModel, validator
-from sqlmodel import Field, SQLModel, Relationship
-from app.models.edition import EditionCoach, Edition
-from app.models.project import ProjectCoach, Project
-from app.models.suggestion import Suggestion
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class UserRole(int, Enum):
