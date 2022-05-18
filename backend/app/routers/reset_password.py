@@ -1,6 +1,4 @@
-from fastapi import APIRouter, Depends, Body
-
-from sqlalchemy.ext.asyncio import AsyncSession
+""" This module includes the reset password endpoints """
 
 from app.crud import read_where, update
 from app.database import db, get_session
@@ -8,9 +6,11 @@ from app.exceptions.key_exceptions import InvalidResetKeyException
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import PasswordsDoNotMatchException
 from app.models.user import User, UserResetPassword
-from app.utils.cryptography import get_password_hash
 from app.utils.checkers import check_key
+from app.utils.cryptography import get_password_hash
 from app.utils.response import response
+from fastapi import APIRouter, Body, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/resetpassword")
 

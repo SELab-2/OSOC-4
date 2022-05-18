@@ -1,3 +1,6 @@
+""" This module includes all the models for projects
+"""
+
 from typing import Dict, List, Optional
 
 from app.config import config

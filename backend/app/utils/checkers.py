@@ -1,3 +1,6 @@
+""" This module includes all the Checkers used by the routers
+"""
+
 from typing import List
 
 from app.crud import read_where

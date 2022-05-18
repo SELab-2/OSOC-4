@@ -1,3 +1,6 @@
+""" This module includes the QuestionAnswer model
+"""
+
 from typing import Optional
 
 from sqlmodel import Field, Relationship, SQLModel

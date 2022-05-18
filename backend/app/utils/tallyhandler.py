@@ -1,3 +1,6 @@
+""" This module includes the functions to process the tally forms
+"""
+
 from app.crud import read_where, update
 from app.models.answer import Answer
 from app.models.question import Question

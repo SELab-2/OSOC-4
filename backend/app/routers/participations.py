@@ -1,3 +1,5 @@
+""" This module includes all the participation endpoints """
+
 from app.config import config
 from app.crud import read_where, update
 from app.database import get_session, websocketManager

@@ -1,3 +1,6 @@
+""" This module includes all the invalid key exceptions
+"""
+
 from app.exceptions.base_exception import BaseException
 
 

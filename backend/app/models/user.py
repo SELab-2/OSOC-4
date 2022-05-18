@@ -1,16 +1,19 @@
+""" This module includes all the models for the users
+"""
+
 from enum import Enum
-from typing import Optional, List
+from typing import List, Optional
 
 from app.config import config
 from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
                                                 InvalidPasswordException)
+from app.models.edition import Edition, EditionCoach
+from app.models.project import Project, ProjectCoach
+from app.models.suggestion import Suggestion
 from app.utils.validators import valid_email, valid_password
 from pydantic import BaseModel, validator
-from sqlmodel import Field, SQLModel, Relationship
-from app.models.edition import EditionCoach, Edition
-from app.models.project import ProjectCoach, Project
-from app.models.suggestion import Suggestion
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class UserRole(int, Enum):
@@ -36,6 +39,8 @@ class User(SQLModel, table=True):
     suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
     class Config:
+        """configuration for sqlmodels
+        """
         validate_assignment = True
 
     @validator('email')
@@ -77,6 +82,9 @@ class UserOutSimple(BaseModel):
     id: str
 
     def __init__(self, **data):
+        """the constructor
+            the kwargs in "data" are used to initialize the attributes of this class
+        """
         data["id"] = config.api_url + "users/" + str(data["id"])
         super().__init__(**data)
 

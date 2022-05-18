@@ -1,3 +1,6 @@
+""" This module includes all the models for the email templates
+"""
+
 from enum import Enum
 
 from pydantic import BaseModel

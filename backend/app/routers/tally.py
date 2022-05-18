@@ -1,3 +1,5 @@
+""" This module includes the tally endpoints """
+
 from app.database import get_session
 from app.utils.response import response
 from app.utils.tallyhandler import process_tally

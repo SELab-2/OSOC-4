@@ -1,3 +1,6 @@
+""" This module includes all the models for the students
+"""
+
 from enum import Enum
 from typing import List, Optional
 

@@ -1,3 +1,6 @@
+""" This module includes the Token model
+"""
+
 from app.config import config
 from pydantic import BaseModel
 

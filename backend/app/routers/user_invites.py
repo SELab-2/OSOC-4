@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+""" This module includes the user invite endpoints """
 
 from app.crud import read_where, update
 from app.database import db, get_session
@@ -8,9 +7,11 @@ from app.exceptions.permissions import NotPermittedException
 from app.exceptions.user_exceptions import (PasswordsDoNotMatchException,
                                             UserAlreadyActiveException)
 from app.models.user import User, UserInvite
-from app.utils.cryptography import get_password_hash
 from app.utils.checkers import check_key
+from app.utils.cryptography import get_password_hash
 from app.utils.response import response
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/invite")
 

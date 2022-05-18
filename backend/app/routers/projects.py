@@ -1,3 +1,5 @@
+""" This module includes all the project endpoints """
+
 from app.config import config
 from app.crud import read_all_where, read_where, update, update_all
 from app.database import get_session, websocketManager

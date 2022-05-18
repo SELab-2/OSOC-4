@@ -1,3 +1,5 @@
+""" This router is used to generate dummy data and insert it in the database """
+
 from random import choice, randrange, sample
 from typing import List
 

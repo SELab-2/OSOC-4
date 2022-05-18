@@ -1,3 +1,5 @@
+""" This module includes all the edition endpoints """
+
 import datetime
 from typing import Dict
 

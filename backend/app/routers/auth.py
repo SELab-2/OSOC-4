@@ -1,3 +1,5 @@
+""" This module includes the authentication endpoints """
+
 import os
 from datetime import timedelta
 from typing import Dict

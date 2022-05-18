@@ -1,3 +1,6 @@
+""" This module includes all the questiontag exceptions
+"""
+
 from app.exceptions.base_exception import BaseException
 
 

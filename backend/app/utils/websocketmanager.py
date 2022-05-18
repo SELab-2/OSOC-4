@@ -1,3 +1,6 @@
+""" This module includes the WebsocketManager class
+"""
+
 from typing import List
 
 from fastapi import WebSocket

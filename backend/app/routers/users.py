@@ -1,3 +1,5 @@
+""" This module includes the user endpoints """
+
 from typing import List
 
 from app.crud import read_all_where, read_where, update
@@ -21,7 +23,6 @@ from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
-
 
 router = APIRouter(prefix="/users")
 

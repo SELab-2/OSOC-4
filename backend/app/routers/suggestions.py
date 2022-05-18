@@ -1,3 +1,5 @@
+""" This module includes the suggestion endpoints """
+
 from app.crud import read_where, update
 from app.database import get_session, websocketManager
 from app.exceptions.suggestion_exception import SuggestionNotFound

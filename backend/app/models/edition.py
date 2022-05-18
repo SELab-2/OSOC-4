@@ -1,3 +1,6 @@
+""" This module includes all the models for the Edition
+"""
+
 from typing import List, Optional
 
 from app.config import config
