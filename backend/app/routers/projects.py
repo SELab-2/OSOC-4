@@ -39,7 +39,7 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
     skills: [ProjectRequiredSkill] = [ProjectRequiredSkill(project=new_project,
                                                            skill_name=required_skill["skill_name"],
                                                            number=required_skill["number"])
-                                        for required_skill in required_skills]
+                                      for required_skill in required_skills]
     users = [ProjectCoach(project_id=new_project.id, coach_id=user_id) for user_id in user_ids]
 
     await update_all(skills, session=session)
