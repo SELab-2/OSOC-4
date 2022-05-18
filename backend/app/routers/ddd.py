@@ -1,4 +1,5 @@
 from random import choice, randrange, sample
+from typing import List
 
 from app.crud import clear_data
 from app.database import get_session
@@ -18,7 +19,12 @@ router = APIRouter(prefix="/ddd")
 
 
 def generate_suggestions(student, student_skills, project, coaches, unconfirmed=3, confirmed_suggestion=None,
-                         admin=None):
+                         admin=None) -> List[Suggestion]:
+    """ generate suggestions for student
+
+    :return: the generated suggestions
+    :rtype: List[Suggestion]
+    """
     suggestions = [Suggestion(
         mail_sent=False,
         decision=choice(list(SuggestionOption)),
@@ -43,6 +49,14 @@ def generate_suggestions(student, student_skills, project, coaches, unconfirmed=
 
 @router.get("/", response_description="Data cleared and reinserted")
 async def add_dummy_data(session: AsyncSession = Depends(get_session)):
+    """add_dummy_data insert dummy data in the database
+
+    :param session: session used to perform database operations, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: response message
+    :rtype: response
+    """
+
     await clear_data(session)
 
     #########
@@ -155,4 +169,9 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
 @router.delete("/", response_description="Data cleared")
 async def clear_database(session: AsyncSession = Depends(get_session)):
+    """clear_database clear the database
+
+    :param session: session used to perform database operations, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    """
     await clear_data(session)

@@ -3,10 +3,20 @@ from app.models.answer import Answer
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.student import Student
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-async def get_save_answer(answer, session):
-    # check if answer exists else save it
+async def get_save_answer(answer: str, session: AsyncSession) -> Answer:
+    """get_save_answer check if answer exists else save it
+
+    :param answer: the answer string
+    :type answer: str
+    :param session: session used to perform database actions
+    :type session: AsyncSession
+    :return: the found or saved answer
+    :rtype: Answer
+    """
+
     a = await read_where(Answer, Answer.answer == answer, session=session)
     if not a:
         a = Answer(answer=answer)
@@ -14,7 +24,7 @@ async def get_save_answer(answer, session):
     return a
 
 
-async def process_tally(data, edition, session):
+async def process_tally(data, edition, session: AsyncSession):
     """Processes a Tally - submitted Tally and returns a dict with fields that can be used to validate the data .
 
     Args:
