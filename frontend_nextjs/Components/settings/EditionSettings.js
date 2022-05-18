@@ -164,7 +164,7 @@ export default function EditionSettings() {
             <Accordion>
                 <AccordionItem eventKey="0">
                     <AccordionHeader>
-                        <h3>Change edition</h3>
+                        <h3>Choose a different edition</h3>
                     </AccordionHeader>
                     <AccordionBody>
                         <div>
