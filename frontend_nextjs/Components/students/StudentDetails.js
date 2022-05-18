@@ -201,7 +201,11 @@ export default function StudentDetails(props) {
             [
                 <Row key={"question" + i}
                     className="student-details-question nomargin">{questionAnswer["question"]}</Row>,
-                <Row key={"answer" + i} className="student-details-answer nomargin">{questionAnswer["answer"]}</Row>
+                (!isURL(questionAnswer["answer"]) ?
+                    <Row key={"answer" + i} className="student-details-answer nomargin">{questionAnswer["answer"]}</Row> :
+                    <Row key={"answer" + i} className="student-details-answer nomargin"><a className="hyperlink" href={questionAnswer["answer"]} target="_blank">{questionAnswer["answer"]}</a></Row >
+                )
+
             ]
         )
     }
@@ -211,6 +215,16 @@ export default function StudentDetails(props) {
             ...prevState,
             ["own_suggestion"]: suggestion
         }));
+    }
+
+    function isURL(str) {
+        const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+            '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+            '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+        return !!pattern.test(str);
     }
 
     if (detailLoading) {

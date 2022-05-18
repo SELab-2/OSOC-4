@@ -43,7 +43,14 @@ async def process_tally(data, edition, session: AsyncSession):
             field["label"] = "Which role are you applying for?"
 
         # Check if the question already exists else save it
-        q = await read_where(Question, Question.question == field["label"], Question.field_id == field["key"], Question.edition == edition, session=session)
+        # get the question by id
+        q = await read_where(Question, Question.field_id == field["key"], Question.edition == edition, session=session)
+
+        # check if the saved question is the same as the one in the form
+        if q.question != field["label"]:
+            q.question = field["label"]
+            await update(q, session=session)
+
         if not q:
             q = Question(question=field["label"], edition=edition)
             await update(q, session=session)

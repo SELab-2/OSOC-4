@@ -156,7 +156,7 @@
     align-content: center;
 }
 
-.name > .image-button {
+.name>.image-button {
     padding-right: 10pt;
 }
 
@@ -164,7 +164,7 @@
     cursor: default;
 }
 
-.name > h1 {
+.name>h1 {
     padding-right: 10pt;
 }
 
@@ -211,4 +211,24 @@
 .suggestion {
     margin-top: 2px;
     margin-bottom: 2px;
+}
+
+/* unvisited link */
+.hyperlink:link {
+    color: blue;
+}
+
+/* visited link */
+.hyperlink:visited {
+    color: purple;
+}
+
+/* mouse over link */
+.hyperlink:hover {
+    color: rgb(49, 72, 199);
+}
+
+/* selected link */
+.hyperlink:active {
+    color: rgb(18, 18, 99);
 }
