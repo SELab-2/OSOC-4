@@ -65,6 +65,13 @@ async def get_editions(session: AsyncSession = Depends(get_session), role: RoleC
         return [results[0].uri] if results else []
 
 
+@router.get("/current_edition", response_description="Edition retrieved")
+async def get_current_edition(session: AsyncSession = Depends(get_session)):
+    result = (await session.execute(select(Edition.year))).all()
+    year = max((row[0] for row in result))
+    return await read_where(Edition, Edition.year == year, session=session)
+
+
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
 async def create_edition(edition: Edition = Body(...), session: AsyncSession = Depends(get_session)):
     """create_edition creates a new edition in the database

@@ -14,6 +14,14 @@ class TestUsers(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    async def asyncSetUp(self):
+        await super().asyncSetUp()
+        eg = EditionGenerator(self.session)
+
+        eg.generate_edition()
+        eg.add_to_db()
+        await self.session.commit()
+
     async def assert_name_edits(self, allowed_users):
         """
         This function can be used to check whether all allowed users were able to successfully edit a name
