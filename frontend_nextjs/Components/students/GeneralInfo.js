@@ -44,7 +44,16 @@ export default function GeneralInfo(props) {
           <Row className="question-answer-row">
             <Col md="auto">Applied to be a student coach.</Col>
           </Row>
-        )
+        );
+      }
+
+      if (props.student["mandatory"]["email"]) {
+        rows.push(
+          <Row className="question-answer-row">
+            <Col md="auto" className="info-titles">email</Col>
+            <Col md="auto" className="info-answers">{props.student["mandatory"]["email"]}</Col>
+          </Row>
+        );
       }
 
       // props.students["listtags"] contains the (question,answer) pair that the user wants to show in the list of
