@@ -60,14 +60,14 @@ class QuestionAnswerGenerator(DataGenerator):
         self.question_answers = []
         self.edition = edition
 
-        self.question_first_name = Question(question="What is your first name?", field_id="", edition=edition.year)
-        self.question_last_name = Question(question="What is your last name?", field_id="", edition=edition.year)
-        self.question_email = Question(question="Your email address", field_id="", edition=edition.year)
-        self.question_alumni = Question(question="Have you participated in osoc before?", field_id="",
+        self.question_first_name = Question(question="Birth name", field_id="question_wa25qB", edition=edition.year)
+        self.question_last_name = Question(question="Last name", field_id="question_m6ZjEk", edition=edition.year)
+        self.question_email = Question(question="Your email address\n", field_id="question_wMENpM", edition=edition.year)
+        self.question_alumni = Question(question="Have you participated in osoc before?", field_id="question_3Exd74",
                                         edition=edition.year)
-        self.question_student_coach = Question(question="Would you like to be a student coach this year?", field_id="",
+        self.question_student_coach = Question(question="Would you like to be a student coach this year?", field_id="question_nroaMN",
                                                edition=edition.year)
-        self.question_phone_number = Question(question="Phone number", field_id="", edition=edition.year)
+        self.question_phone_number = Question(question="Phone number", field_id="question_319dop", edition=edition.year)
 
         self.questions_yes_no = \
             [Question(question=q, field_id="", edition=edition.year) for q in self.questionstrings_yes_no]
