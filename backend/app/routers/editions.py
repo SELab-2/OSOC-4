@@ -35,7 +35,14 @@ from sqlmodel import select
 router = APIRouter(prefix="/editions")
 
 
-def get_sorting(sortstr: str):
+def get_sorting(sortstr: str) -> Dict[str, bool]:
+    """get_sorting generate the sorting dict from the sort string
+
+    :param sortstr: the sort string
+    :type sortstr: str
+    :return: dict with sorting directions
+    :rtype: Dict[str, bool]
+    """
     sorting = [t.split("+") if "+" in t else [t, "asc"] for t in sortstr.split(",")]
     return {t[0]: False if t[1] == "asc" else True for t in sorting}
 
@@ -288,7 +295,19 @@ async def get_showinlist_question_tags(year: int, session: AsyncSession = Depend
 
 
 @router.get("/{year}/questiontags/{tag}")
-async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
+async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)) -> QuestionTagSimpleOut:
+    """get_question_tag get a questiontag by name
+
+    :param year: the edition year
+    :type year: int
+    :param tag: the tag name
+    :type tag: str
+    :param session: session used to perform database operations, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises QuestionTagNotFoundException: _description_
+    :return: the questiontag information
+    :rtype: QuestionTagSimpleOut
+    """
     try:
         res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.tag == tag).options(selectinload(QuestionTag.question)))
         (qtag,) = res.one()

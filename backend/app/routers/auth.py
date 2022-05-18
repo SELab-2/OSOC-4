@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from typing import Dict
 
 from app.config import config
 from app.crud import count_where, read_where, update
@@ -25,6 +26,10 @@ load_dotenv()
 
 
 class Settings(BaseModel):
+    """Settings settings used for authjwt
+
+    :param BaseModel: inherits from BaseModel
+    """
     authjwt_secret_key: str = 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0'
     authjwt_denylist_enabled: bool = True
     authjwt_denylist_token_checks: set = {"access", "refresh"}
@@ -64,7 +69,14 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
 
 
 @router.get('/')
-def root(role: RoleChecker(UserRole.COACH) = Depends()):
+def root(role: RoleChecker(UserRole.COACH) = Depends()) -> Dict[str, str]:
+    """root give back the urls of the routers
+
+    :param role: the checked role
+    :type role: RoleChecker, optional
+    :return: the urls of the routers
+    :rtype:
+    """
     paths = {"editions": f"{config.api_url}editions",
              "students": f"{config.api_url}students",
              "projects": f"{config.api_url}projects",
