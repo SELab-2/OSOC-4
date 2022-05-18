@@ -6,6 +6,8 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class Question(SQLModel, table=True):
+    """represents a Question in the database
+    """
     id: Optional[int] = Field(default=None, primary_key=True)
     field_id: Optional[str]
     question: str = Field(index=True)

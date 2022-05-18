@@ -1,3 +1,4 @@
+from typing import List
 from app.config import config
 from app.crud import read_all_where, read_where, update
 from app.database import get_session, websocketManager
@@ -26,11 +27,16 @@ router.dependencies.append(Depends(RoleChecker(UserRole.COACH)))
 
 @router.get("/{student_id}", response_description="Student retrieved",
             dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_student(student_id: int, session: AsyncSession = Depends(get_session)):
+async def get_student(student_id: int, session: AsyncSession = Depends(get_session)) -> dict:
     """get_student get the Student instances with id from the database
 
-    :return: student with id
-    :rtype: StudentOutExtended
+    :param student_id: _description_
+    :type student_id: int
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises StudentNotFoundException: _description_
+    :return: Student with info, tags & answers, participations, question-answers, suggestions
+    :rtype: dict
     """
 
     student = await read_where(Student, Student.id == student_id, session=session)
@@ -85,12 +91,17 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
 
 @router.get("/{student_id}/question-answers", response_description="Student retrieved",
             dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_student_questionanswers(student_id, session: AsyncSession = Depends(get_session)):
-    """get the question answers of the Student instance with id
+async def get_student_questionanswers(student_id: int, session: AsyncSession = Depends(get_session)) -> List[dict]:
+    """get_student_questionanswers get the question answers of the Student instance with id
 
-    :return: the question answers for the given student_id
-    :rtype: list[dict[str,Any]]
+    :param student_id: the id of the student
+    :type student_id: int
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: list of question-answers
+    :rtype: List[Dict]
     """
+
     # student questionAnswers
     r = await session.execute(select(Question.question, Answer.answer, QuestionTag.tag)
                               .select_from(QuestionAnswer)
@@ -103,7 +114,19 @@ async def get_student_questionanswers(student_id, session: AsyncSession = Depend
 
 @router.patch("/{student_id}",
               dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_student(student_id: int, student_update: StudentUpdate, session: AsyncSession = Depends(get_session)):
+async def update_student(student_id: int, student_update: StudentUpdate, session: AsyncSession = Depends(get_session)) -> dict:
+    """update_student edits a student
+
+    :param student_id: the id of the student
+    :type student_id: int
+    :param student_update: the data of the updated student
+    :type student_update: StudentUpdate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises StudentNotFoundException: raised when the student wasn't found
+    :return: response message
+    :rtype: dict
+    """
     student = await read_where(Student, Student.id == student_id, session=session)
     if student:
         student_update_data = student_update.dict(exclude_unset=True)
@@ -125,14 +148,16 @@ async def update_student(student_id: int, student_update: StudentUpdate, session
 
 
 @router.delete("/{student_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def delete_student(student_id: str, session: AsyncSession = Depends(get_session)):
+async def delete_student(student_id: str, session: AsyncSession = Depends(get_session)) -> dict:
     """delete_student this deletes a student
 
-    :param student_id: the user id
+    :param student_id: the id of the student
     :type student_id: str
-    :raises NotPermittedException: Unauthorized
-    :return: response
-    :rtype: success or error
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises StudentNotFoundException: raised when the student isn't found
+    :return: response message
+    :rtype: dict
     """
 
     student = await read_where(Student, Student.id == int(student_id), session=session)

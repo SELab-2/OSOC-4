@@ -16,8 +16,18 @@ router = APIRouter(prefix="/invite")
 
 
 @router.get("/{invitekey}")
-async def valid_invitekey(invitekey: str, session: AsyncSession = Depends(get_session)):
-    valid = await check_key(invitekey, "I", session)
+async def valid_invitekey(invitekey: str, session: AsyncSession = Depends(get_session)) -> dict:
+    """valid_invitekey checks whether an invitekey is valid
+
+    :param invitekey: the invitekey
+    :type invitekey: str
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises InvalidInviteException: raised when the invitekey isn't valid
+    :return: response message
+    :rtype: dict
+    """
+    valid: bool = await check_key(invitekey, "I", session)
     if valid:
         return response(None, "Valid invitekey")
     else:
@@ -25,15 +35,21 @@ async def valid_invitekey(invitekey: str, session: AsyncSession = Depends(get_se
 
 
 @router.post("/{invitekey}")
-async def invited_user(invitekey: str, userinvite: UserInvite, session: AsyncSession = Depends(get_session)):
+async def invited_user(invitekey: str, userinvite: UserInvite, session: AsyncSession = Depends(get_session)) -> dict:
     """invited_user this processes the passwords from the userinvite
 
     :param invitekey: key for the invite to identify the user
     :type invitekey: str
-    :param userinvite: input model for request
+    :param userinvite: input model for the request
     :type userinvite: UserInvite
-    :return: response
-    :rtype: success or error
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises InvalidInviteException: raised if the invitekey isn't valid
+    :raises NotPermittedException: unauthorized
+    :raises UserAlreadyActiveException: the user is already active
+    :raises PasswordsDoNotMatchException: the password and validation password are not the same
+    :return: response message
+    :rtype: dict
     """
 
     if invitekey[0] != "I":

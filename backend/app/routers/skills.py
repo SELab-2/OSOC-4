@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,11 +13,14 @@ router = APIRouter(prefix="/skills")
 
 
 @router.get("", response_description="Skills retrieved", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def get_skills(session: AsyncSession = Depends(get_session)):
-    """get_roles get all the Skill instances from the database
+async def get_skills(session: AsyncSession = Depends(get_session)) -> List[str]:
+    """get_skills get all the Skill instances from the database
 
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
     :return: list of skills
-    :rtype: dict
+    :rtype: List[str]
     """
+
     results = await read_all_where(Skill, session=session)
     return [r.name for r in results]

@@ -5,6 +5,9 @@ from app.models.question_answer import QuestionAnswer
 
 
 class Answer(SQLModel, table=True):
+    """represents an answer from the database
+    """
+
     id: Optional[int] = Field(default=None, primary_key=True)
     answer: str
 

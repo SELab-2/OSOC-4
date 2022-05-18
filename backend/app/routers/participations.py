@@ -20,12 +20,17 @@ router = APIRouter(prefix="/participations")
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Participation created")
 async def create_participation(participation: ParticipationCreate,
                                session: AsyncSession = Depends(get_session),
-                               Authorize: AuthJWT = Depends()):
+                               Authorize: AuthJWT = Depends()) -> str:
     """create_participation add a new participation
 
-    :param participation: defaults to Body(...)
-    :type user: ParticipationCreate
-    :return: url of the student of the created participation
+    :param participation: the participation data
+    :type participation: ParticipationCreate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises InvalidParticipationException: raised when the participation is not possible
+    :return: the url to the student of the participation
     :rtype: str
     """
 
@@ -67,13 +72,18 @@ async def create_participation(participation: ParticipationCreate,
 async def delete_participation(student_id: str,
                                project_id: str,
                                session: AsyncSession = Depends(get_session),
-                               Authorize: AuthJWT = Depends()):
+                               Authorize: AuthJWT = Depends()) -> None:
     """delete_participations remove a participation
 
     :param student_id: the student id of the participation
-    :type student_id: int
+    :type student_id: str
     :param project_id: the project id of the participation
-    :type project_id: int
+    :type project_id: str
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises ParticipationNotFoundException: raised when the participation isn't found
     """
 
     # check if participation exists
@@ -98,16 +108,22 @@ async def edit_participation(student_id: int,
                              project_id: int,
                              new_participation: ParticipationCreate,
                              session: AsyncSession = Depends(get_session),
-                             Authorize: AuthJWT = Depends()):
+                             Authorize: AuthJWT = Depends()) -> str:
     """edit_participation edit a participation
 
-    :param student_id: the student id of the participation
+    :param student_id:  the student id of the participation
     :type student_id: int
     :param project_id: the project id of the participation
     :type project_id: int
-    :param participation: defaults to Body(...)
-    :type user: ParticipationCreate
-    :return: url of the student of the changed participation
+    :param new_participation: the participation data
+    :type new_participation: ParticipationCreate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises ParticipationNotFoundException: raised when the participation isn't found
+    :raises InvalidParticipationException: raised when the participation isn't valid
+    :return: the url of the student from the participation
     :rtype: str
     """
 

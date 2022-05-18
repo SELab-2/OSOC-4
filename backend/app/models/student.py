@@ -12,6 +12,8 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class DecisionOption(int, Enum):
+    """represents the different types of decisions you can take for a student
+    """
     UNDECIDED = -1
     NO = 0
     MAYBE = 1
@@ -19,6 +21,9 @@ class DecisionOption(int, Enum):
 
 
 class Student(SQLModel, table=True):
+    """represents a Student from the database
+            any aditional data about the students gets stored in the QuestionAnswers
+    """
     id: Optional[int] = Field(default=None, primary_key=True)
     edition_year: Optional[int] = Field(default=None, foreign_key="edition.year")
     edition: Optional[Edition] = Relationship(back_populates="students")
@@ -34,12 +39,19 @@ class Student(SQLModel, table=True):
 
 
 class StudentOutSimple(BaseModel):
+    """an output model for a Student
+    """
     id: str
 
     def __init__(self, **data):
+        """the constructor
+            the kwargs in "data" are used to initialize the attributes of this class
+        """
         data["id"] = config.api_url + "students/" + str(data["id"])
         super().__init__(**data)
 
 
 class StudentUpdate(BaseModel):
+    """the expected input model (in a HTML PATCH request) for editing a Student
+    """
     decision: DecisionOption
