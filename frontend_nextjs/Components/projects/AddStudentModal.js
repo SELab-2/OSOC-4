@@ -25,7 +25,9 @@ export default function AddStudentModal(props) {
     const [skills, setSkills] = useState([])
     const [projectNeededSkills, setProjectNeededSkills] = useState([]);
     const [skillsLeft, setSkillsLeft] = useState([]);
+    const [reason, setReason] = useState("");
     const [options, setOptions] = useState([{ "value": "None", "label": "None" }])
+
 
     /**
      * This function gets called when props.selectedStudent or props.selectedProject changes. It finds the intersection
@@ -86,10 +88,16 @@ export default function AddStudentModal(props) {
                 .setBody({
                     "student_id": props.selectedStudent.id.split("/").pop(),
                     "project_id": props.selectedProject.id.split("/").pop(),
-                    "skill_name": selectedSkill.value === "None" ? "" : selectedSkill.value
+                    "skill_name": selectedSkill.value === "None" ? "" : selectedSkill.value,
+                    "reason": reason
                 })
                 .post()
         }
+    }
+
+    const handleChange = (event) => {
+        event.preventDefault();
+        setReason(event.target.value);
     }
 
     /**
@@ -104,8 +112,11 @@ export default function AddStudentModal(props) {
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                 <h4>Why are you making this decision?</h4>
+                 <p>A reason is not required, but will open up discussion and help us and your fellow coaches to understand.</p>
+                    <input id="suggestin-reason" name="reason" type="text" className="fill_width suggestion-reason" onChange={handleChange} value={reason} placeholder="Your reason"/>
                     <div>
-                        For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?
+                        <h4>For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?</h4>
                     </div>
                     <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
                         options={options}

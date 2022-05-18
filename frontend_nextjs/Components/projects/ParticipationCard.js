@@ -5,6 +5,7 @@ import Image from 'next/image';
 import red_cross from "/public/assets/wrong.svg";
 import { api, Url } from "../../utils/ApiClient";
 import { getID } from "../../utils/string";
+import Hint from "../Hint";
 
 
 /**
@@ -17,6 +18,7 @@ export default function ParticipationCard(props) {
 
     const [student, setStudent] = useState({})
     const [project, setProject] = useState({})
+    const [reason, setReason] = useState(props.participation.reason || "No reason was given");
 
     /**
      * Loads once after the component mounts, it sets the student state.
@@ -57,23 +59,26 @@ export default function ParticipationCard(props) {
             <Card className={"participation-card"} key={props.participation}>
                 <div className={"participation-div"}>
                     <Row>
-                        <Col className={"participation-info"}>
-                            <div className={"participation-name"}>
-                                { (props.project)?
-                                  ((Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null)
-                                  : project.name
-                                }
-                            </div>
-                            <SkillCard number={0} skill_name={props.participation.skill} />
-                        </Col>
+                        <Hint message={reason}>
+                            <Col className={"participation-info"}>
+                                <div className={"participation-name"}>
+                                    { (props.project)?
+                                      ((Object.keys(student).length) ? (`${student["mandatory"]["first name"]} ${student["mandatory"]["last name"]}`) : null)
+                                      : project.name
+                                    }
+                                </div>
+                                <SkillCard number={0} skill_name={props.participation.skill} />
+                            </Col>
+                        </Hint>
                         <Col xs={"auto"} className={"participation-remove-student"}>
                             <div className={"participation-delete"}>
-                                <Image alt={"delete student from project button"} onClick={ev => deleteStudentFromProject(ev)} src={red_cross} width={25} height={25} />
+                                <Hint message="Remove from this project">
+                                    <Image alt={"delete student from project button"} onClick={deleteStudentFromProject} src={red_cross} width={25} height={25} />
+                                </Hint>
                             </div>
                         </Col>
                     </Row>
                 </div>
-
             </Card>
         </div>
     )
