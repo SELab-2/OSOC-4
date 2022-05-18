@@ -25,7 +25,7 @@ class EmailInput(BaseModel):
 
 
 class PasswordResetInput(BaseModel):
-    """the expected input model (in the body of a HTML POST request) for resetting a password 
+    """the expected input model (in the body of a HTML POST request) for resetting a password
     """
     password: str
     validate_password: str

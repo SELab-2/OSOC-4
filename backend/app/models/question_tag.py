@@ -32,7 +32,7 @@ class QuestionTagSimpleOut(BaseModel):
     show_in_list: bool
 
     @validator("tag", pre=True, always=True)
-    def check_tag(cls, tag:str) -> str:
+    def check_tag(cls, tag: str) -> str:
         """validates a tag name
 
         :param tag: the tag name

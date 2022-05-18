@@ -27,7 +27,7 @@ class Edition(SQLModel, table=True):
 
 
 class EditionOutSimple(BaseModel):
-    """an output model for an edition, 
+    """an output model for an edition,
         defines what attributes of an edition are send to the outside world
     """
     uri: str

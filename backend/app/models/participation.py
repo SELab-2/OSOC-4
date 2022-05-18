@@ -22,7 +22,7 @@ class Participation(SQLModel, table=True):
 
 
 class ParticipationCreate(BaseModel):
-    """the expected input model (in the body of a HTML POST request) for creating a new Participation 
+    """the expected input model (in the body of a HTML POST request) for creating a new Participation
     """
     student_id: int
     project_id: int
@@ -38,7 +38,7 @@ class ParticipationCreate(BaseModel):
 
 
 class ParticipationOutStudent(BaseModel):
-    """an output model for a participation for a student, 
+    """an output model for a participation for a student,
         defines what attributes of a participation are send to the outside world when retrieving a student
     """
     project: str
@@ -55,7 +55,7 @@ class ParticipationOutStudent(BaseModel):
 
 
 class ParticipationOutProject(BaseModel):
-    """an output model for a participation for a project, 
+    """an output model for a participation for a project,
         defines what attributes of a participation are send to the outside world when retrieving a project
     """
     student: str

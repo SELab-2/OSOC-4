@@ -49,7 +49,6 @@ class Project(SQLModel, table=True):
 
 
 
-
 class RequiredSkillOut(BaseModel):
     """an output model for ProjectRequiredSkill
     """

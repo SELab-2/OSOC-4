@@ -57,7 +57,7 @@ class UserCreate(BaseModel):
     # password: str
 
     @validator('email')
-    def password_format_check(cls, v:str) -> str:
+    def password_format_check(cls, v: str) -> str:
         """validates whether the email has a correct format
 
         :param v: the value (email address)
@@ -100,7 +100,7 @@ class UserLogin(BaseModel):
     password: str
 
     @validator('email')
-    def email_lowercase_with_format(cls, v:str) -> str:
+    def email_lowercase_with_format(cls, v: str) -> str:
         """validates an email address and transforms it to lowercase
 
         :param v: the value (the email address)
@@ -123,7 +123,7 @@ class UserInvite(BaseModel):
     validate_password: str
 
     @validator('name')
-    def name_not_empty(cls, v:str) -> str:
+    def name_not_empty(cls, v: str) -> str:
         """validates that the name is not an empty string
 
         :param v: the value (the name)
@@ -137,7 +137,7 @@ class UserInvite(BaseModel):
         return v
 
     @validator('password')
-    def password_format_check(cls, v:str) -> str:
+    def password_format_check(cls, v: str) -> str:
         """validates that the password is a valid password (see valid_password in app.utils.validators)
 
         :param v: the value (the password)
@@ -159,7 +159,7 @@ class UserResetPassword(BaseModel):
     validate_password: str
 
     @validator('password')
-    def password_format_check(cls, v:str) -> str:
+    def password_format_check(cls, v: str) -> str:
         """validates that the password is a valid password (see valid_password in app.utils.validators)
 
         :param v: the value (the password)
@@ -183,7 +183,7 @@ class ChangeUser(BaseModel):
     disabled: bool = True
 
     @validator('name')
-    def name_not_empty(cls, v:str) -> str:
+    def name_not_empty(cls, v: str) -> str:
         """validates that the name is not an empty string
 
         :param v: the value (the name)
@@ -205,7 +205,7 @@ class ChangePassword(BaseModel):
     confirm_password: str
 
     @validator('new_password')
-    def password_format_check(cls, v:str) -> str:
+    def password_format_check(cls, v: str) -> str:
         """validates that the password is a valid password (see valid_password in app.utils.validators)
 
         :param v: the value (the password)
@@ -233,7 +233,7 @@ class ChangeUserMe(BaseModel):
     name: str = ""
 
     @validator('name')
-    def name_not_empty(cls, v:str) -> str:
+    def name_not_empty(cls, v: str) -> str:
         """validates that the name is not an empty string
 
         :param v: the value (the name)
