@@ -22,16 +22,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
+
 router = APIRouter(prefix="/users")
 
 
 @router.get("", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Users retrieved",
             response_model=List[UserOutSimple])
-async def get_users(session: AsyncSession = Depends(get_session)):
-    """get_users get all the users from the database
+async def get_users(session: AsyncSession = Depends(get_session)) -> List[str]:
+    """get_users gets all users from the database
 
-    :return: list of users url
-    :rtype: dict
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: list of student URI's
+    :rtype: List[str]
     """
 
     users = await read_all_where(User, session=session)
@@ -39,10 +42,19 @@ async def get_users(session: AsyncSession = Depends(get_session)):
 
 
 @router.get("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
-async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
-    current_user_id = Authorize.get_jwt_subject()
+async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)) -> dict:
+    """get_user_me gets the user you're logged in as (gets yourself)
 
-    user = await read_where(User, User.id == int(current_user_id), session=session)
+    :param Authorize: authorization (needed to know who you are), defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: the user you're logged in as
+    :rtype: UserMe
+    """
+    current_user_id: int = int(Authorize.get_jwt_subject())
+
+    user = await read_where(User, User.id == current_user_id, session=session)
     # User will always be found since otherwise they can't be authorized
     # No need to check whether user exists
 
@@ -51,7 +63,18 @@ async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = De
 
 @router.patch("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
-                         session: AsyncSession = Depends(get_session)):
+                         session: AsyncSession = Depends(get_session)) -> dict:
+    """change_user_me changes the user you're logged in as (yourself)
+
+    :param new_data: the updated data
+    :type new_data: ChangeUserMe
+    :param Authorize: authorization (needed to know who you are), defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: the updated user (yoursel)
+    :rtype: dict
+    """
     current_user_id = Authorize.get_jwt_subject()
 
     user = await read_where(User, User.id == int(current_user_id), session=session)
@@ -65,22 +88,27 @@ async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
 
 @router.patch("/me/password", dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def update_password(passwords: ChangePassword, Authorize: AuthJWT = Depends(),
-                          session: AsyncSession = Depends(get_session)):
-    """"update_password this changes the password of given user if previous password is given
+                          session: AsyncSession = Depends(get_session)) -> dict:
+    """update_password this changes the password of the user you're logged in as if previous password is given
 
     :param passwords: current_password, new_password and confirm_password
     :type passwords: ChangePassword
-    :raises NotPermittedException: Unauthorized
-    :return: response
-    :rtype: success or error
+    :param Authorize: authorization (needed to know who you are), defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises PasswordsDoNotMatchException: when the passwords don't match, this is raised
+    :raises InvalidEmailOrPasswordException: when the password or the email is invalid, this is raised
+    :return:  success or error code
+    :rtype: dict
     """
-
-    current_user_id = Authorize.get_jwt_subject()
+    
+    current_user_id: int = int(Authorize.get_jwt_subject())
 
     if passwords.new_password != passwords.confirm_password:
         raise PasswordsDoNotMatchException()
 
-    user = await read_where(User, User.id == int(current_user_id), session=session)
+    user = await read_where(User, User.id == current_user_id, session=session)
 
     if not verify_password(passwords.current_password, user.password):
         raise InvalidEmailOrPasswordException()
@@ -95,9 +123,11 @@ async def update_password(passwords: ChangePassword, Authorize: AuthJWT = Depend
 async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_session)):
     """add_user_data add a new user
 
-    :param user: defaults to Body(...)
-    :type user: User, optional
-    :return: data of new created user
+    :param user: the input data for creating the user
+    :type user: UserCreate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: data of newly created user
     :rtype: dict
     """
 
@@ -112,14 +142,21 @@ async def add_user_data(user: UserCreate, session: AsyncSession = Depends(get_se
 
 @router.get("/{id}")
 async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
-                   session: AsyncSession = Depends(get_session)):
-    """get_user this functions returns the user with given id (or None)
+                   session: AsyncSession = Depends(get_session)) -> dict:
+    """get_user this functions returns the user with given id
 
     :param id: the user id
     :type id: str
-    :return: response
-    :rtype: success or error
+    :param role: _description_, defaults to Depends()
+    :type role: RoleChecker, optional
+    :param session: _description_, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises UserNotFoundException: raised when the user isn't found
+    :raises UserBadStateException: raised when the requesting user may not perform this request
+    :return: the user
+    :rtype: dict
     """
+
     user = await read_where(User, User.id == int(id), session=session)
 
     if not user:
@@ -133,16 +170,18 @@ async def get_user(id: str, role: RoleChecker(UserRole.COACH) = Depends(),
 
 
 @router.patch("/{user_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession = Depends(get_session)):
+async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession = Depends(get_session)) -> dict:
     """update_user this updates a user
 
     :param user_id: the user id
     :type user_id: str
-    :param new_data: name, active, approved, disabled and role
+    :param new_data: the updated data for the user
     :type new_data: ChangeUser
-    :raises NotPermittedException: Unauthorized
-    :return: response
-    :rtype: success or error
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises UserNotFoundException: raised when the user isn't found
+    :return: the updated user
+    :rtype: dict
     """
 
     user = await read_where(User, User.id == int(user_id), session=session)
@@ -160,14 +199,16 @@ async def update_user(user_id: str, new_data: ChangeUser, session: AsyncSession 
 
 
 @router.delete("/{user_id}", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)):
+async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)) -> dict:
     """delete_user this deletes a user (soft delete, disables the user & resets password related things)
 
     :param user_id: the user id
     :type user_id: str
-    :raises NotPermittedException: Unauthorized
-    :return: response
-    :rtype: success or error
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises UserNotFoundException: raised when the user isn't found
+    :return: the deleted user
+    :rtype: dict
     """
 
     user = await read_where(User, User.id == int(user_id), session=session)
@@ -186,14 +227,19 @@ async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)
 
 
 @router.post("/{id}/invite", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def invite_user(id: str, session: AsyncSession = Depends(get_session)):
+async def invite_user(id: str, session: AsyncSession = Depends(get_session)) -> dict:
     """invite_user this functions invites a user
 
     :param id: the user id
     :type id: str
-    :return: response
-    :rtype: success or error
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises UserNotFoundException: raised when the user isn't found
+    :raises UserAlreadyActiveException: raised when the user is already active
+    :return: a response message
+    :rtype: dict
     """
+
     user = await read_where(User, User.id == int(id), session=session)
 
     if user is None:
@@ -229,9 +275,14 @@ async def approve_user(user_id: str, session: AsyncSession = Depends(get_session
 
     :param user_id: the id of the user
     :type user_id: str
-    :return: response
-    :rtype: _type_
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises UserNotFoundException: raised when the user isn't found
+    :raises UserBadStateException: raised when the requesting user may not make such a request
+    :return: a response message
+    :rtype: dict
     """
+
     user = await read_where(User, User.id == int(user_id), session=session)
 
     if user is None:
