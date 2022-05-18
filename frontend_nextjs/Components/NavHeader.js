@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import {api, Url} from "../utils/ApiClient";
 import {useRouter} from "next/router";
 import Message from './Message';
+import Link from 'next/link'
 
 export default function NavHeader(props) {
     async function logoutHandler(event) {
@@ -102,12 +103,12 @@ export default function NavHeader(props) {
                     <Nav className="me-auto">
                         {menu.map(item => {
                             return (
-                                <Nav.Link href={item.path}
+                                <Link href={item.path}
                                           className={
                                               router.pathname === item.path ? "active" : ""
                                           }>
                                     {item.title}
-                                </Nav.Link>
+                                </Link>
                             )
                         })}
                         {(role === 2)? 
@@ -117,7 +118,7 @@ export default function NavHeader(props) {
                                 </OverlayTrigger> 
                             : <Button className='image-button' style={{marginTop: "5px"}}><Image src={bell}/></Button> 
                         : null}
-                        <Nav.Link onClick={logoutHandler} id="logout-link">Log out</Nav.Link>
+                        <Link onClick={logoutHandler} id="logout-link">Log out</Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
