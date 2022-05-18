@@ -102,7 +102,7 @@ async def update_password(passwords: ChangePassword, Authorize: AuthJWT = Depend
     :return:  success or error code
     :rtype: dict
     """
-    
+
     current_user_id: int = int(Authorize.get_jwt_subject())
 
     if passwords.new_password != passwords.confirm_password:

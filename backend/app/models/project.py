@@ -48,7 +48,6 @@ class Project(SQLModel, table=True):
     participations: List[Participation] = Relationship(back_populates="project")
 
 
-
 class RequiredSkillOut(BaseModel):
     """an output model for ProjectRequiredSkill
     """

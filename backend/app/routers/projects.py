@@ -36,9 +36,9 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
 
     new_project = await update(Project.parse_obj(project_data), session=session)
 
-    skills : [ProjectRequiredSkill ]= [ProjectRequiredSkill(project=new_project,
-                                                            skill_name=required_skill["skill_name"],
-                                                            number=required_skill["number"])
+    skills: [ProjectRequiredSkill] = [ProjectRequiredSkill(project=new_project,
+                                                           skill_name=required_skill["skill_name"],
+                                                           number=required_skill["number"])
                                         for required_skill in required_skills]
     users = [ProjectCoach(project_id=new_project.id, coach_id=user_id) for user_id in user_ids]
 
@@ -48,7 +48,7 @@ async def add_project_data(project: ProjectCreate, session: AsyncSession = Depen
 
 
 @router.get("/{id}", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Project with id retrieved")
-async def get_project_with_id(id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+async def get_project_with_id(id: int, session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()) -> dict:
     """get_project_with_id get Project instance with id from the database
 
     :param id: the id of the project
@@ -80,11 +80,18 @@ async def get_project_with_id(id: int, session: AsyncSession = Depends(get_sessi
 
 
 @router.patch("/{id}", response_description="Project with id updated", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
-async def update_project_with_id(id: int, updated_project: ProjectCreate, session: AsyncSession = Depends(get_session)):
+async def update_project_with_id(id: int, updated_project: ProjectCreate, session: AsyncSession = Depends(get_session)) -> dict:
     """update_project_with_id get Project instance with id from the database
 
-    :return: project with id
-    :rtype: ProjectOutExtended
+    :param id: the id of the project
+    :type id: int
+    :param updated_project: the updated data of the project
+    :type updated_project: ProjectCreate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises ProjectNotFoundException: _description_
+    :return: response message
+    :rtype: dict
     """
 
     project = await read_where(Project, Project.id == id, session=session)
@@ -125,9 +132,22 @@ async def update_project_with_id(id: int, updated_project: ProjectCreate, sessio
 
 
 @router.delete("/{id}", response_description="Project with id deleted")
-async def delete_project_with_id(id: int, role: RoleChecker(UserRole.ADMIN) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+async def delete_project_with_id(id: int, role: RoleChecker(UserRole.ADMIN) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()) -> None:
     """delete_project_with_id delete Project instance with id from the database
             also deletes the participations, requiredskills, projectcoaches, suggestions
+
+
+    :param id: the id of the project
+    :type id: int
+    :param role: the role of the user who requested this, defaults to Depends()
+    :type role: RoleChecker, optional
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises ProjectNotFoundException: raised when the project isn't found
+    :return: None
+    :rtype: dict
     """
     project = await read_where(Project, Project.id == id, session=session)
     if not project:
