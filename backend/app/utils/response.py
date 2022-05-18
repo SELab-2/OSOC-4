@@ -1,4 +1,3 @@
-from time import strftime
 from typing import Dict
 
 
@@ -23,7 +22,7 @@ def errorresponse(error, code: int, message: str):
     """errorresponse
 
     :param error: the error
-    :type error 
+    :type error
     :param message: the response message
     :type message: str
     :return: dictionary with error, code and message

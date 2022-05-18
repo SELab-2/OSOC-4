@@ -57,7 +57,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     :rtype: response
     """
 
-
     await clear_data(session)
 
     #########
