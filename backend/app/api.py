@@ -79,7 +79,7 @@ async def my_exception_handler(request: Request, exception: BaseException):
 @app.exception_handler(AuthJWTException)
 async def auth_exception_handler(request: Request, exception: AuthJWTException):
     """auth_exception_handler handler for the raised exceptions
-    
+
     :param request: the request
     :type request: Request
     :param exception: the raised exception
