@@ -42,23 +42,21 @@ export default function ConflictsPopUpWindow(props) {
     setPopUpShow(false);
   }
 
+  /**
+   * Called when the previous button is clicked. It shows the previous student conflict.
+   */
   function previousStudent() {
     if (currentStudentIndex > 0) {
       setCurrentStudentIndex(currentStudentIndex - 1);
     }
   }
 
+  /**
+   * Called when the next button is clicked. It shows the next student conflict.
+   */
   function nextStudent() {
     if (currentStudentIndex < props.conflicts.length - 1) {
       setCurrentStudentIndex(currentStudentIndex + 1)
-    }
-  }
-
-  function getParticipations() {
-    if (currentStudent.participations) {
-      return currentStudent.participations.map(
-        participation => <ParticipationCard key={participation.project} participation={participation} student={currentStudent}/>
-      )
     }
   }
 
