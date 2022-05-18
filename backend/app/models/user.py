@@ -36,8 +36,6 @@ class User(SQLModel, table=True):
     suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
     class Config:
-        """configuration for sqlmodels
-        """
         validate_assignment = True
 
     @validator('email')
