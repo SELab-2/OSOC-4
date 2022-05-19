@@ -58,7 +58,7 @@ async def create_participation(participation: ParticipationCreate,
 
     await update(old_participation, session)
 
-    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
+    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
 
     return f"{config.api_url}students/{old_participation.student_id}"
 
