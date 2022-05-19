@@ -1,5 +1,4 @@
-import { Button, Col, Modal, ModalHeader, ModalTitle, Row } from "react-bootstrap";
-import StudentFilter from "../select_students/StudentFilter";
+import { Button, Col, Modal, ModalHeader, ModalTitle, Spinner } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { cache } from "../../utils/ApiClient";
 import { api, Url } from "../../utils/ApiClient";
@@ -13,22 +12,23 @@ import { api, Url } from "../../utils/ApiClient";
 export default function SendEmailsPopUpWindow(props) {
 
   const [defaultEmail, setDefaultEmail] = useState(true);
+  const [fail, setFail] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sentSuccess, setSentSuccess] = useState(false);
 
   // defines whether or not the pop up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
 
-  const [students, setStudents] = useState([])
-
-  useEffect(() => {
-    Promise.all(props.selectedStudents.map(student => cache.getStudent(student, ""))).then(allstudents => {
-      setStudents([...allstudents]);
-    })
-  }, [props.selectedStudents])
+  const [selectedStudents, setSelectedStudents] = [props.selectedStudents, props.setSelectedStudents];
 
   /***
    * This function is called when the pop-up window is closed
    */
+
   function onHide() {
+    setSelectedStudents([]);
+    setFail(false);
+    setSentSuccess(false);
     setPopUpShow(false);
   }
 
@@ -36,9 +36,20 @@ export default function SendEmailsPopUpWindow(props) {
    * This function is called on submitting the emails, it sends the emails and hides the pop-up window
    */
   function submitEmail() {
-    Url.fromName(api.sendemails).extend("/decisions").setBody({ "emails": props.selectedStudents }).post().then(() => {
-      setPopUpShow(false);
+    setSending(true);
+    Url.fromName(api.sendemails).extend("/decisions").setBody({ "emails": props.selectedStudents }).post().then((res) => {
+      if (res.success){
+        setSending(false);
+        setSentSuccess(true);
+      } else {
+        setSending(false);
+        setFail(true);
+      }
     })
+  }
+
+  function handleTryAgain(){
+    setFail(false);
   }
 
   // returns the html representation for the send emails pop up window
@@ -55,9 +66,41 @@ export default function SendEmailsPopUpWindow(props) {
           {`Are you sure you want to send ${props.selectedStudents.length} decision emails?`}
         </ModalTitle>
       </ModalHeader>
+      {fail &&
+        <Modal.Body>
+          Something went wrong, please try again
+        </Modal.Body>
+      } 
+      {sentSuccess &&
+        <Modal.Body>
+          {props.selectedStudents.length} decision emails were sent succesfully!
+        </Modal.Body>
+      } 
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Cancel</Button>
-        <Button variant="primary" onClick={submitEmail}>Yes</Button>
+        {(! sending && ! fail && ! sentSuccess) && 
+        <div>
+           <Button variant="secondary" onClick={onHide}>Cancel</Button>
+          <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
+        </div>}
+        {sending && 
+          <Button variant="primary" disabled>
+          Sending...
+          <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+          />
+        </Button>}
+        {sentSuccess &&
+          <Button variant="primary" onClick={onHide}>Close</Button>
+        }
+        {fail && 
+          <div>
+            <Button variant="secondary" onClick={onHide}>Cancel</Button>
+            <Button variant="primary" onClick={handleTryAgain} className="invite-button">Try again</Button>
+          </div>}
       </Modal.Footer>
     </Modal>
   );

@@ -106,7 +106,7 @@ class TestProjects(TestBase):
         await update(project, self.session)
 
         path = "/projects/" + str(project.id)
-        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
         # Send get project by id request
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
@@ -130,7 +130,7 @@ class TestProjects(TestBase):
         await update(project, self.session)
 
         path = "/projects/" + str(project.id)
-        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN])
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
         # Add coach to allowed users
         allowed_users.add(coach.name)

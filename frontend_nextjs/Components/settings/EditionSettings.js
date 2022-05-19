@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Accordion, Dropdown} from "react-bootstrap";
+import {Accordion, Dropdown, Table, Spinner} from "react-bootstrap";
 import {api, Url} from "../../utils/ApiClient";
 import AccordionItem from "react-bootstrap/AccordionItem";
 import AccordionHeader from "react-bootstrap/AccordionHeader";
@@ -7,6 +7,9 @@ import AccordionBody from "react-bootstrap/AccordionBody";
 import QuestionTags from "./QuestionTags";
 import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
+import Hint from "../Hint";
+import { Form, Button, Row} from "react-bootstrap";
+import {log} from "../../utils/logger";
 
 /**
  * This component displays a settings-screen for all settings regarding editions.
@@ -17,21 +20,21 @@ export default function EditionSettings() {
     const [edition, setEdition] = useState(undefined);
     const [editionList, setEditionList] = useState(undefined);
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
+    const [editing, setEditing] = useState(false);
+    const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
+    const [failed, setFailed] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     // fetch the current edition and all the other editions
     useEffect(() => {
         async function fetch() {
             const res = await Url.fromName(api.current_edition).get()
             if (res.success) {
-                console.log("edition")
-                console.log(res.data)
                 await setEdition(res.data);
             }
             let resList = await Url.fromName(api.editions).get();
             if (resList.success) {
                 resList = await Promise.all(resList.data.map(editionUrl => Url.fromUrl(editionUrl).get().then(r => (r.success)? r.data : null)));
-                console.log("edition list")
-                console.log(resList)
                 setEditionList(resList)
             }
             setLoading(false);
@@ -44,10 +47,37 @@ export default function EditionSettings() {
      * @param edition
      */
     function addToEditionList(edition) {
-        console.log("create")
-        console.log((edition))
         setEditionList([edition, ...editionList]);
     }
+
+    async function handleSaved(event) {
+        event.preventDefault();
+        setSaving(true);
+        Url.fromName(api.current_edition).setBody(newEdition).patch().then(res =>{
+            if(res.success){
+                let newEdition2 = {...edition};
+                newEdition2["name"] = newEdition.name;
+                newEdition2["description"] = newEdition.description;
+                setEdition(newEdition2);
+                setSaving(false);
+                setEditing(false);
+            } else {
+                setSaving(false);
+                setFailed(true);
+            }
+        })
+    }
+
+    const editClicked = (event) => {
+        setNewEdition({"name": edition.name, "description": edition.description, "year": edition.year});
+        setEditing(false);
+        setFailed(false);
+        setEditing(true);
+    }
+
+    const handleTryAgain = (event) => {
+        setFailed(false)
+    } 
 
     /**
      * Changes the current edition
@@ -58,25 +88,90 @@ export default function EditionSettings() {
         await setEdition({"year": edition.year, "name": edition.name});
     }
 
-
     if (loading) {
         return (<LoadingPage/>);
     }
+
     return (
         <div className="body-editiondetail">
-            <h1>{edition.name}</h1>
-            <p>{(edition.description) ? edition.description : "No description available"}</p>
+            <Table>
+                <tbody>
+                    <tr>
+                        <td >
+                            {(! editing) ? (
+                                <div>
+                                    <h1>{(edition.name) ? edition.name : "No name available"}</h1>
+                                    <p>{(edition.description) ? edition.description : "No description available"}</p>
+                                </div>
+                            ) : ( 
+                                <div>
+                                    <Form className="form-edition-detail">
+                                        <Form.Group className="mb-3">
+                                            <Form.Control type="text" name="name" disabled={saving || failed} placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3" >
+                                            <Form.Control type="text" name="description" disabled={saving || failed} placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
+                                        </Form.Group>               
+                                    </Form>
+                                    {saving &&
+                                        <Button variant="primary" disabled>
+                                            Saving...
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                            />
+                                        </Button>}
+                                    {failed && 
+                                        <div>
+                                            <Form.Label>Something went wrong, please try again</Form.Label>
+                                            <br/>
+                                            <Button variant={"primary"} onClick={handleTryAgain} className="button-edition-detail">Try again</Button>
+                                            <Button variant="secondary" onClick={(ev) => {
+                                                setEditing(false);
+                                            }} >
+                                                Cancel
+                                            </Button>
+                                        </div>}
+                                    {!saving && !failed &&
+                                        <div>
+                                            <Button variant="primary" onClick={handleSaved} className="button-edition-detail">Save</Button>
+                                            <Button variant="secondary" onClick={(ev) => {
+                                                setEditing(false);
+                                            }} >
+                                                Cancel
+                                            </Button>
+                                        </div>    
+                                    }
+                                </div>
+                            )}
+                        </td>
+                        <td className="form-column">
+                            {!editing && (
+                                <Hint message="Edit edition">
+                                    <Button onClick={editClicked}>
+                                        Edit
+                                    </Button>
+                                </Hint>
+                            )}
+                            
+                        </td>
+                    </tr>
+                </tbody>
+            </Table>
             <Accordion>
                 <AccordionItem eventKey="0">
                     <AccordionHeader>
-                        <h3>Change edition</h3>
+                        <h3>Choose a different edition</h3>
                     </AccordionHeader>
                     <AccordionBody>
                         <div>
                             <p className="details-text">Changing this will affect the whole site.
                             </p>
                             <Dropdown>
-                                <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
+                                <Dropdown.Toggle variant="primary" id="dropdown-basic">
                                     {(edition) ? edition.name : null}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>

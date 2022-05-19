@@ -1,12 +1,25 @@
+""" This module includes the functions to process the tally forms
+"""
+
 from app.crud import read_where, update
 from app.models.answer import Answer
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.student import Student
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-async def get_save_answer(answer, session):
-    # check if answer exists else save it
+async def get_save_answer(answer: str, session: AsyncSession) -> Answer:
+    """get_save_answer check if answer exists else save it
+
+    :param answer: the answer string
+    :type answer: str
+    :param session: session used to perform database actions
+    :type session: AsyncSession
+    :return: the found or saved answer
+    :rtype: Answer
+    """
+
     a = await read_where(Answer, Answer.answer == answer, session=session)
     if not a:
         a = Answer(answer=answer)
@@ -14,7 +27,7 @@ async def get_save_answer(answer, session):
     return a
 
 
-async def process_tally(data, edition, session):
+async def process_tally(data, edition, session: AsyncSession):
     """Processes a Tally - submitted Tally and returns a dict with fields that can be used to validate the data .
 
     Args:
@@ -30,9 +43,16 @@ async def process_tally(data, edition, session):
             field["label"] = "Which role are you applying for?"
 
         # Check if the question already exists else save it
-        q = await read_where(Question, Question.question == field["label"], Question.field_id == field["key"], Question.edition == edition, session=session)
+        # get the question by id
+        q = await read_where(Question, Question.field_id == field["key"], Question.edition == edition, session=session)
+
+        # check if the saved question is the same as the one in the form
+
         if not q:
-            q = Question(question=field["label"], edition=edition)
+            q = Question(question=field["label"], field_id=field["key"], edition=edition)
+            await update(q, session=session)
+        elif q.question != field["label"]:
+            q.question = field["label"]
             await update(q, session=session)
 
         if field["type"] in ["MULTIPLE_CHOICE", "CHECKBOXES"]:

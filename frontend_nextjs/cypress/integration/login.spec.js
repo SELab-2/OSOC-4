@@ -18,9 +18,8 @@ describe("Test login page", () => {
         // logout
         cy.contains("log out", {matchCase: false}).click();
 
-        // todo: doesn't seem to logout
         // check link
-        //cy.url().should("eq", Cypress.config().baseUrl + "/login")// Check we are in login
+        cy.url().should("eq", Cypress.config().baseUrl + "/login")// Check we are in login
     });
 
     it("Should fail login by bad password.", () => {

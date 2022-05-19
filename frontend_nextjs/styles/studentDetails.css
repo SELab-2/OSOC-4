@@ -1,8 +1,3 @@
-.name_big {
-    font-size: 40px;
-    padding-left: 0;
-}
-
 .suggest-button {
     font-size: 13px;
     width: 80px;
@@ -56,10 +51,6 @@
     margin-right: 4px;
 }
 
-.details-upper-layer {
-    margin: 0 0 0 20px;
-}
-
 .dropdown-decision {
     height: 100%;
     padding-top: 7px;
@@ -69,14 +60,9 @@
     border-radius: 5px;
     margin-left: 4px;
     margin-right: 5px;
-    width: 95%;
+    width: 56%;
     font-size: 15px;
     padding-left: 7px;
-}
-
-.remaining-height-details {
-    margin-top: 30px;
-    margin-left: 20px;
 }
 
 .student-details-suggestions-line {
@@ -84,7 +70,8 @@
 }
 
 .suggestions-title {
-    margin-right: 25px;
+    padding-left: 0;
+    width: auto;
 }
 
 .suggestions-circle-red {
@@ -112,10 +99,8 @@
     border-left-color: lightgray;
 
     margin-left: 0;
-    padding-top: 15px;
-    padding-right: 25px;
-    padding-bottom: 25px;
     overflow-y: scroll;
+    padding: 15px 25px 25px 30px;
 }
 
 .backbutton-margin {
@@ -162,11 +147,35 @@
     -webkit-text-fill-color: gray;
 }
 
+.details-upper-layer {
+    justify-content: space-between;
+}
+
+.name {
+    display: flex;
+    align-content: center;
+}
+
+.name>.image-button {
+    padding-right: 10pt;
+}
+
+.alumnicon {
+    cursor: default;
+}
+
+.name>h1 {
+    padding-right: 10pt;
+}
+
+.close-button {
+    padding: 0;
+}
+
 .delete-button {
     padding: 0;
     background-color: rgba(0, 0, 0, 0);
     border-width: 0;
-    margin-top: 20px;
 }
 
 .student-details-question {
@@ -180,8 +189,14 @@
     font-size: 15px;
 }
 
-.buttongroup-paddingtop{
-    padding-top: 5px;
+.info-and-buttons {
+    justify-content: space-between;
+    flex-wrap: wrap-reverse;
+}
+
+.buttongroup-paddingtop {
+    padding: 5pt 0 5pt 0;
+    margin-left: -3.5pt;
 }
 
 .margins-accordion {
@@ -196,4 +211,24 @@
 .suggestion {
     margin-top: 2px;
     margin-bottom: 2px;
+}
+
+/* unvisited link */
+.hyperlink:link {
+    color: blue;
+}
+
+/* visited link */
+.hyperlink:visited {
+    color: purple;
+}
+
+/* mouse over link */
+.hyperlink:hover {
+    color: rgb(49, 72, 199);
+}
+
+/* selected link */
+.hyperlink:active {
+    color: rgb(18, 18, 99);
 }

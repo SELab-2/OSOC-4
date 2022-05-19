@@ -15,9 +15,6 @@ export default function DefaultEmails() {
     return (
         <Row className="fill_width">
             <Col>
-                <Row className="emails-title-margin" md="auto">
-                    <h2 className="nopadding" >Change default emails</h2>
-                </Row>
                 <DefaultEmail templatename="YES_DECISION" value="'Yes'" />
                 <DefaultEmail templatename="MAYBE_DECISION" value="'Maybe'" />
                 <DefaultEmail templatename="NO_DECISION" value="'No'" />

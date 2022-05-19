@@ -1,9 +1,9 @@
-import {Button, Modal} from "react-bootstrap";
-import React, {useEffect, useState} from "react";
+import { Button, Modal } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
 import SkillSelector from "./SkillSelector";
-import {api, Url} from "../../utils/ApiClient";
-import {log} from "../../utils/logger";
-import {StringListToOptionsList} from "../../utils/skillselector";
+import { api, Url } from "../../utils/ApiClient";
+import { log } from "../../utils/logger";
+import { StringListToOptionsList } from "../../utils/skillselector";
 
 
 /**
@@ -18,32 +18,31 @@ import {StringListToOptionsList} from "../../utils/skillselector";
  * @returns {JSX.Element}
  * @constructor
  */
-export default function AddStudentModal(props){
+export default function AddStudentModal(props) {
 
-    const [selectedSkill, setSelectedSkill] = useState({"value": "None", "label": "None"})
+    const [selectedSkill, setSelectedSkill] = useState({ "value": "None", "label": "None" })
 
     const [skills, setSkills] = useState([])
     const [projectNeededSkills, setProjectNeededSkills] = useState([]);
     const [skillsLeft, setSkillsLeft] = useState([]);
-    const [options, setOptions] = useState([{"value": "None", "label": "None"}])
+    const [reason, setReason] = useState("");
+    const [options, setOptions] = useState([{ "value": "None", "label": "None" }])
+
 
     /**
      * This function gets called when props.selectedStudent or props.selectedProject changes. It finds the intersection
      * of the required skills of the selected project and the skills of the selected student
      */
-
-
     useEffect(() => {
-        setSelectedSkill(undefined)
-        if(props.selectedProject !== undefined){
+        if (props.selectedProject !== undefined) {
             let temp_dict = {}
             props.selectedProject.required_skills.map(skill => {
                 temp_dict[skill.skill_name] = skill.number
             })
 
-            props.selectedProject.participations.forEach(participation => {
-                if(participation.skill in temp_dict){
-                    temp_dict[participation.skill] -= 1 ;
+            Object.values(props.selectedProject.participations).forEach(participation => {
+                if (participation.skill in temp_dict) {
+                    temp_dict[participation.skill] -= 1;
                 }
             })
 
@@ -55,29 +54,25 @@ export default function AddStudentModal(props){
 
     useEffect(() => {
         Url.fromName(api.skills).get().then(res => {
-            if (res.success){
-                log("skills halen lunkt")
+            if (res.success) {
                 setSkills(res.data)
             }
         })
     }, [])
 
     useEffect(() => {
-        if(skills.length !== 0 && props.selectedStudent !== undefined && projectNeededSkills.length !== 0){
+        if (skills.length !== 0 && props.selectedStudent !== undefined && projectNeededSkills.length !== 0) {
             let studentClean = props.selectedStudent.skills.map(value => value.name)
-            log("student clean")
-            log(studentClean)
-            log(props.selectedStudent.skills)
             let overlap = StringListToOptionsList(studentClean.filter(skill => projectNeededSkills.includes(skill)))
-            let studentSkills = StringListToOptionsList(studentClean.filter(skill => ! projectNeededSkills.includes(skill)))
-            let projectSkills = StringListToOptionsList(projectNeededSkills.filter(skill => ! studentClean.includes(skill)))
-            let otherSkills = StringListToOptionsList(skills.filter(skill => ! projectNeededSkills.includes(skill)
-                                                             && ! studentClean.includes(skill)))
-            setOptions([{"value": "None", "label": "None"},
-                {"label": "Student project overlap", "options": overlap},
-                {"label": "Student skills", "options": studentSkills},
-                {"label": "Project needed skills", "options": projectSkills},
-                {"label": "Other skills", "options": otherSkills}])
+            let studentSkills = StringListToOptionsList(studentClean.filter(skill => !projectNeededSkills.includes(skill)))
+            let projectSkills = StringListToOptionsList(projectNeededSkills.filter(skill => !studentClean.includes(skill)))
+            let otherSkills = StringListToOptionsList(skills.filter(skill => !projectNeededSkills.includes(skill)
+                && !studentClean.includes(skill)))
+            setOptions([{ "value": "None", "label": "None" },
+            { "label": "Student project overlap", "options": overlap },
+            { "label": "Student skills", "options": studentSkills },
+            { "label": "Project needed skills", "options": projectSkills },
+            { "label": "Other skills", "options": otherSkills }])
         }
     }, [skills, projectNeededSkills, props.selectedStudent])
 
@@ -93,41 +88,50 @@ export default function AddStudentModal(props){
                 .setBody({
                     "student_id": props.selectedStudent.id.split("/").pop(),
                     "project_id": props.selectedProject.id.split("/").pop(),
-                    "skill_name": selectedSkill.value === "None" ? "" : selectedSkill.value})
-                .post()
+                    "skill_name": selectedSkill.value === "None" ? "" : selectedSkill.value,
+                    "reason": reason
+                })
+                .post();
         }
     }
 
+    const handleChange = (event) => {
+        event.preventDefault();
+        setReason(event.target.value);
+    }
+
+    const reset = () => {
+        props.setShowAddStudent(false);
+        setSelectedSkill({ "value": "None", "label": "None" });
+        setReason("");
+    }
     /**
      * this modal screen allows you to select a valid skill and create a participation of the selectedStudent, props.selectedProject
      * and selectedSkill
      * @returns {JSX.Element}
      */
     function getAddModal() {
-        return(
-            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+        return (
+            <Modal show={props.showAddStudent} onHide={() => {reset();}}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                 <h4>Why are you making this decision?</h4>
+                 <p>A reason is not required, but will open up discussion and help us and your fellow coaches to understand.</p>
+                    <input id="suggestin-reason" name="reason" type="text" className="fill_width suggestion-reason" onChange={handleChange} value={reason} placeholder="Your reason"/>
                     <div>
-                        For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?
+                        <h4>For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?</h4>
                     </div>
                     <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
-                                   options={options}
+                        options={options}
                     />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
-                        props.setShowAddStudent(false)
-                        setSelectedSkill(undefined)}}>
+                    <Button variant="secondary" onClick={() => {reset()}}>
                         Dont add student to project
                     </Button>
-                    <Button variant="primary" onClick={async () => {
-                        await AddStudentToProject()
-                        props.setShowAddStudent(false)
-                        setSelectedSkill(undefined)
-                    }}>
+                    <Button variant="primary" onClick={async () => {await AddStudentToProject();reset();}}>
                         Add student to project
                     </Button>
 
@@ -139,8 +143,8 @@ export default function AddStudentModal(props){
      * this modal screen shows if the props.selectedStudent already has a particpation involving props.selectedProject
      * @returns {JSX.Element}
      */
-    function getAlreadyAddedModal(){
-        return(
+    function getAlreadyAddedModal() {
+        return (
             <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} can not be added to {props.selectedProject.name} project</Modal.Title>
@@ -159,8 +163,8 @@ export default function AddStudentModal(props){
      * This modal shows if either or both of props.selectedStudent, props.selectedProject are undefined
      * @returns {JSX.Element}
      */
-    function getMustSelect(){
-        return(
+    function getMustSelect() {
+        return (
             <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>No selected {props.selectedStudent === undefined ? "student" : "project"}{(props.selectedStudent === undefined && props.selectedProject === undefined) ? " or project" : ""}</Modal.Title>
@@ -178,11 +182,11 @@ export default function AddStudentModal(props){
     /**
      * returns the correct modal screen
      */
-    return(<div>
+    return (<div>
         {
             (props.selectedStudent !== undefined && props.selectedProject !== undefined) ?
-            ((! props.selectedProject.participations.map(p => p.student).includes(props.selectedStudent.id)) ?
-                getAddModal() : getAlreadyAddedModal()) : getMustSelect()
+                ((!Object.values(props.selectedProject.participations).map(p => p.student).includes(props.selectedStudent.id)) ?
+                    getAddModal() : getAlreadyAddedModal()) : getMustSelect()
         }
     </div>)
 }
