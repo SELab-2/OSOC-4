@@ -1,13 +1,20 @@
 from random import choice, randrange, sample
 
 from app.models.answer import Answer
+from app.models.edition import Edition
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
+from app.models.student import Student
 from app.tests.utils_for_tests.DataGenerator import DataGenerator
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class QuestionAnswerGenerator(DataGenerator):
+    """
+    The DataGenerator for Questions, Answers, QuestionAnswers and QuestionTags
+    """
     questionstrings_yes_no = [
         "Will you live in Belgium in July 2022?",
         "Can you work during the month of July, Monday through Thursday (~09:00 to 17:00)",
@@ -54,7 +61,16 @@ class QuestionAnswerGenerator(DataGenerator):
          "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
          "Photographer", "Other"]]
 
-    def __init__(self, session, edition):
+    def __init__(self, session: AsyncSession, edition: Edition):
+        """
+        Initializes the data list and assigns the session to use.
+        Also generates mandatory Questions + related and some relevant Questions + related.
+
+        :param session: The session to use to add the data to the database
+        :type session: AsyncSession
+        :param edition: The edition for which to generate data
+        :type edition: Edition
+        """
         super().__init__(session)
         self.other_answers = []
         self.question_answers = []
@@ -62,10 +78,12 @@ class QuestionAnswerGenerator(DataGenerator):
 
         self.question_first_name = Question(question="Birth name", field_id="question_wa25qB", edition=edition.year)
         self.question_last_name = Question(question="Last name", field_id="question_m6ZjEk", edition=edition.year)
-        self.question_email = Question(question="Your email address\n", field_id="question_wMENpM", edition=edition.year)
+        self.question_email = Question(question="Your email address\n", field_id="question_wMENpM",
+                                       edition=edition.year)
         self.question_alumni = Question(question="Have you participated in osoc before?", field_id="question_3Exd74",
                                         edition=edition.year)
-        self.question_student_coach = Question(question="Would you like to be a student coach this year?", field_id="question_nroaMN",
+        self.question_student_coach = Question(question="Would you like to be a student coach this year?",
+                                               field_id="question_nroaMN",
                                                edition=edition.year)
         self.question_phone_number = Question(question="Phone number", field_id="question_319dop", edition=edition.year)
 
@@ -120,7 +138,14 @@ class QuestionAnswerGenerator(DataGenerator):
                      *(answer for answers in (*self.answers_text, *self.answers_multiple_choice,
                                               *self.answers_multiple_choice2) for answer in answers)]
 
-    def generate_question_answers(self, student):
+    def generate_question_answers(self, student: Student) -> None:
+        """
+        Generates Answers and QuestionAnswers for the given student.
+
+        :param student: The student for which to generate Answers and QuestionAnswers.
+        :type student: Student
+        :return: None
+        """
         first_name = choice(self.first_names)
         last_name = choice(self.last_names)
 
