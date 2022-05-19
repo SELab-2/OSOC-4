@@ -14,7 +14,7 @@ from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
                              UserCreate, UserMe, UserOut, UserOutSimple,
                              UserRole)
 from app.routers.editions import get_current_edition
-from app.utils.checkers import RoleChecker, EditionChecker
+from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
