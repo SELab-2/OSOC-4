@@ -47,15 +47,6 @@ export default function GeneralInfo(props) {
         );
       }
 
-      if (props.student["mandatory"]["email"]) {
-        rows.push(
-          <Row className="question-answer-row">
-            <Col md="auto" className="info-titles">email</Col>
-            <Col md="auto" className="info-answers">{props.student["mandatory"]["email"]}</Col>
-          </Row>
-        );
-      }
-
       // props.students["listtags"] contains the (question,answer) pair that the user wants to show in the list of
       // students.
       Object.entries(props.student["listtags"]).map(([k, v]) => {
@@ -70,6 +61,16 @@ export default function GeneralInfo(props) {
       // If we don't show the general info in the list of students, we add the (question, answer) pairs that we don't
       // want to see in the list of students, they are in props.students["detailtags"].
       if (!props.listelement) {
+        // the email address
+        if (props.student["mandatory"]["email"]) {
+          rows.push(
+            <Row className="question-answer-row">
+              <Col md="auto" className="info-titles">email</Col>
+              <Col md="auto" className="info-answers">{props.student["mandatory"]["email"]}</Col>
+            </Row>
+          );
+        }
+        // the other detail-tags
         Object.entries(props.student["detailtags"]).map(([k, v]) => {
           rows.push(
             <Row key={k} className="question-answer-row">
