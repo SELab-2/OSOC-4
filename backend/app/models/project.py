@@ -59,7 +59,7 @@ class RequiredSkillOut(BaseModel):
 
 
 class ProjectCreate(BaseModel):
-    """the expected input model (in the body of a HTML POST request) for creating a new project
+    """the expected input model (in the body of an HTML POST request) for creating a new project
     """
     name: str
     description: str

@@ -25,7 +25,7 @@ class DecisionOption(int, Enum):
 
 class Student(SQLModel, table=True):
     """represents a Student from the database
-            any aditional data about the students gets stored in the QuestionAnswers
+            any additional data about the students gets stored in the QuestionAnswers
     """
     id: Optional[int] = Field(default=None, primary_key=True)
     edition_year: Optional[int] = Field(default=None, foreign_key="edition.year")
@@ -55,6 +55,6 @@ class StudentOutSimple(BaseModel):
 
 
 class StudentUpdate(BaseModel):
-    """the expected input model (in a HTML PATCH request) for editing a Student
+    """the expected input model (in an HTML PATCH request) for editing a Student
     """
     decision: DecisionOption

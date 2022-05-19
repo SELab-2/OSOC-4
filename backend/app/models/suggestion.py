@@ -20,7 +20,6 @@ class SuggestionOption(int, Enum):
 class Suggestion(SQLModel, table=True):
     """represents a Suggestion from the database
     """
-    # mail_sent: bool = Field(default=False)
     id: Optional[int] = Field(default=None, primary_key=True)
     decision: SuggestionOption
     reason: str
@@ -46,8 +45,6 @@ class SuggestionCreate(BaseModel):
 
     student_id: int
     project_id: Optional[int]
-    # suggested_by_id: Optional[int]
-    # skill_name: str
 
 
 class SuggestionExtended(BaseModel):
@@ -59,7 +56,6 @@ class SuggestionExtended(BaseModel):
     student_id: str
     suggested_by_id: str
     project_id: Optional[str]
-    # skill_name: str
 
     def __init__(self, **data):
         """the constructor

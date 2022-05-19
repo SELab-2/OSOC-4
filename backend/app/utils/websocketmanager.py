@@ -34,7 +34,7 @@ class WebSocketManager:
     async def send_personal_message(self, message: str, websocket: WebSocket):
         """send_personal_message send a message to a specific websocket connection
 
-        :param message: messge to be send
+        :param message: message to be sent
         :type message: str
         :param websocket: the WebSocket connection
         :type websocket: WebSocket
@@ -44,7 +44,7 @@ class WebSocketManager:
     async def broadcast(self, message: str):
         """broadcast send a message to all active connections
 
-        :param message: the message to be send
+        :param message: the message to be sent
         :type message: str
         """
         for conn in self.active_connections:
