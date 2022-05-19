@@ -229,9 +229,6 @@ class TestUsers(TestBase):
         await self.do_request(Request.DELETE, f"/users/{self.bad_id}", "user_admin", expected_status=Status.NOT_FOUND)
 
     async def test_post_invite_disabled_user(self):
-        eg = EditionGenerator(self.session)
-        eg.generate_edition()
-        eg.add_to_db()
         await self.session.commit()
 
         disabled_user = await self.get_user_by_name("user_disabled_coach")
