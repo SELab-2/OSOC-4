@@ -65,7 +65,7 @@ class EditionChecker:
         self.update = update
 
     async def __call__(self, year: str, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)) -> Edition:
-        """__call__ calles when request is receiveed
+        """__call__ called when request is received
 
         :param year: the year of the edition where action is performed on
         :type year: str
