@@ -143,65 +143,29 @@ class TestEditions(TestBase):
             response_ids.sort()
             self.assertEqual(test_students_ids, response_ids, f"Returned students don't match expected students for edition {edition.year}")
 
-    async def test_get_edition_projects_user_admin(self):
-
-        edition = await self.create_edition_in_db()
-        projects = await self.create_projects_in_db(edition=edition, count=10)
-
-        # Send request
-        path = f'/editions/{edition.year}/projects'
-        response = await self.do_request(Request.GET, path, self.user_admin.name, access_token=await self.get_access_token(self.user_admin.name))
-        edition_projects_from_response = json.loads(response.content)
-
-        # Check response data
-        test_projects_ids = [project.id for project in projects]
-        test_projects_ids.sort()
-
-        response_ids = [int(project_url.split('/')[-1]) for project_url in edition_projects_from_response]
-        response_ids.sort()
-
-        self.assertEqual(test_projects_ids, response_ids, f"Returned projects don't match expected projects for edition {edition.year}")
-
-    async def test_get_edition_projects_user_coach_no_projects(self):
+    async def test_get_edition_projects(self):
         """GET /editions/{year}/projects with user_coach should get no projects if he is not coach for any projects"""
 
         edition = await self.create_edition_in_db()
         projects = await self.create_projects_in_db(edition=edition, count=10)
 
+        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
         # Send request
         path = f'/editions/{edition.year}/projects'
-        response = await self.do_request(Request.GET, path, self.user_coach.name, access_token=await self.get_access_token(self.user_coach.name))
-        edition_projects_from_response = json.loads(response.content)
+
+        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
 
         # Check response data
         test_projects_ids = [project.id for project in projects]
         test_projects_ids.sort()
 
-        response_ids = [int(project_url.split('/')[-1]) for project_url in edition_projects_from_response]
-        response_ids.sort()
+        project_ids = [project.id for project in projects]
+        project_ids.sort()
 
-        self.assertEqual(len(response_ids), 0, f"No projects should be returned for coach {self.user_coach.name}")
-
-    async def test_get_edition_projects_user_coach_in_project(self):
-        """GET /editions/{year}/projects with user_coach should get a project if he is a coach for the project"""
-
-        edition = await self.create_edition_in_db()
-        projects = await self.create_projects_in_db(edition=edition, count=10)
-
-        projectCoach = ProjectCoach(project_id=projects[0].id, coach_id=self.user_coach.id)
-        await update(projectCoach, session=self.session)
-
-        # Send request
-        path = f'/editions/{edition.year}/projects'
-        response = await self.do_request(Request.GET, path, self.user_coach.name, access_token=await self.get_access_token(self.user_coach.name))
-        edition_projects_from_response = json.loads(response.content)
-
-        # Check response data
-        test_projects_ids = [project.id for project in projects]
-        test_projects_ids.sort()
-        response_ids = [int(project_url.split('/')[-1]) for project_url in edition_projects_from_response]
-        self.assertEqual(len(response_ids), 1, f"Expected 1 project for coach: {self.user_coach.name}")
-        self.assertEqual(projects[0].id, response_ids[0], "Project id in the response url is not correct")
+        for response in responses.values():
+            response_ids = [int(project_url.split('/')[-1]) for project_url in json.loads(response.content)]
+            response_ids.sort()
+            self.assertEqual(response_ids, test_projects_ids, f"Returned project ids did not match.\nExpected:{project_ids}\nGot: {response_ids} ")
 
     async def test_get_edition_resolving_conflict(self):
 
@@ -263,7 +227,7 @@ class TestEditions(TestBase):
 
         question_tag = question_tags[0]
         question_tag.question_id = question.id
-        question_tag.showInList = True
+        question_tag.show_in_list = True
         question_tag.mandatory = True
         await update(question_tag, self.session)
 
@@ -276,32 +240,30 @@ class TestEditions(TestBase):
         self.assertEqual(question_tag_detail_from_response["tag"], question_tag.tag)
         self.assertEqual(question_tag_detail_from_response["question"], "Just a question?")
         self.assertEqual(question_tag_detail_from_response["mandatory"], True)
-        self.assertEqual(question_tag_detail_from_response["showInList"], True)
+        self.assertEqual(question_tag_detail_from_response["show_in_list"], True)
 
     async def test_get_edition_question_tags_showinlist(self):
 
         edition = await self.create_edition_in_db()
-        question_tags = await self.create_question_tags_in_db(edition)
 
         question = Question(question="Just a question?", edition=edition.year)
-        await update(question, self.session)
+        question_tag = QuestionTag(
+            edition=edition.year,
+            question_id=question.id,
+            mandatory=True,
+            tag="test tag",
+            show_in_list=True)
 
-        question_tag = question_tags[0]
-        question_tag.question_id = question.id
-        question_tag.showInList = True
-        question_tag.mandatory = True
+        await update(question, self.session)
         await update(question_tag, self.session)
 
         # send request
-        path = f'/editions/{edition.year}/questiontags/showinlist'
+        path = f'/editions/{edition.year}/questiontags/show_in_list'
         response = await self.do_request(Request.GET, path, self.user_admin.name, access_token=await self.get_access_token(self.user_admin.name))
-        question_tag_detail_from_response = json.loads(response.content)
+        response_tag = json.loads(response.content)
 
         # check response data
-        self.assertEqual(question_tag_detail_from_response["tag"], question_tag.tag)
-        self.assertEqual(question_tag_detail_from_response["question"], "Just a question?")
-        self.assertEqual(question_tag_detail_from_response["mandatory"], True)
-        self.assertEqual(question_tag_detail_from_response["showInList"], True)
+        self.assertEqual(response_tag, [question_tag.tag], "Question tags did not match")
 
     async def test_post_create_edition(self):
 
@@ -443,7 +405,7 @@ class TestEditions(TestBase):
             # tag can only be changed if mandatory is false
             "tag": str(uuid.uuid1()),
             "question": question_text,
-            "showInList": not question_tag.showInList,
+            "show_in_list": not question_tag.show_in_list,
             # mandatory field can't be changed
             "mandatory": question_tag.mandatory
         }
@@ -464,5 +426,5 @@ class TestEditions(TestBase):
         # Check questin tag field values in the database
         question_tag_in_db = await read_where(QuestionTag, QuestionTag.tag == new_question_tag, session=self.session)
         self.assertEqual(question_tag_in_db.tag, new_question_tag, "Question tag was not updated in database.")
-        self.assertEqual(question_tag_in_db.showInList, updated_question_tag_request_body["showInList"], "showInList was not updated in database.")
+        self.assertEqual(question_tag_in_db.show_in_list, updated_question_tag_request_body["show_in_list"], "show_in_list was not updated in database.")
         self.assertEqual(question_tag_in_db.question_id, question.id, "Question id was not updated in database.")

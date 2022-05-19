@@ -65,7 +65,7 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         self.lf = LifespanManager(app)
         await self.lf.__aenter__()
         self.session: AsyncSession = self.sessionmaker()
-        # await clear_data(self.session)
+        await clear_data(self.session)
 
         user_generator = UserGenerator(self.session)
         user_generator.generate_default_users()
