@@ -19,6 +19,7 @@ import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
 import { log } from "../../utils/logger";
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
+import AddUserSelector from "../../Components/projects/AddUserSelector"
 
 function Input(props) {
     return null;
@@ -176,7 +177,9 @@ const Project = () => {
     }
 
     //TODO make this add user to project
-    function addUser() {
+    function addUser(user) {
+        log(user)
+        setUsers(prevstate => [...prevstate, user])
     }
 
     /**
@@ -384,12 +387,7 @@ const Project = () => {
                                 <div className={"project-empty-list"}>Currently there are no assigned staff</div>}
                         </div>
                         {showEdit ?
-                            // TODO make this pop up a selection tool for users
-                            <Hint message="Add new coach / admin to the project">
-                                <div className={"project-details-plus-user"}>
-                                    <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addUser()} />
-                                </div>
-                            </Hint>
+                            <AddUserSelector addUser={addUser} users={users} />
                             : null}
                         <Row>
                             <Col>

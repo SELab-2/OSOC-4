@@ -16,6 +16,7 @@ import "../styles/projects.css"
 import "../styles/projectDetails.css"
 import "../styles/requiredSkillSelector.css"
 import "../styles/defaultEmail.css"
+import "../styles/addUserSelector.css"
 
 import { ThemeProvider } from "react-bootstrap";
 import { SessionProvider } from 'next-auth/react';
