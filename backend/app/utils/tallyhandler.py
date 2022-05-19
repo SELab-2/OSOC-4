@@ -48,7 +48,6 @@ async def process_tally(data, edition, session: AsyncSession):
 
         # check if the saved question is the same as the one in the form
 
-
         if not q:
             q = Question(question=field["label"], field_id=field["key"], edition=edition)
             await update(q, session=session)
