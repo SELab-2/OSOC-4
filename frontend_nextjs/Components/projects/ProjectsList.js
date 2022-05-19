@@ -72,9 +72,9 @@ export default function ProjectsList(props) {
     useEffect(() => {
         Url.fromName(api.current_edition).extend("/resolving_conflicts").get().then(res => {
             if(res.success){
-                setConflicts(res.data)
+                setConflicts(res.data);
             }
-        })
+        });
     }, [allProjects]);
 
     useEffect(() => {

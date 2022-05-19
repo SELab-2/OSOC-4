@@ -1,4 +1,4 @@
-import { Button, Col, Modal, ModalHeader, ModalTitle, Row } from "react-bootstrap";
+import { Button, Col, Modal, ModalHeader, ModalTitle, Row, Card } from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {api, Url} from "../../utils/ApiClient";
 import ParticipationCard from "./ParticipationCard";
@@ -22,12 +22,18 @@ export default function ConflictsPopUpWindow(props) {
    * This function is called when currentStudent changes
    */
   useEffect(() => {
+    console.log("AAAAAAAAAAAAAAAAAAAAAAA");
     if (currentStudentIndex >= props.conflicts.length || currentStudentIndex < 0) {
       setCurrentStudentIndex(props.conflicts.length - 1);
     }
+    
     if (props.conflicts[currentStudentIndex]) {
       Url.fromUrl(props.conflicts[currentStudentIndex]).get(null, true).then(student => {
         setCurrentStudent(student.data);
+        console.log("SET")
+        console.log(props.conflicts)
+        console.log(currentStudentIndex)
+        console.log(student.data)
       });
     } else {
       setCurrentStudent(undefined);
@@ -77,6 +83,9 @@ export default function ConflictsPopUpWindow(props) {
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
+        <p>
+          Some students were assigned to two or more projects, please make sure every student is assigned to only one project.
+        </p>
         {(currentStudent)?
           [<Row>
             <Col md="auto">
