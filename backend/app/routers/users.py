@@ -74,7 +74,7 @@ async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
     :type Authorize: AuthJWT, optional
     :param session: the session object, defaults to Depends(get_session)
     :type session: AsyncSession, optional
-    :return: the updated user (yoursel)
+    :return: the updated user (yourself)
     :rtype: dict
     """
     current_user_id = Authorize.get_jwt_subject()

@@ -1,11 +1,11 @@
-""" This module includes all the questiontag exceptions
+""" This module includes all the QuestionTag exceptions
 """
 
 from app.exceptions.base_exception import BaseException
 
 
 class QuestionTagAlreadyExists(BaseException):
-    """QuestionTagAlreadyExists exception when a questiontag with name already exists
+    """QuestionTagAlreadyExists exception when a QuestionTag with name already exists
 
     :param BaseException: inherits from BaseException
     """
@@ -16,7 +16,7 @@ class QuestionTagAlreadyExists(BaseException):
 
 
 class QuestionTagNotFoundException(BaseException):
-    """QuestionTagNotFoundException exception when a questiontag not found
+    """QuestionTagNotFoundException exception when a QuestionTag not found
 
     :param BaseException: inherits from BaseException
     """
@@ -27,11 +27,11 @@ class QuestionTagNotFoundException(BaseException):
 
 
 class QuestionTagCantBeModified(BaseException):
-    """QuestionTagNotFoundException exception when a questiontag can't be modified
+    """QuestionTagNotFoundException exception when a QuestionTag can't be modified
 
     :param BaseException: inherits from BaseException
     """
     def __init__(self):
         """__init__ inits parent class with status code and message
         """
-        super().__init__(409, "Question of questiontag can't be modified")
+        super().__init__(409, "Question of QuestionTag can't be modified")

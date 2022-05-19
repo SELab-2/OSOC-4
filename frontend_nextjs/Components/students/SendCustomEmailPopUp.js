@@ -5,14 +5,14 @@ import { cache } from "../../utils/ApiClient";
 import { api, Url } from "../../utils/ApiClient";
 
 /***
- * This element shows the pop up window when sending emails in the 'email students' tab.
+ * This element shows the pop-up window when sending emails in the 'email students' tab.
  * @param props popUpShow decides wheater or not the pop-up window is visible, we use setPopUpShow to change the
  * visibility of the pop-up window (it changes popUpShow), students contains a list of students who will receive the email
  * @returns {JSX.Element} an element to render a pop-up window to send emails to students in the 'email students' tab
  */
 export default function SendCustomEmailPopUp(props) {
 
-  // defines whether or not the pop up window must be shown
+  // defines whether the pop-up window must be shown
   const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
   const [emailBody, setEmailBody] = useState("");
   const [emailSubject, setEmailSubject] = useState("");

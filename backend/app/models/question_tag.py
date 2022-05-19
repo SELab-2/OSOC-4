@@ -9,7 +9,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 class QuestionTag(SQLModel, table=True):
     """represents a QuestionTag from the database
-        a questiontag provides meaning (a tag) to a question
+        a QuestionTag provides meaning (a tag) to a question
     """
     tag: str = Field(primary_key=True)
     edition: int = Field(primary_key=True, foreign_key="edition.year")
@@ -21,7 +21,7 @@ class QuestionTag(SQLModel, table=True):
 
 
 class QuestionTagCreate(BaseModel):
-    """the expected input model (in the body of a HTML POST request) for creating a QuestionTag
+    """the expected input model (in the body of an HTML POST request) for creating a QuestionTag
     """
     tag: str
 
@@ -48,7 +48,7 @@ class QuestionTagSimpleOut(BaseModel):
 
 
 class QuestionTagUpdate(BaseModel):
-    """the expected input model (in the body of a HTML PATCH request) for editing a QuestionTag
+    """the expected input model (in the body of an HTML PATCH request) for editing a QuestionTag
 
     :param BaseModel: _description_
     :type BaseModel: _type_
