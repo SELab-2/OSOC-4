@@ -67,6 +67,9 @@ export default function StudentsFilters(props) {
         delete newQuery["filters"];
         delete newQuery["decision"];
         delete newQuery["skills"];
+        delete newQuery["unmatched"];
+        delete newQuery["own_suggestion"];
+
         router.push({
             pathname: router.pathname,
             query: newQuery
