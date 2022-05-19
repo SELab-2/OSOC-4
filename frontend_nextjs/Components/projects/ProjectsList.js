@@ -8,7 +8,7 @@ import ConflictCard from "./ConflictCard";
 import { useWebsocketContext } from "../WebsocketProvider"
 
 /**
- * Lists all of the projects that a user is allowed to view.
+ * Lists all the projects that a user is allowed to view.
  * @param props selectedProject the currently selected project in the project tab,
  * setSelectedProject the setter for the currently selected project in the project tab.
  * @returns {JSX.Element}
@@ -54,7 +54,7 @@ export default function ProjectsList(props) {
     }, [])
 
     /**
-     * Gets called once after mounting the Component and gets the currently logged in user
+     * Gets called once after mounting the Component and gets the currently logged-in user
      */
     useEffect(() => {
         Url.fromName(api.me).get().then(res => {

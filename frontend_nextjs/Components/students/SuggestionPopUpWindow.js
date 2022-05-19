@@ -5,7 +5,7 @@ import { Url, api } from "../../utils/ApiClient";
 /**
  * This component renders the pop-up window when making a suggestion about a student.
  * @param props props has the fields popUpShow, setPopUpShow, decision and student. popUpShow decided the visibility of
- * the pop up window. setPopUpShow is used to change popUpShow. decision is the decision ("yes", "maybe" or "no") of the
+ * the pop-up window. setPopUpShow is used to change popUpShow. decision is the decision ("yes", "maybe" or "no") of the
  * suggestion we want to make for the student. student is the student we want to make a suggestion for.
  * @returns {JSX.Element} A component that renders the pop-up window when making a suggestion about a student
  */

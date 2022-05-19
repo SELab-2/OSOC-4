@@ -199,12 +199,12 @@ const Project = () => {
      * @param body
      */
     function setFields(body) {
-        // in body users only consists of its ids, not the full links so we have to use the "users" state
+        // in body users only consists of its ids, not the full links, so we have to use the "users" state
         setProject(prevState => ({ ...prevState, ...body, "users": users }))
     }
 
     /**
-     * check if body if the given body is correct, if not show error message
+     * check body if the given body is correct, if not show error message
      * @param body
      */
     function checkBody(body) {

@@ -45,7 +45,7 @@ export default function NewProjects() {
 
 
     function AddStudent(){
-        // can't have more different type of students then amount of skills
+        // can't have more different type of students than amount of skills
         if (requiredSkills.length <= skills.length){
             setRequiredSkills(prevState => [...prevState, {"skill_name": "", "number": 1}])
         }

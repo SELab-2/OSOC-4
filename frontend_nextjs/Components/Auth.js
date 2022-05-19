@@ -17,7 +17,7 @@ export default function RouteGuard(props) {
     useEffect(() => {
         if (status === 'loading') return // Do nothing while loading
         if (props.auth && !isUser) {
-            router.push('/login') //Redirect to login
+            router.push('/login') // Redirect to "login"-path
         } else if (isUser && props.auth && !websocketConn && !creatingConnection) {
             connect();
         }
