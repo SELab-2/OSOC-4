@@ -91,7 +91,7 @@ export default function AddStudentModal(props) {
                     "skill_name": selectedSkill.value === "None" ? "" : selectedSkill.value,
                     "reason": reason
                 })
-                .post()
+                .post();
         }
     }
 
@@ -100,6 +100,11 @@ export default function AddStudentModal(props) {
         setReason(event.target.value);
     }
 
+    const reset = () => {
+        props.setShowAddStudent(false);
+        setSelectedSkill({ "value": "None", "label": "None" });
+        setReason("");
+    }
     /**
      * this modal screen allows you to select a valid skill and create a participation of the selectedStudent, props.selectedProject
      * and selectedSkill
@@ -107,7 +112,7 @@ export default function AddStudentModal(props) {
      */
     function getAddModal() {
         return (
-            <Modal show={props.showAddStudent} onHide={() => props.setShowAddStudent(false)}>
+            <Modal show={props.showAddStudent} onHide={() => {reset();}}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
                 </Modal.Header>
@@ -123,17 +128,10 @@ export default function AddStudentModal(props) {
                     />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
-                        props.setShowAddStudent(false)
-                        setSelectedSkill(undefined)
-                    }}>
+                    <Button variant="secondary" onClick={() => {reset()}}>
                         Dont add student to project
                     </Button>
-                    <Button variant="primary" onClick={async () => {
-                        await AddStudentToProject()
-                        props.setShowAddStudent(false)
-                        setSelectedSkill(undefined)
-                    }}>
+                    <Button variant="primary" onClick={async () => {await AddStudentToProject();reset();}}>
                         Add student to project
                     </Button>
 
