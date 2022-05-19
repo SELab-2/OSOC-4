@@ -121,7 +121,7 @@ export default function QuestionTag(props) {
 
             </td>
             <td>
-                {(!questionTag["mandatory"]) &&
+                {(!previousTag["mandatory"]) &&
                 <Hint message="Show in the students list">
                     <input name="show_in_list" type="checkbox" checked={previousTag["show_in_list"]}
                            onChange={handleCheckboxChange}/>
