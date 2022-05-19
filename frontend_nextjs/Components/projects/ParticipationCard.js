@@ -6,6 +6,7 @@ import red_cross from "/public/assets/wrong.svg";
 import { api, Url } from "../../utils/ApiClient";
 import { getID } from "../../utils/string";
 import Hint from "../Hint";
+import LoadingPage from "../LoadingPage";
 
 
 /**
@@ -19,17 +20,21 @@ export default function ParticipationCard(props) {
     const [student, setStudent] = useState({})
     const [project, setProject] = useState({})
     const [reason, setReason] = useState(props.participation.reason || "No reason was given");
+    
+    const [loading, setLoading] = useState(false);
 
     /**
      * Loads once after the component mounts, it sets the student state.
      */
     useEffect(() => {
+        setLoading(true);
         if (props.project) {
             Url.fromUrl(props.participation.student).get().then(response => {
                 if (response.success) {
                     setStudent(response.data);
                     console.log(response.data);
                 }
+                setLoading(false);
             })
             setProject(props.project);
 
@@ -40,6 +45,7 @@ export default function ParticipationCard(props) {
                 }
             })
             setStudent(props.student);
+            setLoading(false);
         }
     }, [props.participation])
 
@@ -47,11 +53,16 @@ export default function ParticipationCard(props) {
      * deletes props.participation
      */
     function deleteStudentFromProject(ev) {
+        setLoading(true);
         ev.stopPropagation();
         // delete participation
         Url.fromName(api.participations)
           .setParams({project_id: project.id_int, student_id: student.id_int})
-          .delete().then();
+          .delete().then(setLoading(false));
+     }
+
+     if (loading) {
+         return <LoadingPage/>
      }
 
     return (
