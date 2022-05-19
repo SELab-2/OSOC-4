@@ -4,7 +4,7 @@ import uuid
 from httpx import Response
 from app.config import config
 from app.crud import read_all_where, read_where, update
-from app.models.project import Project, ProjectCoach
+from app.models.project import Project
 from app.models.user import User, UserRole
 from app.tests.test_base import TestBase, Request
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
