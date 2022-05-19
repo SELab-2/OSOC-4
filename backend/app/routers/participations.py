@@ -90,7 +90,7 @@ async def delete_participation(student_id: str,
 
     await session.delete(participation)
     await session.commit()
-    await websocketManager.broadcast({"projectId": project_id, "studentId": student_id, "deleted_participation": True})
+    await websocketManager.broadcast({"projectId": project_id, "projectUrl": f"{config.api_url}projects/{str(project_id)}", "studentId": student_id, "studentUrl": config.api_url + "students/" + str(student.id), "deleted_participation": True})
 
 
 @router.patch("", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Participation edited")
@@ -140,6 +140,6 @@ async def edit_participation(student_id: int,
 
     await update(old_participation, session)
 
-    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
+    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
 
     return f"{config.api_url}students/{old_participation.student_id}"

@@ -417,6 +417,27 @@ class Cache {
             if (data["deleted_student"] in cache) {
                 delete cache[data["deleted_student"]];
             }
+        } else if ("participation" in data) {
+            const studentUrl = data["studentUrl"]
+
+            if (studentUrl in cache) {
+                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === data["participation"]["project"]);
+                if (index !== -1) {
+                    cache[studentUrl]["participations"][index] = data["participation"];
+                } else {
+                    cache[studentUrl]["participations"].push(data["participation"]);
+                }
+            }
+        } else if ("deleted_participation" in data) {
+            const studentUrl = data["studentUrl"]
+            const projectUrl = data["projectUrl"]
+
+            if (studentUrl in cache) {
+                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === projectUrl);
+                if (index !== -1) {
+                    cache[studentUrl]["participations"].splice(index, 1);
+                }
+            }
         }
     }
 
