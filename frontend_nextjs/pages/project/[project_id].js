@@ -20,6 +20,7 @@ import plus from "/public/assets/plus.svg"
 import { log } from "../../utils/logger";
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
 
+import { checkProjectBody } from "../../utils/inputchecker";
 function Input(props) {
     return null;
 }
@@ -234,7 +235,7 @@ const Project = () => {
             "edition": api.year,
             "users": users.map(url => getID(url))
         }
-        if (checkBody(body)) {
+        if (checkProjectBody(body)) {
             let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
             if (res.success) {
                 setFields(body)

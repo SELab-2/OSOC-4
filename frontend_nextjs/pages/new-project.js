@@ -1,4 +1,4 @@
-import {Button, Form, Modal, Row, Col} from "react-bootstrap";
+import {Button, Form, Modal, Row, Col, Alert} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {api, Url} from "../utils/ApiClient";
@@ -8,6 +8,7 @@ import back from "/public/assets/back.svg";
 import Hint from "../Components/Hint";
 import Image from 'next/image';
 import plus from "/public/assets/plus.svg";
+import { checkProjectBody} from "../utils/inputchecker"
 
 
 export default function NewProjects() {
@@ -26,7 +27,7 @@ export default function NewProjects() {
     const [show, setShow] = useState(false);
     const [availableSkills, setAvailableSkills] = useState([])
     const [users, setUsers] = useState([])
-
+    const [showError, setShowError] = useState(false);
 
     const router = useRouter()
 
@@ -54,7 +55,9 @@ export default function NewProjects() {
         await setUsers(users.filter((_, i) => i !== index))
     }
 
-    function addUser(){
+    // TODO
+    function addUser(event){
+        event.preventDefault()
     }
 
     function addRequiredSkill(){
@@ -62,12 +65,9 @@ export default function NewProjects() {
     }
 
     function changeRequiredSkill(value, index){
-        log("change skill")
         if(requiredSkills[index].label !== ""){
-            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
         } else {
-            log( [...(availableSkills.filter(skill => skill !== value.label))])
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
         let newArray = [...requiredSkills]
@@ -87,16 +87,26 @@ export default function NewProjects() {
             "edition": api.year,
             "users": []
         }
-        log(requiredSkills)
-        let res = await Url.fromName(api.projects).extend("/create").setBody(body).post();
-        if(res.success){
-            router.push("/projects")
+        if(checkProjectBody(body).correct){
+            log(requiredSkills)
+            let res = await Url.fromName(api.projects).extend("/create").setBody(body).post();
+            if(res.success){
+                router.push("/projects")
+            }
+        } else{
+            setShowError(true)
         }
+
     }
 
 
         return(
-        <div>
+        <div className={"add-project-body"}>
+            {showError ?
+                <Alert variant={"warning"} onClose={() => setShowError(false)} dismissible>
+                    Error this is not a valid new project.
+                </Alert> : null
+            }
             <Row className={"project-top-bar nomargin"}>
                 <Col xs={"auto"}>
                     <Hint message="Go back" placement="top">
@@ -128,23 +138,23 @@ export default function NewProjects() {
             </Row>
             <div className={"project-details-page"}>
                 <Form onSubmit={handleSubmitChange}>
-                    <Form.Label>Project name:</Form.Label>
+                    <h5 className={"add-project-label"}>Project name:</h5>
                     <Form.Control type="text" value={projectName} placeholder={"Project name"} onChange={e => setProjectName(e.target.value)} />
 
-                    <Form.Label>Partner name:</Form.Label>
+                    <h5 className={"add-project-label"}>Partner name:</h5>
                     <Form.Control type="text" value={partnerName} placeholder={"Partner name"} onChange={e => setPartnerName(e.target.value)} />
 
-                    <Form.Label>About partner:</Form.Label>
+                    <h5 className={"add-project-label"}>About partner:</h5>
                     <Form.Control as="textarea" rows={3} value={partnerDescription} placeholder={"Short bio about the partner, website, ..."} onChange={e => setPartnerDescription(e.target.value)} />
 
-                    <Form.Label>About project:</Form.Label>
+                    <h5 className={"add-project-label"}>About project:</h5>
                     <Form.Control as="textarea" rows={3} value={projectDescription} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectDescription(e.target.value)} />
                     <Row>
                         <Col>
-                            <Form.Label>Required skills:</Form.Label>
+                            <h5 className={"add-project-label"}>Required skills:</h5>
 
                             {(requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) => (
-                                <RequiredSkillSelector className={"required-skill-selector-row"}
+                                <RequiredSkillSelector className={"add-project-required-skill-selector-row"}
                                                        availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
                                                        key={index} index={index} skills={skills} requiredSkill={requiredSkill}
                                                        setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
@@ -158,16 +168,16 @@ export default function NewProjects() {
                             </Hint>
                         </Col>
                         <Col>
-                            <Form.Label>Users:</Form.Label>
+                            <h5 className={"add-project-label"}>Users:</h5>
                             <div className={"project-details-user-div"}>
                                 {(users.length) ?
                                     users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>))
                                     :
-                                    <div className={"project-empty-list"}>Currently there are no assigned staff</div> }
+                                    <div className={"add-project-empty-list"}>Currently there are no assigned staff</div> }
                             </div>
                             <Hint message={"Add new coach / admin to the project"} >
                                 <div className={"project-details-plus-user"}>
-                                    <Image  width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addUser()} />
+                                    <Image  width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={(e) => addUser(e)} />
                                 </div>
                             </Hint>
                         </Col>
