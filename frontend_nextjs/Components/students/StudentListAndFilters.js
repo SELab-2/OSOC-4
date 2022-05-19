@@ -1,4 +1,4 @@
-import {Button, Col, Row} from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import StudentsFilters from "./StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
 import SearchSortBar from "./SearchSortBar";
@@ -14,6 +14,7 @@ import { useWebsocketContext } from "../WebsocketProvider"
 import LoadingPage from "../LoadingPage"
 import filterIcon from "../../public/assets/show-filter-svgrepo-com.svg"
 import Image from "next/image";
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function StudentList(props) {
 
@@ -134,6 +135,7 @@ export default function StudentList(props) {
           pathname: router.pathname,
           query: newQuery
         }, undefined, { shallow: true })
+        toast.info("The student was deleted by an admin");
       }
     }
 
@@ -200,6 +202,7 @@ export default function StudentList(props) {
           }
         })}
       </InfiniteScroll>
-    </Col>
+    </Col>,
+    <ToastContainer />
   ]
 }
