@@ -417,15 +417,15 @@ class Cache {
             if (data["deleted_student"] in cache) {
                 delete cache[data["deleted_student"]];
             }
-        } else if ("participation" in data) {
+        } else if ("participation_student" in data) {
             const studentUrl = data["studentUrl"]
 
             if (studentUrl in cache) {
-                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === data["participation"]["project"]);
+                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === data["participation_student"]["project"]);
                 if (index !== -1) {
-                    cache[studentUrl]["participations"][index] = data["participation"];
+                    cache[studentUrl]["participations"][index] = data["participation_student"];
                 } else {
-                    cache[studentUrl]["participations"].push(data["participation"]);
+                    cache[studentUrl]["participations"].push(data["participation_student"]);
                 }
             }
         } else if ("deleted_participation" in data) {

@@ -4,7 +4,8 @@ from app.database import get_session, websocketManager
 from app.exceptions.participation_exceptions import (
     InvalidParticipationException, ParticipationNotFoundException)
 from app.models.participation import (Participation, ParticipationCreate,
-                                      ParticipationOutProject)
+                                      ParticipationOutProject,
+                                      ParticipationOutStudent)
 from app.models.project import Project
 from app.models.student import Student
 from app.models.user import UserRole
@@ -58,7 +59,7 @@ async def create_participation(participation: ParticipationCreate,
 
     await update(old_participation, session)
 
-    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
+    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json())), "participation_student": jsonable_encoder(ParticipationOutStudent.parse_raw(old_participation.json()))})
 
     return f"{config.api_url}students/{old_participation.student_id}"
 
@@ -140,6 +141,6 @@ async def edit_participation(student_id: int,
 
     await update(old_participation, session)
 
-    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
+    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation_student": jsonable_encoder(ParticipationOutStudent.parse_raw(old_participation.json())), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
 
     return f"{config.api_url}students/{old_participation.student_id}"
