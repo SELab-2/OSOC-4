@@ -2,6 +2,7 @@ import { Button, Col, Modal, ModalHeader, ModalTitle, Row, Card } from "react-bo
 import {useEffect, useState} from "react";
 import {api, Url} from "../../utils/ApiClient";
 import ParticipationCard from "./ParticipationCard";
+import Hint from "../Hint";
 
 /**
  * This element shows the pop up window when solving the conflicts.
@@ -97,7 +98,9 @@ export default function ConflictsPopUpWindow(props) {
             </Col>
             <Col />
             <Col md="auto">
+              <h4>
               {currentStudentIndex + 1} / {props.conflicts.length}
+              </h4>
             </Col>
           </Row>,
             currentStudent.participations.map(
@@ -108,8 +111,8 @@ export default function ConflictsPopUpWindow(props) {
         }
         <Row style={{marginTop: "10px"}} >
           <Col/>
-          <Col md="auto"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Col>
-          <Col md="auto"><button className="prevnextbutton" onClick={nextStudent}>&#8250;</button></Col>
+          <Col md="auto"><Hint message="Previous conflict"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Hint></Col>
+          <Col md="auto"><Hint message="Next conflict"><button className="prevnextbutton" onClick={nextStudent}>&#8250;</button></Hint></Col>
         </Row>
       </Modal.Body>
       <Modal.Footer>
