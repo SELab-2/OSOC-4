@@ -103,7 +103,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Innovative open source projects, made by incredibly motivated students, coaches & organisations.",
         partner_name="UGent",
         partner_description="Universiteit Gent",
-        coaches=coaches[:2],
         edition=edition.year)
 
     project1_skills = [ProjectRequiredSkill(
@@ -117,7 +116,6 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
         description="Hackers & Cyborgs",
         partner_name="HoGent",
         partner_description="Hogeschool Gent",
-        coaches=coaches[2:],
         edition=edition.year)
     session.add(project)
 

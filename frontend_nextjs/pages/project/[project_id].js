@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { Button, Col, Modal, Row } from "react-bootstrap";
 import { api, Url } from "../../utils/ApiClient";
-import AdminCard from "../../Components/projects/AdminCard";
 import SkillCard from "../../Components/projects/SkillCard";
 import ParticipationCard from "../../Components/projects/ParticipationCard";
 import Image from 'next/image'
@@ -13,7 +12,6 @@ import delete_image from "/public/assets/delete.svg"
 import Hint from "../../Components/Hint";
 import RequiredSkillSelector from "../../Components/projects/RequiredSkillSelector";
 import red_cross from "/public/assets/wrong.svg"
-import { getID } from "../../utils/string";
 import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
@@ -46,7 +44,6 @@ const Project = () => {
     const [partnerName, setPartnerName] = useState("");
     const [projectName, setProjectName] = useState("")
     const [stillRequiredSkills, setStillRequiredSkills] = useState([]);
-    const [users, setUsers] = useState([]);
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
     const [availableSkills, setAvailableSkills] = useState([])
@@ -157,7 +154,6 @@ const Project = () => {
 
     function changeRequiredSkill(value, index){
         if(requiredSkills[index].label !== ""){
-            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
         } else {
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
@@ -165,18 +161,6 @@ const Project = () => {
         let newArray = [...requiredSkills]
         newArray[index] = value
         setRequiredSkills(newArray)
-    }
-    /**
-     * Gets called after successfully removing a user from a project.
-     * @param index
-     * @returns {Promise<void>}
-     */
-    async function deleteUser(index) {
-        await setUsers(users.filter((_, i) => i !== index))
-    }
-
-    //TODO make this add user to project
-    function addUser() {
     }
 
     /**
@@ -191,7 +175,6 @@ const Project = () => {
 
         setPartnerDescription(original.partner_description)
 
-        setUsers(original.users)
     }
 
     /**
@@ -200,7 +183,7 @@ const Project = () => {
      */
     function setFields(body) {
         // in body users only consists of its ids, not the full links, so we have to use the "users" state
-        setProject(prevState => ({ ...prevState, ...body, "users": users }))
+        setProject(prevState => ({ ...prevState, ...body}))
     }
 
     /**
@@ -233,7 +216,6 @@ const Project = () => {
             "partner_name": partnerName,
             "partner_description": partnerDescription,
             "edition": api.getYear(),
-            "users": []
         }
         if (checkProjectBody(body)) {
             let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
@@ -370,22 +352,6 @@ const Project = () => {
                             <EditableDiv isTextArea={true} cssClass={"project-details-big-subtitle"} showEdit={showEdit} value={project.description} changeValue={projectDescription} setChangeValue={setProjectDescription} />
 
                         </div>
-
-                        <div className={"project-details-title-info"}>Assigned staff</div>
-                        <div className={"project-details-user-div" + (showEdit ? "-edit" : "")}>
-                            {(users.length) ?
-                                users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item} />))
-                                :
-                                <div className={"project-empty-list"}>Currently there are no assigned staff</div>}
-                        </div>
-                        {showEdit ?
-                            // TODO make this pop up a selection tool for users
-                            <Hint message="Add new coach / admin to the project">
-                                <div className={"project-details-plus-user"}>
-                                    <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addUser()} />
-                                </div>
-                            </Hint>
-                            : null}
                         <Row>
                             <Col>
                                 <div>

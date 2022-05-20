@@ -46,20 +46,6 @@ export default function NewProjects() {
         })
     }, [])
 
-    /**
-     * Gets called after successfully removing a user from a project.
-     * @param index
-     * @returns {Promise<void>}
-     */
-    async function deleteUser(index){
-        console.log(index)
-        await setUsers(users.filter((_, i) => i !== index))
-    }
-
-    // TODO
-    function addUser(event){
-        event.preventDefault()
-    }
 
     function addRequiredSkill(){
         event.preventDefault()
@@ -79,7 +65,6 @@ export default function NewProjects() {
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        // TODO check forms
         let body = {
             "name":projectName,
             "description":projectDescription,
@@ -87,7 +72,6 @@ export default function NewProjects() {
             "partner_name":partnerName,
             "partner_description": partnerDescription,
             "edition": api.getYear(),
-            "users": []
         }
         if(checkProjectBody(body).correct){
             log(requiredSkills)
@@ -167,20 +151,6 @@ export default function NewProjects() {
                             <Hint message={"Add new required skill"} placement="top">
                                 <div className={"project-details-plus-skill"} >
                                     <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={(e) => addRequiredSkill(e)} />
-                                </div>
-                            </Hint>
-                        </Col>
-                        <Col>
-                            <h5 className={"add-project-label"}>Users:</h5>
-                            <div className={"project-details-user-div"}>
-                                {(users.length) ?
-                                    users.map((item, index) => (<AdminCard key={item} showEdit={showEdit} index={index} deleteUser={deleteUser} user={item}/>))
-                                    :
-                                    <div className={"add-project-empty-list"}>Currently there are no assigned staff</div> }
-                            </div>
-                            <Hint message={"Add new coach / admin to the project"} >
-                                <div className={"project-details-plus-user"}>
-                                    <Image  width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={(e) => addUser(e)} />
                                 </div>
                             </Hint>
                         </Col>
