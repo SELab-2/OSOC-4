@@ -2,7 +2,6 @@ import { Card, Col, Row } from "react-bootstrap";
 import { log } from "../../utils/logger";
 import { useRouter } from "next/router";
 import SkillCard from "./SkillCard";
-import AdminCard from "./AdminCard";
 import React, { useEffect, useState } from "react";
 import ParticipationCard from "./ParticipationCard";
 import Image from 'next/image'
@@ -87,10 +86,6 @@ export default function ProjectCard(props) {
                     <div className={"partner-title"} >{props.project.partner_name}</div>
                     {/*todo make this clickable with link to partner?*/}
                     <br />
-
-                    <Row>
-                        {(props.project.users.length) ? props.project.users.map(item => (<AdminCard key={item} user={item} />)) : null}
-                    </Row>
                     <br />
                     <Row>
                         <Col>

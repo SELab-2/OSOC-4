@@ -10,13 +10,7 @@ from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 
 
-class ProjectCoach(SQLModel, table=True):
-    """represents a ProjectCoach from the database
-        a project-coach is the relationship between a project and a coach,
-        it defines which coach belongs to what project
-    """
-    project_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="project.id")
-    coach_id: Optional[int] = Field(default=None, primary_key=True, foreign_key="user.id")
+
 
 
 class ProjectRequiredSkill(SQLModel, table=True):
@@ -45,7 +39,6 @@ class Project(SQLModel, table=True):
     partner_name: str
     partner_description: str
 
-    coaches: List["User"] = Relationship(back_populates="projects", link_model=ProjectCoach)
     required_skills: List[ProjectRequiredSkill] = Relationship(back_populates="project")
     suggestions: List[Suggestion] = Relationship(back_populates="project")
     participations: List[Participation] = Relationship(back_populates="project")
@@ -67,7 +60,6 @@ class ProjectCreate(BaseModel):
     partner_name: str
     partner_description: str
     edition: int
-    users: List[int]
 
 
 class ProjectOutSimple(BaseModel):
@@ -93,7 +85,6 @@ class ProjectOutExtended(BaseModel):
     partner_name: str
     partner_description: str
     required_skills: List[RequiredSkillOut] = []
-    users: List[str] = []
     participations: Dict[int, ParticipationOutProject] = {}
     edition: str
 

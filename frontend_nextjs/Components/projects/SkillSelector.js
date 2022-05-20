@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {log} from "../../utils/logger";
 import Select from "react-select";
-import {StringListToOptionsList} from "../../utils/skillselector";
 
 /**
  * dropdown select menu with search, that allows you to select a skill

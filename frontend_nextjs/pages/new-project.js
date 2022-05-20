@@ -53,7 +53,6 @@ export default function NewProjects() {
 
     async function handleSubmitChange(event){
         event.preventDefault()
-        // TODO check forms
         let body = {
             "name":projectName,
             "description":projectDescription,
@@ -61,10 +60,7 @@ export default function NewProjects() {
             "partner_name":partnerName,
             "partner_description": partnerDescription,
             "edition": api.year,
-            "users": []
         }
-        log(body)
-        // TODO add skills to project
         await Url.fromName(api.projects).extend("/create").setBody(body).post();
     }
 
