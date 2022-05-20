@@ -75,7 +75,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         user_generator.add_to_db()
         await self.session.commit()
 
-        self.user_coach = self.users["coach"]
         self.user_admin = self.users["user_admin"]
 
     async def asyncTearDown(self) -> None:
