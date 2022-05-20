@@ -18,6 +18,7 @@ import plus from "/public/assets/plus.svg"
 import { log } from "../../utils/logger";
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
 import { ToastContainer, toast } from 'react-toastify';
+import useWindowDimensions from "../../utils/WindowDimensions";
 
 import { checkProjectBody } from "../../utils/inputchecker";
 function Input(props) {
@@ -46,7 +47,10 @@ const Project = () => {
     const [stillRequiredSkills, setStillRequiredSkills] = useState([]);
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
-    const [availableSkills, setAvailableSkills] = useState([])
+    const [availableSkills, setAvailableSkills] = useState([]);
+    const [fullView, setFullView] = useState(false);
+    const { height, width } = useWindowDimensions();
+
 
     const { websocketConn } = useWebsocketContext();
 
@@ -91,6 +95,13 @@ const Project = () => {
             }
         })
     }, [])
+
+    /**
+     * This useEffect changes the fullView state variable, on change of the screen width or router.
+     */
+    useEffect(() => {
+        setFullView(width > 1500 || (width > 1000 && !router.query.studentId));
+    }, [width]);
 
     /**
      * Initalize the value of available skills after mounting the component
@@ -233,7 +244,7 @@ const Project = () => {
             <Row>
                 {loaded ? (<div>
                     <Row className={"project-top-bar nomargin"}>
-                        <Col xs="auto" >
+                        <Col style={{"max-width": 100}} >
                             <Hint message="Go back">
                                 <Image alt={"back button"} onClick={() => {
                                     if (showEdit) {
@@ -262,80 +273,88 @@ const Project = () => {
                                 </Modal.Footer>
                             </Modal>
                         </Col>
-                        <Col>
-                            <EditableDiv cssClass={"project-details-project-title"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName} />
-                        </Col>
-                        <Col xs="auto" >
-                            {showEdit ?
-                                <Hint message="Save changes">
-                                    <Image alt={"save button"} src={save_image} onClick={() => {
-                                        changeProject()
-                                    }} width={33} height={33} />
-                                </Hint>
-                                :
-                                <Hint message="Edit project">
-                                    <Image alt={"edit button"} onClick={() => {
-                                        setEditFields(project)
-                                        setShowEdit(true)
-                                    }} src={edit} width={33} height={33} />
-                                </Hint>
-                            }
-                        </Col>
-                        <Col xs="auto" >
-                            {showEdit ?
-                                <>
-                                    <Hint message="Cancel edit">
-                                        <Image alt={"cancel edit button"} src={red_cross} width={33} height={33} onClick={() => setShowStopEditing(true)} />
-                                    </Hint>
-                                    <Modal show={showStopEditing} onHide={() => setShowStopEditing(false)}>
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Stop editing</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>Are you sure you want to stop editing? Doing so will lose your current changes.</Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={() => setShowStopEditing(false)}>
-                                                Keep editing
-                                            </Button>
-                                            <Button variant="primary" onClick={() => {
-                                                setShowStopEditing(false)
-                                                setShowEdit(false)
-                                            }}>
-                                                Stop editing
-                                            </Button>
+                        {fullView ? 
+                            <Col>
+                                <EditableDiv cssClass={"project-details-project-title"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName} />
+                            </Col>
+                        : <Col/>}
+                
+                                <Col xs="auto">
+                                    {showEdit ?
+                                        <Hint message="Save changes">
+                                            <Image alt={"save button"} src={save_image} onClick={() => {
+                                                changeProject()
+                                            }} width={33} height={33} />
+                                        </Hint>
+                                        :
+                                        <Hint message="Edit project">
+                                            <Image alt={"edit button"} onClick={() => {
+                                                setEditFields(project)
+                                                setShowEdit(true)
+                                            }} src={edit} width={33} height={33} />
+                                        </Hint>
+                                    }
+                                </Col>
+                                <Col xs="auto" >
+                                    {showEdit ?
+                                        <>
+                                            <Hint message="Cancel edit">
+                                                <Image alt={"cancel edit button"} src={red_cross} width={33} height={33} onClick={() => setShowStopEditing(true)} />
+                                            </Hint>
+                                            <Modal show={showStopEditing} onHide={() => setShowStopEditing(false)}>
+                                                <Modal.Header closeButton>
+                                                    <Modal.Title>Stop editing</Modal.Title>
+                                                </Modal.Header>
+                                                <Modal.Body>Are you sure you want to stop editing? Doing so will lose your current changes.</Modal.Body>
+                                                <Modal.Footer>
+                                                    <Button variant="secondary" onClick={() => setShowStopEditing(false)}>
+                                                        Keep editing
+                                                    </Button>
+                                                    <Button variant="primary" onClick={() => {
+                                                        setShowStopEditing(false)
+                                                        setShowEdit(false)
+                                                    }}>
+                                                        Stop editing
+                                                    </Button>
 
-                                        </Modal.Footer>
-                                    </Modal>
-                                </>
+                                                </Modal.Footer>
+                                            </Modal>
+                                        </>
 
-                                :
-                                <div>
-                                    <Hint message="Delete project">
-                                        <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)} />
-                                    </Hint>
-                                    <Modal show={showDelete} onHide={() => setShowDelete(false)}>
-                                        <Modal.Header closeButton>
-                                            <Modal.Title>Delete project?</Modal.Title>
-                                        </Modal.Header>
-                                        <Modal.Body>Are you sure you want to delete this project? Doing so will not be reversible. </Modal.Body>
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={() => setShowDelete(false)}>
-                                                Keep project
-                                            </Button>
-                                            <Button variant="primary" onClick={() => {
-                                                setShowDelete(false)
-                                                deleteProject()
-                                                router.push("/projects")
-                                            }}>
-                                                Delete project
-                                            </Button>
+                                        :
+                                        <div>
+                                            <Hint message="Delete project">
+                                                <Image alt={"delete button"} src={delete_image} width={33} height={33} onClick={() => setShowDelete(true)} />
+                                            </Hint>
+                                            <Modal show={showDelete} onHide={() => setShowDelete(false)}>
+                                                <Modal.Header closeButton>
+                                                    <Modal.Title>Delete project?</Modal.Title>
+                                                </Modal.Header>
+                                                <Modal.Body>Are you sure you want to delete this project? Doing so will not be reversible. </Modal.Body>
+                                                <Modal.Footer>
+                                                    <Button variant="secondary" onClick={() => setShowDelete(false)}>
+                                                        Keep project
+                                                    </Button>
+                                                    <Button variant="primary" onClick={() => {
+                                                        setShowDelete(false)
+                                                        deleteProject()
+                                                        router.push("/projects")
+                                                    }}>
+                                                        Delete project
+                                                    </Button>
 
-                                        </Modal.Footer>
-                                    </Modal>
-                                </div>
-                            }
+                                                </Modal.Footer>
+                                            </Modal>
+                                        </div>
+                                    }
 
-                        </Col>
+                                </Col>
                     </Row>
+
+                    {! fullView ? 
+                        <EditableDiv cssClass={"project-details-project-title"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName} />
+
+                     : null}
                     <div className={"project-details-page"} >
                         <div className={"project-details-edit-field-width"}>
                             <Row className={"nomargin"}>
@@ -376,21 +395,24 @@ const Project = () => {
                                     </Hint>
                                     : null}
                             </Col>
-                            <Col>
-                                <div>
-                                    <div className={"project-card-title"}>Still required skills</div>
-                                    {(stillRequiredSkills.length) ? (stillRequiredSkills.map((requiredSkill, index) => {
-                                        if (requiredSkill.number > 0) {
-                                            return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
+                            { fullView || ! showEdit ?
+                                <Col>
+                                    <div>
+                                        <div className={"project-card-title"}>Still required skills</div>
+                                        {(stillRequiredSkills.length) ? (stillRequiredSkills.map((requiredSkill, index) => {
+                                                if (requiredSkill.number > 0) {
+                                                    return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
+                                                }
+                                                return null
+                                            }))
+                                            :
+                                            <div className={"project-empty-list-col"}>Currently there are no required skills</div>
                                         }
-                                        return null
-                                    }))
-                                        :
-                                        <div className={"project-empty-list-col"}>Currently there are no required skills</div>
-                                    }
-                                </div>
-                            </Col>
-                            <Col>
+                                    </div>
+                                </Col> : null
+                            }
+
+                            {fullView ? <Col>
                                 <div>
                                     <div className={"project-card-title"}>Assigned students</div>
                                     {(Object.values(project.participations).length) ?
@@ -398,8 +420,38 @@ const Project = () => {
                                         <div className={"project-empty-list-col"}>Currently there are no assigned students</div>
                                     }
                                 </div>
-                            </Col>
+                            </Col> : null
+                            }
+                            
                         </Row>
+                        { ! fullView && showEdit ?
+                            <Col>
+                                <div>
+                                    <div className={"project-card-title"}>Still required skills</div>
+                                    {(stillRequiredSkills.length) ? (stillRequiredSkills.map((requiredSkill, index) => {
+                                            if (requiredSkill.number > 0) {
+                                                return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
+                                            }
+                                            return null
+                                        }))
+                                        :
+                                        <div className={"project-empty-list-col"}>Currently there are no required skills</div>
+                                    }
+                                </div>
+                            </Col> : null
+                        }
+
+                        {! fullView ? <Col>
+                            <div>
+                                <div className={"project-card-title"}>Assigned students</div>
+                                {(Object.values(project.participations).length) ?
+                                    Object.values(project.participations).map(participation => (<ParticipationCard key={participation.student} participation={participation} project={project} />)) :
+                                    <div className={"project-empty-list-col"}>Currently there are no assigned students</div>
+                                }
+                            </div>
+                        </Col> : null
+                        }
+
                     </div>
 
                 </div>) : null}
