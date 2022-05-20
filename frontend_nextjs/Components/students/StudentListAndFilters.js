@@ -45,7 +45,7 @@ export default function StudentList(props) {
 
   // clear all selected students when the list of students changes
   useEffect(() => {
-      props.setSelectedStudents([]); // clear selected students
+    props.setSelectedStudents([]); // clear selected students
   }, [studentUrls])
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function StudentList(props) {
     // if users student details is the deleted student => close the details page
     if ("deleted_student" in data) {
       let newQuery = router.query;
-      if (newQuery.studentId.toString() === data["student_int"].toString()) {
+      if ("studentId" in newQuery && newQuery.studentId.toString() === data["student_int"].toString()) {
         delete newQuery["studentId"];
         router.push({
           pathname: router.pathname,
