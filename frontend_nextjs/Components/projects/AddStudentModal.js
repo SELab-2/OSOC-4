@@ -121,9 +121,12 @@ export default function AddStudentModal(props) {
                     <Form.Control type="text" id="suggestin-reason" name="reason" className="fill_width suggestion-reason"
                      onChange={handleChange} value={reason} placeholder="Your reason"/>
                     <div className="student-modal-screen-title">For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?</div>
-                    <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
-                        options={options}
-                    />
+                    <div className="student-modal-screen-skillselector">
+                        <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
+                            options={options}
+                        />
+                    </div>
+                    
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={async () => {await AddStudentToProject();reset();}}>
