@@ -15,7 +15,6 @@ import red_cross from "/public/assets/wrong.svg"
 import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
-import { log } from "../../utils/logger";
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -187,24 +186,6 @@ const Project = () => {
     }
 
     /**
-     * check body if the given body is correct, if not show error message
-     * @param body
-     */
-    function checkBody(body) {
-        if (body.required_skills.some(skill => skill.skill_name === "")) {
-            toast.error("Could not save changes to project")
-            return false
-        }
-        let names_list = body.required_skills.map(skill => skill.skill_name)
-        if (names_list.some((skill_name, index) => names_list.indexOf(skill_name) !== index)) {
-            toast.error("Could not save changes to project")
-            return false
-        }
-
-        return true
-    }
-
-    /**
      * make patch request to change project
      * @returns {Promise<void>}
      */
@@ -217,14 +198,18 @@ const Project = () => {
             "partner_description": partnerDescription,
             "edition": api.getYear(),
         }
-        if (checkProjectBody(body)) {
+        let response = checkProjectBody(body)
+        if (response.correct) {
             let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
             if (res.success) {
                 setFields(body)
                 setShowEdit(false)
+                toast.done("Project changed succesfully!")
             } else {
                 toast.error("Could not save changes to project")
             }
+        } else {
+            toast.error("You have given an incorrect " + response.problem)
         }
     }
 
@@ -339,10 +324,10 @@ const Project = () => {
                     <div className={"project-details-page"} >
                         <div className={"project-details-edit-field-width"}>
                             <Row className={"nomargin"}>
-                                <Col xs={"auto"}>
+                                <Col className="nomargin nopadding" xs={"auto"}>
                                     <div className={"project-details-title-info"} >Project by: </div>
                                 </Col>
-                                <Col>
+                                <Col className="nomargin nopadding">
                                     <EditableDiv isTextArea={false} showEdit={showEdit} value={project.partner_name} changeValue={partnerName} setChangeValue={setPartnerName} cssClass={"project-details-title"} />
                                 </Col>
                             </Row>
@@ -352,8 +337,8 @@ const Project = () => {
                             <EditableDiv isTextArea={true} cssClass={"project-details-big-subtitle"} showEdit={showEdit} value={project.description} changeValue={projectDescription} setChangeValue={setProjectDescription} />
 
                         </div>
-                        <Row>
-                            <Col>
+                        <Row className="nomargin nopadding">
+                            <Col className="nomargin nopadding">
                                 <div>
                                     <div className={"project-card-title"}>All required skills</div>
                                     {(requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) => {
@@ -376,7 +361,7 @@ const Project = () => {
                                     </Hint>
                                     : null}
                             </Col>
-                            <Col>
+                            <Col className="nomargin nopadding">
                                 <div>
                                     <div className={"project-card-title"}>Still required skills</div>
                                     {(stillRequiredSkills.length) ? (stillRequiredSkills.map((requiredSkill, index) => {
@@ -390,7 +375,7 @@ const Project = () => {
                                     }
                                 </div>
                             </Col>
-                            <Col>
+                            <Col className="nomargin nopadding">
                                 <div>
                                     <div className={"project-card-title"}>Assigned students</div>
                                     {(Object.values(project.participations).length) ?

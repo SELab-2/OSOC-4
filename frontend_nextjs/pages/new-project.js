@@ -2,13 +2,13 @@ import {Button, Form, Modal, Row, Col, Alert} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {api, Url} from "../utils/ApiClient";
-import {log} from "../utils/logger";
 import RequiredSkillSelector from "../Components/projects/RequiredSkillSelector";
 import back from "/public/assets/back.svg";
 import Hint from "../Components/Hint";
 import Image from 'next/image';
 import plus from "/public/assets/plus.svg";
 import { checkProjectBody} from "../utils/inputchecker"
+import { ToastContainer, toast } from 'react-toastify';
 
 
 export default function NewProjects() {
@@ -16,18 +16,10 @@ export default function NewProjects() {
     const [partnerName, setPartnerName] = useState("")
     const [partnerDescription, setPartnerDescription] = useState("")
     const [projectDescription, setProjectDescription] = useState("")
-    const [briefing, setBriefing] = useState("")
-
-    const [tools, setTools] = useState("")
-    const [codeLanguages, setCodeLanguages] = useState("")
-
     const [requiredSkills, setRequiredSkills] = useState([{"skill_name":"", "number":1}])
-
     const [skills, setSkills] = useState([])
     const [show, setShow] = useState(false);
     const [availableSkills, setAvailableSkills] = useState([])
-    const [users, setUsers] = useState([])
-    const [showError, setShowError] = useState(false);
 
     const router = useRouter()
 
@@ -71,16 +63,19 @@ export default function NewProjects() {
             "required_skills": requiredSkills,
             "partner_name":partnerName,
             "partner_description": partnerDescription,
-            "edition": api.getYear(),
+            "edition": api.getYear()
         }
-        if(checkProjectBody(body).correct){
-            log(requiredSkills)
+        let response = checkProjectBody(body)
+        if(response.correct){
             let res = await Url.fromName(api.projects).extend("/create").setBody(body).post();
             if(res.success){
                 router.push("/projects")
+                toast.done("Project created succesfully!")
+            } else {
+                toast.error("Could not create new project")
             }
-        } else{
-            setShowError(true)
+        }  else {
+            toast.error("You have given an incorrect " + response.problem)
         }
 
     }
@@ -88,11 +83,6 @@ export default function NewProjects() {
 
         return(
         <div className={"add-project-body"}>
-            {showError ?
-                <Alert variant={"warning"} onClose={() => setShowError(false)} dismissible>
-                    Error this is not a valid new project.
-                </Alert> : null
-            }
             <Row className={"project-top-bar nomargin"}>
                 <Col xs={"auto"}>
                     <Hint message="Go back" placement="top">
@@ -163,6 +153,7 @@ export default function NewProjects() {
                     </div>
                 </Form>
             </div>
+            <ToastContainer />
         </div>
     )
 }
