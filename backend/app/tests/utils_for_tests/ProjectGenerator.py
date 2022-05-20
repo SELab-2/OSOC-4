@@ -5,10 +5,7 @@ from app.tests.utils_for_tests.DataGenerator import DataGenerator
 
 
 class ProjectGenerator(DataGenerator):
-    def __init__(self, session):
-        super().__init__(session)
-
-    def generate_default_projects(self, year=2022, skills=None):
+    def generate_default_projects(self, year=2022):
         projects = [
             Project(
                 edition=year,
