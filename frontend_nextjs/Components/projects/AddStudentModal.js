@@ -8,7 +8,7 @@ import { StringListToOptionsList } from "../../utils/skillselector";
 
 /**
  * When clicking on the button to assign a student to a project, this modal pops-up. If the selected student and project
- * are a valid combination then you can select a skill and add the student to the project. Otherwise a modal screen pops-up
+ * are a valid combination then you can select a skill and add the student to the project. Otherwise, a modal screen pops-up
  * with the reason why the student and project aren't a valid combination.
  *
  * @param props setSelectedStudent the setter for the currently selected student on the project page,

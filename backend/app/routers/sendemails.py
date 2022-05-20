@@ -42,7 +42,7 @@ async def send_decision_emails(data: SendEmails, Authorize: AuthJWT = Depends(),
 async def send_custom_email(custom_email: SendCustomEmail, Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)) -> None:
     """send_custom_email sends a custom email to a student
 
-    :param custom_email: the data of who to send an email to and what email to send
+    :param custom_email: the data of whom to email and what email to send
     :type custom_email: SendCustomEmail
     :param Authorize: needed to know who requested this, defaults to Depends()
     :type Authorize: AuthJWT, optional

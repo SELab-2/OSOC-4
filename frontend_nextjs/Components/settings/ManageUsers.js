@@ -47,6 +47,7 @@ export default function ManageUsers(props) {
 
     const handleSearch = (event) => {
         setSearch(event.target.value);
+        applyFilters(event.target.value, filters);
     };
 
     useEffect(() => {
@@ -106,11 +107,6 @@ export default function ManageUsers(props) {
         );
     }
 
-    async function handleSearchSubmit(event) {
-        event.preventDefault();
-        setShownUsers(users.filter(user => user.name.toLowerCase().includes(search.toLowerCase())))
-    }
-
     const [filters, setFilters] = useState({
         "show-all-users": true,
         "show-approved": false,
@@ -131,14 +127,20 @@ export default function ManageUsers(props) {
         }
         temp[ev.target.id] = true
         setFilters(temp);
+        applyFilters(search, temp);
+    }
 
-        setShownUsers([...users.filter(user => {
-            if (!user.name.toLowerCase().includes(search.toLowerCase())) {return false;}
-            if (ev.target.id === "show-all-users") {return true;}
-            if (ev.target.id === "show-approved") {return user.approved;}
-            if (ev.target.id === "show-unapproved") {return user.active && !user.approved;}
-            if (ev.target.id === "show-inactive") {return !user.active;}
-        })]);
+    function applyFilters(newSearch, newFilters) {
+        let filtered = users;
+
+        filtered = filtered.filter(user => user.name.toLowerCase().includes(newSearch.toLowerCase()));
+
+        if (newFilters["show-all-users"]) {filtered = filtered.filter(user => true)}
+        else if (newFilters["show-approved"]) {filtered = filtered.filter(user => user.approved)}
+        else if (newFilters["show-unapproved"]) {filtered = filtered.filter(user => user.active && !user.approved)}
+        else if (newFilters["show-inactive"]) {filtered = filtered.filter(user => !user.active)}
+        
+        setShownUsers([...filtered]);
     }
 
     return (
@@ -243,11 +245,7 @@ export default function ManageUsers(props) {
                     <thead>
                         <tr>
                             <th>
-                                <Form onSubmit={handleSearchSubmit}>
-                                    <Form.Group controlId="searchTable">
-                                        <Form.Control type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
-                                    </Form.Group>
-                                </Form>
+                                        <input type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
                             </th>
                             <th>
                                 <p>

@@ -59,15 +59,14 @@ class UserCreate(BaseModel):
     """the expected input model for creating a User
     """
     email: str
-    # password: str
 
     @validator('email')
-    def password_format_check(cls, v: str) -> str:
+    def email_format_check(cls, v: str) -> str:
         """validates whether the email has a correct format
 
         :param v: the value (email address)
         :type v: str
-        :raises InvalidEmailException: if the email address is infallid, this exception is raised
+        :raises InvalidEmailException: if the email address is invalid, this exception is raised
         :return: the email address
         :rtype: str
         """
@@ -123,7 +122,7 @@ class UserLogin(BaseModel):
 
 
 class UserInvite(BaseModel):
-    """the expected input model for a userinvite
+    """the expected input model for a UserInvite
         this is the data you type in after clicking on the link in the email received when an admin invites you
     """
     name: str

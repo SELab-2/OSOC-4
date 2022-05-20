@@ -128,9 +128,6 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
         access_token = Authorize.create_access_token(subject=u.id, expires_time=settings.access_expires)
         refresh_token = Authorize.create_refresh_token(subject=u.id, expires_time=settings.refresh_expires)
 
-        # Authorize.set_access_cookies(access_token)
-        # Authorize.set_refresh_cookies(refresh_token)
-
         # return response(UserOutSimple.parse_raw(u.json()), "Login successful")
         return response(
             TokenExtended(id=str(u.id), accessToken=access_token, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
@@ -154,8 +151,6 @@ def refresh(Authorize: AuthJWT = Depends()):
 
     current_user_id = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user_id, expires_time=settings.access_expires)
-    # Authorize.set_access_cookies(new_access_token)
-    # return {"access_token": new_access_token}
     return TokenExtended(accessToken=new_access_token, id=current_user_id,
                          accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
                          refreshToken=Authorize.get_raw_jwt()['jti'])

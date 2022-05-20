@@ -1,27 +1,25 @@
 import {Button, Card} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import {api, Url} from "../../utils/ApiClient";
+import ConflictsPopUpWindow from "./ConflictsPopUpWindow";
 
 /**
  * Shows the current amount of conflicts, in a card like div.
  * @returns {JSX.Element}
  * @constructor
  */
-export default function ConflictCard() {
-    const [conflicts, setConflicts] = useState([])
-
-    /**
-     * Loads once after the component mounts, it sets the conflicts state.
-     */
-    useEffect(() => {
-        Url.fromName(api.current_edition).extend("/resolving_conflicts").get().then(res => {
-            if(res.success){
-                setConflicts(res.data)
-            }
-        })
-    }, [])
+export default function ConflictCard(props) {
+    const [conflictsShow, setConflictsShow] = useState(false);
+  
     /**
      * returns the current amount of conflicts
      */
-    return(<Button variant={"conflicts"}>conflicts {conflicts.length}</Button>)
+    return(
+        <div>
+            <ConflictsPopUpWindow popUpShow={conflictsShow} setPopUpShow={setConflictsShow}
+                                   conflicts={props.conflicts} />
+            <Button variant={"conflicts"} onClick={() => setConflictsShow(true)}
+                    disabled={props.conflicts.length === 0}>conflicts {props.conflicts.length}</Button>
+        </div>
+    )
 }

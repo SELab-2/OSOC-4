@@ -47,7 +47,7 @@ async def use_resetkey(resetkey: str, reset: UserResetPassword = Body(...),
     :type session: AsyncSession, optional
     :raises InvalidResetKeyException: raised when the reset key isn't valid
     :raises NotPermittedException: unauthorized
-    :raises PasswordsDoNotMatchException: raised when the password and the validate password aren't the same
+    :raises PasswordsDoNotMatchException: raised when the password and the validation password aren't the same
     :return: a response message
     :rtype: dict
     """

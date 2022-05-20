@@ -6,6 +6,7 @@ import SuggestionsCount from "./SuggestionsCount";
 import Image from "next/image";
 import Hint from "../Hint";
 import alumniIcon from "../../public/assets/alumni-svgrepo-com.svg";
+import studCoachIcon from "../../public/assets/student-coach.svg";
 
 // get the decision for the student (yes, maybe, no or undecided)
 export function getDecisionString(value) {
@@ -141,16 +142,24 @@ export default function StudentListelement(props) {
       onClick={() => props.elementType === "students" ? studentDetails() : selectStudent()}>
       <Row className="upper-layer">
         <Col id="name" className="name" xs="auto">
-          {props.student["mandatory"]["alumni"] === "yes" ?
-              <Hint message="Student claims to be an alumni">
-                <Image src={alumniIcon} width="25pt" height="25pt" className="alumnicon"/>
-              </Hint>
-              : <></>
-          }
           {props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}
         </Col>
-        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
-          No practical problems
+        <Col md="auto" className="student-listelement-icon">
+          {(props.student["mandatory"]["alumni"] === "yes") &&
+            <Hint message="Student claims to be an alumni">
+              <Image src={alumniIcon} width="25pt" height="35pt"/>
+            </Hint>
+          }
+        </Col>
+        <Col md="auto" className="student-listelement-icon">
+          {(props.student["mandatory"]["student-coach"] === "yes") &&
+            <Hint message="applied to be student coach">
+              <Image src={studCoachIcon} width="25px" height="35px"/>
+            </Hint>
+          }
+        </Col>
+        <Col id="practical-problems" className="practical-problems" xs="auto">
+          {/* if practical problems gets implemented, this is where it should be shown */}
         </Col>
         <Col />
         <Col xs="auto" className="nopadding">
@@ -165,12 +174,6 @@ export default function StudentListelement(props) {
       <Row id="info" className="info">
         <GeneralInfo listelement={true} elementType={props.elementType} student={props.student}
                      decision={getDecisionString(props.student.decision)} />
-        {props.elementType === "emailstudents" ?
-          <Row key={"email_sent"} className="question-answer-row">
-            <Col md="auto" className="info-titles">Email sent</Col>
-            <Col md="auto" className="info-answers">{props.student["email_sent"] ? "Yes" : "No"}</Col>
-          </Row> : <></>
-        }
         <Col />
         <Col id="skills" align="right" className="skills" sm="auto">
           <ul className="nomargin">

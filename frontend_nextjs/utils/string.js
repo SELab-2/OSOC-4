@@ -8,7 +8,7 @@ export function titlecase(text) {
 }
 
 /**
- *  convert a url with an id at the end of the url to an id
+ *  convert a URL with an id at the end of the url to an id
  *  @param url
  *  @returns string
  */

@@ -28,7 +28,7 @@ FRONTEND_URL = os.getenv('FRONTEND_URL')
 
 
 def send_password_reset(email: str, resetkey: str):
-    """send_password_reset this function sents an email to reset the user password
+    """send_password_reset this function sends an email to reset the user password
 
     :param email: the email of the user
     :type email: str
@@ -55,7 +55,7 @@ def send_password_reset(email: str, resetkey: str):
 
 
 def send_invite(email: str, invitekey: str):
-    """send_invite this functions sents an invite email
+    """send_invite this functions sends an invite email
 
     :param email: email of the receiver
     :type email: str
@@ -82,7 +82,7 @@ def send_invite(email: str, invitekey: str):
 
 
 async def send_decision_template_email(student: Student, userid: str, session: AsyncSession):
-    """send_decision_template_email send an email to the student with the decision template
+    """send_decision_template_email sends an email to the student with the decision template
 
     :param student: student object
     :type student: Student
@@ -113,7 +113,7 @@ async def send_decision_template_email(student: Student, userid: str, session: A
 
 
 async def send_email(subject: str, email_body: str, student: Student, userid: str, session: AsyncSession):
-    """send_email send an ematil to student with subject and body
+    """send_email sends an email to student with subject and body
 
     :param subject: the subject for the email
     :type subject: str

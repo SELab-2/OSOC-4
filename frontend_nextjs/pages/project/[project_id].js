@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Alert, Button, Col, Modal, Row } from "react-bootstrap";
+import { Button, Col, Modal, Row } from "react-bootstrap";
 import { api, Url } from "../../utils/ApiClient";
 import AdminCard from "../../Components/projects/AdminCard";
 import SkillCard from "../../Components/projects/SkillCard";
@@ -19,6 +19,7 @@ import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
 import { log } from "../../utils/logger";
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
+import { ToastContainer, toast } from 'react-toastify';
 
 import { checkProjectBody } from "../../utils/inputchecker";
 function Input(props) {
@@ -46,7 +47,6 @@ const Project = () => {
     const [projectName, setProjectName] = useState("")
     const [stillRequiredSkills, setStillRequiredSkills] = useState([]);
     const [users, setUsers] = useState([]);
-    const [showError, setShowError] = useState(false);
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
     const [availableSkills, setAvailableSkills] = useState([])
@@ -143,7 +143,7 @@ const Project = () => {
                     setShowDelete(false);
                     router.push('/projects')
                 } else {
-                    alert("Error: the project '" + project.name + "' couldn't be deleted.");
+                    toast.error("The project '" + project.name + "' couldn't be deleted.");
                 }
             })
     }
@@ -199,22 +199,22 @@ const Project = () => {
      * @param body
      */
     function setFields(body) {
-        // in body users only consists of its ids, not the full links so we have to use the "users" state
+        // in body users only consists of its ids, not the full links, so we have to use the "users" state
         setProject(prevState => ({ ...prevState, ...body, "users": users }))
     }
 
     /**
-     * check if body if the given body is correct, if not show error message
+     * check body if the given body is correct, if not show error message
      * @param body
      */
     function checkBody(body) {
         if (body.required_skills.some(skill => skill.skill_name === "")) {
-            setShowError(true)
+            toast.error("Could not save changes to project")
             return false
         }
         let names_list = body.required_skills.map(skill => skill.skill_name)
         if (names_list.some((skill_name, index) => names_list.indexOf(skill_name) !== index)) {
-            setShowError(true)
+            toast.error("Could not save changes to project")
             return false
         }
 
@@ -241,18 +241,13 @@ const Project = () => {
                 setFields(body)
                 setShowEdit(false)
             } else {
-                setShowError(true)
+                toast.error("Could not save changes to project")
             }
         }
     }
 
     return (
         <div>
-            {showError ?
-                <Alert variant={"warning"} onClose={() => setShowError(false)} dismissible>
-                    Error could not save changes to project
-                </Alert> : null
-            }
             <Row>
                 {loaded ? (<div>
                     <Row className={"project-top-bar nomargin"}>
@@ -443,6 +438,7 @@ const Project = () => {
 
                 </div>) : null}
             </Row>
+            <ToastContainer />
         </div>
     )
 }

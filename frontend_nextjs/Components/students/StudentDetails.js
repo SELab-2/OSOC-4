@@ -23,6 +23,7 @@ import { useSession } from "next-auth/react";
 import LoadingPage from "../LoadingPage"
 import { useWebsocketContext } from "../WebsocketProvider"
 import Hint from "../Hint";
+import studCoachIcon from "../../public/assets/student-coach.svg";
 
 /**
  * This component returns the details of a student
@@ -250,25 +251,40 @@ export default function StudentDetails(props) {
 
             <Row className="details-upper-layer nomargin">
                 <Col>
-                    <div className="name nomargin">
-                        {student["mandatory"]["alumni"] === "yes" ?
-                            <Hint message="Student claims to be an alumni">
-                                <Image src={alumniIcon} width="30pt" height="30pt" className="alumnicon" />
+                    <Row className="nomargin">
+                        <Col md="auto" style={{marginRight: "10px"}}>
+                            <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ?
+                              student["mandatory"]["last name"] : ""}</h1>
+                        </Col>
+                        <Col md="auto" className="student-details-icon">
+                            {(student["mandatory"]["alumni"] === "yes") &&
+                              <Hint message="Student claims to be an alumni">
+                                  <Image src={alumniIcon} width="35pt" height="35pt" />
+                              </Hint>
+                            }
+                        </Col>
+                        <Col md="auto" className="student-details-icon">
+                            {(student["mandatory"]["student-coach"] === "yes") &&
+                              <Hint message="applied to be student coach">
+                                  <Image src={studCoachIcon} width="35px" height="35px"/>
+                              </Hint>
+                            }
+                        </Col>
+                        <Col md="auto" className="student-details-icon">
+                            <Hint message="Delete the student">
+                                <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
+                                    <Image src={deleteIcon} className="delete-icon" />
+                                </button>
                             </Hint>
-                            : <></>
-                        }
-                        <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ? student["mandatory"]["last name"] : ""}</h1>
-                        <Hint message="Delete the student">
-                            <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                                <Image src={deleteIcon} className="delete-icon" />
-                            </button>
-                        </Hint>
-                    </div>
-                    <ul className="nomargin nopadding">
-                        {(student["skills"]) && student["skills"].map((skill, index) =>
-                            <li className="skill" style={{ display: "inline-block" }}
-                                key={index}>{skill["name"].toUpperCase()}</li>)}
-                    </ul>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <ul className="nomargin nopadding">
+                            {(student["skills"]) && student["skills"].map((skill, index) =>
+                              <li className="skill" style={{ display: "inline-block" }}
+                                  key={index}>{skill["name"].toUpperCase()}</li>)}
+                        </ul>
+                    </Row>
                 </Col>
                 <Col xs="auto" className="close-button">
                     <Hint message="Close the details">

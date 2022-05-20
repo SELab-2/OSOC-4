@@ -99,6 +99,7 @@
     margin-right: 0;
 }
 
-.alumnicon {
-    cursor: default;
+.student-listelement-icon {
+    height: 35px;
+    margin-right: 5px;
 }

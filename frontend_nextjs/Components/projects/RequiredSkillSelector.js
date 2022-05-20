@@ -7,7 +7,7 @@ import {log} from "../../utils/logger";
 
 
 /**
- * Searchable skill dropdown menu with a amount selector and remove button
+ * Searchable skill dropdown menu with an amount selector and remove button
  * @param props
  * @returns {JSX.Element}
  * @constructor

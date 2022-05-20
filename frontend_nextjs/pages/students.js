@@ -37,9 +37,7 @@ export default function Students() {
     }, [width, router]);
 
     return (
-
-        <Row style={{height: "calc(100vh - 86px)"}}>
-
+        <Row style={{height: "calc(100vh - 66px)"}}>
             {
                 fullView &&
                 <Col className="fill_height" md="auto" key="studentFilters">
@@ -51,11 +49,11 @@ export default function Students() {
                 <Col>
                     <Row className="nomargin">
                         <StudentListAndFilters selectedStudents={selectedStudents}
-                                               setSelectedStudents={setSelectedStudents} setStudents={setStudents}
-                                               category={showEmailBar ? "emailstudents" : "students"}
-                                               elementType="students" fullview={fullView}/>
+                            setSelectedStudents={setSelectedStudents} setStudents={setStudents}
+                            category={showEmailBar ? "emailstudents" : "students"}
+                            elementType="students" fullview={fullView} />
                     </Row>
-                    {(me && me.role === 2) &&
+                    {(me && me.role === 2 && students.length > 0) &&
                         <EmailBottomBar selectedStudents={selectedStudents} setSelectedStudents={setSelectedStudents} students={students} showEmailBar={showEmailBar} setShowEmailBar={setShowEmailBar} />
                     }
                 </Col>
