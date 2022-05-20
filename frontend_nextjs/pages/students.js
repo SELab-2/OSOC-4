@@ -38,7 +38,11 @@ export default function Students() {
 
     return (
 
+<<<<<<< HEAD
         <Row style={{ height: "calc(100vh - 86px)" }}>
+=======
+        <Row style={{height: "calc(100vh - 66px)"}}>
+>>>>>>> origin/development
 
             {
                 fullView &&

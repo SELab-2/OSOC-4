@@ -1,4 +1,4 @@
-import {ButtonGroup, Col, Form, Row} from "react-bootstrap";
+import { ButtonGroup, Col, Form, Row } from "react-bootstrap";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -17,6 +17,7 @@ export default function SearchSortBar() {
   // This constants contains the values of the searchbar and the sortby dropdown
   const [search, setSearch] = useState((router.query.search) ? router.query.search : "");
   const sortby = (router.query.sortby) ? router.query.sortby : "name_asc";
+  const [timer, setTimer] = useState(null)
 
   /**
    * This function is called when we change the value of the sortby dropdown. It changes the sortby param in the url.
@@ -35,13 +36,29 @@ export default function SearchSortBar() {
    * This function is called when we press enter in the searchbar or click the search button. It changes the search
    * param in the url.
    */
-  function doSearch() {
+  function doSearch(newSearch) {
     let newQuery = router.query;
-    newQuery["search"] = search;
+    if (newSearch === null) {
+      newSearch = search;
+    }
+    newQuery["search"] = newSearch;
     router.push({
       pathname: router.pathname,
       query: newQuery
     }, undefined, { shallow: true });
+  }
+
+  const searchChanged = e => {
+
+    setSearch(e.target.value);
+    clearTimeout(timer);
+
+    const newTimer = setTimeout(() => {
+      doSearch(e.target.value);
+    }, 200)
+
+    setTimer(newTimer)
+
   }
 
   /**
@@ -50,28 +67,18 @@ export default function SearchSortBar() {
   return (
     <Row className="nomargin">
       <ButtonGroup className="nopadding">
-        <Form onSubmit={ev => {
-          ev.preventDefault();
-          doSearch();
+            <input type="text" value={search} placeholder={"Search students"} style={{ paddingLeft: "15px"}}
+              onChange={searchChanged}/>
+        <button className="reset-search-button" onClick={() => {
+          setSearch("")
+          doSearch("")
         }}>
-          <Form.Group controlId="searchStudents">
-            <Form.Control type="text" value={search} placeholder={"Search students"}
-              onChange={(ev) => setSearch(ev.target.value)}>
-            </Form.Control>
-          </Form.Group>
-        </Form>
-        <button className="reset-search-button" onClick={() => setSearch("")}>
           <Hint message="Clear the search-bar">
             <Image src={resetSearchIcon} />
           </Hint>
         </button>
-        <button className="search-button" onClick={() => setSearch(() => doSearch())}>
-          <Hint message="Search">
-            <Image src={searchIcon} />
-          </Hint>
-        </button>
       </ButtonGroup>
-      <Col/>
+      <Col />
       <div className="sortby-label nopadding">
         Sort by:
         <select className="dropdown-sortby" id="dropdown-decision" value={sortby}
@@ -82,6 +89,6 @@ export default function SearchSortBar() {
           <option value={"id+desc"}>New-Old</option>
         </select>
       </div>
-    </Row>
+    </Row >
   )
 }

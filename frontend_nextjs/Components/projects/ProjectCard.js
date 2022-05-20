@@ -37,7 +37,7 @@ export default function ProjectCard(props) {
     /**
      * selects the props.project unless it is already selected, in that case selectedProject is set to undefined.
      */
-    const selectProject = () => {
+    function selectProject() {
         props.setSelectedProject((props.project === props.selectedProject) ? undefined : props.project)
     }
 
@@ -62,7 +62,7 @@ export default function ProjectCard(props) {
     }, [])
 
     return (
-        <div className={"project-card-div"}>
+        <div className={"project-card-div"} onClick={selectProject}>
             <Card className={"project-card" + ((props.project === props.selectedProject) ? "-selected" : "")}>
                 <Card.Body className={"card-body"}>
                     <Row>
