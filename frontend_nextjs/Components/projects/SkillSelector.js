@@ -12,7 +12,7 @@ import Select from "react-select";
 export default function SkillSelector(props){
 
     const filterOption = (candidate, input) => {
-        return input === undefined || candidate.label.includes(input)
+        return input === undefined || candidate.label.toLowerCase().includes(input.toLowerCase())
     };
 
     return(
