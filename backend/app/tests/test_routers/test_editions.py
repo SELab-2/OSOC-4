@@ -100,7 +100,6 @@ class TestEditions(TestBase):
             "year": self.edition.year,
             "name": self.edition.name,
             "description": self.edition.description,
-            "users": f"{config.api_url}editions/{self.edition.year}/users",
             "students": f"{config.api_url}editions/{self.edition.year}/students",
             "projects": f"{config.api_url}editions/{self.edition.year}/projects",
             "questiontags": f"{config.api_url}editions/{self.edition.year}/questiontags"
@@ -108,28 +107,6 @@ class TestEditions(TestBase):
         for user_title in allowed_users:
             edition_data_from_response = json.loads(responses.get(user_title).content)
             self._assert_edition_equal(expected_edition_data, edition_data_from_response)
-
-    async def test_get_edition_users(self):
-        """Test GET /editions/{year}/users"""
-        users = await read_all_where(User, User.active, User.approved, User.disabled == False, session=self.session)
-        for user in users:
-            editionCoach = EditionCoach(edition=self.edition.year, coach_id=user.id)
-            await update(editionCoach, self.session)
-
-        # Send request
-        path = f'/editions/{self.edition.year}/users'
-        allowed_users: Set[str] = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
-        responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)
-
-        test_users_ids = [user.id for user in users]
-        test_users_ids.sort()
-
-        # Compare response edition data with expected edition data
-        for user_title in allowed_users:
-            edition_data_from_response = json.loads(responses.get(user_title).content)
-            response_ids = [int(user_url.split('/')[-1]) for user_url in edition_data_from_response]
-            response_ids.sort()
-            self.assertEqual(test_users_ids, response_ids, f"Returned users of edition {self.edition.year} don't match expected value")
 
     async def test_get_edition_students(self):
         """Test GET /editions/{year}/students"""
