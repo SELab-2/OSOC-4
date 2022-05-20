@@ -45,7 +45,6 @@ export default function StudentList(props) {
 
   // clear all selected students when the list of students changes
   useEffect(() => {
-      props.setStudents([]); // clear students in email-students
       props.setSelectedStudents([]); // clear selected students
   }, [studentUrls])
 

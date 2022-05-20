@@ -147,7 +147,7 @@ export default function ProjectsList(props) {
      * Applies the search filter and "people needed" (only projects who have required skills)
      */
     function changeVisibleProjects(newPeopleNeeded, newSearch) {
-
+        props.setSelectedProject(undefined); // clear the selected project when the list changes
         setVisibleProjects(allProjects.filter(project => {
             let showProj = true;
 
@@ -165,7 +165,7 @@ export default function ProjectsList(props) {
                     (!newPeopleNeeded)                                                         // don't check people needed
                     || (newPeopleNeeded && showProj)   // check people needed
                     );
-        }))
+        }));
     }
 
 
