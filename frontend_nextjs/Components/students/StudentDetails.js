@@ -56,6 +56,9 @@ export default function StudentDetails(props) {
     const { data: session, status } = useSession()
     const [prevStudentid, setPrevStudentid] = useState(undefined)
 
+    /**
+     * This useEffect adds event listeners to call updateFromWebsocket when data has changed.
+     */
     useEffect(() => {
 
         if (websocketConn) {
@@ -69,7 +72,8 @@ export default function StudentDetails(props) {
     }, [websocketConn, student])
 
     /**
-     * This function is called when studentId or props.student_id is changed
+     * This function is called when props.query.studentId is changed. It changes the student variable and other
+     * variables from student fields.
      */
     useEffect(() => {
         // Only fetch the data if the wrong student is loaded
@@ -97,8 +101,16 @@ export default function StudentDetails(props) {
 
     }, [router.query.studentId]);
 
+    /**
+     * This function handles the update from websockets. It checks which part of data has changed and makes the
+     * correct changes to the state of the application.
+     * @param event this event contains the data that changed.
+     * @returns {boolean} Returned only to quit the function early.
+     */
     const updateFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
+
+        // A suggestion has changes or a new suggestion has been made.
         if ("suggestion" in data) {
             if (student && student["id"] === data["suggestion"]["student_id"]) {
                 let new_student = student
@@ -109,6 +121,7 @@ export default function StudentDetails(props) {
                 setStudent({ ...new_student })
             }
 
+        // A new decision has been made about a student.
         } else if ("decision" in data) {
             if (student && student["id"] === data["id"]) {
                 let new_student = student
@@ -118,6 +131,8 @@ export default function StudentDetails(props) {
                 setDecision(data["decision"]["decision"])
                 setDecideField(data["decision"]["decision"])
             }
+
+        // A new email is sent to a student.
         } else if ("email_sent" in data) {
 
             if (student && student["id"] === data["id"]) {
@@ -126,13 +141,9 @@ export default function StudentDetails(props) {
                 setStudent({ ...new_student });
                 return true; // stop searching
             }
-
-
-
         }
     }
 
-    // counts the amount of suggestions for a certain value: "yes", "maybe" or "no"
     /**
      * This function counts the amount of suggestions for a certain value: "yes", "maybe", or "no".
      * @param decision De type of suggestions that need to be counted ("yes", "maybe", or "no").
@@ -211,6 +222,10 @@ export default function StudentDetails(props) {
         )
     }
 
+    /**
+     * Update your own suggestion about a student.
+     * @param suggestion The suggestion you want to make.
+     */
     function updateSuggestion(suggestion) {
         setStudent(prevState => ({
             ...prevState,
@@ -218,6 +233,11 @@ export default function StudentDetails(props) {
         }));
     }
 
+    /**
+     * Check if the String str is a valid URL.
+     * @param str The string which need to be checked
+     * @returns {boolean} True if the string is a valid URL, false otherwise.
+     */
     function isURL(str) {
         const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
             '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
@@ -228,6 +248,9 @@ export default function StudentDetails(props) {
         return !!pattern.test(str);
     }
 
+    /**
+     * Return a loading page if the details page is still loading.
+     */
     if (detailLoading) {
         return (
             <Col className="student-details-window" style={{ "position": "relative", "height": "calc(100vh - 75px)" }}>
@@ -235,6 +258,9 @@ export default function StudentDetails(props) {
             </Col>)
     }
 
+    /**
+     * Returns the html of hte studentDetails.
+     */
     return (
         <Col className="student-details-window fill_height scroll-overflow fill_width">
             {student["mandatory"] &&

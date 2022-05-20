@@ -16,7 +16,18 @@ import filterIcon from "../../public/assets/show-filter-svgrepo-com.svg"
 import Image from "next/image";
 import { ToastContainer, toast } from 'react-toastify';
 
-export default function StudentList(props) {
+/**
+ * This component represents the student list and filters.
+ * @param props prop contains setStudents, selectedStudents, setSelectedStudents, elementType, category and fullView.
+ * setStudents is to set the students in the student list. selectedStudents is the state variable which contains the
+ * students which are selected to receive an email. setSelectedStudents changes this state variable. elementType is
+ * the tab that renders the component: "students" or "projects". category is the category inside the elementType.
+ * In "students", "emailstudents" is the category with the email bar expanded, students is the other category
+ * (email bar not expanded). fullView defines if the filters can be shown on the screen.
+ * @returns {JSX.Element[]} renders the component representing the student list and filters.
+ * @constructor
+ */
+export default function StudentListAndFilters(props) {
 
   const router = useRouter();
 
@@ -44,17 +55,25 @@ export default function StudentList(props) {
 
   const { websocketConn } = useWebsocketContext();
 
-  // clear all selected students when the list of students changes
+  /**
+   * clear all selected students when the list of students changes.
+   */
   useEffect(() => {
     props.setSelectedStudents([]); // clear selected students
   }, [studentUrls])
 
+  /**
+   * Set the students variable in the parent if the own students/studentUrls or category changes.
+   */
   useEffect(() => {
     if (props.category === "emailstudents") {
       props.setStudents([...students.map(student => student.id), ...studentUrls])
     }
   }, [students, studentUrls, props.category])
 
+  /**
+   * This useEffect adds event listeners to call updateDetailsFromWebsocket when data has changed.
+   */
   useEffect(() => {
 
     if (websocketConn) {
@@ -67,6 +86,10 @@ export default function StudentList(props) {
 
   }, [websocketConn, students, studentUrls, router.query, decisions])
 
+  /**
+   * This useEffect sets the state variables on changes in session, students, studentUrls, router.query, search or
+   * sortby.
+   */
   useEffect(() => {
     if (session) {
 
@@ -102,6 +125,10 @@ export default function StudentList(props) {
     }
   }, [session, students, studentUrls, router.query, search, sortby])
 
+  /**
+   * This function fetches the student list by setting all the required parameters.
+   * @returns {Promise<{success: boolean, error}|{data: *, success: boolean}>}
+   */
   const fetchStudents = () => Url.fromName(api.editions_students).setParams(
     {
       decision: router.query.decision || "",
@@ -114,6 +141,10 @@ export default function StudentList(props) {
     }
   ).get();
 
+  /**
+   * This function sets the students list. First, the students are fetched.
+   * Then, the state variables are adjusted.
+   */
   const refreshStudents = () => {
     const studentsLength = students.length < 20 ? 20 : students.length;
     fetchStudents().then(res => {
@@ -130,6 +161,12 @@ export default function StudentList(props) {
     });
   }
 
+  /**
+   * This function handles the update from websockets. It checks which part of data has changed and makes the
+   * correct changes to the state of the application.
+   * @param event the event contains the data that changed
+   * @returns {Promise<void>}
+   */
   const updateDetailsFromWebsocket = async (event) => {
     let data = JSON.parse(event.data)
     await cache.updateCache(event.data, session["userid"]);
@@ -150,6 +187,10 @@ export default function StudentList(props) {
 
   }
 
+  /**
+   * This function fetches extra data for the InfiniteScroll component. This component does not show all the
+   * students at once, but shows more students when scrolling through the students.
+   */
   const fetchData = () => {
 
     let p1 = studentUrls.slice(0, 20);
@@ -163,6 +204,9 @@ export default function StudentList(props) {
     })
   }
 
+  /**
+   * The html representation of the studentListAndFilters component.
+   */
   return [
     <CheeseburgerMenu isOpen={showFilter} closeCallback={() => setShowFilter(false)}>
       <StudentsFilters />
