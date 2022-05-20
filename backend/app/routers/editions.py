@@ -346,7 +346,7 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
             query = select(Question).where(Question.id == qtag.question.id).outerjoin(QuestionAnswer, Question.id == QuestionAnswer.question_id).where(QuestionAnswer.question_id.is_(None))
             query_res = await session.execute(query)
             query_all = query_res.all()
-            print(query_all)
+
             if (len(query_all)) > 0:
                 error = True
     else:
