@@ -86,7 +86,7 @@ export default function NewProjects() {
             "required_skills": requiredSkills,
             "partner_name":partnerName,
             "partner_description": partnerDescription,
-            "edition": api.year,
+            "edition": api.getYear(),
             "users": []
         }
         if(checkProjectBody(body).correct){

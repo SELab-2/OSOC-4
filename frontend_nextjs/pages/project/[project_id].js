@@ -232,8 +232,8 @@ const Project = () => {
             "required_skills": requiredSkills,
             "partner_name": partnerName,
             "partner_description": partnerDescription,
-            "edition": api.year,
-            "users": users.map(url => getID(url))
+            "edition": api.getYear(),
+            "users": []
         }
         if (checkProjectBody(body)) {
             let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
