@@ -1,0 +1,16 @@
+.add-project-label{
+    margin-bottom: 10px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.add-project-body {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.add-project-empty-list{
+    margin-top: 5px;
+    margin-left: 20px;
+    font-size: 18px;
+}
