@@ -66,10 +66,17 @@ async def get_editions(session: AsyncSession = Depends(get_session), role: RoleC
 
 
 @router.get("/current_edition", response_description="Edition retrieved")
-async def get_current_edition(session: AsyncSession = Depends(get_session)):
+async def get_current_edition(session: AsyncSession = Depends(get_session)) -> dict:
+    """get_current_edition get the current edition
+
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: the edition
+    :rtype: dict
+    """
     stmnt = select(Edition).order_by(Edition.year.desc())
     result = await session.execute(stmnt)
-    return result.one()[0]
+    return EditionOutExtended.parse_raw(result.one()[0].json())
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
@@ -114,7 +121,7 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
 async def get_edition(year: int, edition: EditionChecker() = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition get the Edition instance with given year
 
-    :return: list of editions
+    :return: the edition with that year
     :rtype: dict
     """
 
