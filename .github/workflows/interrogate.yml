@@ -30,6 +30,8 @@ jobs:
         with:
           # File or directory to run interrogate on.
           path: backend/
+          # Ignore tests directory
+          exclude: app/tests/
           # Fail when coverage % is less than a given amount.
           fail-under: 76.9 # optional, default is 80
           # Generate a `shields.io` status badge (an SVG image) in at a given file or directory.

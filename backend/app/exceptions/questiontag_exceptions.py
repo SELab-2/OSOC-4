@@ -1,6 +1,8 @@
 """ This module includes all the QuestionTag exceptions
 """
 
+from typing import List
+
 from app.exceptions.base_exception import BaseException
 
 
@@ -35,3 +37,14 @@ class QuestionTagCantBeModified(BaseException):
         """__init__ inits parent class with status code and message
         """
         super().__init__(409, "Question of QuestionTag can't be modified")
+
+
+class QuestionTagInvalidMandatory(BaseException):
+    """QuestionTagNotFoundException exception when a mandatory QuestionTag's question is invalid (not found)
+
+    :param BaseException: inherits from BaseException
+    """
+    def __init__(self, questiontags: List[str]):
+        """__init__ inits parent class with status code and message
+        """
+        super().__init__(400, "Something went wrong, fix the questions for the mandatory questiontags: " + ", ".join(questiontags))

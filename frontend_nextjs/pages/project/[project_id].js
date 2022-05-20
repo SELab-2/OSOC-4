@@ -19,6 +19,7 @@ import { log } from "../../utils/logger";
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
 import { ToastContainer, toast } from 'react-toastify';
 
+import { checkProjectBody } from "../../utils/inputchecker";
 function Input(props) {
     return null;
 }
@@ -151,12 +152,10 @@ const Project = () => {
         setRequiredSkills(prevState => [...prevState, { "number": 1, "skill_name": "" }])
     }
 
-    function changeRequiredSkill(value, index) {
-        if (requiredSkills[index].label !== "") {
-            log([...(availableSkills.filter(skill => skill !== value.label)), requiredSkills[index].label])
+    function changeRequiredSkill(value, index){
+        if(requiredSkills[index].label !== ""){
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
         } else {
-            log([...(availableSkills.filter(skill => skill !== value.label))])
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
         let newArray = [...requiredSkills]
@@ -216,9 +215,9 @@ const Project = () => {
             "required_skills": requiredSkills,
             "partner_name": partnerName,
             "partner_description": partnerDescription,
-            "edition": api.year,
+            "edition": api.getYear(),
         }
-        if (checkBody(body)) {
+        if (checkProjectBody(body)) {
             let res = await Url.fromName(api.projects).extend(`/${project_id}`).setBody(body).patch();
             if (res.success) {
                 setFields(body)
@@ -359,7 +358,11 @@ const Project = () => {
                                     <div className={"project-card-title"}>All required skills</div>
                                     {(requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) => {
                                         if (showEdit) {
-                                            return <RequiredSkillSelector className={"required-skill-selector-row"} availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills} />
+                                            return <RequiredSkillSelector className={"required-skill-selector-row"}
+                                                                          availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
+                                                                          setAvailableSkills={setAvailableSkills}
+                                                                          key={index} index={index} skills={skills} requiredSkill={requiredSkill}
+                                                                          setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills} />
                                         }
                                         return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                     })) : <div className={"project-empty-list-col"}>Currently there are no required skills</div>

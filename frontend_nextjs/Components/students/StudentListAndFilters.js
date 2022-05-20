@@ -1,4 +1,4 @@
-import { Button, Col, Row } from "react-bootstrap";
+import { Alert, Button, Col, Row } from "react-bootstrap";
 import StudentsFilters from "./StudentsFilters";
 import CheeseburgerMenu from "cheeseburger-menu";
 import SearchSortBar from "./SearchSortBar";
@@ -40,12 +40,13 @@ export default function StudentList(props) {
   const { height, width } = useWindowDimensions();
 
   const [showFilter, setShowFilter] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { websocketConn } = useWebsocketContext();
 
   // clear all selected students when the list of students changes
   useEffect(() => {
-      props.setSelectedStudents([]); // clear selected students
+    props.setSelectedStudents([]); // clear selected students
   }, [studentUrls])
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function StudentList(props) {
         // the urlManager returns the url for the list of students
         fetchStudents().then(res => {
           if (res.success) {
+            setErrorMessage("")
             let p1 = res.data.slice(0, 20);
             let p2 = res.data.slice(20);
             setStudentUrls(p2);
@@ -92,6 +94,8 @@ export default function StudentList(props) {
             )).then(newstudents => {
               setStudents([...newstudents]);
             })
+          } else {
+            setErrorMessage(res.error.response.data.message);
           }
         });
       }
@@ -134,7 +138,7 @@ export default function StudentList(props) {
     // if users student details is the deleted student => close the details page
     if ("deleted_student" in data) {
       let newQuery = router.query;
-      if (newQuery.studentId.toString() === data["student_int"].toString()) {
+      if ("studentId" in newQuery && newQuery.studentId.toString() === data["student_int"].toString()) {
         delete newQuery["studentId"];
         router.push({
           pathname: router.pathname,
@@ -178,35 +182,41 @@ export default function StudentList(props) {
         </Row>
       }
       <SearchSortBar />
-      <InfiniteScroll
-        style={{
-          // TODO find a better way to do this
-          // TODO fix for portrait screens, test for non 1080p screens
-          // ATTENTION THIS ONLY WORKS FOR SCREENS IN LANDSCAPE MODE
-          // listheights[props.category] contains the custom offset for a given category. Default 155px for projects
-          "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 155px)",
-          "position": "relative",
-          "transition": "height 0.6s"
-        }}
-        dataLength={students.length} //This is important field to render the next data
-        height={1}
-        next={fetchData}
-        hasMore={studentUrls.length > 0}
-        loader={<LoadingPage />}
-        endMessage={
-          <p style={{ textAlign: 'center' }}>
-            <b>Yay! You have seen it all</b>
-          </p>
-        }
-      >
-        {students.map((i, index) => {
-          if (props.category === "emailstudents") {
-            return <StudentListelement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} elementType="emailstudents" />
-          } else {
-            return <StudentListelement selectedStudents={props.selectedStudents} setSelectedStudents={props.setSelectedStudents} key={i.id} student={i} elementType={props.elementType} />// elementType is projects or students
+      {errorMessage ?
+        <Alert variant="danger">
+          <Alert.Heading>{errorMessage}</Alert.Heading>
+        </Alert>
+        :
+        <InfiniteScroll
+          style={{
+            // TODO find a better way to do this
+            // TODO fix for portrait screens, test for non 1080p screens
+            // ATTENTION THIS ONLY WORKS FOR SCREENS IN LANDSCAPE MODE
+            // listheights[props.category] contains the custom offset for a given category. Default 155px for projects
+            "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 155px)",
+            "position": "relative",
+            "transition": "height 0.6s"
+          }}
+          dataLength={students.length} //This is important field to render the next data
+          height={1}
+          next={fetchData}
+          hasMore={studentUrls.length > 0}
+          loader={<LoadingPage />}
+          endMessage={
+            <p style={{ textAlign: 'center' }}>
+              <b>Yay! You have seen it all</b>
+            </p>
           }
-        })}
-      </InfiniteScroll>
+        >
+          {students.map((i, index) => {
+            if (props.category === "emailstudents") {
+              return <StudentListelement key={i.id} student={i} setSelectedStudents={props.setSelectedStudents} selectedStudents={props.selectedStudents} elementType="emailstudents" />
+            } else {
+              return <StudentListelement selectedStudents={props.selectedStudents} setSelectedStudents={props.setSelectedStudents} key={i.id} student={i} elementType={props.elementType} />// elementType is projects or students
+            }
+          })}
+        </InfiniteScroll>
+      }
     </Col>,
     <ToastContainer />
   ]
