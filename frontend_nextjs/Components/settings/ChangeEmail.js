@@ -1,5 +1,6 @@
 import {Button} from "react-bootstrap";
 import { Url } from "../../utils/ApiClient";
+import { api } from "../../utils/ApiClient";
 
 /**
  * This component displays a settings-screen to change a user's email.

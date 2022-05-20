@@ -27,12 +27,13 @@ import Login from "../pages/login";
 import RouteGuard from "../Components/Auth";
 import Invite from "./invites/[invitekey]";
 import Reset from "./resetpassword/[resetkey]";
+import ChangeKey from './change/[changekey]';
 import { WebsocketProvider } from "../Components/WebsocketProvider"
 
 function MyApp({ Component, pageProps }) {
   const [interval, setInterval] = useState(0);
 
-  const no_auth = [Login, Invite, Reset];
+  const no_auth = [Login, Invite, Reset, ChangeKey];
 
 
   return (

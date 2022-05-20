@@ -65,8 +65,8 @@ def send_change_email_email(email: str, changekey: str):
 
     receiver_email = email  # Enter receiver address
 
-    subject = "Forgot Password"
-    body = f"Use this link to change the email of your account {FRONTEND_URL}/change-email/{changekey}"
+    subject = "Change email"
+    body = f"Use this link to change the email of your account {FRONTEND_URL}/change/{changekey}"
 
     message = MIMEMultipart()
     message["From"] = SENDER_EMAIL
