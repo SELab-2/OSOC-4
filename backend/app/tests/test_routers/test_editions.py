@@ -3,13 +3,13 @@ from typing import Dict, Set, List
 import uuid
 from httpx import Response
 from app.config import config
-from app.crud import read_all_where, read_where, update
+from app.crud import read_where, update
 from app.models.project import Project
-from app.models.user import User, UserRole
+from app.models.user import UserRole
 from app.tests.test_base import TestBase, Request
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
-from app.models.edition import Edition, EditionCoach
+from app.models.edition import Edition
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.tests.utils_for_tests.ProjectGenerator import ProjectGenerator
 from app.models.participation import Participation
