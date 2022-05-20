@@ -165,12 +165,6 @@ export default function StudentListelement(props) {
       <Row id="info" className="info">
         <GeneralInfo listelement={true} elementType={props.elementType} student={props.student}
                      decision={getDecisionString(props.student.decision)} />
-        {props.elementType === "emailstudents" ?
-          <Row key={"email_sent"} className="question-answer-row">
-            <Col md="auto" className="info-titles">Email sent</Col>
-            <Col md="auto" className="info-answers">{props.student["email_sent"] ? "Yes" : "No"}</Col>
-          </Row> : <></>
-        }
         <Col />
         <Col id="skills" align="right" className="skills" sm="auto">
           <ul className="nomargin">
