@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Button, Form} from "react-bootstrap";
+import {Button, Form, Spinner} from "react-bootstrap";
 import {log} from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
@@ -12,6 +12,8 @@ export default function ChangeName(props) {
     const [savedSuccess, setSavedSuccess] = useState(false)
     const [name, setName] = useState(props.user.name)
     const [changeName, setChangeName] = useState(props.user.name)
+    const [saving, setSaving] = useState(false);
+    const [fail, setFail] = useState(false);
 
     const handleChangeName = (event) => {
         event.preventDefault()
@@ -25,10 +27,17 @@ export default function ChangeName(props) {
     async function handleSubmitChange(event) {
         log("handle submit change name");
         event.preventDefault();
+        setSavedSuccess(false);
+        setFail(false);
+        setSaving(true);
         let response = await Url.fromName(api.myself).setBody({"name": changeName}).patch();
         if (response.success) {
+            setSaving(false);
             setSavedSuccess(true);
             setName(changeName);
+        } else {
+            setSaving(false);
+            setFail(true);
         }
     }
 
@@ -40,8 +49,20 @@ export default function ChangeName(props) {
                     <Form.Label>Change name to:</Form.Label>
                     <Form.Control type="text" value={changeName} onChange={handleChangeName} />
                 </Form.Group>
-                {savedSuccess ? (<p>Changed name successfully</p>): null}
-                <Button variant={"outline-secondary"} type="submit">Change name</Button>
+                {savedSuccess &&<p>Changed name successfully</p>}
+                {fail && <p>Something went wrong, please try again</p>}
+                {!saving &&<Button variant={"primary"} type="submit">Change name</Button>}
+                {saving && 
+                <Button variant="primary" disabled>
+                  Saving changes...
+                  <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                  />
+                </Button>}
             </Form>
         </div>
     )
