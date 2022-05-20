@@ -55,7 +55,7 @@ export default function SearchSortBar() {
 
     const newTimer = setTimeout(() => {
       doSearch(e.target.value);
-    }, 500)
+    }, 200)
 
     setTimer(newTimer)
 
@@ -67,16 +67,8 @@ export default function SearchSortBar() {
   return (
     <Row className="nomargin">
       <ButtonGroup className="nopadding">
-        <Form onSubmit={ev => {
-          ev.preventDefault();
-          doSearch();
-        }}>
-          <Form.Group controlId="searchStudents">
-            <Form.Control type="text" value={search} placeholder={"Search students"}
-              onChange={searchChanged}>
-            </Form.Control>
-          </Form.Group>
-        </Form>
+            <input type="text" value={search} placeholder={"Search students"} style={{ paddingLeft: "15px"}}
+              onChange={searchChanged}/>
         <button className="reset-search-button" onClick={() => {
           setSearch("")
           doSearch("")
