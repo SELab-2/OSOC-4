@@ -52,6 +52,7 @@ export default function NewProjects() {
      * @returns {Promise<void>}
      */
     async function deleteUser(index){
+        console.log(index)
         await setUsers(users.filter((_, i) => i !== index))
     }
 
@@ -61,6 +62,7 @@ export default function NewProjects() {
     }
 
     function addRequiredSkill(){
+        event.preventDefault()
         setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
     }
 
@@ -155,15 +157,16 @@ export default function NewProjects() {
 
                             {(requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) => (
                                 <RequiredSkillSelector className={"add-project-required-skill-selector-row"}
-                                                       availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
-                                                       key={index} index={index} skills={skills} requiredSkill={requiredSkill}
+                                                       availableSkills={availableSkills} setAvailableSkills={setAvailableSkills}
+                                                       changeRequiredSkill={changeRequiredSkill} key={index}
+                                                       index={index} skills={skills} requiredSkill={requiredSkill}
                                                        setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
                                 />
                             ))) : null}
 
                             <Hint message={"Add new required skill"} placement="top">
                                 <div className={"project-details-plus-skill"} >
-                                    <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={() => addRequiredSkill()} />
+                                    <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={(e) => addRequiredSkill(e)} />
                                 </div>
                             </Hint>
                         </Col>

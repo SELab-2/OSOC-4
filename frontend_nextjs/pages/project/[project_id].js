@@ -397,7 +397,11 @@ const Project = () => {
                                     <div className={"project-card-title"}>All required skills</div>
                                     {(requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) => {
                                         if (showEdit) {
-                                            return <RequiredSkillSelector className={"required-skill-selector-row"} availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill} key={index} index={index} skills={skills} requiredSkill={requiredSkill} setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills} />
+                                            return <RequiredSkillSelector className={"required-skill-selector-row"}
+                                                                          availableSkills={availableSkills} changeRequiredSkill={changeRequiredSkill}
+                                                                          setAvailableSkills={setAvailableSkills}
+                                                                          key={index} index={index} skills={skills} requiredSkill={requiredSkill}
+                                                                          setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills} />
                                         }
                                         return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
                                     })) : <div className={"project-empty-list-col"}>Currently there are no required skills</div>

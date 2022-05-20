@@ -20,6 +20,12 @@ export default function RequiredSkillSelector(props){
      * @constructor
      */
     async function DeleteRequiredSkill() {
+        if(props.requiredSkills[props.index].skill_name !== ""){
+            props.setAvailableSkills(prevState => [...prevState, props.requiredSkills[props.index].skill_name])
+        }
+        // console.log(props.index)
+        // log(props.requiredSkills.filter((_, i) => i !== props.index))
+        // log(props.requiredSkills[props.index])
         if (props.requiredSkills.length > 1) {
             await props.setRequiredSkills(props.requiredSkills.filter((_, i) => i !== props.index))
         }
@@ -59,7 +65,7 @@ export default function RequiredSkillSelector(props){
             <Row className={"required-skill-selector-row"}>
                 <Col>
                     <Select classNamePrefix="select-search"
-                            defaultValue={props.requiredSkills[props.index].skill_name !== "" ?
+                            value={props.requiredSkills[props.index].skill_name !== "" ?
                                 {"label": props.requiredSkills[props.index].skill_name, "value": props.requiredSkills[props.index].skill_name}
                             :
                                 {"label": "no skill selected", "value":"no skill selected"}
