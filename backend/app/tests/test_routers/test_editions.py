@@ -246,27 +246,6 @@ class TestEditions(TestBase):
         self.assertEqual(question_tag_detail_from_response["mandatory"], True)
         self.assertEqual(question_tag_detail_from_response["show_in_list"], True)
 
-    async def test_get_edition_question_tags_showinlist(self):
-        """Test GET /editions/{year}/questiontags/show_in_list"""
-        question = Question(question="Just a question?", edition=self.edition.year)
-        question_tag = QuestionTag(
-            edition=self.edition.year,
-            question_id=question.id,
-            mandatory=True,
-            tag="test tag",
-            show_in_list=True)
-
-        await update(question, self.session)
-        await update(question_tag, self.session)
-
-        # send request
-        path = f'/editions/{self.edition.year}/questiontags/show_in_list'
-        response = await self.do_request(Request.GET, path, "user_admin", access_token=await self.get_access_token("user_admin"))
-        response_tag = json.loads(response.content)
-
-        # check response data
-        self.assertEqual(response_tag, [question_tag.tag], "Question tags did not match")
-
     async def test_post_create_edition(self):
         """Test POST /editions/create"""
         # Prepare new edition data
