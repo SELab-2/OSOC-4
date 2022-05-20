@@ -23,8 +23,8 @@ export default function StudentList(props) {
   const listheights = { "students": "178px", "emailstudents": "245px" } // The custom height for the studentlist for the page of key
 
   // These constants are initialized empty, the data will be inserted in useEffect
-  const [studentUrls, setStudentUrls] = useState([]);
-  const [students, setStudents] = useState([]);
+  const [studentUrls, setStudentUrls] = useState([]); // list of student you should show
+  const [students, setStudents] = useState([]);  // list of all retrieved students (the data)
 
   // These variables are used to notice if search or filters have changed, they will have the values of search,
   // sortby and filters that we filtered for most recently.
@@ -42,6 +42,11 @@ export default function StudentList(props) {
   const [showFilter, setShowFilter] = useState(false);
 
   const { websocketConn } = useWebsocketContext();
+
+  // clear all selected students when the list of students changes
+  useEffect(() => {
+      props.setSelectedStudents([]); // clear selected students
+  }, [studentUrls])
 
   useEffect(() => {
     if (props.category === "emailstudents") {
