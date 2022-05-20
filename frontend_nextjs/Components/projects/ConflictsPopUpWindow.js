@@ -112,14 +112,17 @@ export default function ConflictsPopUpWindow(props) {
           : null}
           </Row>
 
-          <Row> 
-            <Row>
-             <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
-            </Row>
-            <Row >
-              <Col md="auto"><Hint message="Previous conflict"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Hint></Col>
-              <Col md="auto"><Hint message="Next conflict"><button className="prevnextbutton" onClick={nextStudent}>&#8250;</button></Hint></Col>
-            </Row>
+          <Row>
+            <Col/>
+            <Col md="auto">
+              <Row>
+                <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
+              </Row>
+              <Row >
+                <Col md="auto"><Hint message="Previous conflict"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Hint></Col>
+                <Col md="auto"><Hint message="Next conflict"><button className="prevnextbutton" onClick={nextStudent}>&#8250;</button></Hint></Col>
+              </Row>
+            </Col>
           </Row>
           
         </Row>
