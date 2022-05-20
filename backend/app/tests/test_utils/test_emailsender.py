@@ -10,6 +10,7 @@ from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.utils.mailsender import send_invite, send_password_reset, send_email, send_decision_template_email
 
 
+@unittest.skip("Do not overload the email system.")
 class TestMailsender(TestBase):
     # todo find a way to confirm reception
     email_receiver = os.getenv("TEST_EMAIL")
@@ -17,7 +18,6 @@ class TestMailsender(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @unittest.skip("Do not overload the email system.")
     async def asyncSetUp(self):
         await super().asyncSetUp()
 
@@ -39,15 +39,12 @@ class TestMailsender(TestBase):
 
         await self.session.commit()
 
-    @unittest.skip("Do not overload the email system.")
     def test_send_password_reset(self):
         send_password_reset(self.email_receiver, "test_reset_key")
 
-    @unittest.skip("Do not overload the email system.")
     def test_send_invite(self):
         send_invite(self.email_receiver, "test_invite_key")
 
-    @unittest.skip("Do not overload the email system.")
     async def test_send_decision_template_email(self):
         user = await self.get_user_by_name("user_admin")
         student = await read_where(Student, session=self.session)
@@ -55,7 +52,6 @@ class TestMailsender(TestBase):
         # test could be expanded
         await send_decision_template_email(student, str(user.id), self.session)
 
-    @unittest.skip("Do not overload the email system.")
     async def test_send_mail(self):
         user = await self.get_user_by_name("user_admin")
         student = await read_where(Student, session=self.session)
