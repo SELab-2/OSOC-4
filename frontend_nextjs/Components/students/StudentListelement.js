@@ -158,8 +158,8 @@ export default function StudentListelement(props) {
             </Hint>
           }
         </Col>
-        <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
-          No practical problems
+        <Col id="practical-problems" className="practical-problems" xs="auto">
+          {/* if practical problems gets implemented, this is where it should be shown */}
         </Col>
         <Col />
         <Col xs="auto" className="nopadding">
