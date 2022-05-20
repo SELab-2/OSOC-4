@@ -6,6 +6,7 @@ import SuggestionsCount from "./SuggestionsCount";
 import Image from "next/image";
 import Hint from "../Hint";
 import alumniIcon from "../../public/assets/alumni-svgrepo-com.svg";
+import studCoachIcon from "../../public/assets/student-coach.svg";
 
 // get the decision for the student (yes, maybe, no or undecided)
 export function getDecisionString(value) {
@@ -141,13 +142,21 @@ export default function StudentListelement(props) {
       onClick={() => props.elementType === "students" ? studentDetails() : selectStudent()}>
       <Row className="upper-layer">
         <Col id="name" className="name" xs="auto">
-          {props.student["mandatory"]["alumni"] === "yes" ?
-              <Hint message="Student claims to be an alumni">
-                <Image src={alumniIcon} width="25pt" height="25pt" className="alumnicon"/>
-              </Hint>
-              : <></>
-          }
           {props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}
+        </Col>
+        <Col md="auto" className="student-listelement-icon">
+          {(props.student["mandatory"]["alumni"] === "yes") &&
+            <Hint message="Student claims to be an alumni">
+              <Image src={alumniIcon} width="25pt" height="35pt"/>
+            </Hint>
+          }
+        </Col>
+        <Col md="auto" className="student-listelement-icon">
+          {(props.student["mandatory"]["student-coach"] === "yes") &&
+            <Hint message="applied to be student coach">
+              <Image src={studCoachIcon} width="25px" height="35px"/>
+            </Hint>
+          }
         </Col>
         <Col id="practical-problems" style={{ backgroundColor: getProblemsColor() }} className="practical-problems" xs="auto">
           No practical problems
