@@ -17,6 +17,7 @@ import "../styles/projects.css"
 import "../styles/projectDetails.css"
 import "../styles/requiredSkillSelector.css"
 import "../styles/defaultEmail.css"
+import "../styles/addProject.css"
 
 
 import { ThemeProvider } from "react-bootstrap";
