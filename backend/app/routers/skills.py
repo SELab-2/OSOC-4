@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter(prefix="/skills")
 
 
-@router.get("", response_description="Skills retrieved", dependencies=[Depends(RoleChecker(UserRole.ADMIN))])
+@router.get("", response_description="Skills retrieved", dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def get_skills(session: AsyncSession = Depends(get_session)) -> List[str]:
     """get_skills get all the Skill instances from the database
 
