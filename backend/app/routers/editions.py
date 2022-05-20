@@ -13,7 +13,7 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
-    QuestionTagNotFoundException)
+    QuestionTagInvalidMandatory, QuestionTagNotFoundException)
 from app.models.answer import Answer
 from app.models.edition import (Edition, EditionCoach, EditionOutExtended,
                                 EditionOutSimple)
@@ -213,6 +213,14 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     res = res.all()
 
     students = [r for (r,) in res]
+
+    # if there are students check if all mandatory tags are correct
+    if len(students) != 0:
+        query = select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.mandatory == True).join(Question).outerjoin(QuestionAnswer, QuestionAnswer.question_id == Question.id).where(QuestionAnswer.question_id.is_(None))
+        res = await session.execute(query)
+        resall = res.all()
+        if len(resall) != 0:
+            raise QuestionTagInvalidMandatory([tag.tag for (tag,) in resall])
 
     if orderby:
         sorting = get_sorting(orderby).items()
