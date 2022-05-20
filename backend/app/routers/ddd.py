@@ -1,12 +1,11 @@
 """ This router is used to generate dummy data and insert it in the database """
 
-from random import choice, randrange, sample
+from random import choice, randrange
 from typing import List
 
 from app.crud import clear_data
 from app.database import get_session
 from app.models.participation import Participation
-from app.models.project import Project, ProjectRequiredSkill
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
