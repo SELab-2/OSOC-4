@@ -4,7 +4,7 @@ import uuid
 from httpx import Response
 from app.config import config
 from app.crud import read_all_where, read_where, update
-from app.models.project import Project, ProjectCoach, ProjectRequiredSkill
+from app.models.project import Project, ProjectRequiredSkill
 from app.models.user import UserRole
 from app.tests.test_base import TestBase, Request
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
@@ -80,7 +80,6 @@ class TestProjects(TestBase):
         skill_generator.add_to_db()
         await self.session.commit()
 
-        project_coach = await self.get_user_by_name("user_approved_coach")
         self.project_data.update({
             "required_skills": [{"skill_name": skill.name, "number": 3} for skill in skills],
         })
