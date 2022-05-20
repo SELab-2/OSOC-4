@@ -5,10 +5,24 @@ import arrowUp from "../../public/assets/arrow_up.svg";
 
 import Image from "next/image";
 
-export default function StudentList(props) {
+/**
+ * This component represents the email bar on the bottom of the students list.
+ * It provides the functionality to select/deselect all the students and send them emails in bulk.
+ * @param props props contains the fields students, selectedStudents, setSelectedStudents, showEmailBar,
+ * setShowEmailBar. students and selectedStudents are state variables which contains respectively the students and
+ * the selected students to send an email. setSelectedStudents changes the selectedStudents state variable.
+ * showEmailBar decides the visibility of the  emailBar. setEmailBar can change the showEmailBar variable.
+ * @returns {JSX.Element[]} The component that renders the email bar on the bottom of the students list.
+ * @constructor
+ */
+export default function EmailBottomBar(props) {
     // These constant define whether the pop-up windows should be shown or not
     const [sendEmailsPopUpShow, setSendEmailsPopUpShow] = useState(false);
 
+    /**
+     * This function selects all the students present in the student list.
+     * If all the students are already selected, then deselect all the students.
+     */
     function selectAll() {
         if (props.students.length === props.selectedStudents.length) {
             props.setSelectedStudents([])
@@ -17,6 +31,9 @@ export default function StudentList(props) {
         }
     }
 
+    /**
+     * Returns the html of the EmailBottomBar component
+     */
     return [
         <Row className="email-bar">
             <SendEmailsPopUpWindow key="emailPopUp" popUpShow={sendEmailsPopUpShow}

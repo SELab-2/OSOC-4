@@ -1,3 +1,4 @@
+import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.css'
 import '../styles/globals.css'
 import "../styles/colors.css"
@@ -16,6 +17,8 @@ import "../styles/projects.css"
 import "../styles/projectDetails.css"
 import "../styles/requiredSkillSelector.css"
 import "../styles/defaultEmail.css"
+import "../styles/addProject.css"
+import "../styles/studentModal.css"
 
 import { ThemeProvider } from "react-bootstrap";
 import { SessionProvider } from 'next-auth/react';

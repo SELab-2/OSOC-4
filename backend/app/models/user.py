@@ -9,7 +9,6 @@ from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
                                                 InvalidPasswordException)
 from app.models.edition import Edition, EditionCoach
-from app.models.project import Project, ProjectCoach
 from app.models.suggestion import Suggestion
 from app.utils.validators import valid_email, valid_password
 from pydantic import BaseModel, validator
@@ -35,7 +34,6 @@ class User(SQLModel, table=True):
     approved: bool = False
     disabled: bool = True
     editions: List[Edition] = Relationship(back_populates="coaches", link_model=EditionCoach)
-    projects: List[Project] = Relationship(back_populates="coaches", link_model=ProjectCoach)
     suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
     class Config:
@@ -59,15 +57,14 @@ class UserCreate(BaseModel):
     """the expected input model for creating a User
     """
     email: str
-    # password: str
 
     @validator('email')
-    def password_format_check(cls, v: str) -> str:
+    def email_format_check(cls, v: str) -> str:
         """validates whether the email has a correct format
 
         :param v: the value (email address)
         :type v: str
-        :raises InvalidEmailException: if the email address is infallid, this exception is raised
+        :raises InvalidEmailException: if the email address is invalid, this exception is raised
         :return: the email address
         :rtype: str
         """
@@ -123,7 +120,7 @@ class UserLogin(BaseModel):
 
 
 class UserInvite(BaseModel):
-    """the expected input model for a userinvite
+    """the expected input model for a UserInvite
         this is the data you type in after clicking on the link in the email received when an admin invites you
     """
     name: str

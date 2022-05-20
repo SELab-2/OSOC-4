@@ -2,7 +2,6 @@ import { Card, Col, Row } from "react-bootstrap";
 import { log } from "../../utils/logger";
 import { useRouter } from "next/router";
 import SkillCard from "./SkillCard";
-import AdminCard from "./AdminCard";
 import React, { useEffect, useState } from "react";
 import ParticipationCard from "./ParticipationCard";
 import Image from 'next/image'
@@ -37,7 +36,7 @@ export default function ProjectCard(props) {
     /**
      * selects the props.project unless it is already selected, in that case selectedProject is set to undefined.
      */
-    const selectProject = () => {
+    function selectProject() {
         props.setSelectedProject((props.project === props.selectedProject) ? undefined : props.project)
     }
 
@@ -59,10 +58,10 @@ export default function ProjectCard(props) {
             temp_list.push({ "amount": temp_dict[name], "name": name })
         })
         setSkills(temp_list)
-    }, [])
+    }, [props.project])
 
     return (
-        <div className={"project-card-div"}>
+        <div className={"project-card-div"} onClick={selectProject}>
             <Card className={"project-card" + ((props.project === props.selectedProject) ? "-selected" : "")}>
                 <Card.Body className={"card-body"}>
                     <Row>
@@ -87,10 +86,6 @@ export default function ProjectCard(props) {
                     <div className={"partner-title"} >{props.project.partner_name}</div>
                     {/*todo make this clickable with link to partner?*/}
                     <br />
-
-                    <Row>
-                        {(props.project.users.length) ? props.project.users.map(item => (<AdminCard key={item} user={item} />)) : null}
-                    </Row>
                     <br />
                     <Row>
                         <Col>

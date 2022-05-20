@@ -18,7 +18,7 @@ class EditionCoach(SQLModel, table=True):
 
 
 class Edition(SQLModel, table=True):
-    """represents an edion from the database
+    """represents an edition from the database
     """
     year: int = Field(primary_key=True)
     name: str
@@ -31,7 +31,7 @@ class Edition(SQLModel, table=True):
 
 class EditionOutSimple(BaseModel):
     """an output model for an edition,
-        defines what attributes of an edition are send to the outside world
+        defines what attributes of an edition are sent to the outside world
     """
     uri: str
     name: Optional[str] = ""
@@ -46,7 +46,7 @@ class EditionOutSimple(BaseModel):
 
 class EditionOutExtended(BaseModel):
     """an extended output model for an edition, gives more info than the EditionOutSimple
-        defines what attributes of an edition are send to the outside world
+        defines what attributes of an edition are sent to the outside world
     """
     uri: str
     year: int

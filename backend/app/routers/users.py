@@ -9,10 +9,11 @@ from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
                                             UserNotFoundException)
-from app.models.edition import Edition
+from app.models.edition import Edition, EditionCoach
 from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
                              UserCreate, UserMe, UserOut, UserOutSimple,
                              UserRole)
+from app.routers.editions import get_current_edition
 from app.utils.checkers import RoleChecker
 from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
@@ -73,7 +74,7 @@ async def change_user_me(new_data: ChangeUserMe, Authorize: AuthJWT = Depends(),
     :type Authorize: AuthJWT, optional
     :param session: the session object, defaults to Depends(get_session)
     :type session: AsyncSession, optional
-    :return: the updated user (yoursel)
+    :return: the updated user (yourself)
     :rtype: dict
     """
     current_user_id = Authorize.get_jwt_subject()
@@ -294,5 +295,10 @@ async def approve_user(user_id: str, session: AsyncSession = Depends(get_session
         raise UserBadStateException()  # The user is already approved
 
     user.approved = True
+
+    edition = await get_current_edition(session)
+    await update(EditionCoach(edition=edition.year, coach_id=user_id), session=session)
+
     await update(user, session=session)
+
     return response(None, "Approved the user successfully")

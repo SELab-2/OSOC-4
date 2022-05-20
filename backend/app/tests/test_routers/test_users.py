@@ -1,5 +1,6 @@
 import json
 import os
+import unittest
 from typing import Dict, Set, Tuple
 
 from httpx import Response
@@ -13,6 +14,14 @@ from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 class TestUsers(TestBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    async def asyncSetUp(self):
+        await super().asyncSetUp()
+        eg = EditionGenerator(self.session)
+
+        eg.generate_edition()
+        eg.add_to_db()
+        await self.session.commit()
 
     async def assert_name_edits(self, allowed_users):
         """
@@ -173,6 +182,7 @@ class TestUsers(TestBase):
 
         await self.assert_name_edits(allowed_users)
 
+    @unittest.skip("Do not overload the email system.")
     async def test_post_invite_user(self):
         unactivated_user = await self.get_user_by_name("user_unactivated_coach")
 
@@ -220,10 +230,8 @@ class TestUsers(TestBase):
         # Try to delete imaginary user
         await self.do_request(Request.DELETE, f"/users/{self.bad_id}", "user_admin", expected_status=Status.NOT_FOUND)
 
+    @unittest.skip("Do not overload the email system.")
     async def test_post_invite_disabled_user(self):
-        eg = EditionGenerator(self.session)
-        eg.generate_edition()
-        eg.add_to_db()
         await self.session.commit()
 
         disabled_user = await self.get_user_by_name("user_disabled_coach")

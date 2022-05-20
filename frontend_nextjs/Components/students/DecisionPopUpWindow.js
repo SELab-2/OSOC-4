@@ -25,7 +25,7 @@ export default function DecisionPopUpWindow(props) {
   }
 
   /**
-   * This functin is called on submitting the decision.
+   * This function is called on submitting the decision.
    */
   function submitDecision() {
 

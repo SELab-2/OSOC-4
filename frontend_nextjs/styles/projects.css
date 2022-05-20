@@ -127,3 +127,22 @@
     -webkit-appearance: none;
     height: 20px;
 }
+
+.projects-positioning {
+    padding-top: 20px;
+}
+
+.prevnextbutton {
+    font-size: 20px;
+    background-color: #f1f1f1;
+    color: black;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border-width: 0;
+    margin-left: 10px;
+}
+
+.prevnextbutton:hover {
+    background-color: #ddd;
+}

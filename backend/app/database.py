@@ -37,7 +37,6 @@ async def init_db():
     for _ in range(15):
         try:
             async with engine.begin() as conn:
-                # await conn.run_sync(SQLModel.metadata.drop_all)
                 await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))
                 await conn.run_sync(SQLModel.metadata.create_all)
                 connection = True
