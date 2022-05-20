@@ -332,7 +332,6 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
     except Exception:
         raise QuestionTagNotFoundException()
 
-
     error = False
     if qtag.question:
         q = qtag.question.question
