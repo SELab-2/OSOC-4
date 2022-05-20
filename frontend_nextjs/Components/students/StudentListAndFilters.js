@@ -20,7 +20,7 @@ export default function StudentList(props) {
 
   const router = useRouter();
 
-  const listheights = { "students": "178px", "emailstudents": "245px" } // The custom height for the studentlist for the page of key
+  const listheights = { "students": "176px", "emailstudents": "243px" } // The custom height for the studentlist for the page of key
 
   // These constants are initialized empty, the data will be inserted in useEffect
   const [studentUrls, setStudentUrls] = useState([]); // list of student you should show
@@ -50,8 +50,8 @@ export default function StudentList(props) {
   }, [studentUrls])
 
   useEffect(() => {
-    if (props.category === "emailstudents") {
-      props.setStudents([...students.map(student => student.id), ...studentUrls])
+    if (props.setStudents) {
+      props.setStudents([...students.map(student => student.id), ...studentUrls]);
     }
   }, [students, studentUrls, props.category])
 
@@ -193,7 +193,7 @@ export default function StudentList(props) {
             // TODO fix for portrait screens, test for non 1080p screens
             // ATTENTION THIS ONLY WORKS FOR SCREENS IN LANDSCAPE MODE
             // listheights[props.category] contains the custom offset for a given category. Default 155px for projects
-            "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 155px)",
+            "height": listheights[props.category] ? `calc(100vh - ${listheights[props.category]})` : "calc(100vh - 135px)",
             "position": "relative",
             "transition": "height 0.6s"
           }}

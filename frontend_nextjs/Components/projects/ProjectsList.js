@@ -215,7 +215,7 @@ export default function ProjectsList(props) {
                 }
 
             </Row>
-            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 155px)" }}>
+            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 137px)" }}>
                 {
                     visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
                 }
