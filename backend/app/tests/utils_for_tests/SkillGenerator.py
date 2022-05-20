@@ -10,7 +10,6 @@ class SkillGenerator(DataGenerator):
               "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
               "Photographer"]
 
-
     def generate_skills(self) -> list[Skill]:
         """
         Generates an amount of Skills
