@@ -65,7 +65,6 @@ async def get_project_with_id(id: int, session: AsyncSession = Depends(get_sessi
     if not project:
         raise ProjectNotFoundException()
 
-
     projectOutExtended = ProjectOutExtended.parse_raw(project.json())
     projectRequiredSkills = await session.execute(select(ProjectRequiredSkill).where(ProjectRequiredSkill.project_id == int(id)))
     projectOutExtended.required_skills = [RequiredSkillOut.parse_raw(s.json()) for (s,) in projectRequiredSkills.all()]
@@ -105,7 +104,6 @@ async def update_project_with_id(id: int, updated_project: ProjectCreate, sessio
     old_skills = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(id), session=session)
     for skill in old_skills:
         await session.delete(skill)
-
 
     await session.commit()
 

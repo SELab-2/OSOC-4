@@ -10,9 +10,6 @@ from pydantic import BaseModel
 from sqlmodel import Field, Relationship, SQLModel
 
 
-
-
-
 class ProjectRequiredSkill(SQLModel, table=True):
     """represents a ProjectRequiredSkill from the database
         a project-required-skill is the relationship between a project and a skill,
