@@ -14,7 +14,7 @@ const ChangeKey = () => {
         Url.fromName(api.change).extend(`/${changekey}`).get().then(resp =>{
             console.log(resp);
             if (resp.success) {
-                setValidkey(true);
+                setValidKey(true);
             }
         })
         setLoading(false);

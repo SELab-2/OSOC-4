@@ -27,7 +27,8 @@ async def valid_changekey(changekey: str, session: AsyncSession = Depends(get_se
     :return: response message
     :rtype: dict
     """
-    valid: bool = await check_key(changekey, "C", session)
+    print(changekey)
+    valid = await check_key(changekey, "C", session)
     if valid:
         return response(None, "Valid change email key")
     else:
