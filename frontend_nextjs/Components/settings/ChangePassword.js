@@ -68,7 +68,7 @@ export default function ChangePassword(props) {
                 {(changedSuccess)? (<Form.Text className="text-muted">Changed password!</Form.Text>) : null}
 
             </Form.Group>
-            <Button variant="outline-secondary" type="submit">Change password</Button>
+            <Button variant="primary" type="submit">Change password</Button>
 
         </Form>
     )

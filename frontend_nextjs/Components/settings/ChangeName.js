@@ -41,7 +41,7 @@ export default function ChangeName(props) {
                     <Form.Control type="text" value={changeName} onChange={handleChangeName} />
                 </Form.Group>
                 {savedSuccess ? (<p>Changed name successfully</p>): null}
-                <Button variant={"outline-secondary"} type="submit">Change name</Button>
+                <Button variant={"primary"} type="submit">Change name</Button>
             </Form>
         </div>
     )
