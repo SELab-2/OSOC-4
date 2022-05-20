@@ -27,11 +27,13 @@ async def get_save_answer(answer: str, session: AsyncSession) -> Answer:
     return a
 
 
-async def process_tally(data, edition, session: AsyncSession):
-    """Processes a Tally - submitted Tally and returns a dict with fields that can be used to validate the data .
+async def process_tally(data: dict[str, str], edition: int, session: AsyncSession) -> None:
+    """Processes a Tally - submitted Tally and returns a dict with fields that can be used to validate the data.
 
-    Args:
-        data ([type]): [description]
+    :param data:
+    :param session:
+    :param edition:
+    :return: None
     """
 
     student = Student(edition_year=edition)
