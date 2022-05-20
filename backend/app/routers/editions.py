@@ -275,7 +275,7 @@ async def get_conflicting_students(year: int, session: AsyncSession = Depends(ge
         """
     )
 
-    return [f"{config.api_url}/students/{id}" for (id,) in student_ids]
+    return [f"{config.api_url}students/{id}" for (id,) in student_ids]
 
 
 # Question Tag Endpoints
