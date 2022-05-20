@@ -1,4 +1,5 @@
 import json
+import os
 
 from app.crud import read_where
 from app.models.answer import Answer
@@ -34,7 +35,7 @@ class TestTallyHandler(TestBase):
 
         await self.session.commit()
 
-        with open("../test_data/tallyform") as f:
+        with open("./app/tests/test_data/tallyform") as f:
             data = json.load(f)
 
         # test the tally processing
