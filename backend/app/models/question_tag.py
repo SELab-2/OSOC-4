@@ -33,6 +33,7 @@ class QuestionTagSimpleOut(BaseModel):
     question: str
     mandatory: bool
     show_in_list: bool
+    error: bool
 
     @validator("tag", pre=True, always=True)
     def check_tag(cls, tag: str) -> str:
