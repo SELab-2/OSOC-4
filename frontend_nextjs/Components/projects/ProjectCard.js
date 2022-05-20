@@ -59,7 +59,7 @@ export default function ProjectCard(props) {
             temp_list.push({ "amount": temp_dict[name], "name": name })
         })
         setSkills(temp_list)
-    }, [])
+    }, [props.project])
 
     return (
         <div className={"project-card-div"} onClick={selectProject}>
