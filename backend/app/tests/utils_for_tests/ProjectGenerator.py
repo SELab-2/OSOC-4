@@ -1,11 +1,23 @@
 import uuid
 from random import randrange
 from app.models.project import Project, ProjectRequiredSkill
+from app.models.skill import Skill
 from app.tests.utils_for_tests.DataGenerator import DataGenerator
 
 
 class ProjectGenerator(DataGenerator):
-    def generate_default_projects(self, year=2022):
+    """
+    The DataGenerator for projects
+    """
+    def generate_default_projects(self, year: int = 2022) -> list[Project]:
+        """
+        Generates the default projects for testing.
+
+        :param year: The year of the edition the generated projects are in
+        :type year: int, Optional
+        :return: The generated projects
+        :rtype: list[Project]
+        """
         projects = [
             Project(
                 edition=year,
@@ -23,7 +35,17 @@ class ProjectGenerator(DataGenerator):
         self.data += projects
         return projects
 
-    def generate_project_skills(self, project, skills):
+    def generate_project_skills(self, project: Project, skills: list[Skill]) -> list[ProjectRequiredSkill]:
+        """
+        Generates required skills for a project.
+
+        :param project: The project to generate skills for
+        :type project: Project
+        :param skills: The list of skills to choose from
+        :type skills: list[Skill]
+        :return: The generated skills for the project
+        :rtype: list[ProjectRequiredSkill]
+        """
         project_skills = [ProjectRequiredSkill(
             number=randrange(1, 5),
             project=project,
@@ -32,7 +54,15 @@ class ProjectGenerator(DataGenerator):
         self.data += project_skills
         return project_skills
 
-    def generate_project(self, year=2022):
+    def generate_project(self, year: int = 2022) -> Project:
+        """
+        Generates a project.
+
+        :param year: The year of the edition the generated project is in
+        :type year: int, Optional
+        :return: The generated project
+        :rtype: Project
+        """
         project = Project(
             edition=year,
             name=f"project_{str(uuid.uuid1())}",
@@ -44,5 +74,15 @@ class ProjectGenerator(DataGenerator):
         self.data.append(project)
         return project
 
-    def generate_projects(self, year=2022, n=1):
+    def generate_projects(self, year: int = 2022, n: int = 1) -> list[Project]:
+        """
+        Generates a number of projects.
+
+        :param year: The year of the edition the generated projects are in
+        :type year: int, Optional
+        :param n: The amount of projects to generate
+        :type n: int
+        :return: The generated projects
+        :rtype: list[Project]
+        """
         return [self.generate_project(year) for _ in range(n)]
