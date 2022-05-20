@@ -69,7 +69,7 @@ export default function ProjectsList(props) {
      */
     useEffect(() => {
         Url.fromName(api.current_edition).extend("/resolving_conflicts").get().then(res => {
-            if(res.success){
+            if (res.success) {
                 setConflicts(res.data);
             }
         });
@@ -98,6 +98,7 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
                     new_projects[i]["participations"][studentid] = data["participation"]
+                    new_projects[i] = { ...new_projects[i] }
                     setVisibleProjects([...new_projects])
                 }
             })
@@ -105,6 +106,7 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...allProjects]
                     new_projects[i]["participations"][studentid] = data["participation"]
+                    new_projects[i] = { ...new_projects[i] }
                     setAllProjects([...new_projects])
                     return true; // stop searching
                 }
@@ -117,6 +119,7 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
                     delete new_projects[i]["participations"][studentid]
+                    new_projects[i] = { ...new_projects[i] }
                     setVisibleProjects([...new_projects])
                 }
             })
@@ -124,6 +127,7 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...allProjects]
                     delete new_projects[i]["participations"][studentid]
+                    new_projects[i] = { ...new_projects[i] }
                     setAllProjects([...new_projects])
                     return true; // stop searching
                 }
@@ -164,7 +168,7 @@ export default function ProjectsList(props) {
                 && (
                     (!newPeopleNeeded)                                                         // don't check people needed
                     || (newPeopleNeeded && showProj)   // check people needed
-                    );
+                );
         }));
     }
 
@@ -197,16 +201,16 @@ export default function ProjectsList(props) {
         <Col className="fill_height fill_width">
             <Row className="center-content projects-controls">
                 <Col className="search-project">
-                            <input type="text" value={search}
-                                          placeholder={"Search projects"}
-                                          onChange={e => handleSearch(e)} />
+                    <input type="text" value={search}
+                        placeholder={"Search projects"}
+                        onChange={e => handleSearch(e)} />
 
                 </Col>
                 <Col xs="auto">
                     <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded} />
                 </Col >
                 <Col xs="auto" >
-                    <ConflictCard conflicts={conflicts}/>
+                    <ConflictCard conflicts={conflicts} />
                 </Col>
                 {me !== undefined && me.role === 2 ?
                     <Col xs="auto" >
@@ -217,7 +221,7 @@ export default function ProjectsList(props) {
             </Row>
             <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 137px)" }}>
                 {
-                    visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard key={index} project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
+                    visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
                 }
             </Row>
         </Col>
