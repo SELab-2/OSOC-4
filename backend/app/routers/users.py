@@ -19,6 +19,8 @@ from app.utils.cryptography import get_password_hash, verify_password
 from app.utils.keygenerators import generate_new_invite_key
 from app.utils.mailsender import send_invite
 from app.utils.response import response
+from app.utils.keygenerators import generate_new_change_email_key
+from app.utils.mailsender import send_change_email_email
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -61,6 +63,27 @@ async def get_user_me(Authorize: AuthJWT = Depends(), session: AsyncSession = De
     # No need to check whether user exists
 
     return response(UserMe.parse_raw(user.json()), "User retrieved successfully")
+
+
+@router.post("/me/change-email")
+async def change_email_me(Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)) -> dict:
+    """change_email_me send an email with a change email link
+
+    :return: a message
+    :rtype: dict
+    """
+    current_user_id: int = int(Authorize.get_jwt_subject())
+    user = await read_where(User, User.id == current_user_id, session=session)
+    # User will always be found since otherwise they can't be authorized
+    # No need to check whether user exists
+
+    #create an change email key
+    change_key, change_expires = generate_new_change_email_key()
+    # save it
+    db.redis.setex(change_key, change_expires, str(user.id))
+    # send email to user with the invite key
+    send_change_email_email(user.email, change_key)
+    return response(None, "Invite sent successfully")
 
 
 @router.patch("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])

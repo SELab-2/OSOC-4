@@ -1,4 +1,5 @@
 import {Button} from "react-bootstrap";
+import { Url } from "../../utils/ApiClient";
 
 /**
  * This component displays a settings-screen to change a user's email.
@@ -10,9 +11,14 @@ export default function ChangeEmail(props) {
      * This function makes a post request to the api to request a new email
      * @param event
      */
-    const requestNewEmail = event => {
+    async function requestNewEmail(event){
         event.preventDefault();
-        //TODO make this work with backend
+        let response = await Url.fromName(api.myself).extend("/change-email").post();
+        if (response.success){
+            alert("Gelukt!");
+        } else {
+            alert("Niet gelukt");
+        }
     }
 
     return(

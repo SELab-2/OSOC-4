@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 INVITE_EXPIRE = os.getenv('INVITE_EXPIRE')
 PASSWORDRESET_EXPIRE = os.getenv('PASSWORDRESET_EXPIRE')
-
+CHANGE_EMAIL_EXPIRE= os.getenv("CHANGE_EMAIL_EXPIRE")
 
 def generate_random_key(length: int) -> str:
     """generate_random_key generate random string of x chars
@@ -57,3 +57,19 @@ def generate_new_reset_password_key() -> Tuple[str, int]:
         invite_key = "R" + generate_random_key(20)
 
     return invite_key, reset_password_expires
+
+
+def generate_new_change_email_key() ->Tuple[str, int]:
+    """generate_new_change_email_key generate change email key
+
+    :return: change email key and change email expire
+    :rtype: Tuple[str, int]
+    """
+    change_email_expire: int = timedelta(minutes=int(CHANGE_EMAIL_EXPIRE))
+
+    invite_key = "C" + generate_random_key(20)
+    # make sure the invite key is unique
+    while db.redis.get(invite_key):
+        invite_key = "C" + generate_random_key(20)
+
+    return invite_key, change_email_expire
