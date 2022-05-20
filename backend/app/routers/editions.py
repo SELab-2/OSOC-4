@@ -33,7 +33,7 @@ from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
-from sqlmodel import select
+from sqlmodel import func, select
 
 router = APIRouter(prefix="/editions")
 
@@ -332,12 +332,27 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
     except Exception:
         raise QuestionTagNotFoundException()
 
+
+    error = False
     if qtag.question:
         q = qtag.question.question
+
+        # check if there are students and if the question is valid
+        student_query = select(func.count(Student.id)).where(Student.edition_year == year)
+        student_res = await session.execute(student_query)
+        (count,) = student_res.one()
+        if count > 0:
+            # check if there are answers for the question
+            query = select(Question).where(Question.id == qtag.question.id).outerjoin(QuestionAnswer, Question.id == QuestionAnswer.question_id).where(QuestionAnswer.question_id.is_(None))
+            query_res = await session.execute(query)
+            query_all = query_res.all()
+            print(query_all)
+            if (len(query_all)) > 0:
+                error = True
     else:
         q = ""
 
-    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, show_in_list=qtag.show_in_list, question=q)
+    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, show_in_list=qtag.show_in_list, question=q, error=error)
 
 
 @router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))], response_description="Added question tag")
