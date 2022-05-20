@@ -1,5 +1,4 @@
 import json
-import os
 
 from app.crud import read_where
 from app.models.answer import Answer
