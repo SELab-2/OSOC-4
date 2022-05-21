@@ -459,13 +459,21 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     if questiontag.tag == "skills":
         students = await read_all_where(Student, Student.edition_year == year, session=session)
         for s in students:
+
+            # remove all the studentskills
+            statement = select(StudentSkill).where(StudentSkill.student_id == s.id)
+            stat_res = await session.execute(statement)
+            stat_all = stat_res.all()
+            for (studskill,) in stat_all:
+                await session.delete(studskill)
+                await session.commit()
+
             # get the answers for the new questions
             query = select(Answer).select_from(QuestionAnswer).where(QuestionAnswer.question_id == questiontag.question_id).where(QuestionAnswer.student_id == s.id).join(Answer)
             query_res = await session.execute(query)
             query_all = query_res.all()
 
             for (answer,) in query_all:
-                print(answer)
                 skill = await read_where(Skill, Skill.name == answer.answer, session=session)
                 if not skill:
                     skill = Skill(name=answer.answer)
