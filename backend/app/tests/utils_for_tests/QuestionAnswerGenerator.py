@@ -54,11 +54,7 @@ class QuestionAnswerGenerator(DataGenerator):
         ["What do/did you study?",
          "backend developer", "business management", "communication sciences",
          "computer sciences", "design", "frontend development", "marketing",
-         "photography", "videography", "other"],
-        ["Which role are you applying for?",
-         "Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
-         "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
-         "Photographer", "Other"]]
+         "photography", "videography", "other"]]
 
     def __init__(self, session: AsyncSession, edition: Edition):
         """
@@ -196,8 +192,10 @@ class QuestionAnswerGenerator(DataGenerator):
                                   answer=answer)
                    for answer in sample(self.answers_multiple_choice2[i], k=randrange(1, 3))]
 
-        # TODO #594 change the answer to the skills, using a random answer for now
-        qa += [QuestionAnswer(student=student, question=self.question_skill, answer=answer_first_name)]
+        qa += [QuestionAnswer(student=student,
+                              question=self.question_skill,
+                              answer=Answer(answer=skill.name))
+               for skill in student.skills]
 
         self.question_answers += qa
         self.data += qa
