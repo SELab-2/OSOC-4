@@ -210,7 +210,7 @@ export default function EditionSettings() {
                     </AccordionHeader>
                     <AccordionBody>
                         <div className="questiontags">
-                            <QuestionTags reload={reloadQuestionTags}/>
+                            <QuestionTags reload={reloadQuestionTags} setReload={setReloadQuestionTags}/>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
