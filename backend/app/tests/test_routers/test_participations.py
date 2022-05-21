@@ -63,28 +63,65 @@ class TestParticipations(TestBase):
         self.assertEqual(1, len(db_participations))
         self.assert_participation_equal(self.participation_data, db_participations[0])
 
+    async def test_participation_create_existing(self):
+        """Test POST /participations/create existing participation"""
+        # create a participation in db
+        participation = Participation(**self.participation_data)
+        await update(participation, session=self.session)
+
+        # modify participation
+        self.participation_data.update({
+            "skill_name": self.skills[1].name,  # new skill
+            "reason": str(uuid.uuid1())   # new reason
+        })
+
+        # Send request
+        path = "/participations/create"
+        await self.do_request(Request.POST, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
+
+        # verify participation is changed
+        db_participation = await read_where(Participation, Participation.student_id == self.participation_data["student_id"], Participation.project_id == self.participation_data["project_id"], session=self.session)
+        self.assert_participation_equal(self.participation_data, db_participation)
+
     async def test_participation_create_invalid_student(self):
         """Test POST /participations/create with invalid student id"""
+        path = "/participations/create"
 
         self.participation_data.update({
             "student_id": 0
         })
-        path = "/participations/create"
 
         await self.do_request(Request.POST, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
 
     async def test_participation_create_invalid_project(self):
         """Test POST /participations/create with invalid project id"""
+        path = "/participations/create"
 
         self.participation_data.update({
             "project_id": 0
         })
-        path = "/participations/create"
 
         await self.do_request(Request.POST, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
 
     async def test_participation_create_year_mismatch(self):
-        """Test POST /participations/create with invalid project id"""
+        """Test POST /participations/create with participation and student in different editions"""
+        path = "/participations/create"
+
+        # generate new edition
+        edition_generator = EditionGenerator(self.session)
+        edition = edition_generator.generate_edition(self.edition.year + 1)
+        await update(edition, self.session)
+
+        # generate project in new edition
+        project_generator = ProjectGenerator(self.session)
+        project = project_generator.generate_project(year=edition.year)
+        await update(project, self.session)
+
+        self.participation_data.update({
+            "project_id": project.id
+        })
+
+        await self.do_request(Request.POST, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
 
     async def test_delete_participations(self):
         """Test DELETE /participations"""
@@ -93,12 +130,18 @@ class TestParticipations(TestBase):
         await update(participation, session=self.session)
 
         # Send DELETE request
-        path = f"/participations?student_id={self.students[0].id}&project_id={self.project.id}"
+        path = f"/participations?student_id={self.participation_data['student_id']}&project_id={self.participation_data['project_id']}"
         await self.do_request(Request.DELETE, path, "user_admin", access_token=await self.get_access_token("user_admin"))
 
         # verify participation is deleted from db
         db_participations = await read_all_where(Participation, Participation.student_id == participation.student_id, Participation.project_id == participation.project_id, session=self.session)
         self.assertEqual(0, len(db_participations))
+
+    async def test_delete_nonexisting_participations(self):
+        """Test DELETE /participations where the participation does not exist"""
+        # Send DELETE request
+        path = f"/participations?student_id={self.participation_data['student_id']}&project_id={self.participation_data['project_id']}"
+        await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.BAD_REQUEST, access_token=await self.get_access_token("user_admin"))
 
     async def test_patch_participations(self):
         """Test PATCH /participations"""
@@ -113,9 +156,73 @@ class TestParticipations(TestBase):
         })
 
         # Send PATCH request
-        path = f"/participations?student_id={self.students[0].id}&project_id={self.project.id}"
+        path = f"/participations?student_id={participation.student_id}&project_id={participation.project_id}"
         await self.do_request(Request.PATCH, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
 
         # verify participation is changed
         db_participation = await read_where(Participation, Participation.student_id == self.participation_data["student_id"], Participation.project_id == self.participation_data["project_id"], session=self.session)
         self.assert_participation_equal(self.participation_data, db_participation)
+
+    async def test_patch_participations_nonexistent(self):
+        """Test PATCH /participations where the participation does not exist"""
+        path = f"/participations?student_id={self.participation_data['student_id']}&project_id={self.participation_data['project_id']}"
+
+        # Send PATCH request
+        await self.do_request(Request.PATCH, path, "user_admin", expected_status=Status.BAD_REQUEST, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
+
+    async def test_patch_participations_invalid_student(self):
+        """Test PATCH /participations with invalid student id"""
+        # add participation to db
+        participation = Participation(**self.participation_data)
+        await update(participation, session=self.session)
+
+        path = f"/participations?student_id={participation.student_id}&project_id={participation.project_id}"
+
+        # set invalid student id
+        self.participation_data.update({
+            "student_id": 0
+        })
+
+        # Send PATCH request
+        await self.do_request(Request.PATCH, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
+
+    async def test_patch_participations_invalid_project(self):
+        """Test PATCH /participations with invalid project id"""
+        # add participation to db
+        participation = Participation(**self.participation_data)
+        await update(participation, session=self.session)
+
+        path = f"/participations?student_id={participation.student_id}&project_id={participation.project_id}"
+
+        # set invalid project id
+        self.participation_data.update({
+            "project_id": 0
+        })
+
+        # Send PATCH request
+        await self.do_request(Request.PATCH, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
+
+    async def test_patch_participations_year_mismatch(self):
+        """Test PATCH /participations with participation and student in different editions"""
+        participation = Participation(**self.participation_data)
+        await update(participation, session=self.session)
+
+        path = f"/participations?student_id={participation.student_id}&project_id={participation.project_id}"
+
+        # generate new edition
+        edition_generator = EditionGenerator(self.session)
+        edition = edition_generator.generate_edition(self.edition.year + 1)
+        await update(edition, self.session)
+
+        # generate project in new edition
+        project_generator = ProjectGenerator(self.session)
+        project = project_generator.generate_project(year=edition.year)
+        await update(project, self.session)
+
+        # set new project id
+        self.participation_data.update({
+            "project_id": project.id
+        })
+
+        # Send PATCH request
+        await self.do_request(Request.PATCH, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
