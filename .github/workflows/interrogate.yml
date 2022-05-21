@@ -15,22 +15,75 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  interrogate_api:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
       - name: Python Interrogate Check
         uses: JackMcKew/python-interrogate-check@v0.1.1
         with:
-          # File or directory to run interrogate on.
-          path: backend/
-          # Fail when coverage % is less than a given amount.
-          fail-under: 69 # optional, default is 80
-          # Generate a `shields.io` status badge (an SVG image) in at a given file or directory.
-          badge-location: . # optional, default is .
+          path: backend/app/api.py
+          fail-under: 100
+  interrogate_config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Interrogate Check
+        uses: JackMcKew/python-interrogate-check@v0.1.1
+        with:
+          path: backend/app/config.py
+          fail-under: 100
+  interrogate_crud:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Interrogate Check
+        uses: JackMcKew/python-interrogate-check@v0.1.1
+        with:
+          path: backend/app/crud.py
+          fail-under: 100
+  interrogate_database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Interrogate Check
+        uses: JackMcKew/python-interrogate-check@v0.1.1
+        with:
+          path: backend/app/database.py
+          fail-under: 100
+  interrogate_exceptions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Interrogate Check
+        uses: JackMcKew/python-interrogate-check@v0.1.1
+        with:
+          path: backend/app/exceptions
+          fail-under: 100
+  interrogate_models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Interrogate Check
+        uses: JackMcKew/python-interrogate-check@v0.1.1
+        with:
+          path: backend/app/models
+          fail-under: 100
+  interrogate_routers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Interrogate Check
+        uses: JackMcKew/python-interrogate-check@v0.1.1
+        with:
+          path: backend/app/routers
+          fail-under: 100
+  interrogate_utils:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Python Interrogate Check
+        uses: JackMcKew/python-interrogate-check@v0.1.1
+        with:
+          path: backend/app/utils
+          fail-under: 100

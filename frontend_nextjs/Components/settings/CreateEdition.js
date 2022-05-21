@@ -12,18 +12,30 @@ import {api, Url} from "../../utils/ApiClient";
     const [editionDescription, setEditionDescription] = useState("");
     const [changedSuccess, setChangedSuccess] = useState(false);
 
+    /**
+     * This function the change of the edition year text field.
+     * @param event the event of changing the edition year text field.
+     */
     const handleChangeEditionYear = (event) => {
         event.preventDefault()
         setChangedSuccess(false)
         setEditionYear(event.target.value);
     }
 
+  /**
+   * This function the change of the edition name text field.
+   * @param event the event of changing the edition name text field.
+   */
     const handleChangeEditionName = (event) => {
-        event.preventDefault()
-        setChangedSuccess(false)
-        setEditionName(event.target.value);
+      event.preventDefault()
+      setChangedSuccess(false)
+      setEditionName(event.target.value);
     }
 
+    /**
+     * This function the change of the edition description text field.
+     * @param event the event of changing the edition description text field.
+     */
     const handleChangeEditionDescription = (event) => {
         event.preventDefault()
         setChangedSuccess(false)
@@ -32,7 +44,7 @@ import {api, Url} from "../../utils/ApiClient";
 
     /**
      * This function makes a post request to the api to create a new edition
-     * @param event
+     * @param event the event of pressing the submit button.
      */
     async function handleSubmitChange(event){
         event.preventDefault()
@@ -46,6 +58,9 @@ import {api, Url} from "../../utils/ApiClient";
         if (response.success) { setChangedSuccess(true); props.addToEditionList(body)}
     }
 
+    /**
+     * Return the html of the CreateEdition component.
+     */
     return(
         <Form onSubmit={handleSubmitChange}>
             <Form.Group className="mb-3" controlId="editionYear">

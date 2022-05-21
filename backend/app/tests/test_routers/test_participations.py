@@ -16,11 +16,12 @@ from app.models.skill import Skill
 
 
 class TestParticipations(TestBase):
-    async def create_edition_in_db(self, edition_year: int = 2022) -> Edition:
+    async def asyncSetUp(self):
+        await super().asyncSetUp()
+
         edition_generator = EditionGenerator(self.session)
-        edition = edition_generator.generate_edition(edition_year)
-        await update(edition, self.session)
-        return edition
+        self.edition = edition_generator.generate_edition(2022)
+        await update(self.edition, self.session)
 
     async def create_students_in_db(self, edition: Edition, count: int = 1) -> List[Student]:
         skill_generator = SkillGenerator(self.session)

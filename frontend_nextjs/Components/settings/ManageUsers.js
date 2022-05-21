@@ -28,6 +28,9 @@ export default function ManageUsers(props) {
     const [sending, setSending] = useState(false);
     const [fail, setFail] = useState(false);
 
+    /**
+     * called when the manage users component is closed.
+     */
     const handleClose = () => {
         setFail(false);
         setSent(false);
@@ -36,6 +39,9 @@ export default function ManageUsers(props) {
         setToInvite("");
     }
 
+    /**
+     * Called when the 'try again' is pushed.
+     */
     const handleTryAgain = () => {
         setFail(false);
         setSent(false);
@@ -43,12 +49,23 @@ export default function ManageUsers(props) {
         setToInvite("");
     }
 
+    /**
+     * called when ManageUsers needs to be showed.
+     */
     const handleShow = () => setShow(true);
 
+    /**
+     * Called when the 'search names' field has changed. It searches for the current value of the text field.
+     * @param event the event of changing the 'search names' field.
+     */
     const handleSearch = (event) => {
         setSearch(event.target.value);
+        applyFilters(event.target.value, filters);
     };
 
+    /**
+     * This function sets the state variables users and shownUsers.
+     */
     useEffect(() => {
         if (Boolean(props.initialize)) {
             if (!users.length && !loading) {
@@ -106,11 +123,6 @@ export default function ManageUsers(props) {
         );
     }
 
-    async function handleSearchSubmit(event) {
-        event.preventDefault();
-        setShownUsers(users.filter(user => user.name.toLowerCase().includes(search.toLowerCase())))
-    }
-
     const [filters, setFilters] = useState({
         "show-all-users": true,
         "show-approved": false,
@@ -131,16 +143,30 @@ export default function ManageUsers(props) {
         }
         temp[ev.target.id] = true
         setFilters(temp);
-
-        setShownUsers([...users.filter(user => {
-            if (!user.name.toLowerCase().includes(search.toLowerCase())) {return false;}
-            if (ev.target.id === "show-all-users") {return true;}
-            if (ev.target.id === "show-approved") {return user.approved;}
-            if (ev.target.id === "show-unapproved") {return user.active && !user.approved;}
-            if (ev.target.id === "show-inactive") {return !user.active;}
-        })]);
+        applyFilters(search, temp);
     }
 
+    /**
+     * Filter the users, it sets the shownUsers to the users that pass the filters.
+     * @param newSearch The search value on which the users must be filtered.
+     * @param newFilters the filters 'show all users', 'show aproved', 'show unapproved' and 'show inactive'.
+     */
+    function applyFilters(newSearch, newFilters) {
+        let filtered = users;
+
+        filtered = filtered.filter(user => user.name.toLowerCase().includes(newSearch.toLowerCase()));
+
+        if (newFilters["show-all-users"]) {filtered = filtered.filter(user => true)}
+        else if (newFilters["show-approved"]) {filtered = filtered.filter(user => user.approved)}
+        else if (newFilters["show-unapproved"]) {filtered = filtered.filter(user => user.active && !user.approved)}
+        else if (newFilters["show-inactive"]) {filtered = filtered.filter(user => !user.active)}
+        
+        setShownUsers([...filtered]);
+    }
+
+    /**
+     * Return the html of the ManageUsers component.
+     */
     return (
         <div>
             <Button variant="primary" onClick={handleShow} className="invite-users-button">
@@ -243,11 +269,7 @@ export default function ManageUsers(props) {
                     <thead>
                         <tr>
                             <th>
-                                <Form onSubmit={handleSearchSubmit}>
-                                    <Form.Group controlId="searchTable">
-                                        <Form.Control type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
-                                    </Form.Group>
-                                </Form>
+                                        <input type="text" value={search} placeholder={"Search names"} onChange={handleSearch} />
                             </th>
                             <th>
                                 <p>

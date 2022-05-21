@@ -1,15 +1,15 @@
 """ This router is used to generate dummy data and insert it in the database """
 
-from random import choice, randrange, sample
+from random import choice, randrange
 from typing import List
 
 from app.crud import clear_data
 from app.database import get_session
 from app.models.participation import Participation
-from app.models.project import Project, ProjectRequiredSkill
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
+from app.tests.utils_for_tests.ProjectGenerator import ProjectGenerator
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
 from app.tests.utils_for_tests.UserGenerator import UserGenerator
@@ -98,34 +98,13 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     user_generator.add_to_db()
 
-    project = Project(
-        name="Student Volunteer Project",
-        description="Innovative open source projects, made by incredibly motivated students, coaches & organisations.",
-        partner_name="UGent",
-        partner_description="Universiteit Gent",
-        coaches=coaches[:2],
-        edition=edition.year)
+    project_generator = ProjectGenerator(session)
+    project1, project2 = project_generator.generate_default_projects(edition.year)
 
-    project1_skills = [ProjectRequiredSkill(
-        number=randrange(2, 5),
-        project=project,
-        skill=skill)
-        for skill in skills]
+    project1_skills = project_generator.generate_project_skills(project1, skills)
+    project_generator.generate_project_skills(project2, skills)
 
-    project2 = Project(
-        name="Cyberfest",
-        description="Hackers & Cyborgs",
-        partner_name="HoGent",
-        partner_description="Hogeschool Gent",
-        coaches=coaches[2:],
-        edition=edition.year)
-    session.add(project)
-
-    project2_skills = [ProjectRequiredSkill(
-        number=randrange(1, 8),
-        project=project2,
-        skill=skill)
-        for skill in sample(skills, k=randrange(3, len(skills)))]
+    project_generator.add_to_db()
 
     student_generator = StudentGenerator(session, edition, skills)
     # generate students without suggestions
@@ -139,7 +118,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     for s in SuggestionOption:
         for i in range(2):
             student = student_generator.generate_student()
-            suggestions += generate_suggestions(student, skills, project, coaches[:2], 5, s, choice(admins))
+            suggestions += generate_suggestions(student, skills, project1, coaches[:2], 5, s, choice(admins))
             suggestions += generate_suggestions(student, skills, project2, coaches[2:], 5, s, choice(admins))
             suggestions += generate_suggestions(student, skills, project2, coaches[2:], 5, s, choice(admins))
 
@@ -147,16 +126,8 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
     for required_skill in project1_skills:
         for _ in range(randrange(required_skill.number)):
             student = student_generator.generate_student()
-            participations.append(Participation(student=student, project=project,
+            participations.append(Participation(student=student, project=project1,
                                                 skill=required_skill.skill))
-
-    session.add(project)
-    session.add(project2)
-
-    for skill in project1_skills:
-        session.add(skill)
-    for skill in project2_skills:
-        session.add(skill)
 
     for suggestion in suggestions:
         session.add(suggestion)

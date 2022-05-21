@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 from enum import IntEnum, Enum, auto
-from typing import Set, Dict, Any, Tuple, Optional, Type, List
+from typing import Any, Optional, Type
 
 from asgi_lifespan import LifespanManager
 from httpx import AsyncClient, Response
@@ -16,13 +16,28 @@ from sqlalchemy.orm import sessionmaker
 
 
 class Request(Enum):
+    """ Enum to represent the required request
+    """
     DELETE = auto()
     GET = auto()
     POST = auto()
     PATCH = auto()
     PUT = auto()
 
-    async def do_request(self, client: AsyncClient, path: str, headers: Dict[str, str], body: Any = None) -> Response:
+    async def do_request(self, client: AsyncClient, path: str, headers: dict[str, str], body: Any = None) -> Response:
+        """do_request execute the required request based on what Request calls the function.
+
+        :param client: The client that will do the request
+        :type client: AsyncClient
+        :param path: The path for the request
+        :type path: str
+        :param headers: The request headers
+        :type headers: dict[str, str]
+        :param body: The body of the request, defaults to None
+        :type body: Any (most of the time dict[str, str]), optional
+        :return: Response of the request
+        :rtype: Response
+        """
         if self.name == "DELETE":
             return await client.delete(path, headers=headers)
         elif self.name == "GET":
@@ -38,6 +53,8 @@ class Request(Enum):
 
 
 class Status(IntEnum):
+    """ Enum to represent various status codes
+    """
     SUCCESS = 200
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
@@ -47,19 +64,34 @@ class Status(IntEnum):
 
 
 class TestBase(unittest.IsolatedAsyncioTestCase):
+    """ The base class for all TestClasses for the routers
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the TestBase
+
+        :param args:
+        :param kwargs:
+        """
         super().__init__(*args, **kwargs)
         self.sessionmaker = sessionmaker(
             engine, expire_on_commit=False, class_=AsyncSession
         )
 
         self.bad_id = 0
-        self.users: Dict[str, User] = {}
+        self.users: dict[str, User] = {}
         self.saved_objects = {
             "passwords": {},  # passwords will be saved as {"passwords": {"user_admin": "user_admin_password"}}
         }
 
     async def asyncSetUp(self) -> None:
+        """
+        Sets up the test environment for each unittest.
+        This includes a session and the default test users.
+
+        :return: None
+        """
         asyncio.get_running_loop().set_debug(False)  # silent mode
         self.client: AsyncClient = AsyncClient(app=app, base_url="http://test")
         self.lf = LifespanManager(app)
@@ -75,16 +107,33 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         user_generator.add_to_db()
         await self.session.commit()
 
-        self.user_coach = self.users["coach"]
-        self.user_admin = self.users["user_admin"]
-
     async def asyncTearDown(self) -> None:
+        """
+        Resets the test environment to undo any changes done during a test.
+
+        :return: None
+        """
         await clear_data(self.session)
         await self.lf.__aexit__()
         await self.client.aclose()
         await self.session.close()
 
-    async def get_users_by(self, roles: List[UserRole], active=True, approved=True, disabled=False) -> Set[str]:
+    async def get_users_by(self, roles: list[UserRole], active=True, approved=True, disabled=False) -> set[str]:
+        """
+        Returns the names of all users whose roles are in the given roles list and who match the other statuses.
+
+        :param roles: All roles of which to retrieve the usernames
+        :type roles: list[UserRole]
+        :param active: The active status of the users to be retrieved
+        :type active: boolean
+        :param approved: The approved status of the users to be retrieved
+        :type approved: boolean
+        :param disabled: The disabled status of the users to be retrieved
+        :type disabled: boolean
+        :return: The set of usernames of all users matching the given requirements.
+        :rtype: set[str]
+        """
+
         users = await read_all_where(User, session=self.session)
         return {user.name for user in users
                 if user.role in roles
@@ -93,9 +142,23 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
                 and user.disabled == disabled}
 
     async def get_user_by_name(self, user_name: str) -> Optional[Type[User]]:
+        """
+        Retrieves a user from the database by its name.
+
+        :param user_name: The name of the user to be retrieved
+        :return: The retrieved user
+        :rtype: Optional[Type[User]]
+        """
         return await read_where(User, User.name == user_name, session=self.session)
 
     async def get_access_token(self, user_name: str):
+        """
+        Returns the access token for a user with the name of user_name
+
+        :param user_name: The name of the user of which to get an access token
+        :type user_name: str
+        :return: Access token
+        """
         user: User = await self.get_user_by_name(user_name)
         email: str = user.email
         password: str = self.saved_objects["passwords"][user_name]
@@ -110,21 +173,22 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
         Tests whether a request with the given data matches the expected status and returns the response.
 
         :param request_type: The type of request
+        :type request_type: Request
         :param path: The path of the request
         :type path: str
         :param user: The requesting user
-        :type user: str
+        :type user: str, optional
         :param expected_status: The expected status of the request, defaults to 200
-        :type expected_status: int
-        :param json_body: The request body
-        :type json_body: Depends on the request, most of the time a dict
+        :type expected_status: int, optional
         :param access_token: The access token of the request, defaults to token of user
-        :type access_token: str
+        :type access_token: str, optional
+        :param json_body: The request body
+        :type json_body: Depends on the request, most of the time a dict, optional
 
         :return: The response of the request
         :rtype: Response
         """
-        headers: Dict[str, str] = {}
+        headers: dict[str, str] = {}
 
         if user != "":
             if access_token is None:
@@ -146,15 +210,40 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
         return response
 
-    async def _auth_test_request(self, request_type: Request, path: str, body: Dict):
+    async def _auth_test_request(self, request_type: Request, path: str, body: dict) -> None:
+        """
+        Asserts whether a request fails in the expected manner when an access token is wrong or missing.
+
+        :param request_type: The Request enum to represent the request type
+        :type request_type: Request
+        :param path: The path of the request
+        :type path: str
+        :param body: The body for the request
+        :type body: dict
+        :return: None
+        """
         await self.do_request(request_type, path, expected_status=Status.UNAUTHORIZED, json_body=body)
         await self.do_request(request_type, path, "user_admin", expected_status=Status.UNPROCESSABLE,
                               json_body=body, access_token="wrong token")
 
     async def _access_test_request(
-            self, request_type: Request, path, allowed_users: Set[str], body: Dict = None
-    ) -> Dict[str, Response]:
-        responses: Dict[str, Response] = {}
+            self, request_type: Request, path, allowed_users: set[str], body: dict = None
+    ) -> dict[str, Response]:
+        """
+        Asserts that all allowed users can execute the response successfully and return the responses of each request.
+
+        :param request_type: The Request enum to represent the request type
+        :type request_type: Request
+        :param path: The path of the request
+        :type path: str
+        :param allowed_users: The names of all users that should be allowed to successfully do the request
+        :type allowed_users: set[str]
+        :param body: The body for the request
+        :type body: dict
+        :return: A dict of the users' name and the corresponding Response
+        :rtype: dict[str, Response]
+        """
+        responses: dict[str, Response] = {}
         # Allowed users
         for user_name in allowed_users:
             responses[user_name] = await self.do_request(request_type, path, user_name, Status.SUCCESS, json_body=body)
@@ -166,15 +255,21 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
         return responses
 
-    async def auth_access_request_test(self, request_type: Request, path: str, allowed_users: Set[str],
-                                       body: Dict = None) -> Dict[str, Response]:
+    async def auth_access_request_test(self, request_type: Request, path: str, allowed_users: set[str],
+                                       body: dict = None) -> dict[str, Response]:
         """
         Assert for all users whether only allowed_users are allowed request access to the given path.
 
         :param request_type: type of the request
+        :type request_type: Request
         :param path: The path for the request
+        :type path: str
         :param allowed_users: All allowed users
+        :type allowed_users: set[str]
         :param body: The body of the request
+        :type body: dict
+        :return: The responses for the requests of all allowed users
+        :rtype: dict[str, Response]
         """
 
         # Check bad access tokens
@@ -184,19 +279,25 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
     async def auth_access_request_test_per_user(
             self, request_type: Request,
-            allowed_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]],
-            blocked_users_path_and_body: Dict[str, Tuple[str, Dict[str, str]]]
-    ) -> Dict[str, Response]:
+            allowed_users_path_and_body: dict[str, tuple[str, dict[str, str]]],
+            blocked_users_path_and_body: dict[str, tuple[str, dict[str, str]]]
+    ) -> dict[str, Response]:
         """
         Assert for all users whether only allowed_users are allowed request access to the given path and body.
+        This function also allows to assign a specific path and body per user for endpoints which necessitate this.
 
         :param request_type: type of the request
+        :type request_type: Request
         :param allowed_users_path_and_body:
         A dict containing a map from the allowed users to their specific path and body
+        :type allowed_users_path_and_body: dict[str, tuple[str, dict[str, str]]]
         :param blocked_users_path_and_body:
         A dict containing a map from the blocked users to their specific path and body
+        :type blocked_users_path_and_body: dict[str, tuple[str, dict[str, str]]]
+        :return: The responses for the requests of all allowed users
+        :rtype: dict[str, Response]
         """
-        responses: Dict[str, Response] = {}
+        responses: dict[str, Response] = {}
 
         for user_name, (path, body) in allowed_users_path_and_body.items():
             await self._auth_test_request(request_type, path, body)

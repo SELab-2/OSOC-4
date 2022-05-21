@@ -1,14 +1,14 @@
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Form } from "react-bootstrap";
 import React, { useEffect, useState } from "react";
 import SkillSelector from "./SkillSelector";
 import { api, Url } from "../../utils/ApiClient";
-import { log } from "../../utils/logger";
 import { StringListToOptionsList } from "../../utils/skillselector";
+
 
 
 /**
  * When clicking on the button to assign a student to a project, this modal pops-up. If the selected student and project
- * are a valid combination then you can select a skill and add the student to the project. Otherwise a modal screen pops-up
+ * are a valid combination then you can select a skill and add the student to the project. Otherwise, a modal screen pops-up
  * with the reason why the student and project aren't a valid combination.
  *
  * @param props setSelectedStudent the setter for the currently selected student on the project page,
@@ -24,7 +24,6 @@ export default function AddStudentModal(props) {
 
     const [skills, setSkills] = useState([])
     const [projectNeededSkills, setProjectNeededSkills] = useState([]);
-    const [skillsLeft, setSkillsLeft] = useState([]);
     const [reason, setReason] = useState("");
     const [options, setOptions] = useState([{ "value": "None", "label": "None" }])
 
@@ -51,7 +50,9 @@ export default function AddStudentModal(props) {
     }, [props.selectedProject])
 
 
-
+    /**
+     * This useEffect initializes the skills state variable.
+     */
     useEffect(() => {
         Url.fromName(api.skills).get().then(res => {
             if (res.success) {
@@ -60,6 +61,10 @@ export default function AddStudentModal(props) {
         })
     }, [])
 
+    /**
+     * This function classifies the skills in the skill categories, depending on the selected student. Then it sets the
+     * options state variable.
+     */
     useEffect(() => {
         if (skills.length !== 0 && props.selectedStudent !== undefined && projectNeededSkills.length !== 0) {
             let studentClean = props.selectedStudent.skills.map(value => value.name)
@@ -95,11 +100,19 @@ export default function AddStudentModal(props) {
         }
     }
 
+    /**
+     * Handle the changes in the reason input bar.
+     * @param event
+     */
     const handleChange = (event) => {
         event.preventDefault();
         setReason(event.target.value);
     }
 
+    /**
+     * This reset is called when the AddStudentModel is hidden. It makes the modal window invisible and resets the
+     * reason and selected skill.
+     */
     const reset = () => {
         props.setShowAddStudent(false);
         setSelectedSkill({ "value": "None", "label": "None" });
@@ -117,20 +130,19 @@ export default function AddStudentModal(props) {
                     <Modal.Title>Add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to {props.selectedProject.name}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                 <h4>Why are you making this decision?</h4>
-                 <p>A reason is not required, but will open up discussion and help us and your fellow coaches to understand.</p>
-                    <input id="suggestin-reason" name="reason" type="text" className="fill_width suggestion-reason" onChange={handleChange} value={reason} placeholder="Your reason"/>
-                    <div>
-                        <h4>For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?</h4>
+                    <div className="student-modal-screen-title">Why are you making this decision?</div>
+                    <p>A reason is not required, but will open up discussion and help us and your fellow coaches to understand.</p>
+                    <Form.Control type="text" id="suggestin-reason" name="reason" className="fill_width suggestion-reason"
+                     onChange={handleChange} value={reason} placeholder="Your reason"/>
+                    <div className="student-modal-screen-title">For which skill requirement do you want to add {props.selectedStudent["mandatory"]["first name"]} {props.selectedStudent["mandatory"]["last name"]} to the project?</div>
+                    <div className="student-modal-screen-skillselector">
+                        <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
+                            options={options}
+                        />
                     </div>
-                    <SkillSelector selectedSkill={selectedSkill} setSelectedSkill={setSelectedSkill}
-                        options={options}
-                    />
+                    
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {reset()}}>
-                        Dont add student to project
-                    </Button>
                     <Button variant="primary" onClick={async () => {await AddStudentToProject();reset();}}>
                         Add student to project
                     </Button>

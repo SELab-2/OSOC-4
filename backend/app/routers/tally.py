@@ -12,7 +12,7 @@ router = APIRouter(prefix="/tally")
 @router.post("/add", response_description="Form submitted")
 async def add_new_form(year: int, data: dict, session: AsyncSession = Depends(get_session)) -> dict:
     """add_new_form adds processes a submitted form
-        this endpoint will by called by the tally webhook
+        this endpoint will be called by the tally webhook
         the data send will be processed here
 
     :param year: the edition year

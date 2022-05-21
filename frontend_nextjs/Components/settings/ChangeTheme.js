@@ -8,10 +8,17 @@ import React, {useState} from "react";
 export default function ChangeTheme(props) {
     const [theme, setTheme] = useState('Off')
 
+    /**
+     * This function changes the theme state variable.
+     * @param mode The new theme mode.
+     */
     function handleClick(mode){
         setTheme(mode)
     }
 
+    /**
+     * Return the html of the ChangeTheme component.
+     */
     return(
         <div>
             <p className="details-text">Changing the theme can reduces the strain on your eyes. <br/>
@@ -25,6 +32,3 @@ export default function ChangeTheme(props) {
         </div>
     )
 }
-
-
-// <Button variant={"outline-secondary"} onClick={changeTheme}>{darkTheme ? "Turn to light theme" : "Turn to dark theme"}</Button>

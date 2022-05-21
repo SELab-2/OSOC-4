@@ -28,7 +28,7 @@ class TestKeyGenerators(unittest.TestCase):
         Args:
             key_gen: The key generator
             key_identifier: The start of the key
-            expire: The expire variable of the key
+            expire: The expiry variable of the key
 
         Returns:
 

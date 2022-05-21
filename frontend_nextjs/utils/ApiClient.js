@@ -318,8 +318,8 @@ class API {
             this._paths.emailtemplates = res.data[this.emailtemplates];
             this._paths.sendemails = res.data[this.sendemails];
             this._paths.myself = res.data[this.myself];
-            if (this._getYear()) {
-                this._paths.current_edition = this._paths.editions + "/" + this._getYear();
+            if (this.getYear()) {
+                this._paths.current_edition = this._paths.editions + "/" + this.getYear();
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
                 this._paths.current_edition = (res.data.length) ? res.data[0] : null;
@@ -348,7 +348,7 @@ class API {
         this.invalidate();
     }
 
-    _getYear() {
+    getYear() {
         return localStorage.getItem("api_year");
     }
 
@@ -421,6 +421,27 @@ class Cache {
         } else if ("deleted_student" in data) {
             if (data["deleted_student"] in cache) {
                 delete cache[data["deleted_student"]];
+            }
+        } else if ("participation_student" in data) {
+            const studentUrl = data["studentUrl"]
+
+            if (studentUrl in cache) {
+                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === data["participation_student"]["project"]);
+                if (index !== -1) {
+                    cache[studentUrl]["participations"][index] = data["participation_student"];
+                } else {
+                    cache[studentUrl]["participations"].push(data["participation_student"]);
+                }
+            }
+        } else if ("deleted_participation" in data) {
+            const studentUrl = data["studentUrl"]
+            const projectUrl = data["projectUrl"]
+
+            if (studentUrl in cache) {
+                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === projectUrl);
+                if (index !== -1) {
+                    cache[studentUrl]["participations"].splice(index, 1);
+                }
             }
         }
     }
