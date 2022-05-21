@@ -75,6 +75,9 @@ export default function ProjectsList(props) {
         });
     }, [allProjects]);
 
+    /**
+     * This useEffect adds an eventListener in order to call updateDetailsFromWebsocket when the data has changed.
+     */
     useEffect(() => {
 
         if (websocketConn) {
@@ -87,9 +90,15 @@ export default function ProjectsList(props) {
 
     }, [websocketConn, visibleProjects, allProjects, router.query])
 
+    /**
+     * This function is called when the data has changed. The function will determine which type of data has changed
+     * and change the state of the application accordingly.
+     * @param event the event parameter contains the changed data.
+     */
     const updateDetailsFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
 
+        // A participation has changed
         if ("participation" in data) {
             const studentid = parseInt(data["studentId"])
             const projectid = parseInt(data["projectId"])
@@ -111,6 +120,8 @@ export default function ProjectsList(props) {
                     return true; // stop searching
                 }
             })
+
+        // A participation has been deleted
         } else if ("deleted_participation" in data) {
             const studentid = parseInt(data["studentId"])
             const projectid = parseInt(data["projectId"])
@@ -132,6 +143,8 @@ export default function ProjectsList(props) {
                     return true; // stop searching
                 }
             })
+
+        // A project has been deleted.
         } else if ("deleted_project" in data) {
             const projectid = data["deleted_project"];
 
@@ -173,7 +186,11 @@ export default function ProjectsList(props) {
     }
 
 
-
+    /**
+     * This function handles the changes to the search bar.
+     * @param event The event of changing the search bar.
+     * @returns {Promise<void>}
+     */
     async function handleSearch(event) {
         event.preventDefault();
         setSearch(event.target.value);
@@ -182,7 +199,7 @@ export default function ProjectsList(props) {
 
     /**
      * changes the value of peopleNeeded
-     * @param event
+     * @param event The event of the change of the peopleNeeded checkbox.
      * @returns {Promise<void>}
      */
     async function changePeopleNeeded(event) {
@@ -197,6 +214,9 @@ export default function ProjectsList(props) {
         router.push("/new-project")
     }
 
+    /**
+     * The html of the ProjectList component.
+     */
     return (
         <Col className="fill_height fill_width">
             <Row className="center-content projects-controls">

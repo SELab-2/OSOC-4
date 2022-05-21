@@ -12,7 +12,7 @@ import {useEffect} from "react";
 
 /**
  * The page corresponding with the 'projects' tab
- * @returns {JSX.Element}
+ * @returns {JSX.Element} the component that renders the 'projects' tab.
  * @constructor
  */
 export default function Projects() {
@@ -24,10 +24,16 @@ export default function Projects() {
 
     const {height, width} = useWindowDimensions();
 
+    /**
+     * This useEffect sets the fullView state variable depending on the screens width.
+     */
     useEffect(() => {
         setFullView(width > 1500);
     }, [width]);
 
+    /**
+     * Return the html of the projects page.
+     */
     return (
         <Row className="fill_height fill_width remaining_height">
             {fullView && <StudentsFilters/>}
