@@ -51,9 +51,9 @@ class TestParticipations(TestBase):
         await self.do_request(Request.POST, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=post_body)
 
         # verify participation is created in db
-        participation_in_db = await read_all_where(Participation, Participation.reason == post_body["reason"], session=self.session)
-        self.assertEqual(1, len(participation_in_db))
-        self.assert_participation_equal(post_body, participation_in_db[0])
+        db_participations = await read_all_where(Participation, Participation.student_id == post_body["student_id"], Participation.project_id == post_body["project_id"], session=self.session)
+        self.assertEqual(1, len(db_participations))
+        self.assert_participation_equal(post_body, db_participations[0])
 
     async def test_delete_participations(self):
         reason = str(uuid.uuid1())
@@ -63,16 +63,16 @@ class TestParticipations(TestBase):
         await update(participation, session=self.session)
 
         # verify participation is in db
-        participation_in_db = await read_all_where(Participation, Participation.reason == reason, session=self.session)
-        self.assertEqual(1, len(participation_in_db))
+        db_participations = await read_all_where(Participation, Participation.reason == reason, session=self.session)
+        self.assertEqual(1, len(db_participations))
 
         # Send DELETE request
         path = f"/participations?student_id={self.students[0].id}&project_id={self.project.id}"
         await self.do_request(Request.DELETE, path, "user_admin", access_token=await self.get_access_token("user_admin"))
 
         # verify participation is deleted from db
-        participation_in_db = await read_where(Participation, Participation.reason == reason, session=self.session)
-        self.assertIsNone(participation_in_db)
+        db_participations = await read_all_where(Participation, Participation.student_id == participation.student_id, Participation.project_id == participation.project_id, session=self.session)
+        self.assertEqual(0, len(db_participations))
 
     async def test_patch_participations(self):
         reason = str(uuid.uuid1())
@@ -82,8 +82,8 @@ class TestParticipations(TestBase):
         await update(participation, session=self.session)
 
         # verify participation is in db
-        participation_in_db = await read_all_where(Participation, Participation.reason == reason, session=self.session)
-        self.assertEqual(1, len(participation_in_db))
+        db_participations = await read_all_where(Participation, Participation.reason == reason, session=self.session)
+        self.assertEqual(1, len(db_participations))
 
         # modify participation
         modified_participation = {
@@ -98,5 +98,5 @@ class TestParticipations(TestBase):
         await self.do_request(Request.PATCH, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=modified_participation)
 
         # verify participation is changed
-        participation_in_db = await read_where(Participation, Participation.reason == modified_participation["reason"], session=self.session)
-        self.assert_participation_equal(modified_participation, participation_in_db)
+        db_participation = await read_where(Participation, Participation.student_id == modified_participation["student_id"], Participation.project_id == modified_participation["project_id"], session=self.session)
+        self.assert_participation_equal(modified_participation, db_participation)
