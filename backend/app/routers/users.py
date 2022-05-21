@@ -2,7 +2,7 @@
 
 from typing import List
 
-from app.crud import read_all_where, read_where, update
+from app.crud import read_all_where, read_where, update, delete
 from app.database import db, get_session
 from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
                                             PasswordsDoNotMatchException,
@@ -224,6 +224,15 @@ async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)
     user.password = ""
 
     user = await update(user, session=session)
+
+    # delete the EditionCoach object
+    print("DELETE EDITIONCOACH")
+    edition = await get_current_edition(session)
+    print(edition)
+    edit_coach = await read_where(EditionCoach, EditionCoach.edition == edition.year, EditionCoach.coach_id == int(user_id), session=session)
+    print(edit_coach)
+    if edit_coach:
+        await delete(edit_coach, session=session)
 
     return response(UserOut.parse_raw(user.json()), "User deleted successfully")
 
