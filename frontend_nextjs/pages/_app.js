@@ -23,7 +23,6 @@ import "../styles/studentModal.css"
 import { ThemeProvider } from "react-bootstrap";
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
-import RefreshTokenHandler from '../Components/refreshTokenHandler';
 import Login from "../pages/login";
 import RouteGuard from "../Components/Auth";
 import Invite from "./invites/[invitekey]";
@@ -46,7 +45,6 @@ function MyApp({ Component, pageProps }) {
           >
             <Component {...pageProps} />
           </ThemeProvider>
-          <RefreshTokenHandler setInterval={setInterval} />
         </RouteGuard>
       </WebsocketProvider>
 
