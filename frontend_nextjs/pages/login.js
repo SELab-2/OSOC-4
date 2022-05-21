@@ -8,7 +8,12 @@ import {api, Url} from "../utils/ApiClient";
 import { Form, Button, Spinner} from 'react-bootstrap';
 import { toast, ToastContainer } from 'react-toastify';
 
-const Login = props => {
+/**
+ * The login page.
+ * @returns {JSX.Element} The component that renders the login page.
+ * @constructor
+ */
+export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showForgot, setShowForgot] = useState(false)
@@ -17,23 +22,39 @@ const Login = props => {
     const [message, setMessage] = useState("");
     const [saving, setSaving] = useState(false);
     const router = useRouter();
-    // let from = useLocation().state?.from?.pathname || "/";
-    // const navigate = useNavigate()
 
+    /**
+     * called when the email field is changed, it changes the email state variable according to the value of
+     * the email field.
+     * @param event the event of changing the email field.
+     */
     const handleChangeEmail = (event) => {
         setEmail(event.target.value);
     }
 
+    /**
+     * called when the password field is changed, it changes the password state variable according to the value of
+     * the password field.
+     * @param event the event of changing the password field.
+     */
     const handleChangePassword = (event) => {
         setPassword(event.target.value);
     }
 
+    /**
+     * called when the emailForgot field is changed, it changes the emailForgot state variable according to the value of
+     * the emailForgot field.
+     * @param event the event of changing the emailForgot field.
+     */
     const handleChangeEmailForgot = (event) => {
         event.preventDefault();
         setEmailForgot(event.target.value);
     }
 
-
+    /**
+     * Called when the login button is pushed. It will try to log in with the current login credentials.
+     * @returns {Promise<void>}
+     */
     async function handleLogin() {
         await setLoading(true);
         await signIn('credentials', {redirect: false, email: email, password: password });
@@ -42,6 +63,11 @@ const Login = props => {
     }
 
 
+    /**
+     * Called when the 'reset password' button is pushed.
+     * @param event the event of pushing the 'reset password' button.
+     * @returns {Promise<void>}
+     */
     async function handleSubmitForgot(event) {
         event.preventDefault();
         setSaving(true);
@@ -63,10 +89,16 @@ const Login = props => {
         }
     }
 
+    /**
+     * If the page is loading, show the loading animation.
+     */
     if (loading) {
         return (<LoadingPage/>);
     }
 
+    /**
+     * Return the html for the login page.
+     */
     return (
         <div className="body-login">
             <section className="body-left">
@@ -116,7 +148,3 @@ const Login = props => {
         </div>
     )
 }
-
-
-
-export default Login

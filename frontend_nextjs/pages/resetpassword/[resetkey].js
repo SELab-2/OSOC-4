@@ -8,6 +8,11 @@ import Image from 'next/image'
 import { ToastContainer, toast } from 'react-toastify';
 import { Form, Button, Spinner } from 'react-bootstrap';
 
+/**
+ * The page to reset your password.
+ * @returns {JSX.Element} the page tho reset your password.
+ * @constructor
+ */
 const Reset = () => {
     const router = useRouter()
     const { resetkey } = router.query
@@ -17,16 +22,30 @@ const Reset = () => {
     const [password, setPassword] = useState("");
     const [validatePassword, setValidatePassword] = useState("");
 
+    /**
+     * Handle the change of the password field. It changes the state variable password.
+     * @param event The event of changing the password field.
+     */
     const handleChangePassword = (event) => {
         event.preventDefault();
         setPassword(event.target.value);
     }
 
+    /**
+     * Handle the change of the validation password field. It changes the state variable validatePassword.
+     * @param event The event of changing the validatePassword field.
+     */
     const handleChangeValidationPassword = (event) => {
         event.preventDefault();
         setValidatePassword(event.target.value);
     }
 
+    /**
+     * Called when pushing the submit button. It posts the new password to the database if the password is valid and
+     * password and validatePassword are the same.
+     * @param event The event of pushing the submit button.
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (password <= 11) { toast.error("The new password is to short, it should be at least 12 characters long"); return; }
@@ -54,6 +73,9 @@ const Reset = () => {
         }
     }
 
+    /**
+     * This useEffect sets the validKey variable on change of the resetKey state variable.
+     */
     useEffect(() => {
         Url.fromName(api.resetpassword).extend(`/${resetkey}`).get().then(resp => {
             if (resp.success) { setValidkey(true); }
@@ -61,6 +83,10 @@ const Reset = () => {
         });
     }, [resetkey])
 
+    /**
+     * If the page is loading, show the loading animation.
+     * If there is not valid key, show a message.
+     */
     if (loading) {
         return <LoadingPage />
     }
@@ -68,6 +94,9 @@ const Reset = () => {
         return <h1>Not a valid password reset key</h1>
     }
 
+    /**
+     * Return the html of the reset password page.
+     */
     return (
         <div className='body-login'>
             <section className="body-left">

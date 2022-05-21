@@ -13,16 +13,28 @@ import {api, Url} from "../../utils/ApiClient";
     const [editionDescription, setEditionDescription] = useState("");
     const [saving, setSaving] = useState(false);
 
+    /**
+     * This function the change of the edition year text field.
+     * @param event the event of changing the edition year text field.
+     */
     const handleChangeEditionYear = (event) => {
         event.preventDefault()
         setEditionYear(event.target.value);
     }
 
+  /**
+   * This function the change of the edition name text field.
+   * @param event the event of changing the edition name text field.
+   */
     const handleChangeEditionName = (event) => {
         event.preventDefault()
         setEditionName(event.target.value);
     }
 
+    /**
+     * This function the change of the edition description text field.
+     * @param event the event of changing the edition description text field.
+     */
     const handleChangeEditionDescription = (event) => {
         event.preventDefault()
         setEditionDescription(event.target.value);
@@ -30,7 +42,7 @@ import {api, Url} from "../../utils/ApiClient";
 
     /**
      * This function makes a post request to the api to create a new edition
-     * @param event
+     * @param event the event of pressing the submit button.
      */
     async function handleSubmitChange(event){
         setSaving(true);
@@ -54,6 +66,9 @@ import {api, Url} from "../../utils/ApiClient";
         setEditionDescription("");
     }
 
+    /**
+     * Return the html of the CreateEdition component.
+     */
     return(
         <div>
             <Form onSubmit={handleSubmitChange}>
