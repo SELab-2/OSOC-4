@@ -39,7 +39,7 @@ export default function Projects() {
         <>
             {! fullView ?
             <>
-                <div className="project-top-bar-repsonsive">
+                <div className="project-top-bar-responsive">
                     <Row className="nomargin">
                         <Button className="filter-btn" onClick={() => setShowProject(prevstate => !prevstate)}>
                             {showProject ? 
