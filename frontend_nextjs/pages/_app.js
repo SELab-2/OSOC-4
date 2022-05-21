@@ -37,6 +37,7 @@ function MyApp({ Component, pageProps }) {
 
 
   return (
+    // session provider is used so every page can access the session
     <SessionProvider session={pageProps.session} refetchInterval={interval} basePath={`${process.env.NEXT_BASE_PATH}/api/auth`}>
       <WebsocketProvider>
         <RouteGuard auth={!no_auth.includes(Component)}>
