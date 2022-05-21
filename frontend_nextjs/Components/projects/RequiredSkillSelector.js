@@ -71,7 +71,6 @@ export default function RequiredSkillSelector(props){
                                 {"label": "no skill selected", "value":"no skill selected"}
                             }
                             onChange={async (value) => {
-                                log(value)
                                 await props.changeRequiredSkill(value, props.index)
                             }}
                             filterOption={filterOption}

@@ -46,12 +46,12 @@ export default function NewProjects() {
 
     function changeRequiredSkill(value, index){
         if(requiredSkills[index].label !== ""){
-            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].skill_name])
         } else {
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
         let newArray = [...requiredSkills]
-        newArray[index]["skill_name"] = value.value
+        newArray[index].skill_name = value.value
         setRequiredSkills(newArray)
     }
 

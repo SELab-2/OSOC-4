@@ -148,17 +148,21 @@ const Project = () => {
      * Add new empty value in dropdown menu
      */
     function addRequiredSkill() {
-        setRequiredSkills(prevState => [...prevState, { "number": 1, "skill_name": "" }])
+        if(requiredSkills.length < skills.length){
+            setRequiredSkills(prevState => [...prevState, { "number": 1, "skill_name": "" }])
+        } else {
+            toast.error("Can't have more required skills than skills")
+        }
     }
 
     function changeRequiredSkill(value, index){
         if(requiredSkills[index].label !== ""){
-            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].skill_name])
         } else {
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
         let newArray = [...requiredSkills]
-        newArray[index] = value
+        newArray[index].skill_name = value.value
         setRequiredSkills(newArray)
     }
 
