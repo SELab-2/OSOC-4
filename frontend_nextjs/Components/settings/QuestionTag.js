@@ -5,15 +5,16 @@ import saveIcon from '../../public/assets/save.svg';
 import Image from "next/image";
 import { cache, Url } from "../../utils/ApiClient";
 import Hint from "../Hint";
+import {toast} from "react-toastify";
 
 /**
  * This component represents a row in the table of question tags. It represents one question tag.
- * @param props props contains questionTag, questionTags, deleteTag, renameTag, setEdited, edited, setNewQuestionTag,
- * setErrorMessage. QuestionTag is the object that represents the row's queston tag. questionTags is the list of all
+ * @param props props contains questionTag, questionTags, deleteTag, renameTag, setEdited, edited, setNewQuestionTag.
+ * QuestionTag is the object that represents the row's queston tag. questionTags is the list of all
  * the rendered question tags. deleteTag is a function that needs to be called when deleting the quesion tag. renameTag
  * is a function that needs to be called when editing the tag name. edited is a state variable that represent the
  * currently edited questiontag, setEdited edits the variable. setNewQuestionTag is to set the variable that represents
- * the new question tag when clicking on 'new question tag'. setErrorMessage is used to show an error message.
+ * the new question tag when clicking on 'new question tag'.
  * @returns {JSX.Element} A table row that represents a question tag.
  */
 export default function QuestionTag(props) {
@@ -70,10 +71,16 @@ export default function QuestionTag(props) {
      */
     const deleteTag = (event) => {
         event.preventDefault();
+        setSaving(true);
         Url.fromUrl(previousTag["url"]).delete().then(res => {
             if (res.success) {
-                props.deleteTag(previousTag["url"])
-                cache.clear()
+                props.deleteTag(previousTag["url"]);
+                cache.clear();
+                toast.success("Question tag successfully deleted");
+                setSaving(false);
+            } else {
+                toast.error("Something went wrong, please try again");
+                setSaving(false);
             }
         })
     }
@@ -87,23 +94,31 @@ export default function QuestionTag(props) {
         event.preventDefault();
         setSaving(true);
         let requirements = [questionTag["tag"].length > 0,
-        props.questionTags.every(qt => qt["tag"] !== questionTag["tag"] || qt["url"] === questionTag["url"]),
-        questionTag["question"].length > 0,
-        props.questionTags.every(qt => qt["question"] !== questionTag["question"] || qt["url"] === questionTag["url"])];
+            props.questionTags.every(qt => qt["tag"] !== questionTag["tag"] || qt["url"] === questionTag["url"]),
+            questionTag["question"].length > 0,
+            props.questionTags.every(qt => qt["question"] !== questionTag["question"] || qt["url"] === questionTag["url"])];
         if (requirements.every(req => req)) {
+            setSaving(true);
             Url.fromUrl(questionTag["url"]).setBody(questionTag).patch().then(res => {
-                if (previousTag["tag"] !== questionTag["tag"]) {
-                    props.renameTag(questionTag["url"], res["data"])
+                if (res.success) {
+                    if (previousTag["tag"] !== questionTag["tag"]) {
+                        props.renameTag(questionTag["url"], res["data"])
+                    }
+                    setPreviousTag(questionTag);
+                    cache.clear();
+                    toast.success("Question tag successfully edited");
+                    props.setEdited(undefined);
+                    setSaving(false);
+                } else {
+                    toast.error("Something went wrong, please try again");
+                    setQuestionTag({...previousTag});
+                    setSaving(false);
                 }
-                setPreviousTag(questionTag);
-                cache.clear();
             })
-            props.setErrorMessage("");
-            props.setEdited(undefined);
         } else {
             let messages = ["Tag name must not be empty", "Tag name must be unique",
                 "Question must not be empty", "Question must be unique"];
-            props.setErrorMessage(messages[requirements.indexOf(false)]);
+            toast.error(messages[requirements.indexOf(false)]);
         }
         setSaving(false);
     }
@@ -136,7 +151,8 @@ export default function QuestionTag(props) {
                 }
             </td>
             <td>
-                {(!props.edited) &&
+                {saving ? <p>Saving...</p> :
+                  [(!props.edited) ?
                     <Hint message="Edit question-tag">
                         <button className="table-button" onClick={(ev) => {
                             props.setNewQuestionTag(undefined);
@@ -145,39 +161,19 @@ export default function QuestionTag(props) {
                         }}>
                             <Image src={editIcon} height="30px" />
                         </button>
-                    </Hint>}
-                {saving && <p>Saving</p>}
-                {props.edited &&
+                    </Hint> :
                     <Hint message="Save">
                         <button className="table-button" onClick={handleSubmit}>
                             <Image src={saveIcon} height="30px" />
                         </button>
-                    </Hint>}
-
-                {/* {
-                    ((!props.edited) ?
-                        <Hint message="Edit question-tag">
-                            <button className="table-button" onClick={(ev) => {
-                                props.setNewQuestionTag(undefined);
-                                props.setEdited(previousTag["url"]);
-                                setQuestionTag(previousTag);
-                            }}>
-                                <Image src={editIcon} className="questionTag-image"/>
-                            </button>
-                        </Hint>
-                        : 
-                        <Hint message="Save">
-                            <button className="table-button" onClick={handleSubmit}>
-                                <Image src={saveIcon} className="questionTag-image"/>
-                            </button>
-                        </Hint>)
-                } */}
-                {(!previousTag["mandatory"]) &&
+                    </Hint>,
+                  (!previousTag["mandatory"]) &&
                     <Hint message="Delete question-tag">
                         <button onClick={deleteTag} className="table-button">
                             <Image src={deleteIcon} className="questionTag-image" />
                         </button>
                     </Hint>
+                  ]
                 }
             </td>
         </tr>
