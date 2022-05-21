@@ -254,14 +254,6 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)) -> 
         user.disabled = False
         await update(user, session=session)
 
-        # get the latest edition
-        stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())
-        editionres = await session.execute(stat)
-        (edition,) = editionres.first()
-        edition.coaches.append(user)
-
-        await update(edition, session=session)
-
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key()
     # save it
