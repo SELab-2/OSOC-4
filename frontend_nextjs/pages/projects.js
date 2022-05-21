@@ -12,7 +12,7 @@ import {useEffect} from "react";
 
 /**
  * The page corresponding with the 'projects' tab
- * @returns {JSX.Element}
+ * @returns {JSX.Element} the component that renders the 'projects' tab.
  * @constructor
  */
 export default function Projects() {
@@ -24,10 +24,16 @@ export default function Projects() {
 
     const {height, width} = useWindowDimensions();
 
+    /**
+     * This useEffect sets the fullView state variable depending on the screens width.
+     */
     useEffect(() => {
         setFullView(width > 1500);
     }, [width]);
 
+    /**
+     * Return the html of the projects page.
+     */
     return (
         <Row className="fill_height fill_width remaining_height">
             {fullView && <StudentsFilters/>}
@@ -35,11 +41,11 @@ export default function Projects() {
                 <StudentListAndFilters setSelectedStudents={setSelectedStudents} selectedStudents={selectedStudents}
                                        elementType="projects" fullview={fullView}/>
             </Col>
-            <Col className="center-content" md="auto" style={{marginLeft: "0"}}>
+            <Col className="center-content" md="auto" style={{marginLeft: "0", maxWidth: "60"}}>
                 <div>
                     <Hint message="Add the selected student(s) to the selected project">
                         <Image onClick={() => setShowAddStudent(true)} src={matchIcon} alt="match student to project"
-                               width={80}/>
+                               width={60}/>
                     </Hint>
                     <AddStudentModal selectedProject={selectedProject} selectedStudent={selectedStudents[0]}
                                      setShowAddStudent={setShowAddStudent} showAddStudent={showAddStudent}/>

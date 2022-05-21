@@ -1,7 +1,8 @@
-import { Button, Spinner, Row, Form } from "react-bootstrap";
+import { Button, Spinner, Row, Form} from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import { api, Url } from "../../utils/ApiClient";
 import { Card } from "react-bootstrap";
+import { ToastContainer, toast } from 'react-toastify';
 
 /***
  * This element makes a From with a title on the left, to change a default email
@@ -16,6 +17,9 @@ export default function DefaultEmail(props) {
   const [saving, setSaving] = useState(false);
   const [fail, setFail] = useState(false);
 
+  /**
+   * This useEffect initializes the template value.
+   */
   useEffect(() => {
     Url.fromName(api.emailtemplates).extend("/" + props.templatename).get().then(res => {
       if (res.success) {
@@ -48,9 +52,11 @@ export default function DefaultEmail(props) {
     setSaving(true);
     Url.fromName(api.emailtemplates).extend("/" + props.templatename).setBody(template).patch().then(async res => {
       if (res.success){
+          toast.success("Default email changed succesfully");
           setPrevTemplate(template);
           setSaving(false);
       } else {
+        toast.error("Something went wrong, please try again");
         setSaving(false);
         setFail(true);
       }
@@ -59,6 +65,11 @@ export default function DefaultEmail(props) {
     
   }
 
+  /**
+   * When something went wrong during submitting the template and 'try again' is pressed, this function is called.
+   * It sets the template to its original value and enables editing.
+   * @param event
+   */
   const handleTryAgain = (event) => {
     setTemplate(prevTemplate);
     setEditing(true);
@@ -74,8 +85,12 @@ export default function DefaultEmail(props) {
     setFail(false);
   }
 
+  /**
+   * Return the html for the DefaultEmail component.
+   */
   return (
     <>
+    <div>
       <Row>
         <Card>
           <Card.Body>
@@ -124,13 +139,14 @@ export default function DefaultEmail(props) {
             {(template.subject !== "" || template.template !== "") && ! editing && ! fail && <Button variant="primary" onClick={changeDefaultEmail}>Change default</Button>}
             {fail && 
               <div>
-                <p>Something went wrong, please try again</p>
                 <Button variant="primary" onClick={handleTryAgain}>Try again</Button>
                 <Button variant="secondary" onClick={close} className="invite-button">Close</Button>
               </div>}
           </Card.Body>
         </Card>
       </Row>
+      <ToastContainer autoClose={4000}/>
+      </div>
     </>
   )
 }

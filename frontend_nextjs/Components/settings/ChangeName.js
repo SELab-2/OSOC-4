@@ -1,5 +1,6 @@
 import React, {useState} from "react";
-import {Button, Form} from "react-bootstrap";
+import {Button, Form, Spinner} from "react-bootstrap";
+import { ToastContainer, toast } from 'react-toastify';
 import {log} from "../../utils/logger";
 import {api, Url} from "../../utils/ApiClient";
 
@@ -9,10 +10,14 @@ import {api, Url} from "../../utils/ApiClient";
  */
 export default function ChangeName(props) {
 
-    const [savedSuccess, setSavedSuccess] = useState(false)
     const [name, setName] = useState(props.user.name)
     const [changeName, setChangeName] = useState(props.user.name)
+    const [saving, setSaving] = useState(false);
 
+    /**
+     * This function is called when the name text field is changed. It changes the changeName state variable.
+     * @param event the event of changing the text field.
+     */
     const handleChangeName = (event) => {
         event.preventDefault()
         setChangeName(event.target.value)
@@ -23,15 +28,22 @@ export default function ChangeName(props) {
      * @param event
      */
     async function handleSubmitChange(event) {
-        log("handle submit change name");
         event.preventDefault();
+        setSaving(true);
         let response = await Url.fromName(api.myself).setBody({"name": changeName}).patch();
         if (response.success) {
-            setSavedSuccess(true);
+            toast.success("Name changed succesfully");
+            setSaving(false);
             setName(changeName);
+        } else {
+            toast.error("Something went wrong, please try again");
+            setSaving(false);
         }
     }
 
+    /**
+     * The html of the ChangeName component.
+     */
     return (
         <div>
             <p>Current name: <span className={"details-info"}>{name}</span></p>
@@ -40,9 +52,21 @@ export default function ChangeName(props) {
                     <Form.Label>Change name to:</Form.Label>
                     <Form.Control type="text" value={changeName} onChange={handleChangeName} />
                 </Form.Group>
-                {savedSuccess ? (<p>Changed name successfully</p>): null}
-                <Button variant={"primary"} type="submit">Change name</Button>
+                {saving ? 
+                    <Button variant="primary" disabled>
+                    Saving changes...
+                    <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                    />
+                    </Button> 
+                : 
+                    <Button variant={"primary"} type="submit">Change name</Button>}
             </Form>
+            <ToastContainer/>
         </div>
     )
 }

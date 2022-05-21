@@ -2,9 +2,13 @@ import axios from 'axios';
 import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from 'next-auth/react';
-import { api, Url } from "../../../utils/ApiClient";
 import { log } from "../../../utils/logger";
 
+/**
+ * This function refreshes the access token using the refresh token.
+ * @param tokenObject The new access token or an error.
+ * @returns {Promise<(*&{error: string})|(*&{accessTokenExpires: number, accessToken: *, refreshToken: *})>}
+ */
 async function refreshAccessToken(tokenObject) {
     const csrfToken = await getCsrfToken()
     try {

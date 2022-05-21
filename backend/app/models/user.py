@@ -9,7 +9,6 @@ from app.exceptions.validator_exeptions import (EmptyNameException,
                                                 InvalidEmailException,
                                                 InvalidPasswordException)
 from app.models.edition import Edition, EditionCoach
-from app.models.project import Project, ProjectCoach
 from app.models.suggestion import Suggestion
 from app.utils.validators import valid_email, valid_password
 from pydantic import BaseModel, validator
@@ -35,7 +34,6 @@ class User(SQLModel, table=True):
     approved: bool = False
     disabled: bool = True
     editions: List[Edition] = Relationship(back_populates="coaches", link_model=EditionCoach)
-    projects: List[Project] = Relationship(back_populates="coaches", link_model=ProjectCoach)
     suggestions: List[Suggestion] = Relationship(back_populates="suggested_by")
 
     class Config:

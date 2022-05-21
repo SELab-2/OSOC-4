@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {log} from "../../utils/logger";
 import Select from "react-select";
-import {StringListToOptionsList} from "../../utils/skillselector";
 
 /**
  * dropdown select menu with search, that allows you to select a skill
@@ -12,11 +11,19 @@ import {StringListToOptionsList} from "../../utils/skillselector";
  */
 export default function SkillSelector(props){
 
+  /**
+   * This function is used to filter skills with text search.
+   * @param candidate The canditate skill.
+   * @param input The input of the text field.
+   * @returns {*|boolean} True if the candidate should be shown with te given input text, false otherwise.
+   */
     const filterOption = (candidate, input) => {
-        log(props.options)
-        return input === undefined || candidate.label.includes(input)
+        return input === undefined || candidate.label.toLowerCase().includes(input.toLowerCase())
     };
 
+    /**
+     * Return the html of the SkillSelector.
+     */
     return(
         <div>
             <Select classNamePrefix="select-search"

@@ -28,7 +28,12 @@ export function addFilterGlobal(query, filter, startItems, itemName, value) {
     return newQuery
 }
 
-export default function StudentsFilters(props) {
+/**
+ * This component represents the filters in the students tab.
+ * @returns {JSX.Element} the component that renders the student filters.
+ * @constructor
+ */
+export default function StudentsFilters() {
 
     const router = useRouter();
 
@@ -45,12 +50,14 @@ export default function StudentsFilters(props) {
     const own_suggestion = (router.query.own_suggestion) ? router.query.own_suggestion.split(",") : []
     const unmatched = router.query.unmatched || ""
 
+    /**
+     * This useEffect initializes the state variables allSkills and filteredSkills.
+     */
     useEffect(() => {
         Url.fromName(api.skills).get().then(async res => {
             if (res.success) {
                 res = res.data;
                 if (res) {
-                    // scuffed way to get unique skills (should be fixed in backend soon)
                     setAllSkills(res);
                     setFilteredSkills(res);
                 }

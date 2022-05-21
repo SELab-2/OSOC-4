@@ -38,3 +38,11 @@ ul {
   padding: 0 0 0 0;
   margin: 0 0 0 0;
 }
+
+input {
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: var(--gray1) !important;
+  padding-left: 7px;
+}

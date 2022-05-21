@@ -15,6 +15,9 @@ export default function GeneralInfo(props) {
 
   const [projects, setProjects] = useState(undefined);
 
+  /**
+   * This useEffect() initializes the 'projects' state variable.
+   */
   useEffect(() => {
     if (! projects && props.student["participations"]) {
       for (let newProject of props.student["participations"]) {
@@ -38,14 +41,6 @@ export default function GeneralInfo(props) {
       let decision = (props.student.decision === -1) ? "Undecided" : ["No", "Maybe", "Yes"][props.student.decision];
 
       let rows = [];
-
-      if (props.student["mandatory"]["student-coach"] === "yes") {
-        rows.push(
-          <Row className="question-answer-row">
-            <Col md="auto">Applied to be a student coach.</Col>
-          </Row>
-        );
-      }
 
       // props.students["listtags"] contains the (question,answer) pair that the user wants to show in the list of
       // students.
@@ -96,9 +91,19 @@ export default function GeneralInfo(props) {
       // add the decision of the student to the general info
       rows.push(
         <Row key={"Decision"} className="question-answer-row">
-          <Col md="auto" className="info-titles">Decision: <b>{decision}</b></Col>
+          <Col md="auto" className="info-titles">Decision</Col>
+          <Col md="auto" className="info-answers">{decision}</Col>
         </Row>
       )
+      // add the email_sent field if the email bar at the bottom of the screen is expanded.
+      if (props.elementType === "emailstudents") {
+        rows.push(
+          <Row key={"email_sent"} className="question-answer-row">
+            <Col md="auto" className="info-titles">Email sent</Col>
+            <Col md="auto" className="info-answers">{props.student["email_sent"] ? "Yes" : "No"}</Col>
+          </Row>
+        )
+      }
 
       return rows;
     }

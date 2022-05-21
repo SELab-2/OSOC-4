@@ -13,7 +13,7 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
-    QuestionTagNotFoundException)
+    QuestionTagInvalidMandatory, QuestionTagNotFoundException)
 from app.models.answer import Answer
 from app.models.edition import (Edition, EditionCoach, EditionOutExtended,
                                 EditionOutSimple)
@@ -26,14 +26,14 @@ from app.models.question_tag import (QuestionTag, QuestionTagCreate,
 from app.models.skill import StudentSkill
 from app.models.student import DecisionOption, Student
 from app.models.suggestion import Suggestion, SuggestionOption
-from app.models.user import User, UserRole
+from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
-from sqlmodel import select
+from sqlmodel import func, select
 
 router = APIRouter(prefix="/editions")
 
@@ -66,10 +66,17 @@ async def get_editions(session: AsyncSession = Depends(get_session), role: RoleC
 
 
 @router.get("/current_edition", response_description="Edition retrieved")
-async def get_current_edition(session: AsyncSession = Depends(get_session)):
+async def get_current_edition(session: AsyncSession = Depends(get_session)) -> dict:
+    """get_current_edition get the current edition
+
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: the edition
+    :rtype: dict
+    """
     stmnt = select(Edition).order_by(Edition.year.desc())
     result = await session.execute(stmnt)
-    return result.one()[0]
+    return EditionOutExtended.parse_raw(result.one()[0].json())
 
 
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
@@ -114,7 +121,7 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
 async def get_edition(year: int, edition: EditionChecker() = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition get the Edition instance with given year
 
-    :return: list of editions
+    :return: the edition with that year
     :rtype: dict
     """
 
@@ -147,22 +154,6 @@ async def update_edition(year: int, edition: Edition = Body(...), role: RoleChec
         setattr(result, key, value)
     await update(result, session)
     return EditionOutSimple.parse_raw(result.json()).uri
-
-
-@router.get("/{year}/users", response_description="Users retrieved")
-async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
-    """get_users get all the User instances from the database in edition with given year
-
-    :return: list of users
-    :rtype: dict
-    """
-
-    edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
-    user_ids = [coach.coach_id for coach in edition_coaches]
-    # get the admins
-    admins = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
-    user_ids += [admin.id for admin in admins]
-    return [f"{config.api_url}users/{str(id)}" for id in user_ids]
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
@@ -213,6 +204,14 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     res = res.all()
 
     students = [r for (r,) in res]
+
+    # if there are students check if all mandatory tags are correct
+    if len(students) != 0:
+        query = select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.mandatory == True).join(Question).outerjoin(QuestionAnswer, QuestionAnswer.question_id == Question.id).where(QuestionAnswer.question_id.is_(None))
+        res = await session.execute(query)
+        resall = res.all()
+        if len(resall) != 0:
+            raise QuestionTagInvalidMandatory([tag.tag for (tag,) in resall])
 
     if orderby:
         sorting = get_sorting(orderby).items()
@@ -267,7 +266,7 @@ async def get_conflicting_students(year: int, session: AsyncSession = Depends(ge
         """
     )
 
-    return [f"{config.api_url}/students/{id}" for (id,) in student_ids]
+    return [f"{config.api_url}students/{id}" for (id,) in student_ids]
 
 
 # Question Tag Endpoints
@@ -286,22 +285,6 @@ async def get_question_tags(year: int, session: AsyncSession = Depends(get_sessi
     tags = res.all()
 
     return [f"{config.api_url}editions/{str(year)}/questiontags/{tag.tag}" for (tag,) in tags]
-
-
-@router.get("/{year}/questiontags/show_in_list", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker(update=True))], response_description="Tags retrieved")
-async def get_showinlist_question_tags(year: int, session: AsyncSession = Depends(get_session)):
-    """get_showinlist_question_tags return list of questiontags that must be shown in the listview
-
-    :param year: edition year
-    :type year: int
-    :param session: _description_, defaults to Depends(get_session)
-    :type session: AsyncSession, optional
-    :return: list of QuestionTags
-    :rtype: list of QuestionTags
-    """
-    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).where(QuestionTag.show_in_list is True).order_by(QuestionTag.tag))
-    tags = res.all()
-    return [tag.tag for (tag,) in tags]
 
 
 @router.get("/{year}/questiontags/{tag}")
@@ -324,12 +307,26 @@ async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(
     except Exception:
         raise QuestionTagNotFoundException()
 
+    error = False
     if qtag.question:
         q = qtag.question.question
+
+        # check if there are students and if the question is valid
+        student_query = select(func.count(Student.id)).where(Student.edition_year == year)
+        student_res = await session.execute(student_query)
+        (count,) = student_res.one()
+        if count > 0:
+            # check if there are answers for the question
+            query = select(Question).where(Question.id == qtag.question.id).outerjoin(QuestionAnswer, Question.id == QuestionAnswer.question_id).where(QuestionAnswer.question_id.is_(None))
+            query_res = await session.execute(query)
+            query_all = query_res.all()
+
+            if (len(query_all)) > 0:
+                error = True
     else:
         q = ""
 
-    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, show_in_list=qtag.show_in_list, question=q)
+    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, show_in_list=qtag.show_in_list, question=q, error=error)
 
 
 @router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))], response_description="Added question tag")

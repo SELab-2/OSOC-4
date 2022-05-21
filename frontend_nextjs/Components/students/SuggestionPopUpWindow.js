@@ -16,6 +16,9 @@ export default function SuggestionPopUpWindow(props) {
 
   const [suggestion, setSuggestion] = useState({ "reason": "" });
 
+  /**
+   * This useEffect changes the state variable suggestion to your own suggestion, on change of popUpShow.
+   */
   useEffect(() => {
     if (props.popUpShow && props.student["own_suggestion"]) {
       setSuggestion(props.student["own_suggestion"])

@@ -149,11 +149,7 @@
 
 .details-upper-layer {
     justify-content: space-between;
-}
-
-.name {
-    display: flex;
-    align-content: center;
+    margin-bottom: 10px;
 }
 
 .name>.image-button {
@@ -231,4 +227,9 @@
 /* selected link */
 .hyperlink:active {
     color: rgb(18, 18, 99);
+}
+
+.student-details-icon {
+    align-self: center;
+    margin-right: 5px;
 }

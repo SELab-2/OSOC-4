@@ -6,6 +6,7 @@ import Image from "next/image";
 import saveIcon from "../../public/assets/save.svg";
 import deleteIcon from "../../public/assets/delete.svg";
 import LoadingPage from "../LoadingPage";
+import {toast, ToastContainer} from "react-toastify";
 
 /**
  * This component displays a settings-screen where you can manage the question tags for an edition
@@ -23,8 +24,7 @@ export default function QuestionTags(props) {
     // empty row in the end of the table.
     const [newQuestionTag, setNewQuestionTag] = useState(undefined);
 
-    // This variable holds the error message that needs to be shown. If this is empty, no error message is shown.
-    const [errorMessage, setErrorMessage] = useState("");
+    const [saving, setSaving] = useState(false);
 
     const [loading, setLoading] = useState(true);
 
@@ -76,20 +76,32 @@ export default function QuestionTags(props) {
         newQuestionTag["question"].length > 0,
         !questionTags.some(qt => qt["question"] === newQuestionTag["question"])];
         if (requirements.every(req => req)) {
+            setSaving(true);
             Url.fromName(api.editions_questiontags).setBody({ ...newQuestionTag }).post().then(resp => {
-                Url.fromUrl(resp["data"]).setBody({ ...newQuestionTag }).patch().then(() => {
-                    newQuestionTag["url"] = resp["data"];
-                    setQuestionTags([...questionTags, { ...newQuestionTag }]);
-                    setNewQuestionTag(undefined);
-                    setEdited(undefined);
-                    cache.clear();
-                })
+                if (resp.success) {
+                    Url.fromUrl(resp["data"]).setBody({ ...newQuestionTag }).patch().then(result => {
+                        if (result.success) {
+                            newQuestionTag["url"] = resp["data"];
+                            setNewQuestionTag(undefined);
+                            setEdited(undefined);
+                            cache.clear();
+                            props.setReload(p => p + 1);
+                            toast.success("New question tag saved successfully");
+                            setSaving(false);
+                        } else {
+                            toast.error("Something went wrong, please try again");
+                            setSaving(false);
+                        }
+                    })
+                } else {
+                    toast.error("Something went wrong, please try again");
+                    setSaving(false);
+                }
             })
-            setErrorMessage("");
         } else {
             let messages = ["Tag name must not be empty", "Tag name must be unique",
                 "Question must not be empty", "Question must be unique"];
-            setErrorMessage(messages[requirements.indexOf(false)]);
+            toast.error(messages[requirements.indexOf(false)]);
         }
     }
 
@@ -117,14 +129,19 @@ export default function QuestionTags(props) {
         setQuestionTags(newQuestionTags);
     }
 
+    /**
+     * If the component is loading, return the loading animation.
+     */
     if (loading) {
         return (<LoadingPage/>);
     }
+
     /**
      * The html that renders the question tags.
      */
     return (
         <div>
+            <ToastContainer autoClose={4000}/>
             <Table responsive>
                 <thead>
                     <tr className="table-head">
@@ -145,7 +162,7 @@ export default function QuestionTags(props) {
                         <QuestionTag key={questionTag["url"]} questionTag={questionTag} questionTags={questionTags}
                             deleteTag={deleteTag} renameTag={renameTag}
                             setEdited={setEdited} edited={edited === questionTag["url"]}
-                            setNewQuestionTag={setNewQuestionTag} setErrorMessage={setErrorMessage} />)}
+                            setNewQuestionTag={setNewQuestionTag} />)}
                     {(newQuestionTag) &&
                         <tr key="newQuestionTag">
                             <td>
@@ -158,21 +175,18 @@ export default function QuestionTags(props) {
                             </td>
                             <td><p /></td>
                             <td>
-                                <button className="table-button" onClick={submitNewTag}>
-                                    <Image src={saveIcon} height="30px" />
-                                </button>
-                                <button onClick={(ev) => {
-                                    setErrorMessage("");
+                                {saving ? <p>Saving...</p> :
+                                  [<button className="table-button" onClick={submitNewTag}>
+                                      <Image src={saveIcon} height="30px"/>
+                                  </button>,
+                                    <button onClick={(ev) => {
                                     setNewQuestionTag(undefined)
                                 }} className="table-button">
                                     <Image src={deleteIcon} height="30px" />
-                                </button>
+                                    </button>
+                                    ]
+                                }
                             </td>
-                        </tr>
-                    }
-                    {(errorMessage) &&
-                        <tr key="error">
-                            <td className="errormessage">{errorMessage}</td>
                         </tr>
                     }
                 </tbody>

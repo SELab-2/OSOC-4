@@ -33,6 +33,9 @@ export default function ChangeEmail(props) {
         }
     }
 
+    /**
+     * The html that renders the ChangeEmail component.
+     */
     return(
         <div>
             <p className="details-text">Request to change your accounts e-mailadres, first we will send a email to your current e-mailaddress to confirm this.<br/>

@@ -8,8 +8,8 @@ import QuestionTags from "./QuestionTags";
 import CreateEdition from "./CreateEdition";
 import LoadingPage from "../LoadingPage";
 import Hint from "../Hint";
-import { Form, Button, Row} from "react-bootstrap";
-import {log} from "../../utils/logger";
+import { Form, Button} from "react-bootstrap";
+import { ToastContainer, toast } from 'react-toastify';
 
 /**
  * This component displays a settings-screen for all settings regarding editions.
@@ -22,10 +22,11 @@ export default function EditionSettings() {
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
     const [editing, setEditing] = useState(false);
     const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
-    const [failed, setFailed] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // fetch the current edition and all the other editions
+    /**
+     * fetch the current edition and all the other editions
+     */
     useEffect(() => {
         async function fetch() {
             const res = await Url.fromName(api.current_edition).get()
@@ -50,6 +51,11 @@ export default function EditionSettings() {
         setEditionList([edition, ...editionList]);
     }
 
+    /**
+     * Handle the event of pressing the save button. The edition is patched to the database.
+     * @param event The event of pressing the save button.
+     * @returns {Promise<void>}
+     */
     async function handleSaved(event) {
         event.preventDefault();
         setSaving(true);
@@ -58,26 +64,26 @@ export default function EditionSettings() {
                 let newEdition2 = {...edition};
                 newEdition2["name"] = newEdition.name;
                 newEdition2["description"] = newEdition.description;
+                toast.success("Edited edition successfully");
                 setEdition(newEdition2);
                 setSaving(false);
                 setEditing(false);
             } else {
+                toast.errory("Something went wrong, please try again");
                 setSaving(false);
-                setFailed(true);
+                setEditing(false);
             }
         })
     }
 
+    /**
+     * Called when pushing the 'edit' button. It changes the state variables so that the edition fields are editable.
+     * @param event
+     */
     const editClicked = (event) => {
         setNewEdition({"name": edition.name, "description": edition.description, "year": edition.year});
-        setEditing(false);
-        setFailed(false);
         setEditing(true);
     }
-
-    const handleTryAgain = (event) => {
-        setFailed(false)
-    } 
 
     /**
      * Changes the current edition
@@ -88,10 +94,16 @@ export default function EditionSettings() {
         await setEdition({"year": edition.year, "name": edition.name});
     }
 
+    /**
+     * If the page is loading, return the loading animation.
+     */
     if (loading) {
         return (<LoadingPage/>);
     }
 
+    /**
+     * Return the html of the EditionSettings component.
+     */
     return (
         <div className="body-editiondetail">
             <Table>
@@ -107,13 +119,13 @@ export default function EditionSettings() {
                                 <div>
                                     <Form className="form-edition-detail">
                                         <Form.Group className="mb-3">
-                                            <Form.Control type="text" name="name" disabled={saving || failed} placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
+                                            <Form.Control type="text" name="name" disabled={saving} placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
                                         </Form.Group>
                                         <Form.Group className="mb-3" >
-                                            <Form.Control type="text" name="description" disabled={saving || failed} placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
+                                            <Form.Control type="text" name="description" disabled={saving} placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
                                         </Form.Group>               
                                     </Form>
-                                    {saving &&
+                                    {saving ?
                                         <Button variant="primary" disabled>
                                             Saving...
                                             <Spinner
@@ -123,19 +135,8 @@ export default function EditionSettings() {
                                                 role="status"
                                                 aria-hidden="true"
                                             />
-                                        </Button>}
-                                    {failed && 
-                                        <div>
-                                            <Form.Label>Something went wrong, please try again</Form.Label>
-                                            <br/>
-                                            <Button variant={"primary"} onClick={handleTryAgain} className="button-edition-detail">Try again</Button>
-                                            <Button variant="secondary" onClick={(ev) => {
-                                                setEditing(false);
-                                            }} >
-                                                Cancel
-                                            </Button>
-                                        </div>}
-                                    {!saving && !failed &&
+                                        </Button> 
+                                        :
                                         <div>
                                             <Button variant="primary" onClick={handleSaved} className="button-edition-detail">Save</Button>
                                             <Button variant="secondary" onClick={(ev) => {
@@ -189,7 +190,7 @@ export default function EditionSettings() {
                     </AccordionHeader>
                     <AccordionBody>
                         <div className="questiontags">
-                            <QuestionTags reload={reloadQuestionTags}/>
+                            <QuestionTags reload={reloadQuestionTags} setReload={setReloadQuestionTags}/>
                         </div>
                     </AccordionBody>
                 </AccordionItem>
@@ -203,6 +204,7 @@ export default function EditionSettings() {
                 </AccordionItem>
 
             </Accordion>
+            <ToastContainer autoClose={4000}/>
         </div>
     );
 }
