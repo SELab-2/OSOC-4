@@ -23,7 +23,7 @@ from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
-from app.models.skill import StudentSkill
+from app.models.skill import Skill, StudentSkill
 from app.models.student import DecisionOption, Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import User, UserRole
@@ -449,9 +449,31 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
         if question:
             questiontag.question_id = question.id
         else:
-            newquestion = Question(question=tagupdate.question, field_id="", edition=year)
-            await update(newquestion, session=session)
-            questiontag.question_id = newquestion.id
+            question = Question(question=tagupdate.question, field_id="", edition=year)
+            await update(question, session=session)
+            questiontag.question_id = question.id
 
     await update(questiontag, session=session)
+
+    # if the tag is skills => update the skills in the student object
+    if questiontag.tag == "skills":
+        students = await read_all_where(Student, Student.edition_year == year, session=session)
+        for s in students:
+            # get the answers for the new questions
+            query = select(Answer).select_from(QuestionAnswer).where(QuestionAnswer.question_id == questiontag.question_id).where(QuestionAnswer.student_id == s.id).join(Answer)
+            query_res = await session.execute(query)
+            query_all = query_res.all()
+
+            for (answer,) in query_all:
+                print(answer)
+                skill = await read_where(Skill, Skill.name == answer.answer, session=session)
+                if not skill:
+                    skill = Skill(name=answer.answer)
+                    await update(skill, session=session)
+
+                student_skill = await read_where(StudentSkill, StudentSkill.student_id == s.id, StudentSkill.skill_name == skill.name, session=session)
+                if not student_skill:
+                    student_skill = StudentSkill(student_id=s.id, skill_name=skill.name)
+                    await update(student_skill, session=session)
+
     return f"{config.api_url}editions/{str(year)}/questiontags/{questiontag.tag}"
