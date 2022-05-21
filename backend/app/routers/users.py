@@ -9,7 +9,7 @@ from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
                                             UserNotFoundException)
-from app.models.edition import Edition, EditionCoach
+from app.models.edition import EditionCoach
 from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
                              UserCreate, UserMe, UserOut, UserOutSimple,
                              UserRole)
@@ -22,8 +22,6 @@ from app.utils.response import response
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlmodel import select
 
 router = APIRouter(prefix="/users")
 
