@@ -1,7 +1,7 @@
-import { Button, Col, Modal, ModalHeader, ModalTitle, Spinner } from "react-bootstrap";
-import { useState, useEffect } from "react";
-import { cache } from "../../utils/ApiClient";
+import { Button, Modal, ModalHeader, ModalTitle, Spinner } from "react-bootstrap";
+import { useState } from "react";
 import { api, Url } from "../../utils/ApiClient";
+import { toast, ToastContainer } from "react-toastify";
 
 /***
  * This element shows the pop up window when sending emails in the 'email students' tab.
@@ -33,9 +33,11 @@ export default function SendEmailsPopUpWindow(props) {
     setSending(true);
     Url.fromName(api.sendemails).extend("/decisions").setBody({ "emails": props.selectedStudents }).post().then((res) => {
       if (res.success){
+        toast.success(`${props.selectedStudents.length} decision emails were sent succesfully!`);
         setSending(false);
         setSentSuccess(true);
       } else {
+        toast.error("Something went wrong, please try again");
         setSending(false);
         setFail(true);
       }
@@ -53,54 +55,47 @@ export default function SendEmailsPopUpWindow(props) {
    * returns the html representation for the send emails pop up window
    */
   return (
-    <Modal
-      show={props.popUpShow}
-      onHide={() => onHide()}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <ModalHeader closeButton>
-        <ModalTitle id="contained-modal-title-vcenter">
-          {`Are you sure you want to send ${props.selectedStudents.length} decision emails?`}
-        </ModalTitle>
-      </ModalHeader>
-      {fail &&
-        <Modal.Body>
-          Something went wrong, please try again
-        </Modal.Body>
-      } 
-      {sentSuccess &&
-        <Modal.Body>
-          {props.selectedStudents.length} decision emails were sent succesfully!
-        </Modal.Body>
-      } 
-      <Modal.Footer>
-        {(! sending && ! fail && ! sentSuccess) && 
-        <div>
-           <Button variant="secondary" onClick={onHide}>Cancel</Button>
-          <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
-        </div>}
-        {sending && 
-          <Button variant="primary" disabled>
-          Sending...
-          <Spinner
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-          />
-        </Button>}
-        {sentSuccess &&
-          <Button variant="primary" onClick={onHide}>Close</Button>
-        }
-        {fail && 
+    <div>
+      <Modal
+        show={props.popUpShow}
+        onHide={() => onHide()}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <ModalHeader closeButton>
+          <ModalTitle id="contained-modal-title-vcenter">
+            {`Are you sure you want to send ${props.selectedStudents.length} decision emails?`}
+          </ModalTitle>
+        </ModalHeader>
+        <Modal.Footer>
+          {(! sending && ! fail && ! sentSuccess) && 
           <div>
             <Button variant="secondary" onClick={onHide}>Cancel</Button>
-            <Button variant="primary" onClick={handleTryAgain} className="invite-button">Try again</Button>
+            <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
           </div>}
-      </Modal.Footer>
-    </Modal>
+          {sending && 
+            <Button variant="primary" disabled>
+            Sending...
+            <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+            />
+          </Button>}
+          {sentSuccess &&
+            <Button variant="primary" onClick={onHide}>Close</Button>
+          }
+          {fail && 
+            <div>
+              <Button variant="secondary" onClick={onHide}>Cancel</Button>
+              <Button variant="primary" onClick={handleTryAgain} className="invite-button">Try again</Button>
+            </div>}
+        </Modal.Footer>
+      </Modal>
+      <ToastContainer autoClose={4000}/>
+    </div>
   );
 }
