@@ -22,7 +22,6 @@ export default function EditionSettings() {
     const [reloadQuestionTags, setReloadQuestionTags] = useState(0);
     const [editing, setEditing] = useState(false);
     const [newEdition, setNewEdition] = useState({"name": "", "description": "", "year": 0});
-    const [failed, setFailed] = useState(false);
     const [saving, setSaving] = useState(false);
 
     // fetch the current edition and all the other editions
@@ -72,8 +71,6 @@ export default function EditionSettings() {
 
     const editClicked = (event) => {
         setNewEdition({"name": edition.name, "description": edition.description, "year": edition.year});
-        setEditing(false);
-        setFailed(false);
         setEditing(true);
     }
 
@@ -106,10 +103,10 @@ export default function EditionSettings() {
                                 <div>
                                     <Form className="form-edition-detail">
                                         <Form.Group className="mb-3">
-                                            <Form.Control type="text" name="name" disabled={saving || failed} placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
+                                            <Form.Control type="text" name="name" disabled={saving} placeholder="Enter new name" value={newEdition.name} onChange={(ev => setNewEdition({...newEdition, ["name"]: ev.target.value}))}/>
                                         </Form.Group>
                                         <Form.Group className="mb-3" >
-                                            <Form.Control type="text" name="description" disabled={saving || failed} placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
+                                            <Form.Control type="text" name="description" disabled={saving} placeholder="Enter new description" value={newEdition.description} onChange={(ev => setNewEdition({...newEdition, ["description"]: ev.target.value}))}/>
                                         </Form.Group>               
                                     </Form>
                                     {saving ?
