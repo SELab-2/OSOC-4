@@ -42,8 +42,8 @@ async def process_tally(data, edition, session: AsyncSession):
     # get the skills questiontag
     skills_tag = await read_where(QuestionTag, QuestionTag.tag == "skills", QuestionTag.edition == edition, session=session)
 
-    # using a volgnummer for the questionanswers to be able to display them in the correct order
-    volgnummer = 0
+    # using a number for the questionanswers to be able to display them in the correct order
+    number = 0
 
     for field in data["data"]["fields"]:
 
@@ -87,11 +87,11 @@ async def process_tally(data, edition, session: AsyncSession):
                             await update(student_skill, session=session)
 
                         # save the question answer binding
-                        await update(QuestionAnswer(student=student, volgnummer=volgnummer, question=q, answer=a), session=session)
-                        volgnummer += 1
+                        await update(QuestionAnswer(student=student, number=number, question=q, answer=a), session=session)
+                        number += 1
 
         elif field["type"] in ["TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_PHONE_NUMBER", "INPUT_EMAIL", "INPUT_LINK", "FILE_UPLOAD"]:
             if field["value"] is not None:
                 a = await get_save_answer(str(field["value"]), session)
-                await update(QuestionAnswer(student=student, volgnummer=volgnummer, question=q, answer=a), session=session)
-                volgnummer += 1
+                await update(QuestionAnswer(student=student, number=number, question=q, answer=a), session=session)
+                number += 1
