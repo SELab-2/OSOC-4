@@ -147,24 +147,25 @@ export default function StudentListelement(props) {
         <Col id="name" className="name" xs="auto">
           {props.student["mandatory"]["first name"]} {props.student["mandatory"]["last name"]}
         </Col>
-        <Col md="auto" className="student-listelement-icon">
-          {(props.student["mandatory"]["alumni"] === "yes") &&
-            <Hint message="Student claims to be an alumni">
-              <Image src={alumniIcon} width="25pt" height="35pt"/>
-            </Hint>
-          }
+        <Col className="icons-container">
+          <div className="student-listelement-icon">
+            {(props.student["mandatory"]["alumni"] === "yes") &&
+              <Hint message="Student claims to be an alumni">
+                <Image src={alumniIcon} width="25pt" height="35pt"/>
+              </Hint>
+            }
+          </div>
+          <div className="student-listelement-icon">
+            {(props.student["mandatory"]["student-coach"] === "yes") &&
+              <Hint message="applied to be student coach">
+                <Image src={studCoachIcon} width="25px" height="35px"/>
+              </Hint>
+            }
+          </div>
+        {/*<Col id="practical-problems" className="practical-problems" xs="auto">*/}
+        {/* if practical problems get implemented, this is where it should be shown */}
+        {/*</Col>*/}
         </Col>
-        <Col md="auto" className="student-listelement-icon">
-          {(props.student["mandatory"]["student-coach"] === "yes") &&
-            <Hint message="applied to be student coach">
-              <Image src={studCoachIcon} width="25px" height="35px"/>
-            </Hint>
-          }
-        </Col>
-        <Col id="practical-problems" className="practical-problems" xs="auto">
-          {/* if practical problems gets implemented, this is where it should be shown */}
-        </Col>
-        <Col />
         <Col xs="auto" className="nopadding">
           <Row xs="auto" className="nomargin">
             <Col className="suggestions" xs="auto">Suggestions:</Col>
@@ -177,7 +178,6 @@ export default function StudentListelement(props) {
       <Row id="info" className="info">
         <GeneralInfo listelement={true} elementType={props.elementType} student={props.student}
                      decision={getDecisionString(props.student.decision)} />
-        <Col />
         <Col id="skills" align="right" className="skills" sm="auto">
           <ul className="nomargin">
             {getSkills()}
