@@ -14,13 +14,12 @@ export function checkProjectBody(body) {
         response.problem = "required skills"
     }
 
-    let should_be_checked = ["name", "description", "partner_name", "partnerdescription"];
-
-    for( check in should_be_checked){
-        if (body[check] === ""){
+    let should_be_checked = ["name", "description", "partner_name", "partner_description"];
+    for( let check in should_be_checked){
+        if (body[should_be_checked[check]] === ""){
             response.correct = false
-            response.problem = check
-            return;
+            response.problem = should_be_checked[check]
+            return response;
         }
     }
 
