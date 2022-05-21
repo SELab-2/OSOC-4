@@ -22,6 +22,7 @@ export default function ProjectCard(props) {
     const router = useRouter()
 
     const [skills, setSkills] = useState([])
+
     /**
      * Navigates to the detail page of props.project
      */
@@ -33,6 +34,7 @@ export default function ProjectCard(props) {
 
         router.push("/project/" + id)
     }
+
     /**
      * selects the props.project unless it is already selected, in that case selectedProject is set to undefined.
      */
@@ -60,6 +62,9 @@ export default function ProjectCard(props) {
         setSkills(temp_list)
     }, [props.project])
 
+    /**
+     * Return the html for the ProjectCard.
+     */
     return (
         <div className={"project-card-div"} onClick={selectProject}>
             <Card className={"project-card" + ((props.project === props.selectedProject) ? "-selected" : "")}>

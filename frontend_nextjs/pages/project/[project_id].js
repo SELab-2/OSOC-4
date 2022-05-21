@@ -15,7 +15,6 @@ import red_cross from "/public/assets/wrong.svg"
 import PropTypes from "prop-types";
 import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
-import { log } from "../../utils/logger";
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -25,9 +24,10 @@ function Input(props) {
 }
 
 Input.propTypes = { children: PropTypes.node };
+
 /**
  * this page corresponds with the projects/id tab
- * @returns {JSX.Element}
+ * @returns {JSX.Element} The component rendering the project details.
  * @constructor
  */
 const Project = () => {
@@ -50,6 +50,9 @@ const Project = () => {
 
     const { websocketConn } = useWebsocketContext();
 
+    /**
+     * This useEffect initializes the project, editfields, requiredSkills and stillRequiredSkills state variables.
+     */
     useEffect(() => {
         if (!loaded) {
             api.invalidate();
@@ -78,12 +81,14 @@ const Project = () => {
 
     }, [])
 
+    /**
+     * This useEffect initializes the skills state variable.
+     */
     useEffect(() => {
         Url.fromName(api.skills).get().then(async res => {
             if (res.success) {
                 res = res.data;
                 if (res) {
-                    // scuffed way to get unique skills (should be fixed in backend soon)
                     let array = [];
                     res.map(skill => array.push({ "value": skill, "label": skill }));
                     setSkills(array);
@@ -102,6 +107,9 @@ const Project = () => {
         }
     }, [requiredSkills, skills])
 
+    /**
+     * This function adds an event listener to the websockets to call updateDetailsFromWebsocket when the data changes.
+     */
     useEffect(() => {
 
         if (websocketConn) {
@@ -114,11 +122,17 @@ const Project = () => {
 
     }, [websocketConn, project, router.query])
 
+    /**
+     * This function is called when the data has changed. It determines wich data has changed and changes the
+     * state of the application.
+     * @param event contains the data that changed.
+     */
     const updateDetailsFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
         const studentid = parseInt(data["studentId"])
         const projectid = parseInt(data["projectId"])
 
+        // The current project has been changed.
         if (projectid === project.id_int) {
             if ("participation" in data) {
                 let new_project = project;
@@ -133,6 +147,10 @@ const Project = () => {
 
     }
 
+    /**
+     * Delete the current project.
+     * @returns {Promise<void>}
+     */
     async function deleteProject() {
         Url.fromUrl(project.id)
             .delete().then(res => {
@@ -152,6 +170,11 @@ const Project = () => {
         setRequiredSkills(prevState => [...prevState, { "number": 1, "skill_name": "" }])
     }
 
+    /**
+     * Change the required skills state variable.
+     * @param value The new/changed required skill.
+     * @param index The index of the required skill in the requiredSkills list.
+     */
     function changeRequiredSkill(value, index){
         if(requiredSkills[index].label !== ""){
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].label])
@@ -228,6 +251,9 @@ const Project = () => {
         }
     }
 
+    /**
+     * Returns the html of the 'project details' page.
+     */
     return (
         <div>
             <Row>

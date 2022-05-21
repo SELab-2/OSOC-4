@@ -1,11 +1,10 @@
-import {Button, Card} from "react-bootstrap";
-import {useEffect, useState} from "react";
-import {api, Url} from "../../utils/ApiClient";
+import {Button} from "react-bootstrap";
+import { useState} from "react";
 import ConflictsPopUpWindow from "./ConflictsPopUpWindow";
 
 /**
  * Shows the current amount of conflicts, in a card like div.
- * @returns {JSX.Element}
+ * @returns {JSX.Element} The component that renders the current amount of conflicts, in a card like div.
  * @constructor
  */
 export default function ConflictCard(props) {
