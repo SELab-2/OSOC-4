@@ -83,7 +83,7 @@ async def change_email_me(Authorize: AuthJWT = Depends(), session: AsyncSession 
     db.redis.setex(change_key, change_expires, str(user.id))
     # send email to user with the invite key
     send_change_email_email(user.email, change_key)
-    return response(None, "Invite sent successfully")
+    return response(None, "Request sent successfully")
 
 
 @router.patch("/me", dependencies=[Depends(RoleChecker(UserRole.COACH))])

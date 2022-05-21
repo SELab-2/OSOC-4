@@ -6,6 +6,7 @@ import LoadingPage from "../../Components/LoadingPage"
 import { api, Url } from "../../utils/ApiClient";
 import logoScreen from '../../public/assets/osoc-screen.png';
 import Image from 'next/image'
+import { Spinner, Button } from "react-bootstrap";
 
 const ChangeKey = () => {
     const router = useRouter();
@@ -13,6 +14,8 @@ const ChangeKey = () => {
     const [validKey, setValidKey] = useState(false);
     const [loading, setLoading] = useState(true);
     const [email, setEmail] = useState("");
+    const [saving, setSaving] = useState(false);
+    const [fail, setFail] = useState(false);
 
     const handleChangeEmail = (event) => {
         setEmail(event.target.value);
@@ -30,16 +33,27 @@ const ChangeKey = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setSaving(true);
+        setFail(false);
         const data = {"email": email}
         const resp = await Url.fromName(api.change).extend(`/${changekey}`).setBody(data).post();
 
         if (resp.success) {
+            setSaving(false);
             toast.success(resp.data["message"]);
-            await router.push('/login');
+            await setTimeout(function(){
+                router.push('/login');
+            }, 4000);
         } else {
-            console.log("Niet gelukt");
-            console.log(resp);
+            setSaving(false);
+            setFail(true);
+            toast.error("Something went wrong, please try again");
         }
+    }
+
+    const tryAgain = (event) => {
+        setFail(false);
+        setEmail("");
     }
 
     if (loading) {
@@ -61,14 +75,31 @@ const ChangeKey = () => {
                     <p className="welcome-message">Reset your email</p>
                     <div className="login-form">
                         <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="New email" />
+                        {!saving && ! fail &&
                         <button className="submit" onClick={handleSubmit}>
                             Submit
-                        </button>
+                        </button>}
+                        {saving && 
+                        <Button variant="primary" disabled>
+                        Changing email...
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                        />
+                      </Button>}
+
+                        {fail && 
+                        <button className="submit" onClick={tryAgain}>
+                        Try again
+                        </button>}
 
                     </div>
                 </div>
             </section>
-            <ToastContainer/>
+            <ToastContainer autoClose={4000}/>
         </div>
     )
 
