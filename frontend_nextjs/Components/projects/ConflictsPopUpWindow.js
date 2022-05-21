@@ -4,6 +4,10 @@ import {api, Url} from "../../utils/ApiClient";
 import ParticipationCard from "./ParticipationCard";
 import Hint from "../Hint";
 import LoadingPage from "../LoadingPage"
+import Image from "next/image";
+import left from "../../public/assets/left.svg"
+import right from "../../public/assets/right.svg"
+
 
 /**
  * This element shows the pop up window when solving the conflicts.
@@ -83,7 +87,7 @@ export default function ConflictsPopUpWindow(props) {
     >
       <ModalHeader closeButton>
         <ModalTitle id="contained-modal-title-vcenter">
-          Conflicts
+          Resolve Conflicts
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
@@ -110,23 +114,35 @@ export default function ConflictsPopUpWindow(props) {
               ]
             }
         </Row>
-
-        <Row>
-          <Col/>
-          <Col md="auto">
-            <Row>
-              <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
-            </Row>
-            <Row >
-              <Col md="auto"><Hint message="Previous conflict"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Hint></Col>
-              <Col md="auto"><Hint message="Next conflict"><button className="prevnextbutton" onClick={nextStudent}>&#8250;</button></Hint></Col>
-            </Row>
-          </Col>
-        </Row>
           
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={onHide}>Close</Button>
+        <Row >
+          <Col className="conflict-resolve-page-col">
+            {
+              currentStudentIndex > 0 ? 
+              <div className={"prevnextbutton" + ( currentStudentIndex <= 0 ? "-disabled" : "")} onClick={previousStudent}>
+                <Image width={48} height={48} src={left}/>
+              </div>
+              :
+              null
+            }    
+          </Col>
+          <Col className="conflict-resolve-page-number">
+            <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
+          </Col>
+          <Col className="conflict-resolve-page-col">
+            {currentStudentIndex + 1 < props.conflicts.length ?
+              <Hint message="Next conflict">
+                <div className={"prevnextbutton" + ( currentStudentIndex + 1 >= props.conflicts.length ? "-disabled" : "")} onClick={nextStudent}>
+                  <Image width={48} height={48} src={right}/>
+                </div>
+              </Hint>
+              :
+              null
+            }
+          </Col>
+        </Row>
       </Modal.Footer>
     </Modal>
   );
