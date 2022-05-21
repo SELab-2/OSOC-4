@@ -50,7 +50,9 @@ export default function AddStudentModal(props) {
     }, [props.selectedProject])
 
 
-
+    /**
+     * This useEffect initializes the skills state variable.
+     */
     useEffect(() => {
         Url.fromName(api.skills).get().then(res => {
             if (res.success) {
@@ -59,6 +61,10 @@ export default function AddStudentModal(props) {
         })
     }, [])
 
+    /**
+     * This function classifies the skills in the skill categories, depending on the selected student. Then it sets the
+     * options state variable.
+     */
     useEffect(() => {
         if (skills.length !== 0 && props.selectedStudent !== undefined && projectNeededSkills.length !== 0) {
             let studentClean = props.selectedStudent.skills.map(value => value.name)
@@ -94,11 +100,19 @@ export default function AddStudentModal(props) {
         }
     }
 
+    /**
+     * Handle the changes in the reason input bar.
+     * @param event
+     */
     const handleChange = (event) => {
         event.preventDefault();
         setReason(event.target.value);
     }
 
+    /**
+     * This reset is called when the AddStudentModel is hidden. It makes the modal window invisible and resets the
+     * reason and selected skill.
+     */
     const reset = () => {
         props.setShowAddStudent(false);
         setSelectedSkill({ "value": "None", "label": "None" });

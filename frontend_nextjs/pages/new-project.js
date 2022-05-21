@@ -10,19 +10,28 @@ import plus from "/public/assets/plus.svg";
 import { checkProjectBody} from "../utils/inputchecker"
 import { ToastContainer, toast } from 'react-toastify';
 
-
+/**
+ * This page renders the 'new project' page. The page is used to make a new project.
+ * @returns {JSX.Element} The component that renders the 'new project' page.
+ * @constructor
+ */
 export default function NewProjects() {
     const [projectName, setProjectName] = useState("")
     const [partnerName, setPartnerName] = useState("")
     const [partnerDescription, setPartnerDescription] = useState("")
     const [projectDescription, setProjectDescription] = useState("")
+
     const [requiredSkills, setRequiredSkills] = useState([{"skill_name":"", "number":1}])
     const [skills, setSkills] = useState([])
     const [show, setShow] = useState(false);
     const [availableSkills, setAvailableSkills] = useState([])
+    const [showError, setShowError] = useState(false);
 
     const router = useRouter()
 
+    /**
+     * This useEffect initializes the skills and availableSkills state variables.
+     */
     useEffect(() => {
         Url.fromName(api.skills).get().then(async res => {
             if (res.success) {
@@ -38,12 +47,19 @@ export default function NewProjects() {
         })
     }, [])
 
-
+    /**
+     * This function adds a required skill to the project.
+     */
     function addRequiredSkill(){
         event.preventDefault()
         setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
     }
 
+    /**
+     * This function changes a required skill by changing the label or the amount needed.
+     * @param value The new required skill.
+     * @param index The index of hte required skill in the requiredSkills list.
+     */
     function changeRequiredSkill(value, index){
         if(requiredSkills[index].label !== ""){
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].skill_name])
@@ -55,6 +71,12 @@ export default function NewProjects() {
         setRequiredSkills(newArray)
     }
 
+    /**
+     * This function handles the submit button of the new project. First, it checks if the inputted fields are valid.
+     * If so, it posts the inputted fields to the database. If not, it shows an error message.
+     * @param event
+     * @returns {Promise<void>}
+     */
     async function handleSubmitChange(event){
         event.preventDefault()
         let body = {
@@ -80,8 +102,10 @@ export default function NewProjects() {
 
     }
 
-
-        return(
+    /**
+     * Returns the html of the 'new project' page.
+     */
+    return(
         <div className={"add-project-body"}>
             <Row className={"project-top-bar nomargin"}>
                 <Col xs={"auto"}>

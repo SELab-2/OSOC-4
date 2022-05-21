@@ -26,7 +26,7 @@ from app.models.question_tag import (QuestionTag, QuestionTagCreate,
 from app.models.skill import StudentSkill
 from app.models.student import DecisionOption, Student
 from app.models.suggestion import Suggestion, SuggestionOption
-from app.models.user import User, UserRole
+from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
@@ -154,22 +154,6 @@ async def update_edition(year: int, edition: Edition = Body(...), role: RoleChec
         setattr(result, key, value)
     await update(result, session)
     return EditionOutSimple.parse_raw(result.json()).uri
-
-
-@router.get("/{year}/users", response_description="Users retrieved")
-async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
-    """get_users get all the User instances from the database in edition with given year
-
-    :return: list of users
-    :rtype: dict
-    """
-
-    edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
-    user_ids = [coach.coach_id for coach in edition_coaches]
-    # get the admins
-    admins = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
-    user_ids += [admin.id for admin in admins]
-    return [f"{config.api_url}users/{str(id)}" for id in user_ids]
 
 
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")

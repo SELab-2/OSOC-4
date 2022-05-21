@@ -17,6 +17,7 @@ import EditableDiv from "../../Components/projects/EditableDiv";
 import plus from "/public/assets/plus.svg"
 import { useWebsocketContext } from "../../Components/WebsocketProvider";
 import { ToastContainer, toast } from 'react-toastify';
+import useWindowDimensions from "../../utils/WindowDimensions";
 
 import { checkProjectBody } from "../../utils/inputchecker";
 function Input(props) {
@@ -24,9 +25,10 @@ function Input(props) {
 }
 
 Input.propTypes = { children: PropTypes.node };
+
 /**
  * this page corresponds with the projects/id tab
- * @returns {JSX.Element}
+ * @returns {JSX.Element} The component rendering the project details.
  * @constructor
  */
 const Project = () => {
@@ -45,10 +47,16 @@ const Project = () => {
     const [stillRequiredSkills, setStillRequiredSkills] = useState([]);
     const [showBackExit, setShowBackExit] = useState(false);
     const [showStopEditing, setShowStopEditing] = useState(false);
-    const [availableSkills, setAvailableSkills] = useState([])
+    const [availableSkills, setAvailableSkills] = useState([]);
+    const [fullView, setFullView] = useState(false);
+    const { height, width } = useWindowDimensions();
+
 
     const { websocketConn } = useWebsocketContext();
 
+    /**
+     * This useEffect initializes the project, editfields, requiredSkills and stillRequiredSkills state variables.
+     */
     useEffect(() => {
         if (!loaded) {
             api.invalidate();
@@ -77,12 +85,14 @@ const Project = () => {
 
     }, [])
 
+    /**
+     * This useEffect initializes the skills state variable.
+     */
     useEffect(() => {
         Url.fromName(api.skills).get().then(async res => {
             if (res.success) {
                 res = res.data;
                 if (res) {
-                    // scuffed way to get unique skills (should be fixed in backend soon)
                     let array = [];
                     res.map(skill => array.push({ "value": skill, "label": skill }));
                     setSkills(array);
@@ -90,6 +100,13 @@ const Project = () => {
             }
         })
     }, [])
+
+    /**
+     * This useEffect changes the fullView state variable, on change of the screen width or router.
+     */
+    useEffect(() => {
+        setFullView(width > 1500 || (width > 1000 && !router.query.studentId));
+    }, [width]);
 
     /**
      * Initalize the value of available skills after mounting the component
@@ -101,6 +118,9 @@ const Project = () => {
         }
     }, [requiredSkills, skills])
 
+    /**
+     * This function adds an event listener to the websockets to call updateDetailsFromWebsocket when the data changes.
+     */
     useEffect(() => {
 
         if (websocketConn) {
@@ -113,11 +133,17 @@ const Project = () => {
 
     }, [websocketConn, project, router.query])
 
+    /**
+     * This function is called when the data has changed. It determines wich data has changed and changes the
+     * state of the application.
+     * @param event contains the data that changed.
+     */
     const updateDetailsFromWebsocket = (event) => {
         let data = JSON.parse(event.data)
         const studentid = parseInt(data["studentId"])
         const projectid = parseInt(data["projectId"])
 
+        // The current project has been changed.
         if (projectid === project.id_int) {
             if ("participation" in data) {
                 let new_project = project;
@@ -132,6 +158,10 @@ const Project = () => {
 
     }
 
+    /**
+     * Delete the current project.
+     * @returns {Promise<void>}
+     */
     async function deleteProject() {
         Url.fromUrl(project.id)
             .delete().then(res => {
@@ -155,6 +185,11 @@ const Project = () => {
         }
     }
 
+    /**
+     * Change the required skills state variable.
+     * @param value The new/changed required skill.
+     * @param index The index of the required skill in the requiredSkills list.
+     */
     function changeRequiredSkill(value, index){
         if(requiredSkills[index].label !== ""){
             setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].skill_name])
@@ -217,12 +252,15 @@ const Project = () => {
         }
     }
 
+    /**
+     * Returns the html of the 'project details' page.
+     */
     return (
         <div>
             <Row>
                 {loaded ? (<div>
                     <Row className={"project-top-bar nomargin"}>
-                        <Col xs="auto" >
+                        <Col style={{"max-width": 100}} >
                             <Hint message="Go back">
                                 <Image alt={"back button"} onClick={() => {
                                     if (showEdit) {
@@ -251,10 +289,13 @@ const Project = () => {
                                 </Modal.Footer>
                             </Modal>
                         </Col>
-                        <Col>
-                            <EditableDiv cssClass={"project-details-project-title"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName} />
-                        </Col>
-                        <Col xs="auto" >
+                        {fullView ?
+                            <Col>
+                                <EditableDiv cssClass={"project-details-project-title"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName} />
+                            </Col>
+                        : <Col/>}
+
+                        <Col xs="auto">
                             {showEdit ?
                                 <Hint message="Save changes">
                                     <Image alt={"save button"} src={save_image} onClick={() => {
@@ -325,8 +366,13 @@ const Project = () => {
 
                         </Col>
                     </Row>
+                   
                     <div className={"project-details-page"} >
-                        <div className={"project-details-edit-field-width"}>
+                        {! fullView ?
+                            <EditableDiv cssClass={"project-details-project-title-small"} showEdit={showEdit} value={project.name} changeValue={projectName} setChangeValue={setProjectName} />
+
+                        : null}
+                        <div className={"project-details-edit-field-width" + (! fullView ? "-small" : "")}>
                             <Row className={"nomargin"}>
                                 <Col className="nomargin nopadding" xs={"auto"}>
                                     <div className={"project-details-title-info"} >Project by: </div>
@@ -365,20 +411,35 @@ const Project = () => {
                                     </Hint>
                                     : null}
                             </Col>
-                            <Col className="nomargin nopadding">
-                                <div>
-                                    <div className={"project-card-title"}>Still required skills</div>
-                                    {(stillRequiredSkills.length) ? (stillRequiredSkills.map((requiredSkill, index) => {
-                                        if (requiredSkill.number > 0) {
-                                            return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
+                            { fullView ? 
+                                <Col className="nomargin nopadding">
+                                    <div>
+                                        <div className={"project-card-title"}>Still required skills</div>
+                                        {(stillRequiredSkills.length) ? (stillRequiredSkills.map((requiredSkill, index) => {
+                                            if (requiredSkill.number > 0) {
+                                                return <SkillCard key={index} skill_name={requiredSkill.skill_name} number={requiredSkill.number} />
+                                            }
+                                            return null
+                                        }))
+                                            :
+                                            <div className={"project-empty-list-col"}>Currently there are no required skills</div>
                                         }
-                                        return null
-                                    }))
-                                        :
-                                        <div className={"project-empty-list-col"}>Currently there are no required skills</div>
-                                    }
-                                </div>
-                            </Col>
+                                    </div>
+                                </Col> 
+                                : null }
+                            {fullView ? 
+                                <Col className="nomargin nopadding">
+                                    <div>
+                                        <div className={"project-card-title"}>Assigned students</div>
+                                        {(Object.values(project.participations).length) ?
+                                            Object.values(project.participations).map(participation => (<ParticipationCard key={participation.student} participation={participation} project={project} />)) :
+                                            <div className={"project-empty-list-col"}>Currently there are no assigned students</div>
+                                        }
+                                    </div>
+                                </Col>
+                            : null}
+                        </Row>
+                        {! fullView ? 
                             <Col className="nomargin nopadding">
                                 <div>
                                     <div className={"project-card-title"}>Assigned students</div>
@@ -388,9 +449,8 @@ const Project = () => {
                                     }
                                 </div>
                             </Col>
-                        </Row>
+                            : null}
                     </div>
-
                 </div>) : null}
             </Row>
             <ToastContainer />
