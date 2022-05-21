@@ -1,7 +1,7 @@
-import { Button, Col, Modal, ModalHeader, ModalTitle, Spinner } from "react-bootstrap";
-import { useState, useEffect } from "react";
-import { cache } from "../../utils/ApiClient";
+import { Button, Modal, ModalHeader, ModalTitle, Spinner } from "react-bootstrap";
+import { useState } from "react";
 import { api, Url } from "../../utils/ApiClient";
+import { toast, ToastContainer } from "react-toastify";
 
 /***
  * This element shows the pop up window when sending emails in the 'email students' tab.
@@ -11,18 +11,13 @@ import { api, Url } from "../../utils/ApiClient";
  */
 export default function SendEmailsPopUpWindow(props) {
 
-  const [defaultEmail, setDefaultEmail] = useState(true);
-  const [fail, setFail] = useState(false);
   const [sending, setSending] = useState(false);
-  const [sentSuccess, setSentSuccess] = useState(false);
 
   /***
    * This function is called when the pop-up window is closed
    */
   function onHide() {
     props.setSelectedStudents([]);
-    setFail(false);
-    setSentSuccess(false);
     props.setPopUpShow(false);
   }
 
@@ -33,74 +28,55 @@ export default function SendEmailsPopUpWindow(props) {
     setSending(true);
     Url.fromName(api.sendemails).extend("/decisions").setBody({ "emails": props.selectedStudents }).post().then((res) => {
       if (res.success){
+        onHide();
+        toast.success(`${props.selectedStudents.length} decision emails were sent succesfully!`);
         setSending(false);
-        setSentSuccess(true);
       } else {
         setSending(false);
-        setFail(true);
+        toast.error("Something went wrong, please try again");
+        props.setPopUpShow(false); //Instead of onHide() -> To keep the original selected students selected when the request to send emails fails, otherwise al the studens get deselected
       }
     })
-  }
-
-  /**
-   * When something went wrong when sending emails and 'try again' is pushed, this method is called.
-   */
-  function handleTryAgain(){
-    setFail(false);
   }
 
   /**
    * returns the html representation for the send emails pop up window
    */
   return (
-    <Modal
-      show={props.popUpShow}
-      onHide={() => onHide()}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <ModalHeader closeButton>
-        <ModalTitle id="contained-modal-title-vcenter">
-          {`Are you sure you want to send ${props.selectedStudents.length} decision emails?`}
-        </ModalTitle>
-      </ModalHeader>
-      {fail &&
-        <Modal.Body>
-          Something went wrong, please try again
-        </Modal.Body>
-      } 
-      {sentSuccess &&
-        <Modal.Body>
-          {props.selectedStudents.length} decision emails were sent succesfully!
-        </Modal.Body>
-      } 
-      <Modal.Footer>
-        {(! sending && ! fail && ! sentSuccess) && 
-        <div>
-           <Button variant="secondary" onClick={onHide}>Cancel</Button>
-          <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
-        </div>}
-        {sending && 
-          <Button variant="primary" disabled>
-          Sending...
-          <Spinner
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-          />
-        </Button>}
-        {sentSuccess &&
-          <Button variant="primary" onClick={onHide}>Close</Button>
-        }
-        {fail && 
-          <div>
-            <Button variant="secondary" onClick={onHide}>Cancel</Button>
-            <Button variant="primary" onClick={handleTryAgain} className="invite-button">Try again</Button>
-          </div>}
-      </Modal.Footer>
-    </Modal>
+    <div>
+      <Modal
+        show={props.popUpShow}
+        onHide={() => onHide()}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <ModalHeader closeButton>
+          <ModalTitle id="contained-modal-title-vcenter">
+            {`Are you sure you want to send ${props.selectedStudents.length} decision emails?`}
+          </ModalTitle>
+        </ModalHeader>
+        <Modal.Footer>
+          {sending ?
+            <Button variant="primary" disabled>
+            Sending emails...
+            <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+            />
+            </Button>
+            :
+              <div>
+                <Button variant="secondary" onClick={onHide}>Cancel</Button>
+                <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
+              </div>
+              }
+        </Modal.Footer>
+      </Modal>
+      <ToastContainer autoClose={4000}/>
+    </div>
   );
 }
