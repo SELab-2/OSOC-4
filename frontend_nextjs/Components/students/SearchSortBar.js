@@ -55,15 +55,14 @@ export default function SearchSortBar() {
    */
   function searchChanged(ev) {
 
-    setSearch(e.target.value);
+    setSearch(ev.target.value);
     clearTimeout(timer);
 
     const newTimer = setTimeout(() => {
-      doSearch(e.target.value);
+      doSearch(ev.target.value);
     }, 200)
 
-    setTimer(newTimer)
-
+    setTimer(newTimer);
   }
 
   /**
