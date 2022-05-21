@@ -28,8 +28,8 @@ export default function ManageUsers(props) {
     const [sending, setSending] = useState(false);
 
     const handleClose = () => {
-        setSending(false);
         setShow(false);
+        setSending(false);
         setToInvite("");
     }
 

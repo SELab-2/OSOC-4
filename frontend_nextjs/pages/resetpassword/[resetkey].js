@@ -78,7 +78,6 @@ const Reset = () => {
             <section className='body-right'>
                 <div className="login-container">
                     <p className="welcome-message">Reset your password</p>
-                    <div className="login-container">
                         <Form onSubmit={handleSubmit}>
                             <Form.Group>
                                 <Form.Label>New password</Form.Label>
@@ -104,7 +103,6 @@ const Reset = () => {
                                 :
                                 <Button variant="primary" type="submit" className="submit" disabled={password.length <= 11 || password !== validatePassword}>Change password</Button>}
                         </Form>
-                    </div>
                 </div>
             </section>
             <ToastContainer autoClose={4000}/>
