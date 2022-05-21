@@ -5,23 +5,24 @@
  * @returns {boolean}
  */
 export function checkProjectBody(body) {
-    let response = {"correct" : false }
+    let response = {"correct" : true }
     let names_list = body.required_skills.map(skill => skill.skill_name)
 
     if (body.required_skills.some(skill => skill.skill_name === "")) {
         response.problem = "required skills"
     } else if (names_list.some((skill_name, index) => names_list.indexOf(skill_name) !== index)) {
         response.problem = "required skills"
-    } else if (body.name === ""){
-        response.problem = "name"
-    } else if (body.description === ""){
-        response.problem = "project description"
-    } else if (body.partner_name === ""){
-        response.problem = "partner name"
-    } else if (body.partner_description === ""){
-        response.problem = "partner description"
-    } else {
-        response.correct = true
     }
+
+    let should_be_checked = ["name", "description", "partner_name", "partnerdescription"];
+
+    for( check in should_be_checked){
+        if (body[check] === ""){
+            response.correct = false
+            response.problem = check
+            return;
+        }
+    }
+
     return response
 }
