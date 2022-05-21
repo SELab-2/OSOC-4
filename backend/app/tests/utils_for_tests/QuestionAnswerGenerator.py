@@ -105,10 +105,10 @@ class QuestionAnswerGenerator(DataGenerator):
         self.questions_multiple_choice2 = []
         self.answers_multiple_choice2 = []
 
-        self.answers_multiple_choice2.append([Answer(answer=answer_text) for answer_text in self.qa_multiple_choice2[0][1:]])
-
-        self.questions_multiple_choice2.append(Question(question=self.qa_multiple_choice2[1][0], field_id="", edition=edition.year))
         self.answers_multiple_choice2.append([Answer(answer=answer_text) for answer_text in self.qa_multiple_choice2[1][1:]])
+
+        self.questions_multiple_choice2.append(Question(question=self.qa_multiple_choice2[0][0], field_id="", edition=edition.year))
+        self.answers_multiple_choice2.append([Answer(answer=answer_text) for answer_text in self.qa_multiple_choice2[0][1:]])
 
         self.question_tags = [QuestionTag(question=self.question_first_name,
                                           edition=self.edition.year, mandatory=True, tag="first name"),

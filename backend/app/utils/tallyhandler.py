@@ -42,10 +42,13 @@ async def process_tally(data, edition, session: AsyncSession):
     # get the skills questiontag
     skills_tag = await read_where(QuestionTag, QuestionTag.tag == "skills", QuestionTag.edition == edition, session=session)
 
+    # using a volgnummer for the questionanswers to be able to display them in the correct order
+    volgnummer = 0
+
     for field in data["data"]["fields"]:
 
-        if "Which role are you applying for that is not in the list above?" == field["label"]:
-            field["label"] = "Which role are you applying for?"
+        # if "Which role are you applying for that is not in the list above?" == field["label"]:
+        #     field["label"] = "Which role are you applying for?"
 
         # Check if the question already exists else save it
         # get the question by id
@@ -65,7 +68,7 @@ async def process_tally(data, edition, session: AsyncSession):
             q.question = field["label"]
             await update(q, session=session)
 
-        elif field["type"] in ["MULTIPLE_CHOICE", "CHECKBOXES"]:
+        if field["type"] in ["MULTIPLE_CHOICE", "CHECKBOXES"]:
             q_values = field["value"] if isinstance(field["value"], list) else [field["value"]]
             if "options" in field:
                 for option in field["options"]:
@@ -84,9 +87,11 @@ async def process_tally(data, edition, session: AsyncSession):
                             await update(student_skill, session=session)
 
                         # save the question answer binding
-                        await update(QuestionAnswer(student=student, question=q, answer=a), session=session)
+                        await update(QuestionAnswer(student=student, volgnummer=volgnummer, question=q, answer=a), session=session)
+                        volgnummer += 1
 
         elif field["type"] in ["TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_PHONE_NUMBER", "INPUT_EMAIL", "INPUT_LINK", "FILE_UPLOAD"]:
             if field["value"] is not None:
                 a = await get_save_answer(str(field["value"]), session)
-                await update(QuestionAnswer(student=student, question=q, answer=a), session=session)
+                await update(QuestionAnswer(student=student, volgnummer=volgnummer, question=q, answer=a), session=session)
+                volgnummer += 1

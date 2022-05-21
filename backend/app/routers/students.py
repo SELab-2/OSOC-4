@@ -111,7 +111,7 @@ async def get_student_questionanswers(student_id: int, session: AsyncSession = D
                               .join(Question, QuestionAnswer.question)
                               .join(Answer, QuestionAnswer.answer)
                               .outerjoin(QuestionTag, Question.question_tags)
-                              .where(QuestionAnswer.student_id == int(student_id)).order_by(Question.id))
+                              .where(QuestionAnswer.student_id == int(student_id)).order_by(QuestionAnswer.volgnummer))
     return [{"question": x[0], "answer": x[1]} for x in r.all() if x[2] is None]
 
 
