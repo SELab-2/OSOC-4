@@ -17,6 +17,7 @@ async function refreshAccessToken(tokenObject) {
 
         const url = process.env.NEXT_INTERNAL_API_URL;
 
+        // get the refreshed access token
         const tokenResponse = await axios.post(url + "/refresh", {}, { headers: { "Authorization": "Bearer " + tokenObject.refreshToken, 'X-CSRF-TOKEN': csrfToken } });
 
         return {
@@ -33,6 +34,8 @@ async function refreshAccessToken(tokenObject) {
     }
 }
 
+
+// A list of providers to sign in with
 const providers = [
     CredentialsProvider({
         name: 'Credentials',
@@ -54,6 +57,7 @@ const providers = [
     })
 ]
 
+// these callbacks are run when new access token is received
 const callbacks = {
     jwt: async ({ token, user }) => {
         if (user) {
@@ -91,6 +95,7 @@ const callbacks = {
     }
 }
 
+// custom cookies config is used in production so multiple branch deployments use different cookies
 export const options = (process.env.NODE_ENV === "development") ? {
     providers,
     callbacks,
