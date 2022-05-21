@@ -1,6 +1,6 @@
 import uuid
 from app.crud import read_all_where, read_where, update
-from app.tests.test_base import TestBase, Request
+from app.tests.test_base import TestBase, Request, Status
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
@@ -30,6 +30,13 @@ class TestParticipations(TestBase):
 
         await self.session.commit()
 
+        self.participation_data = {
+            "student_id": self.students[0].id,
+            "project_id": self.project.id,
+            "skill_name": self.skills[0].name,
+            "reason": str(uuid.uuid1())
+        }
+
     def assert_participation_equal(self, test_data: dict[str, any], participation: Participation):
         """Assert that the data in the given participation matches the test data
 
@@ -48,32 +55,42 @@ class TestParticipations(TestBase):
 
     async def test_post_participation_create(self):
         """Test POST /participations/create"""
-        # Send POST request
-        post_body = {
-            "student_id": self.students[0].id,
-            "project_id": self.project.id,
-            "skill_name": self.skills[0].name,
-            "reason": str(uuid.uuid1())
-        }
         path = "/participations/create"
-        await self.do_request(Request.POST, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=post_body)
+        await self.do_request(Request.POST, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
 
         # verify participation is created in db
-        db_participations = await read_all_where(Participation, Participation.student_id == post_body["student_id"], Participation.project_id == post_body["project_id"], session=self.session)
+        db_participations = await read_all_where(Participation, Participation.student_id == self.participation_data["student_id"], Participation.project_id == self.participation_data["project_id"], session=self.session)
         self.assertEqual(1, len(db_participations))
-        self.assert_participation_equal(post_body, db_participations[0])
+        self.assert_participation_equal(self.participation_data, db_participations[0])
+
+    async def test_participation_create_invalid_student(self):
+        """Test POST /participations/create with invalid student id"""
+
+        self.participation_data.update({
+            "student_id": 0
+        })
+        path = "/participations/create"
+
+        await self.do_request(Request.POST, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
+
+    async def test_participation_create_invalid_project(self):
+        """Test POST /participations/create with invalid project id"""
+
+        self.participation_data.update({
+            "project_id": 0
+        })
+        path = "/participations/create"
+
+        await self.do_request(Request.POST, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
+
+    async def test_participation_create_year_mismatch(self):
+        """Test POST /participations/create with invalid project id"""
 
     async def test_delete_participations(self):
         """Test DELETE /participations"""
-        reason = str(uuid.uuid1())
-
         # create a participation in db
-        participation = Participation(student_id=self.students[0].id, project_id=self.project.id, skill_name=self.skills[0].name, reason=reason)
+        participation = Participation(**self.participation_data)
         await update(participation, session=self.session)
-
-        # verify participation is in db
-        db_participations = await read_all_where(Participation, Participation.reason == reason, session=self.session)
-        self.assertEqual(1, len(db_participations))
 
         # Send DELETE request
         path = f"/participations?student_id={self.students[0].id}&project_id={self.project.id}"
@@ -85,28 +102,20 @@ class TestParticipations(TestBase):
 
     async def test_patch_participations(self):
         """Test PATCH /participations"""
-        reason = str(uuid.uuid1())
-
         # create a participation in db
-        participation = Participation(student_id=self.students[0].id, project_id=self.project.id, skill_name=self.skills[0].name, reason=reason)
+        participation = Participation(**self.participation_data)
         await update(participation, session=self.session)
 
-        # verify participation is in db
-        db_participations = await read_all_where(Participation, Participation.reason == reason, session=self.session)
-        self.assertEqual(1, len(db_participations))
-
         # modify participation
-        modified_participation = {
-            "student_id": self.students[0].id,
-            "project_id": self.project.id,
+        self.participation_data.update({
             "skill_name": self.skills[1].name,  # new skill
             "reason": str(uuid.uuid1())   # new reason
-        }
+        })
 
         # Send PATCH request
         path = f"/participations?student_id={self.students[0].id}&project_id={self.project.id}"
-        await self.do_request(Request.PATCH, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=modified_participation)
+        await self.do_request(Request.PATCH, path, "user_admin", access_token=await self.get_access_token("user_admin"), json_body=self.participation_data)
 
         # verify participation is changed
-        db_participation = await read_where(Participation, Participation.student_id == modified_participation["student_id"], Participation.project_id == modified_participation["project_id"], session=self.session)
-        self.assert_participation_equal(modified_participation, db_participation)
+        db_participation = await read_where(Participation, Participation.student_id == self.participation_data["student_id"], Participation.project_id == self.participation_data["project_id"], session=self.session)
+        self.assert_participation_equal(self.participation_data, db_participation)
