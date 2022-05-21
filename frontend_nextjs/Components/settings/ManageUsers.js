@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {Button, Form, Modal, Table, Spinner} from "react-bootstrap";
 import UserTr from "./UserTr";
 import {api, Url} from "../../utils/ApiClient";
+import { ToastContainer, toast } from 'react-toastify';
 
 /**
  * This component displays a settings-screen where you can manage the users in the application
@@ -24,22 +25,11 @@ export default function ManageUsers(props) {
     const [toInvite, setToInvite] = useState("");
     const [loading, setLoading] = useState(false)
     const [show, setShow] = useState(false);
-    const [sent, setSent] = useState(false);
     const [sending, setSending] = useState(false);
-    const [fail, setFail] = useState(false);
 
     const handleClose = () => {
-        setFail(false);
-        setSent(false);
         setSending(false);
         setShow(false);
-        setToInvite("");
-    }
-
-    const handleTryAgain = () => {
-        setFail(false);
-        setSent(false);
-        setSending(false);
         setToInvite("");
     }
 
@@ -87,24 +77,30 @@ export default function ManageUsers(props) {
     async function handleSubmitInvite(event) {
         event.preventDefault();
         setSending(true);
+        let fail = false;
         const emails = toInvite.trim().split("\n").map(a => a.trim());
         await Promise.all(emails.map(email =>
             Url.fromName(api.users).extend("/create").setBody({"email": email}).post().then(async resp => {
                 if (resp.success && resp.data.data.id) {
                     await Url.fromUrl(resp.data.data.id).extend("/invite").post().then(async resp2 => {
                         setSending(false);
-                        if (resp2.success) {
-                            setSent(true);
-                        } else {
-                            setFail(true);
+                        if (! resp2.success) {
+                            fail = true;
+                            handleClose();
+                            toast.error("Something went wrong, please try again");
                         }
                     });
                 } else {
-                    setSending(false);
-                    setFail(true);
+                    fail = true;
+                    handleClose();
+                    toast.error("Something went wrong, please try again");
                 }
             }))
         );
+        if (! fail){
+            handleClose();
+            toast.success("Send invite emails have been sent successfully");
+        }
     }
 
     const [filters, setFilters] = useState({
@@ -162,24 +158,15 @@ export default function ManageUsers(props) {
                             <Modal.Body>
                                 <Form.Group controlId="inviteUserTextarea">
                                     <Form.Label>List of email-address(es) of the users you want to invite, seperated from each other by an newline</Form.Label>
-                                    {(sent || sending || fail) ? (
+                                    {sending ? (
                                         <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} disabled/>
                                     ) : (
                                         <Form.Control as="textarea" value={toInvite} onChange={handleChangeToInvite} rows={3} />
                                     )}
-                                    {(sent || fail) && <br/>}
-                                    {(fail) && <Form.Label>Something went wrong, please try again</Form.Label>}
-                                    {(sent) && <Form.Label>Invites have been sent!</Form.Label>}
                                 </Form.Group>
                             </Modal.Body>
                             <Modal.Footer>
-                                {sent && <Button variant={"primary"} onClick={handleClose}>Close</Button>}
-                                {fail && 
-                                <div>
-                                    <Button variant="secondary" onClick={handleClose}>Close</Button>
-                                    <Button variant="primary" onClick={handleTryAgain} className="invite-button">Try again</Button>
-                                </div>} 
-                                {sending && 
+                                {sending ?
                                     <Button variant="primary" disabled className="invite-button">
                                         Sending invites...
                                         <Spinner
@@ -190,8 +177,7 @@ export default function ManageUsers(props) {
                                             aria-hidden="true"
                                         />
                                     </Button>
-                                }
-                                {!sent && !fail && !sending && 
+                                :
                                     <div>
                                         <Button variant={"secondary"} onClick={handleClose}>Close</Button>
                                         <Button variant={"primary"} type="submit" className="invite-button">Invite users</Button>
@@ -263,6 +249,7 @@ export default function ManageUsers(props) {
                             {(shownUsers.length) ? (shownUsers.map((item, index) => (<UserTr isMe={item.email === props.me.email} key={item.id} user={item} />))) : null}
                     </tbody>
                 </Table>
+                <ToastContainer autoClose={4000}/>
         </div>
     );
 }
