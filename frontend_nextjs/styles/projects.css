@@ -59,6 +59,7 @@
 
 .search-project {
     min-width: 120pt;
+    width: 100%;
 }
 
 .center-content {
@@ -145,4 +146,25 @@
 
 .prevnextbutton:hover {
     background-color: #ddd;
+}
+
+.project-add-button-div-responsive{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.project-add-button-responsive{
+    width: 100%;
+}
+
+.project-top-bar-repsonsive{
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.projectlist-top-bar-repsonsive{
+    margin-left: 5px;
+    margin-right: 5px;
 }

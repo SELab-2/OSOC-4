@@ -219,6 +219,7 @@ export default function ProjectsList(props) {
      */
     return (
         <Col className="fill_height fill_width">
+            {props.fullView ?
             <Row className="center-content projects-controls">
                 <Col className="search-project">
                     <input type="text" value={search}
@@ -239,6 +240,36 @@ export default function ProjectsList(props) {
                 }
 
             </Row>
+             :
+            <div className="projectlist-top-bar-repsonsive">
+                <Row className="center-content projects-controls">
+                    <Col className="search-project" >
+                        <input className="search-project"  type="text" value={search}
+                            placeholder={"Search projects"}
+                            onChange={e => handleSearch(e)} />
+
+                    </Col>
+                </Row>
+                <div className="center-content">
+                    <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded} />
+                </div>
+                
+                <Row className="center-content">
+                    <Col xs="auto" >
+                        <ConflictCard conflicts={conflicts} />
+                    </Col>
+                    {me !== undefined && me.role === 2 ?
+                        <Col xs="auto" >
+                            <Button className={"center"} onClick={handleNewProject}>New project</Button>
+                        </Col> : null
+                    }
+
+                </Row>
+            </div>
+             }
+            
+            
+
             <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 137px)" }}>
                 {
                     visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
