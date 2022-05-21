@@ -47,6 +47,9 @@ export default function ChangePassword(props) {
         if (response.success) { 
             setSaving(false);
             toast.success("Password changed successfully");
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
         } else {
             toast.error("Something went wrong, please try again");
             setSaving(false);
