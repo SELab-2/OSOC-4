@@ -48,7 +48,12 @@ export default function SearchSortBar() {
     }, undefined, { shallow: true });
   }
 
-  const searchChanged = e => {
+  /**
+   * This function is called when the searchbar changed its value.
+   * It will search the inserted value after 200ms.
+   * @param ev the event of changing the search bar.
+   */
+  function searchChanged(ev) {
 
     setSearch(e.target.value);
     clearTimeout(timer);
@@ -62,7 +67,7 @@ export default function SearchSortBar() {
   }
 
   /**
-   * return html representation of the suggestion counts for a student
+   * return html representation of the SearchSortBar.
    */
   return (
     <Row className="nomargin">

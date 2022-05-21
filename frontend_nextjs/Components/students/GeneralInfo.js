@@ -15,6 +15,9 @@ export default function GeneralInfo(props) {
 
   const [projects, setProjects] = useState(undefined);
 
+  /**
+   * This useEffect() initializes the 'projects' state variable.
+   */
   useEffect(() => {
     if (! projects && props.student["participations"]) {
       for (let newProject of props.student["participations"]) {
@@ -92,7 +95,7 @@ export default function GeneralInfo(props) {
           <Col md="auto" className="info-answers">{decision}</Col>
         </Row>
       )
-
+      // add the email_sent field if the email bar at the bottom of the screen is expanded.
       if (props.elementType === "emailstudents") {
         rows.push(
           <Row key={"email_sent"} className="question-answer-row">

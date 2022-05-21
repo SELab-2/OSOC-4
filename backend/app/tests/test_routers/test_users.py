@@ -1,5 +1,6 @@
 import json
 import os
+import unittest
 from typing import Dict, Set, Tuple
 
 from httpx import Response
@@ -181,6 +182,7 @@ class TestUsers(TestBase):
 
         await self.assert_name_edits(allowed_users)
 
+    @unittest.skip("Do not overload the email system.")
     async def test_post_invite_user(self):
         unactivated_user = await self.get_user_by_name("user_unactivated_coach")
 
@@ -228,6 +230,7 @@ class TestUsers(TestBase):
         # Try to delete imaginary user
         await self.do_request(Request.DELETE, f"/users/{self.bad_id}", "user_admin", expected_status=Status.NOT_FOUND)
 
+    @unittest.skip("Do not overload the email system.")
     async def test_post_invite_disabled_user(self):
         await self.session.commit()
 

@@ -126,7 +126,13 @@ async def send_email(subject: str, email_body: str, student: Student, userid: st
     :param session: the session used to perform database operations
     :type session: AsyncSession
     """
-    r = await session.execute(select(QuestionTag.tag, Answer.answer).where(QuestionTag.tag.in_(["first name", "last name", "email"])).select_from(Student).where(Student.id == int(student.id)).join(QuestionAnswer).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).join(Answer))
+    r = await session.execute(select(QuestionTag.tag, Answer.answer)
+                              .where(QuestionTag.tag.in_(["first name", "last name", "email"]))
+                              .select_from(Student)
+                              .where(Student.id == int(student.id))
+                              .join(QuestionAnswer)
+                              .join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id)
+                              .join(Answer))
     student_info = r.all()
 
     user = await read_where(User, User.id == int(userid), session=session)

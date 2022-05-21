@@ -4,7 +4,7 @@ import uuid
 from httpx import Response
 from app.config import config
 from app.crud import read_all_where, read_where, update
-from app.models.project import Project, ProjectCoach, ProjectRequiredSkill
+from app.models.project import Project, ProjectRequiredSkill
 from app.models.user import UserRole
 from app.tests.test_base import TestBase, Request
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
@@ -19,7 +19,6 @@ class TestProjects(TestBase):
         "partner_name": "UGent",
         "partner_description": "De C in UGent staat voor communicatie",
         "required_skills": [],
-        "users": [],
     }
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +36,6 @@ class TestProjects(TestBase):
 
         project_dict = project.dict()
         skills = test_data.pop("required_skills")
-        users = test_data.pop("users")
 
         # compare data
         for key, value in test_data.items():
@@ -45,12 +43,6 @@ class TestProjects(TestBase):
                              (f"{key} of project '{project_name}' did not match.\n"
                               f"Expected: {value}\n"
                               f"Got: {project_dict[key]}"))
-
-        # compare project users
-        db_users = await read_all_where(ProjectCoach, ProjectCoach.project_id == int(project.id), session=self.session)
-        self.assertEqual(len(db_users), len(users), f"Number of users for project {project_name} does not match number of users in database")
-        for db_user in db_users:
-            self.assertTrue(db_user.coach_id in users, f"User with id {db_user.coach_id} not found for project {project_name}")
 
         # compare project required skills
         db_skills = await read_all_where(ProjectRequiredSkill, ProjectRequiredSkill.project_id == int(project.id), session=self.session)
@@ -82,16 +74,14 @@ class TestProjects(TestBase):
         # compare every field in the database with the test value
         await self.assert_projects_equal(self.project_data, project_in_db)
 
-    async def test_post_add_project_data_with_skills_and_users(self):
+    async def test_post_add_project_data_with_skills(self):
         skill_generator = SkillGenerator(self.session)
         skills = skill_generator.generate_skills()
         skill_generator.add_to_db()
         await self.session.commit()
 
-        project_coach = await self.get_user_by_name("user_approved_coach")
         self.project_data.update({
             "required_skills": [{"skill_name": skill.name, "number": 3} for skill in skills],
-            "users": [project_coach.id],
         })
 
         await self.test_post_add_project_data()
@@ -148,11 +138,9 @@ class TestProjects(TestBase):
     async def test_patch_projects_with_id(self):
         # Set up coaches and project
         user_generator = UserGenerator(self.session)
-        coaches = user_generator.generate_users(4)
         user_generator.add_to_db()
 
         project = Project(
-            coaches=[coaches[0]],
             **self.project_data)
         await update(project, self.session)
 
@@ -175,7 +163,6 @@ class TestProjects(TestBase):
             "description": str(uuid.uuid1()),
             "partner_name": str(uuid.uuid1()),
             "partner_description": str(uuid.uuid1()),
-            "users": [coach.id for coach in coaches],
             "required_skills": project_skills,
             "edition": self.edition.year
         }

@@ -318,8 +318,8 @@ class API {
             this._paths.emailtemplates = res.data[this.emailtemplates];
             this._paths.sendemails = res.data[this.sendemails];
             this._paths.myself = res.data[this.myself];
-            if (this._getYear()) {
-                this._paths.current_edition = this._paths.editions + "/" + this._getYear();
+            if (this.getYear()) {
+                this._paths.current_edition = this._paths.editions + "/" + this.getYear();
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
                 this._paths.current_edition = (res.data.length) ? res.data[0] : null;
@@ -348,7 +348,7 @@ class API {
         this.invalidate();
     }
 
-    _getYear() {
+    getYear() {
         return localStorage.getItem("api_year");
     }
 

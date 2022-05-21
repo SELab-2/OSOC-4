@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Image from 'next/image';
 import red_cross from "/public/assets/wrong.svg";
 import { api, Url } from "../../utils/ApiClient";
-import { getID } from "../../utils/string";
 import Hint from "../Hint";
 import LoadingPage from "../LoadingPage";
 
@@ -61,10 +60,16 @@ export default function ParticipationCard(props) {
           .delete().then(setLoading(false));
      }
 
-     if (loading) {
+    /**
+     * If the page is loading, return the loading animation.
+     */
+    if (loading) {
          return <LoadingPage/>
      }
 
+    /**
+     * Return the html for the ParticipationCard.
+     */
     return (
         <div>
             <Card className={"participation-card"} key={props.participation}>

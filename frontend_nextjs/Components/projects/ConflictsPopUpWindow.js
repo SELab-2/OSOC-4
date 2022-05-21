@@ -23,11 +23,12 @@ export default function ConflictsPopUpWindow(props) {
   const [loading, setLoading] = useState(false);
 
   /**
-   * This function is called when currentStudent changes
+   * This function is called when currentStudent or conflicts changes. It loads the correct current student depending
+   * on the current page.
    */
   useEffect(() => {
     setLoading(true);
-    if (currentStudentIndex >= props.conflicts.length || currentStudentIndex < 0) {
+    if (currentStudentIndex && (currentStudentIndex >= props.conflicts.length || currentStudentIndex < 0)) {
       setCurrentStudentIndex(props.conflicts.length - 1);
     }
     
@@ -85,52 +86,44 @@ export default function ConflictsPopUpWindow(props) {
           Conflicts
         </ModalTitle>
       </ModalHeader>
-      <Modal.Body className="modalbody-margin"> 
-        <>
+      <Modal.Body className="modalbody-margin">
         <p>
           Some students were assigned to two or more projects, please make sure every student is assigned to only one project.
         </p>
 
-        <Row>
         <Row style={{height: "300px"}}>
-        {(loading)? <LoadingPage/> :
-        (currentStudent)?
-            <>
-            <Row>
-              <Col md="auto">
-                <h4>
-                  {currentStudent["mandatory"] ? currentStudent["mandatory"]["first name"] : ""} {currentStudent["mandatory"] ? currentStudent["mandatory"]["last name"] : ""}
-                </h4>
-              </Col>
-            </Row>
-            <ul style={{overflow:"auto", height: "250px"}}>
-              {currentStudent.participations.map(
-              participation =>
-                <ParticipationCard key={participation.project} participation={participation} student={currentStudent}/>)}
-            </ul>
-            </>
-          : null}
-          </Row>
-
-          <Row>
-            <Col/>
-            <Col md="auto">
+          {(loading)? <LoadingPage /> :
+          (currentStudent) &&
+              [
               <Row>
-                <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
-              </Row>
-              <Row >
-                <Col md="auto"><Hint message="Previous conflict"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Hint></Col>
-                <Col md="auto"><Hint message="Next conflict"><button className="prevnextbutton" onClick={nextStudent}>&#8250;</button></Hint></Col>
-              </Row>
-            </Col>
-          </Row>
-          
+                <Col md="auto">
+                  <h4>
+                    {currentStudent["mandatory"] ? currentStudent["mandatory"]["first name"] : ""} {currentStudent["mandatory"] ? currentStudent["mandatory"]["last name"] : ""}
+                  </h4>
+                </Col>
+              </Row>,
+              <ul style={{overflow:"auto", height: "250px"}}>
+                {currentStudent.participations.map(
+                participation =>
+                  <ParticipationCard key={participation.project} participation={participation} student={currentStudent}/>)}
+              </ul>
+              ]
+            }
         </Row>
 
-
-        
-       
-        </>
+        <Row>
+          <Col/>
+          <Col md="auto">
+            <Row>
+              <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
+            </Row>
+            <Row >
+              <Col md="auto"><Hint message="Previous conflict"><button className="prevnextbutton" onClick={previousStudent}>&#8249;</button></Hint></Col>
+              <Col md="auto"><Hint message="Next conflict"><button className="prevnextbutton" onClick={nextStudent}>&#8250;</button></Hint></Col>
+            </Row>
+          </Col>
+        </Row>
+          
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={onHide}>Close</Button>

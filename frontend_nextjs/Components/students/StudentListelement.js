@@ -49,7 +49,10 @@ export default function StudentListelement(props) {
     return colors[props.student.decision];
   }
 
-
+  /**
+   * Get the border color for the student.
+   * @returns {string} the color for the student.
+   */
   function getBorder() {
     if (!isSelected(props.student)) {
       return "var(--not-selected-gray)"
@@ -113,8 +116,8 @@ export default function StudentListelement(props) {
   /**
    * Indicates whether a student is included in the selection.
    *
-   * @param student
-   * @returns boolean
+   * @param student the student to check for.
+   * @returns boolean True if the student is select, false if not.
    */
   function isSelected(student) {
     return props.selectedStudents.includes(student) || props.selectedStudents.includes(student.id)

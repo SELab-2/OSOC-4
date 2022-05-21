@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import deleteIcon from '../../public/assets/delete.svg';
 import editIcon from '../../public/assets/edit.svg';
 import saveIcon from '../../public/assets/save.svg';
 import Image from "next/image";
-import {cache, Url} from "../../utils/ApiClient";
+import { cache, Url } from "../../utils/ApiClient";
 import Hint from "../Hint";
 
 /**
@@ -33,7 +33,7 @@ export default function QuestionTag(props) {
      */
     const handleChange = (event) => {
         event.preventDefault()
-        const {name, value} = event.target;
+        const { name, value } = event.target;
         setQuestionTag(prevState => ({
             ...prevState,
             [name]: value
@@ -46,16 +46,16 @@ export default function QuestionTag(props) {
      * @param event The click event on the checkbox
      */
     const handleCheckboxChange = (event) => {
-        const {name, checked} = event.target;
+        const { name, checked } = event.target;
 
-        let newQuestionTag = {...previousTag};
+        let newQuestionTag = { ...previousTag };
         newQuestionTag[name] = checked;
         Url.fromUrl(previousTag["url"]).setBody(newQuestionTag).patch().then(res => {
             setPreviousTag(newQuestionTag);
             cache.clear();
         })
 
-        newQuestionTag = {...questionTag};
+        newQuestionTag = { ...questionTag };
         newQuestionTag[name] = checked;
         setQuestionTag(newQuestionTag);
     }
@@ -83,9 +83,9 @@ export default function QuestionTag(props) {
         event.preventDefault();
         setSaving(true);
         let requirements = [questionTag["tag"].length > 0,
-            props.questionTags.every(qt => qt["tag"] !== questionTag["tag"] || qt["url"] === questionTag["url"]),
-            questionTag["question"].length > 0,
-            props.questionTags.every(qt => qt["question"] !== questionTag["question"] || qt["url"] === questionTag["url"])];
+        props.questionTags.every(qt => qt["tag"] !== questionTag["tag"] || qt["url"] === questionTag["url"]),
+        questionTag["question"].length > 0,
+        props.questionTags.every(qt => qt["question"] !== questionTag["question"] || qt["url"] === questionTag["url"])];
         if (requirements.every(req => req)) {
             Url.fromUrl(questionTag["url"]).setBody(questionTag).patch().then(res => {
                 if (previousTag["tag"] !== questionTag["tag"]) {
@@ -113,22 +113,22 @@ export default function QuestionTag(props) {
                 {(previousTag["mandatory"] || !props.edited) ? (
                     <p>{previousTag["tag"]}</p>
                 ) : (
-                    <input name="tag" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange}/>
+                    <input name="tag" placeholder="Tag" value={questionTag["tag"]} onChange={handleChange} />
                 )
                 }
             </td>
             <td>
                 {(props.edited) ? <input name="question" placeholder="Question" value={questionTag["question"]}
-                                         onChange={handleChange}/> :
-                    <p>{previousTag["question"]}</p>}
+                    onChange={handleChange} /> :
+                    <p style={{ color: (previousTag["error"] ? "red" : "black") }}>{previousTag["question"]}</p>}
 
             </td>
             <td>
                 {(!previousTag["mandatory"]) &&
-                <Hint message="Show in the students list">
-                    <input name="show_in_list" type="checkbox" checked={previousTag["show_in_list"]}
-                           onChange={handleCheckboxChange}/>
-                </Hint>
+                    <Hint message="Show in the students list">
+                        <input name="show_in_list" type="checkbox" checked={previousTag["show_in_list"]}
+                            onChange={handleCheckboxChange} />
+                    </Hint>
                 }
             </td>
             <td>
@@ -139,15 +139,15 @@ export default function QuestionTag(props) {
                             props.setEdited(previousTag["url"]);
                             setQuestionTag(previousTag);
                         }}>
-                            <Image src={editIcon} height="30px"/>
+                            <Image src={editIcon} height="30px" />
                         </button>
                     </Hint>}
                 {saving && <p>Saving</p>}
-                {props.edited && 
+                {props.edited &&
                     <Hint message="Save">
-                    <button className="table-button" onClick={handleSubmit}>
-                        <Image src={saveIcon} height="30px"/>
-                    </button>
+                        <button className="table-button" onClick={handleSubmit}>
+                            <Image src={saveIcon} height="30px" />
+                        </button>
                     </Hint>}
 
                 {/* {
@@ -171,7 +171,7 @@ export default function QuestionTag(props) {
                 {(!previousTag["mandatory"]) &&
                     <Hint message="Delete question-tag">
                         <button onClick={deleteTag} className="table-button">
-                            <Image src={deleteIcon} className="questionTag-image"/>
+                            <Image src={deleteIcon} className="questionTag-image" />
                         </button>
                     </Hint>
                 }
