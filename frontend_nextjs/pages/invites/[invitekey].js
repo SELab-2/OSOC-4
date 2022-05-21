@@ -7,6 +7,11 @@ import logoScreen from '../../public/assets/osoc-screen.png';
 import Image from 'next/image'
 import { ToastContainer, toast } from 'react-toastify';
 
+/**
+ * This component represents the invite page, which you see when you open an invitation link.
+ * @returns {JSX.Element} The component that renders the invite page.
+ * @constructor
+ */
 const Invite = () => {
     const router = useRouter()
     const { invitekey } = router.query
@@ -17,18 +22,36 @@ const Invite = () => {
     const [password, setPassword] = useState("");
     const [validatePassword, setValidatePassword] = useState("");
 
+    /**
+     * Called when the password field is changed, it adjusts the password state variable.
+     * @param event the event of changing the password field.
+     */
     const handleChangePassword = (event) => {
         setPassword(event.target.value);
     }
 
+    /**
+     * Called when the validation password field is changed, it adjusts the validation password state variable.
+     * @param event The event of changing the validation password field.
+     */
     const handleChangeValidationPassword = (event) => {
         setValidatePassword(event.target.value);
     }
 
+    /**
+     * Called when the name field is changed, it adjusts the name state variable.
+     * @param event The event of changing the name field.
+     */
     const handleChangeName = (event) => {
         setName(event.target.value);
     }
 
+    /**
+     * Called when the fields are submitted. It posts the invite to the database if the passwords are valid and
+     * the same.
+     * @param event the event of pushing the submit button.
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (password <= 11) { toast.error("The new password is to short, it should be at least 12 characters long"); return; }
@@ -46,6 +69,9 @@ const Invite = () => {
         }
     }
 
+    /**
+     * This useEffect sets the validKey state variable on change of the inviteKey state variable.
+     */
     useEffect(async () => {
         const resp = await Url.fromName(api.invite).extend(`/${invitekey}`).get();
 
@@ -55,6 +81,10 @@ const Invite = () => {
         setLoading(false);
     }, [invitekey])
 
+    /**
+     * If the page is loading, return the loading animation.
+     * If there is not a valid key, show the message.
+     */
     if (loading) {
         return <LoadingPage />
     }
@@ -62,6 +92,9 @@ const Invite = () => {
         return <h1>Not a valid invite</h1>
     }
 
+    /**
+     * Return the html of the invite page.
+     */
     return (
         <div className='body-login'>
             <section className="body-left">

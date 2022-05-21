@@ -54,7 +54,7 @@ function Settings() {
     }
 
     /**
-     * If the page is loading, return the loading animation.
+     * If the page is loading, show the loading animation.
      */
     if (loading) {
         return (<LoadingPage/>);
