@@ -1,6 +1,11 @@
 import { RotateCircleLoading } from 'react-loadingg';
 
-export default function LoadingPage(props) {
+/**
+ * This component shows a loading animation.
+ * @returns {JSX.Element} A component that renders a loading animation.
+ * @constructor
+ */
+export default function LoadingPage() {
     return (
         <RotateCircleLoading />
     );
