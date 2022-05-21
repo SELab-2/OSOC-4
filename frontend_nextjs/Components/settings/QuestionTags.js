@@ -117,9 +117,13 @@ export default function QuestionTags(props) {
         setQuestionTags(newQuestionTags);
     }
 
+    /**
+     * If the component is loading, return the loading animation.
+     */
     if (loading) {
         return (<LoadingPage/>);
     }
+
     /**
      * The html that renders the question tags.
      */

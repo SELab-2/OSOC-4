@@ -31,6 +31,9 @@ function Settings() {
     const [loading, setLoading] = useState(true)
 
 
+    /**
+     * This useEffect initializes the 'me' state variable.
+     */
     useEffect(() => {
             Url.fromName(api.myself).get().then(res => {
                 if (res.success) {
@@ -50,10 +53,16 @@ function Settings() {
         setDarkTheme(!darkTheme)
     }
 
+    /**
+     * If the page is loading, return the loading animation.
+     */
     if (loading) {
         return (<LoadingPage/>);
     }
 
+    /**
+     * Return the html of the settings page.
+     */
     return (
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
