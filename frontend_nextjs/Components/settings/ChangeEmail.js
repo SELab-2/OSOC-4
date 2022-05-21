@@ -23,10 +23,10 @@ export default function ChangeEmail(props) {
         let response = await Url.fromName(api.myself).extend("/change-email").post();
         if (response.success){
             setSaving(false);
-            toast.success(response.data["message"]);
+            toast.success("Request sent succesfully. You will be logged out");
             await setTimeout(function(){
                 signOut();
-            }, 3500);
+            }, 4000);
         } else {
             toast.error("Something went wrong, please try again");
             setSaving(false);
@@ -42,10 +42,9 @@ export default function ChangeEmail(props) {
                 There you will get a link which will allow you to change your current accounts e-mailadres to the e-mailadres of your choosing.
                 <br/><b>You will be automatically logged out after requesting the email to change your e-mailaddress!</b></p>
             <p>Current e-mail adress: <span className={"details-info"}>{props.user.email}</span> </p>
-            {!saving && <Button variant="primary" onClick={requestNewEmail}>Request new e-mailadres</Button>}
-            {saving && 
+            {saving ?
             <Button variant="primary" disabled>
-            Sending email...
+            Requesting new emailaddress...
             <Spinner
                 as="span"
                 animation="border"
@@ -53,8 +52,10 @@ export default function ChangeEmail(props) {
                 role="status"
                 aria-hidden="true"
             />
-            </Button>}
-            <ToastContainer autoClose={3500}/>
+            </Button>
+            :
+            <Button variant="primary" onClick={requestNewEmail}>Request new e-mailaddress</Button>}
+            <ToastContainer autoClose={4000}/>
         </div>
     )
 }

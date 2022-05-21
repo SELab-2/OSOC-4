@@ -3,6 +3,7 @@
 from app.crud import read_where, update
 from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidChangeKeyException
+from app.exceptions.user_exceptions import EmailsDoNotMatchException
 from app.utils.checkers import check_key
 from app.utils.response import response
 from app.models.user import UserResetEmail
@@ -25,7 +26,7 @@ async def valid_changekey(changekey: str, session: AsyncSession = Depends(get_se
     :return: response message
     :rtype: dict
     """
-    print(changekey)
+
     valid = await check_key(changekey, "C", session)
     if valid:
         return response(None, "Valid change email key")
@@ -39,7 +40,7 @@ async def use_changekey(changekey: str, data: UserResetEmail = Body(...),
 
     :param use_changekey: the reset key
     :type use_changekey: str
-    :param data: the change data (the new email passwords), defaults to Body(...)
+    :param data: the change data (the new emails), defaults to Body(...)
     :type data: UserResetEmail, optional
     :param session: the session object, defaults to Depends(get_session)
     :type session: AsyncSession, optional
@@ -48,11 +49,13 @@ async def use_changekey(changekey: str, data: UserResetEmail = Body(...),
     :return: a response message
     :rtype: dict
     """
-    print("Hier geraakt")
     if changekey[0] != "C":
         raise InvalidChangeKeyException()
 
     userid = db.redis.get(changekey)  # check that the inv key exists
+
+    if data.email != data.validateEmail:
+        raise EmailsDoNotMatchException()
 
     if userid:
         user = await read_where(User, User.id == int(userid), session=session)

@@ -6,7 +6,7 @@ import LoadingPage from "../../Components/LoadingPage"
 import { api, Url } from "../../utils/ApiClient";
 import logoScreen from '../../public/assets/osoc-screen.png';
 import Image from 'next/image'
-import { Spinner, Button } from "react-bootstrap";
+import { Spinner, Button, Form } from "react-bootstrap";
 
 const ChangeKey = () => {
     const router = useRouter();
@@ -14,11 +14,15 @@ const ChangeKey = () => {
     const [validKey, setValidKey] = useState(false);
     const [loading, setLoading] = useState(true);
     const [email, setEmail] = useState("");
+    const [validateEmail, setValidateEmail] = useState("");
     const [saving, setSaving] = useState(false);
-    const [fail, setFail] = useState(false);
 
     const handleChangeEmail = (event) => {
         setEmail(event.target.value);
+    }
+
+    const handleChangeValidateEmail = (event) => {
+        setValidateEmail(event.target.value);
     }
 
     useEffect(async () => {
@@ -34,8 +38,10 @@ const ChangeKey = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setSaving(true);
-        setFail(false);
-        const data = {"email": email}
+        const data = {
+            "email": email,
+            "validateEmail": validateEmail
+        }
         const resp = await Url.fromName(api.change).extend(`/${changekey}`).setBody(data).post();
 
         if (resp.success) {
@@ -49,11 +55,6 @@ const ChangeKey = () => {
             setFail(true);
             toast.error("Something went wrong, please try again");
         }
-    }
-
-    const tryAgain = (event) => {
-        setFail(false);
-        setEmail("");
     }
 
     if (loading) {
@@ -74,28 +75,30 @@ const ChangeKey = () => {
                 <div className="login-container">
                     <p className="welcome-message">Reset your email</p>
                     <div className="login-form">
-                        <input type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="New email" />
-                        {!saving && ! fail &&
-                        <button className="submit" onClick={handleSubmit}>
-                            Submit
-                        </button>}
-                        {saving && 
-                        <Button variant="primary" disabled>
-                        Changing email...
-                        <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                        />
-                      </Button>}
-
-                        {fail && 
-                        <button className="submit" onClick={tryAgain}>
-                        Try again
-                        </button>}
-
+                        <Form onSubmit={handleSubmit}>
+                            <Form.Group>
+                                <Form.Label>New email address</Form.Label>
+                                <Form.Control type="email" name="email" value={email} onChange={handleChangeEmail} placeholder="New email"/>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Repeat new email address</Form.Label>
+                                <Form.Control type="email" name="validateEmail" value={validateEmail} onChange={handleChangeValidateEmail} placeholder="Confirm email" />
+                                {email !== validateEmail && <Form.Text id="validateEmailHelpBlock" muted>Email should be the same!</Form.Text>}
+                            </Form.Group>
+                            {saving ?
+                                <Button variant="primary" disabled className="submit">
+                                Changing email...
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                                </Button> 
+                                :
+                                <Button variant="primary" type="submit" className="submit" disabled={email !== validateEmail || email === ""}>Change email</Button>}
+                        </Form>
                     </div>
                 </div>
             </section>
