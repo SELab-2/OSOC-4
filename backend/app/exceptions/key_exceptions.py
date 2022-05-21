@@ -34,4 +34,16 @@ class InvalidChangeKeyException(BaseException):
     def __init__(self):
         """__init__ inits parent class with status code and message
         """
-        super().__init__(400, "The change key is invalid or has expired")   
+        super().__init__(400, "The change key is invalid or has expired") 
+
+
+
+class InvalidConfirmKeyException(BaseException):
+    """InvalidConfirmKeyException exception for invalid confirm key
+
+    :param BaseException: inherits from BaseException
+    """
+    def __init__(self):
+        """__init__ inits parent class with status code and message
+        """
+        super().__init__(400, "The confirm key is invalid or has expired")

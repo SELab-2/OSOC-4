@@ -29,11 +29,12 @@ import Invite from "./invites/[invitekey]";
 import Reset from "./resetpassword/[resetkey]";
 import ChangeKey from './change/[changekey]';
 import { WebsocketProvider } from "../Components/WebsocketProvider"
+import ConfirmKey from './confirm/[confirmkey]';
 
 function MyApp({ Component, pageProps }) {
   const [interval, setInterval] = useState(0);
 
-  const no_auth = [Login, Invite, Reset, ChangeKey];
+  const no_auth = [Login, Invite, Reset, ChangeKey, ConfirmKey];
 
 
   return (

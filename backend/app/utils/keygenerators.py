@@ -73,3 +73,19 @@ def generate_new_change_email_key() ->Tuple[str, int]:
         invite_key = "C" + generate_random_key(20)
 
     return invite_key, change_email_expire
+
+
+def generate_new_confirm_email_key() ->Tuple[str, int]:
+    """generate_new_confirm_email_key generate confirm email key
+
+    :return: confirm email key and confirm email expire
+    :rtype: Tuple[str, int]
+    """
+    confirm_email_expire: int = timedelta(minutes=int(CHANGE_EMAIL_EXPIRE))
+
+    invite_key = "X" + generate_random_key(20)
+    # make sure the invite key is unique
+    while db.redis.get(invite_key):
+        invite_key = "X" + generate_random_key(20)
+
+    return invite_key, confirm_email_expire

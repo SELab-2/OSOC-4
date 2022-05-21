@@ -1,15 +1,16 @@
 """ This module includes the change email endpoints """
 
-from app.crud import read_where, update
+from app.crud import read_where
 from app.database import db, get_session
 from app.exceptions.key_exceptions import InvalidChangeKeyException
 from app.utils.checkers import check_key
+from app.utils.keygenerators import generate_new_confirm_email_key
+from app.utils.mailsender import send_confirm_email_email
 from app.utils.response import response
 from app.models.user import UserResetEmail
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.user import User, UserResetPassword
-from app.exceptions.permissions import NotPermittedException
+from app.models.user import User
 
 router = APIRouter(prefix="/change")
 
@@ -25,12 +26,15 @@ async def valid_changekey(changekey: str, session: AsyncSession = Depends(get_se
     :return: response message
     :rtype: dict
     """
-    print(changekey)
+
     valid = await check_key(changekey, "C", session)
     if valid:
         return response(None, "Valid change email key")
     else:
         raise InvalidChangeKeyException()
+
+
+        
 
 @router.post("/{changekey}")
 async def use_changekey(changekey: str, data: UserResetEmail = Body(...),
@@ -56,17 +60,27 @@ async def use_changekey(changekey: str, data: UserResetEmail = Body(...),
 
     if userid:
         user = await read_where(User, User.id == int(userid), session=session)
+        if user:
+            confirm_key, confirm_expires = generate_new_confirm_email_key()
+            db.redis.setex(confirm_key, confirm_expires, str(user.id))
+            # send email to user with the confirm key
+            send_confirm_email_email(data.email, confirm_key)
+            return response(None, "Confirm email sent successfully")
 
-        if not user:
-            raise NotPermittedException()
+        raise InvalidChangeKeyException()
 
-        if not user.active:
-            raise NotPermittedException()
+        # user = await read_where(User, User.id == int(userid), session=session)
 
-        user.email = data.email
+        # if not user:
+        #     raise NotPermittedException()
 
-        await update(user, session=session)
-        db.redis.delete(changekey)
+        # if not user.active:
+        #     raise NotPermittedException()
+
+        # user.email = data.email
+
+        # await update(user, session=session)
+        # db.redis.delete(changekey)
 
         return response(None, "New email successfully set, you can now login with your new email")
 

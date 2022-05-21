@@ -185,6 +185,7 @@ class API {
     invite = "invite";
     resetpassword = "resetpassword";
     change = "change";
+    confirm = "confirm"
 
     // the api.[name] fields
     me = "me";
@@ -211,6 +212,7 @@ class API {
         invite: this.baseUrl + "/invite",
         resetpassword: this.baseUrl + "/resetpassword",
         change: this.baseUrl + "/change",
+        confirm: this.baseUrl + "/confirm",
 
 
         me: null,

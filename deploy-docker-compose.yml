@@ -55,6 +55,7 @@ services:
       INVITE_EXPIRE: 4320 #in minutes
       PASSWORDRESET_EXPIRE: 30 # in minutes
       CHANGE_EMAIL_EXPIRE: 30 # in minutes
+      CONFIRM_EMAIL_EXPIRE: 30 # in minutes
       PATHPREFIX: /${PATHPREFIX}
       DOMAIN: https://sel2-4.ugent.be
       FRONTEND_URL: https://sel2-4.ugent.be/${PATHPREFIX}/frontend
