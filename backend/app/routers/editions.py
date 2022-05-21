@@ -4,7 +4,7 @@ import datetime
 from typing import Dict
 
 from app.config import config
-from app.crud import read_all_where, read_where, update
+from app.crud import delete, read_all_where, read_where, update
 from app.database import get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
@@ -374,15 +374,15 @@ async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depen
         raise QuestionTagCantBeModified()
 
     if questiontag.question and len(questiontag.question.question_answers) == 0:
+
+        qu = questiontag.question
+
         # delete the unused question
         questiontag.question_id = None
         await update(questiontag, session=session)
+        await delete(qu, session=session)
 
-        await session.delete(questiontag.question)
-        await session.commit()
-
-    await session.delete(questiontag)
-    await session.commit()
+    await delete(questiontag, session=session)
 
 
 @router.patch("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
