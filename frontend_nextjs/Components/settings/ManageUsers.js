@@ -28,6 +28,9 @@ export default function ManageUsers(props) {
     const [sending, setSending] = useState(false);
     const [fail, setFail] = useState(false);
 
+    /**
+     * called when the manage users component is closed.
+     */
     const handleClose = () => {
         setFail(false);
         setSent(false);
@@ -36,6 +39,9 @@ export default function ManageUsers(props) {
         setToInvite("");
     }
 
+    /**
+     * Called when the 'try again' is pushed.
+     */
     const handleTryAgain = () => {
         setFail(false);
         setSent(false);
@@ -43,13 +49,23 @@ export default function ManageUsers(props) {
         setToInvite("");
     }
 
+    /**
+     * called when ManageUsers needs to be showed.
+     */
     const handleShow = () => setShow(true);
 
+    /**
+     * Called when the 'search names' field has changed. It searches for the current value of the text field.
+     * @param event the event of changing the 'search names' field.
+     */
     const handleSearch = (event) => {
         setSearch(event.target.value);
         applyFilters(event.target.value, filters);
     };
 
+    /**
+     * This function sets the state variables users and shownUsers.
+     */
     useEffect(() => {
         if (Boolean(props.initialize)) {
             if (!users.length && !loading) {
@@ -130,6 +146,11 @@ export default function ManageUsers(props) {
         applyFilters(search, temp);
     }
 
+    /**
+     * Filter the users, it sets the shownUsers to the users that pass the filters.
+     * @param newSearch The search value on which the users must be filtered.
+     * @param newFilters the filters 'show all users', 'show aproved', 'show unapproved' and 'show inactive'.
+     */
     function applyFilters(newSearch, newFilters) {
         let filtered = users;
 
@@ -143,6 +164,9 @@ export default function ManageUsers(props) {
         setShownUsers([...filtered]);
     }
 
+    /**
+     * Return the html of the ManageUsers component.
+     */
     return (
         <div>
             <Button variant="primary" onClick={handleShow} className="invite-users-button">

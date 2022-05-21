@@ -13,6 +13,10 @@ export default function ChangeName(props) {
     const [name, setName] = useState(props.user.name)
     const [changeName, setChangeName] = useState(props.user.name)
 
+    /**
+     * This function is called when the name text field is changed. It changes the changeName state variable.
+     * @param event the event of changing the text field.
+     */
     const handleChangeName = (event) => {
         event.preventDefault()
         setChangeName(event.target.value)
@@ -32,6 +36,9 @@ export default function ChangeName(props) {
         }
     }
 
+    /**
+     * The html of the ChangeName component.
+     */
     return (
         <div>
             <p>Current name: <span className={"details-info"}>{name}</span></p>

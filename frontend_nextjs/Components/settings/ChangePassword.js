@@ -13,18 +13,30 @@ export default function ChangePassword(props) {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [changedSuccess, setChangedSuccess] = useState(false);
 
+    /**
+     * This function handles the change of the current password field. It changes the currentPassword state variable.
+     * @param event the event of changing the currentPassword field.
+     */
     const handleChangeCurrentPassword = (event) => {
         event.preventDefault()
         setChangedSuccess(false)
         setCurrentPassword(event.target.value);
     }
 
+    /**
+     * This function handles the change of the new password field. It changes the newPassword state variable.
+     * @param event the event of changing the newPassword field.
+     */
     const handleChangeNewPassword = (event) => {
         event.preventDefault()
         setChangedSuccess(false)
         setNewPassword(event.target.value);
     }
 
+    /**
+     * This function handles the change of the confirm password field. It changes the confirmPassword state variable.
+     * @param event the event of changing the confirmPassword field.
+     */
     const handleChangeConfirmPassword = (event) => {
         event.preventDefault()
         setChangedSuccess(false)
@@ -49,6 +61,9 @@ export default function ChangePassword(props) {
         }
     }
 
+    /**
+     * Return the html of the ChangePassword component.
+     */
     return(
         <Form onSubmit={handleSubmitChange}>
             <Form.Group className="mb-3" controlId="currentPassword">

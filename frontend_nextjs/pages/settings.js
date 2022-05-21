@@ -31,6 +31,9 @@ function Settings() {
     const [loading, setLoading] = useState(true)
 
 
+    /**
+     * This useEffect initializes the 'me' state variable.
+     */
     useEffect(() => {
             Url.fromName(api.myself).get().then(res => {
                 if (res.success) {
