@@ -13,6 +13,7 @@ import Link from 'next/link';
 export default function NavHeader(props) {
     async function logoutHandler(event) {
         event.preventDefault();
+        localStorage.clear();
         await signOut()
     }
 
