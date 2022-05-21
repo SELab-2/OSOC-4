@@ -127,7 +127,7 @@ async def add_dummy_data(session: AsyncSession = Depends(get_session)):
 
     student_generator = StudentGenerator(session, edition, skills)
     # generate students without suggestions
-    student_generator.generate_students(0)
+    student_generator.generate_students(50)
     student_generator.add_to_db()
 
     suggestions = []
