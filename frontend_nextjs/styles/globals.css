@@ -46,3 +46,11 @@ input {
   border-color: var(--gray1) !important;
   padding-left: 7px;
 }
+
+.btn-primary{
+  font-weight: bold !important;
+}
+
+.btn-secondary{
+  font-weight: bold !important;
+}
