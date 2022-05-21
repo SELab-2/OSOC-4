@@ -69,12 +69,12 @@ export default function ChangePassword(props) {
                 <Form.Group className="mb-3" controlId="newPassword">
                     <Form.Label>New password</Form.Label>
                     <Form.Control type="password" placeholder="New password" value={newPassword} onChange={handleChangeNewPassword}/>
-                    {newPassword.length < 11 &&<Form.Text id="passwordHelpBlock" muted>Password should be at least 12 characters long!</Form.Text>}
+                    {newPassword.length <= 11 &&<Form.Text id="passwordHelpBlock" muted>Password should be at least 12 characters long!</Form.Text>}
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="confirmPassword">
                     <Form.Label>Repeat new password</Form.Label>
                     <Form.Control type="password" placeholder="Confirm password" value={confirmPassword} onChange={handleChangeConfirmPassword}/>
-                    {newPassword !== confirmPassword && <Form.Text id="passwordHelpBlock" muted>Passwords do not match!</Form.Text>}
+                    {newPassword !== confirmPassword && <Form.Text id="confirmPasswordHelpBlock" muted>Passwords do not match!</Form.Text>}
                 </Form.Group>
                 {saving ?
                     <Button variant="primary" disabled>

@@ -6,21 +6,24 @@ import { api, Url } from "../../utils/ApiClient";
 import logoScreen from '../../public/assets/osoc-screen.png';
 import Image from 'next/image'
 import { ToastContainer, toast } from 'react-toastify';
+import { Form, Button, Spinner } from 'react-bootstrap';
 
 const Reset = () => {
     const router = useRouter()
     const { resetkey } = router.query
     const [validKey, setValidkey] = useState(false);
     const [loading, setLoading] = useState(true);
-
+    const [saving, setSaving] = useState(false);
     const [password, setPassword] = useState("");
     const [validatePassword, setValidatePassword] = useState("");
 
     const handleChangePassword = (event) => {
+        event.preventDefault();
         setPassword(event.target.value);
     }
 
     const handleChangeValidationPassword = (event) => {
+        event.preventDefault();
         setValidatePassword(event.target.value);
     }
 
@@ -28,7 +31,7 @@ const Reset = () => {
         event.preventDefault();
         if (password <= 11) { toast.error("The new password is to short, it should be at least 12 characters long"); return; }
         if (password !== validatePassword) { toast.error("The two passwords don't match."); return; }
-
+        setSaving(true);
         const data = {
             "password": password,
             "validate_password": validatePassword
@@ -36,8 +39,18 @@ const Reset = () => {
         const resp = await Url.fromName(api.resetpassword).extend(`/${resetkey}`).setBody(data).post();
 
         if (resp.success) {
+            setSaving(false);
             toast.success(resp.data["message"]);
-            await router.push('/login');
+            setPassword("");
+            setValidatePassword("");
+            await setTimeout(function(){
+                router.push('/login');
+            }, 4000);
+        } else {
+            setSaving(false);
+            toast.error("Something went wrong, please try again");
+            setPassword("");
+            setValidatePassword("");
         }
     }
 
@@ -65,19 +78,36 @@ const Reset = () => {
             <section className='body-right'>
                 <div className="login-container">
                     <p className="welcome-message">Reset your password</p>
-                    <div className="login-form">
-                        <input type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password" />
-                        {(password.length > 11) ? <p className='text-right'>Password is at least 12 characters long</p> : (<p className='text-wrong'>Password should be at least 12 characters long!</p>)}
-                        <input type="password" name="validatePassword" value={validatePassword} onChange={handleChangeValidationPassword} placeholder="Confirm password" />
-                        {(password !== "" && password === validatePassword) ? <p className='text-right'>Password are the same</p> : (<p className='text-wrong'>Passwords should be the same!</p>)}
-                        <button className="submit" onClick={handleSubmit}>
-                            Submit
-                        </button>
-
+                    <div className="login-container">
+                        <Form onSubmit={handleSubmit}>
+                            <Form.Group>
+                                <Form.Label>New password</Form.Label>
+                                <Form.Control type="password" name="password" value={password} onChange={handleChangePassword} placeholder="Password"/>
+                                {password.length <= 11 && <Form.Text id="passwordHelpBlock" muted>Password should be at least 12 characters long!</Form.Text>}
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Repeat new password</Form.Label>
+                                <Form.Control type="password" name="validatePassword" value={validatePassword} onChange={handleChangeValidationPassword} placeholder="Confirm password" />
+                                {password !== validatePassword && <Form.Text id="confirmPasswordHelpBlock" muted>Passwords should be the same!</Form.Text>}
+                            </Form.Group>
+                            {saving ?
+                                <Button variant="primary" disabled className="submit">
+                                Changing password...
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                                </Button> 
+                                :
+                                <Button variant="primary" type="submit" className="submit" disabled={password.length <= 11 || password !== validatePassword}>Change password</Button>}
+                        </Form>
                     </div>
                 </div>
             </section>
-            <ToastContainer />
+            <ToastContainer autoClose={4000}/>
         </div>
 
 
