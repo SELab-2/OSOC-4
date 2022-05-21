@@ -6,6 +6,10 @@ import NavHeader from "../Components/NavHeader"
 import { cache } from "../utils/ApiClient";
 import { useWebsocketContext } from './WebsocketProvider'
 
+/**
+ * This component makes sure that only authorized users can access certain pages. It also redirects unauthorized users to login page.
+ * @param props this includes all the children components and a boolean auth that represents if the page that must be shown is authorized or not.
+*/
 export default function RouteGuard(props) {
     const router = useRouter()
     const { data: session, status, token } = useSession()
@@ -23,10 +27,15 @@ export default function RouteGuard(props) {
 
     }, [router, isUser, props.auth, status, websocketConn])
 
+    /**
+     * Create a websocket connection + handle the states
+     */
     function connect() {
         // make a websocket connection
         setCreatingConnection(true)
         let newwebconn = new WebSocket((process.env.NEXT_API_URL + "/ws").replace("http", "ws").replace("https", "ws"))
+
+        // update the cache if a message is received (this is needed so the cache is up to date)
         newwebconn.addEventListener("message", (event) => {
             cache.updateCache(event.data, session["userid"])
         })
