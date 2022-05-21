@@ -17,11 +17,15 @@ import Hint from "../Hint";
  * @returns {JSX.Element} A table row that represents a question tag.
  */
 export default function QuestionTag(props) {
+    // The current questiontag in the database.
     const [previousTag, setPreviousTag] = useState({});
+    // The questiontag as edited locally.
     const [questionTag, setQuestionTag] = useState({});
     const [saving, setSaving] = useState(false);
-    const [fail, setFail] = useState(false);
 
+    /**
+     * useEffect sets the state variable previousTag every time the props.questiontag changes.
+     */
     useEffect(() => {
         setPreviousTag(props.questionTag);
     }, [props.questionTag]);
@@ -29,7 +33,7 @@ export default function QuestionTag(props) {
     /**
      * This function is called when the tag name or question are edited. It changes their value in the questionTag
      * variable.
-     * @param event
+     * @param event the event of changing the questiontag.
      */
     const handleChange = (event) => {
         event.preventDefault()

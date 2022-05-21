@@ -25,7 +25,9 @@ export default function EditionSettings() {
     const [failed, setFailed] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    // fetch the current edition and all the other editions
+    /**
+     * fetch the current edition and all the other editions
+     */
     useEffect(() => {
         async function fetch() {
             const res = await Url.fromName(api.current_edition).get()
@@ -50,6 +52,11 @@ export default function EditionSettings() {
         setEditionList([edition, ...editionList]);
     }
 
+    /**
+     * Handle the event of pressing the save button. The edition is patched to the database.
+     * @param event The event of pressing the save button.
+     * @returns {Promise<void>}
+     */
     async function handleSaved(event) {
         event.preventDefault();
         setSaving(true);
@@ -68,6 +75,10 @@ export default function EditionSettings() {
         })
     }
 
+    /**
+     * Called when pushing the 'edit' button. It changes the state variables so that the edition fields are editable.
+     * @param event
+     */
     const editClicked = (event) => {
         setNewEdition({"name": edition.name, "description": edition.description, "year": edition.year});
         setEditing(false);
@@ -75,6 +86,10 @@ export default function EditionSettings() {
         setEditing(true);
     }
 
+    /**
+     * Handle the 'try again' button.
+     * @param event the event of pushing the 'try again' button.
+     */
     const handleTryAgain = (event) => {
         setFailed(false)
     } 
@@ -88,10 +103,16 @@ export default function EditionSettings() {
         await setEdition({"year": edition.year, "name": edition.name});
     }
 
+    /**
+     * If the page is loading, return the loading animation.
+     */
     if (loading) {
         return (<LoadingPage/>);
     }
 
+    /**
+     * Return the html of the EditionSettings component.
+     */
     return (
         <div className="body-editiondetail">
             <Table>
