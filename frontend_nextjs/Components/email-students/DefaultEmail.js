@@ -1,7 +1,8 @@
-import { Button, Spinner, Row, Form } from "react-bootstrap";
+import { Button, Spinner, Row, Form} from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import { api, Url } from "../../utils/ApiClient";
 import { Card } from "react-bootstrap";
+import { ToastContainer, toast } from 'react-toastify';
 
 /***
  * This element makes a From with a title on the left, to change a default email
@@ -51,9 +52,11 @@ export default function DefaultEmail(props) {
     setSaving(true);
     Url.fromName(api.emailtemplates).extend("/" + props.templatename).setBody(template).patch().then(async res => {
       if (res.success){
+          toast.success("Default email changed succesfully");
           setPrevTemplate(template);
           setSaving(false);
       } else {
+        toast.error("Something went wrong, please try again");
         setSaving(false);
         setFail(true);
       }
@@ -87,6 +90,7 @@ export default function DefaultEmail(props) {
    */
   return (
     <>
+    <div>
       <Row>
         <Card>
           <Card.Body>
@@ -135,13 +139,14 @@ export default function DefaultEmail(props) {
             {(template.subject !== "" || template.template !== "") && ! editing && ! fail && <Button variant="primary" onClick={changeDefaultEmail}>Change default</Button>}
             {fail && 
               <div>
-                <p>Something went wrong, please try again</p>
                 <Button variant="primary" onClick={handleTryAgain}>Try again</Button>
                 <Button variant="secondary" onClick={close} className="invite-button">Close</Button>
               </div>}
           </Card.Body>
         </Card>
       </Row>
+      <ToastContainer autoClose={4000}/>
+      </div>
     </>
   )
 }
