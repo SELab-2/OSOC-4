@@ -1,5 +1,6 @@
 import React, {useState} from "react";
-import {Button, Form} from "react-bootstrap";
+import {Button, Form, Spinner} from "react-bootstrap";
+import { toast, ToastContainer } from "react-toastify";
 import {api, Url} from "../../utils/ApiClient";
 
 /**
@@ -10,23 +11,20 @@ import {api, Url} from "../../utils/ApiClient";
     const [editionYear, setEditionYear] = useState("");
     const [editionName, setEditionName] = useState("");
     const [editionDescription, setEditionDescription] = useState("");
-    const [changedSuccess, setChangedSuccess] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const handleChangeEditionYear = (event) => {
         event.preventDefault()
-        setChangedSuccess(false)
         setEditionYear(event.target.value);
     }
 
     const handleChangeEditionName = (event) => {
         event.preventDefault()
-        setChangedSuccess(false)
         setEditionName(event.target.value);
     }
 
     const handleChangeEditionDescription = (event) => {
         event.preventDefault()
-        setChangedSuccess(false)
         setEditionDescription(event.target.value);
     }
 
@@ -35,6 +33,7 @@ import {api, Url} from "../../utils/ApiClient";
      * @param event
      */
     async function handleSubmitChange(event){
+        setSaving(true);
         event.preventDefault()
         let body = {
             "year": editionYear,
@@ -43,27 +42,47 @@ import {api, Url} from "../../utils/ApiClient";
         }
 
         let response = await Url.fromName(api.editions).extend("/create").setBody(body).post();
-        if (response.success) { setChangedSuccess(true); props.addToEditionList(body)}
+        if (response.success) {
+            props.addToEditionList(body);
+            toast.success("Created new edition");
+        } else {
+            toast.error("Something went wrong, please try again");
+        }
+        setSaving(false);
+        setEditionYear("");
+        setEditionName("");
+        setEditionDescription("");
     }
 
     return(
-        <Form onSubmit={handleSubmitChange}>
-            <Form.Group className="mb-3" controlId="editionYear">
-                <Form.Label>Year</Form.Label>
-                <Form.Control type="text" placeholder="Year" value={editionYear} onChange={handleChangeEditionYear} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="editionName">
-                <Form.Label>Name</Form.Label>
-                <Form.Control type="text" placeholder="Name" value={editionName} onChange={handleChangeEditionName} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="editionDescription">
-                <Form.Label>Description</Form.Label>
-                <Form.Control type="text" placeholder="Description" value={editionDescription} onChange={handleChangeEditionDescription}/>
-            </Form.Group>
-            <Button variant="primary" type="submit">Create edition</Button>
-            <Form.Group>
-                {(changedSuccess)? (<Form.Text className="text-muted">Edition created!</Form.Text>) : null}
-            </Form.Group>
-        </Form>
+        <div>
+            <Form onSubmit={handleSubmitChange}>
+                <Form.Group className="mb-3" controlId="editionYear">
+                    <Form.Label>Year</Form.Label>
+                    <Form.Control type="text" placeholder="Year" value={editionYear} onChange={handleChangeEditionYear} />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="editionName">
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control type="text" placeholder="Name" value={editionName} onChange={handleChangeEditionName} />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="editionDescription">
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control type="text" placeholder="Description" value={editionDescription} onChange={handleChangeEditionDescription}/>
+                </Form.Group>
+                {saving ?
+                <Button variant="primary" disabled>
+                Creating new edition...
+                <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                />
+                </Button> 
+                :<Button variant="primary" type="submit">Create edition</Button>}
+            </Form>
+            <ToastContainer autoClose={4000}/>
+        </div>
     )
 }
