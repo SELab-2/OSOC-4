@@ -50,10 +50,16 @@ function Settings() {
         setDarkTheme(!darkTheme)
     }
 
+    /**
+     * If the page is loading, show the loading animation.
+     */
     if (loading) {
         return (<LoadingPage/>);
     }
 
+    /**
+     * Return the html of the settings page.
+     */
     return (
         <div className="body-settings">
             <Accordion defaultActiveKey="0">
