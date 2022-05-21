@@ -16,6 +16,9 @@ export default function DefaultEmail(props) {
   const [saving, setSaving] = useState(false);
   const [fail, setFail] = useState(false);
 
+  /**
+   * This useEffect initializes the template value.
+   */
   useEffect(() => {
     Url.fromName(api.emailtemplates).extend("/" + props.templatename).get().then(res => {
       if (res.success) {
@@ -59,6 +62,11 @@ export default function DefaultEmail(props) {
     
   }
 
+  /**
+   * When something went wrong during submitting the template and 'try again' is pressed, this function is called.
+   * It sets the template to its original value and enables editing.
+   * @param event
+   */
   const handleTryAgain = (event) => {
     setTemplate(prevTemplate);
     setEditing(true);
@@ -74,6 +82,9 @@ export default function DefaultEmail(props) {
     setFail(false);
   }
 
+  /**
+   * Return the html for the DefaultEmail component.
+   */
   return (
     <>
       <Row>

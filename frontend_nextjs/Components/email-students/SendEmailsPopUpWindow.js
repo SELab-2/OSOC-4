@@ -16,20 +16,14 @@ export default function SendEmailsPopUpWindow(props) {
   const [sending, setSending] = useState(false);
   const [sentSuccess, setSentSuccess] = useState(false);
 
-  // defines whether or not the pop up window must be shown
-  const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
-
-  const [selectedStudents, setSelectedStudents] = [props.selectedStudents, props.setSelectedStudents];
-
   /***
    * This function is called when the pop-up window is closed
    */
-
   function onHide() {
-    setSelectedStudents([]);
+    props.setSelectedStudents([]);
     setFail(false);
     setSentSuccess(false);
-    setPopUpShow(false);
+    props.setPopUpShow(false);
   }
 
   /***
@@ -48,14 +42,19 @@ export default function SendEmailsPopUpWindow(props) {
     })
   }
 
+  /**
+   * When something went wrong when sending emails and 'try again' is pushed, this method is called.
+   */
   function handleTryAgain(){
     setFail(false);
   }
 
-  // returns the html representation for the send emails pop up window
+  /**
+   * returns the html representation for the send emails pop up window
+   */
   return (
     <Modal
-      show={popUpShow}
+      show={props.popUpShow}
       onHide={() => onHide()}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
