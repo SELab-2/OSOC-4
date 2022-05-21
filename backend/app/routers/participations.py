@@ -97,8 +97,6 @@ async def delete_participation(student_id: str,
 
     # check edition
     student = await read_where(Student, Student.id == int(student_id), session=session)
-    if not student:
-        raise ParticipationNotFoundException()
     await EditionChecker(update=True)(student.edition_year, Authorize, session)
 
     await session.delete(participation)
