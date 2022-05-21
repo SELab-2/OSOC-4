@@ -80,7 +80,7 @@ const ChangeKey = () => {
                             Submit
                         </button>}
                         {saving && 
-                        <Button disabled className="submit">
+                        <Button variant="primary" disabled>
                         Changing email...
                         <Spinner
                             as="span"

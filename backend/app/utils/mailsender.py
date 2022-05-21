@@ -82,34 +82,6 @@ def send_change_email_email(email: str, changekey: str):
         server.sendmail(SENDER_EMAIL, receiver_email, text)
 
 
-def send_confirm_email_email(email: str, confirmkey: str):
-    """send_confirm_email_email this funcion sends an email to confirm a user email
-
-    :param email: the email of the user
-    :type email: str
-    :param confirmkey: the confirm key
-    :type confirmkey: str
-    """
-
-    receiver_email = email  # Enter receiver address
-
-    subject = "Confirm email"
-    body = f"Use this link to confirm the email of your account {FRONTEND_URL}/confirm-email/{confirmkey}"
-
-    message = MIMEMultipart()
-    message["From"] = SENDER_EMAIL
-    message["To"] = receiver_email
-    message["Subject"] = subject
-
-    message.attach(MIMEText(body, "plain"))
-    text = message.as_string()
-
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_SSL_PORT, context=context) as server:
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        server.sendmail(SENDER_EMAIL, receiver_email, text)
-
-
 def send_invite(email: str, invitekey: str):
     """send_invite this functions sends an invite email
 

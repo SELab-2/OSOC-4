@@ -29,7 +29,6 @@ services:
       INVITE_EXPIRE: 4320 # in minutes
       PASSWORDRESET_EXPIRE: 30 # in minutes
       CHANGE_EMAIL_EXPIRE: 30 # in minutes
-      CONFIRM_EMAIL_EXPIRE: 30 # in minutes
       # Frontend URL
       FRONTEND_URL: http://localhost:3000
     
