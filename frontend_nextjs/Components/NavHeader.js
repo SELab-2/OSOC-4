@@ -10,7 +10,18 @@ import { useRouter } from "next/router";
 import Message from './Message';
 import Link from 'next/link';
 
-export default function NavHeader(props) {
+/**
+ * This component renders the navigation bar on top of the screen.
+ * @returns {JSX.Element} A component that renders the navigation bar on top of the screen.
+ * @constructor
+ */
+export default function NavHeader() {
+
+    /**
+     * This function logs out the user.
+     * @param event the event of pressing the 'log out' button.
+     * @returns {Promise<void>}
+     */
     async function logoutHandler(event) {
         event.preventDefault();
         localStorage.clear();
@@ -20,6 +31,9 @@ export default function NavHeader(props) {
     const [role, setRole] = useState(0);
     const [newUsers, setNewUsers] = useState(undefined);
 
+    /**
+     * This useEffect sets the role of the user (role state variable). It also sets the newUsers state variable.
+     */
     useEffect(() => {
         if (role === 0) {
             Url.fromName(api.me).get().then(res => {
@@ -50,6 +64,10 @@ export default function NavHeader(props) {
         if (newUsers && newUsers.length) {
             return [...newUsers.map(user => {
 
+                /**
+                 * Called when pushing the 'approve user' button.
+                 * @returns {Promise<void>}
+                 */
                 async function approveUser() {
                     const res = await Url.fromName(api.users).extend("/" + user.id + "/approve").post()
                     if (res.success) {
@@ -59,6 +77,10 @@ export default function NavHeader(props) {
                     }
                 }
 
+                /**
+                 * Called when pushing the 'delete user' button.
+                 * @returns {Promise<void>}
+                 */
                 async function deleteUser() {
                     const res = await Url.fromName(api.users).extend("/" + user.id).delete();
                     if (res.success) {
@@ -68,6 +90,9 @@ export default function NavHeader(props) {
                     }
                 }
 
+                /**
+                 * Return the html to render one new user.
+                 */
                 return (
                     <Message key={user.id} title={`${user.name} has joined`}
                         subtitle="You can now approve or revoke the access to the application">
@@ -83,6 +108,10 @@ export default function NavHeader(props) {
     }
 
 
+    /**
+     * This variable contains the different menu options in the navigation bar.
+     * @type {[{path: string, title: string},{path: string, title: string},{path: string, title: string}]}
+     */
     const menu = [
         { title: 'Students', path: '/students' },
         { title: 'Projects', path: '/projects' },
@@ -94,6 +123,9 @@ export default function NavHeader(props) {
         {showNewUsers()}
     </Popover>);
 
+    /**
+     * Return the html for the NavHeader component.
+     */
     return (
         <Navbar expand="md">
             <Container>
