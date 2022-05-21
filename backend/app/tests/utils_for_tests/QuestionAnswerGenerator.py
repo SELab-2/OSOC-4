@@ -196,6 +196,7 @@ class QuestionAnswerGenerator(DataGenerator):
                                   answer=answer)
                    for answer in sample(self.answers_multiple_choice2[i], k=randrange(1, 3))]
 
+        # TODO #594 change the answer to the skills, using a random answer for now
         qa += [QuestionAnswer(student=student, question=self.question_skill, answer=answer_first_name)]
 
         self.question_answers += qa
