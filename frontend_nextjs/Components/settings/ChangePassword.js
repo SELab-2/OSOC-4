@@ -78,7 +78,7 @@ export default function ChangePassword(props) {
                 </Form.Group>
                 {saving ?
                     <Button variant="primary" disabled>
-                    Saving changes...
+                    Changing password...
                     <Spinner
                         as="span"
                         animation="border"
