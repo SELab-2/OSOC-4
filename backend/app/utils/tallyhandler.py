@@ -30,9 +30,9 @@ async def get_save_answer(answer: str, session: AsyncSession) -> Answer:
 async def process_tally(data: dict[str, str], edition: int, session: AsyncSession) -> None:
     """Processes a Tally - submitted Tally and returns a dict with fields that can be used to validate the data.
 
-    :param data:
-    :param session:
-    :param edition:
+    :param data: Data of the tallyform to be parsed.
+    :param edition: The edition to which the form belongs.
+    :param session: The session to add the data to.
     :return: None
     """
 
