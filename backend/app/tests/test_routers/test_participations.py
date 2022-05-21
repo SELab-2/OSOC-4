@@ -31,6 +31,13 @@ class TestParticipations(TestBase):
         await self.session.commit()
 
     def assert_participation_equal(self, test_data: dict[str, any], participation: Participation):
+        """Assert that the data in the given participation matches the test data
+
+        :param test_data: dictionary containing the test data
+        :type test_data: dict[str, any]
+        :param participation: the participation to compare
+        :type participation: Participation
+        """
         participation_dict = participation.dict()
         # compare data
         for key, value in test_data.items():
@@ -40,6 +47,7 @@ class TestParticipations(TestBase):
                               f"Got: {participation_dict[key]}"))
 
     async def test_post_participation_create(self):
+        """Test POST /participations/create"""
         # Send POST request
         post_body = {
             "student_id": self.students[0].id,
@@ -56,6 +64,7 @@ class TestParticipations(TestBase):
         self.assert_participation_equal(post_body, db_participations[0])
 
     async def test_delete_participations(self):
+        """Test DELETE /participations"""
         reason = str(uuid.uuid1())
 
         # create a participation in db
@@ -75,6 +84,7 @@ class TestParticipations(TestBase):
         self.assertEqual(0, len(db_participations))
 
     async def test_patch_participations(self):
+        """Test PATCH /participations"""
         reason = str(uuid.uuid1())
 
         # create a participation in db
