@@ -63,7 +63,6 @@ class EditionOutExtended(BaseModel):
             the kwargs in "data" are used to initialize the attributes of this class
         """
         data["uri"] = config.api_url + "editions/" + str(data["year"])
-        data["users"] = f"{config.api_url}editions/{data['year']}/users"
         data["students"] = f"{config.api_url}editions/{data['year']}/students"
         data["projects"] = f"{config.api_url}editions/{data['year']}/projects"
         data["questiontags"] = f"{config.api_url}editions/{data['year']}/questiontags"
