@@ -16,7 +16,7 @@ router = APIRouter(prefix="/change")
 
 @router.get("/{changekey}")
 async def valid_changekey(changekey: str, session: AsyncSession = Depends(get_session)) -> dict:
-    """valid_changekey checks whether an emailkey is valid
+    """valid_changekey checks whether a changekey is valid
 
     :param ch: the changekey
     :type changekey: str

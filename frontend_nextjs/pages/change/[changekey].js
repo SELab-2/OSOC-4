@@ -8,6 +8,11 @@ import logoScreen from '../../public/assets/osoc-screen.png';
 import Image from 'next/image'
 import { Spinner, Button, Form } from "react-bootstrap";
 
+/**
+ * This component represents the change email page, which you see when you open an change email link.
+ * @returns {JSX.Element} The component that renders the change email page.
+ * @constructor
+ */
 const ChangeKey = () => {
     const router = useRouter();
     const {changekey} = router.query
@@ -17,14 +22,25 @@ const ChangeKey = () => {
     const [validateEmail, setValidateEmail] = useState("");
     const [saving, setSaving] = useState(false);
 
+    /**
+     * Called when the email field is changed, it adjusts the email state variable.
+     * @param event the event of changing the email field.
+     */
     const handleChangeEmail = (event) => {
         setEmail(event.target.value);
     }
 
+    /**
+     * Called when the validation email field is changed, it adjusts the validation email state variable.
+     * @param event the event of changing the validation email field.
+     */
     const handleChangeValidateEmail = (event) => {
         setValidateEmail(event.target.value);
     }
 
+    /**
+     * This useEffect sets the validKey state variable on change of the changekey state variable.
+     */
     useEffect(async () => {
         Url.fromName(api.change).extend(`/${changekey}`).get().then(resp =>{
             console.log(resp);
@@ -35,6 +51,12 @@ const ChangeKey = () => {
         setLoading(false);
     }, [changekey])
 
+    /**
+     * Called when the fields are submitted. It posts the change to the database if the email are valid and
+     * the same.
+     * @param event the event of pushing the submit button.
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
         setSaving(true);
@@ -57,6 +79,10 @@ const ChangeKey = () => {
         }
     }
 
+    /**
+     * If the page is loading, return the loading animation.
+     * If there is not a valid key, show the message.
+     */
     if (loading) {
         return <LoadingPage />
     }
@@ -64,6 +90,9 @@ const ChangeKey = () => {
         return <h1>Not a valid change email key</h1>
     }
 
+    /**
+     * Return the html of the change email page.
+     */
     return (
         <div className='body-login'>
             <section className="body-left">
