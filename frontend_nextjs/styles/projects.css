@@ -57,7 +57,11 @@
     margin-top: 20px;
 }
 
-.search-project {
+.search-project-small {
+    min-width: 120pt;
+}
+
+.search-project-small {
     min-width: 120pt;
     width: 100%;
 }

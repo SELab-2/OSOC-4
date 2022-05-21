@@ -219,7 +219,7 @@ export default function ProjectsList(props) {
      */
     return (
         <Col className="fill_height fill_width">
-            {props.fullView ?
+            {props.fullview ?
             <Row className="center-content projects-controls">
                 <Col className="search-project">
                     <input type="text" value={search}
@@ -244,7 +244,7 @@ export default function ProjectsList(props) {
             <div className="projectlist-top-bar-repsonsive">
                 <Row className="center-content projects-controls">
                     <Col className="search-project" >
-                        <input className="search-project"  type="text" value={search}
+                        <input className="search-project-small"  type="text" value={search}
                             placeholder={"Search projects"}
                             onChange={e => handleSearch(e)} />
 

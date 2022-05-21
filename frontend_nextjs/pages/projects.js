@@ -89,7 +89,7 @@ export default function Projects() {
                     </div>
                 </Col>
                 <ProjectsList selectedStudent={selectedStudents[0]} setSelectedProject={setSelectedProject}
-                              selectedProject={selectedProject}/>
+                              selectedProject={selectedProject} fullview={fullView}/>
             </Row>}
         </>
 
