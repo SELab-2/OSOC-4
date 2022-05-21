@@ -11,18 +11,13 @@ import { toast, ToastContainer } from "react-toastify";
  */
 export default function SendEmailsPopUpWindow(props) {
 
-  const [defaultEmail, setDefaultEmail] = useState(true);
-  const [fail, setFail] = useState(false);
   const [sending, setSending] = useState(false);
-  const [sentSuccess, setSentSuccess] = useState(false);
 
   /***
    * This function is called when the pop-up window is closed
    */
   function onHide() {
     props.setSelectedStudents([]);
-    setFail(false);
-    setSentSuccess(false);
     props.setPopUpShow(false);
   }
 
@@ -33,22 +28,15 @@ export default function SendEmailsPopUpWindow(props) {
     setSending(true);
     Url.fromName(api.sendemails).extend("/decisions").setBody({ "emails": props.selectedStudents }).post().then((res) => {
       if (res.success){
+        onHide();
         toast.success(`${props.selectedStudents.length} decision emails were sent succesfully!`);
         setSending(false);
-        setSentSuccess(true);
       } else {
-        toast.error("Something went wrong, please try again");
         setSending(false);
-        setFail(true);
+        toast.error("Something went wrong, please try again");
+        props.setPopUpShow(false); //Instead of onHide() -> To keep the original selected students selected when the request to send emails fails, otherwise al the studens get deselected
       }
     })
-  }
-
-  /**
-   * When something went wrong when sending emails and 'try again' is pushed, this method is called.
-   */
-  function handleTryAgain(){
-    setFail(false);
   }
 
   /**
@@ -69,14 +57,9 @@ export default function SendEmailsPopUpWindow(props) {
           </ModalTitle>
         </ModalHeader>
         <Modal.Footer>
-          {(! sending && ! fail && ! sentSuccess) && 
-          <div>
-            <Button variant="secondary" onClick={onHide}>Cancel</Button>
-            <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
-          </div>}
-          {sending && 
+          {sending ?
             <Button variant="primary" disabled>
-            Sending...
+            Sending emails...
             <Spinner
                 as="span"
                 animation="border"
@@ -84,15 +67,13 @@ export default function SendEmailsPopUpWindow(props) {
                 role="status"
                 aria-hidden="true"
             />
-          </Button>}
-          {sentSuccess &&
-            <Button variant="primary" onClick={onHide}>Close</Button>
-          }
-          {fail && 
-            <div>
-              <Button variant="secondary" onClick={onHide}>Cancel</Button>
-              <Button variant="primary" onClick={handleTryAgain} className="invite-button">Try again</Button>
-            </div>}
+            </Button>
+            :
+              <div>
+                <Button variant="secondary" onClick={onHide}>Cancel</Button>
+                <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
+              </div>
+              }
         </Modal.Footer>
       </Modal>
       <ToastContainer autoClose={4000}/>
