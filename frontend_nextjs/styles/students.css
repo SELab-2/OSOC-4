@@ -1,0 +1,113 @@
+.students-controls > * {
+    margin: 7pt 0;
+}
+
+.students_list {
+    margin: 0 30px 0 20px;
+    padding: 0;
+}
+
+.fill_height {
+    height: 100%;
+}
+
+.scroll-overflow {
+    overflow-y: auto;
+}
+
+.fill_width {
+    width: 100%;
+}
+
+.remaining_height {
+    width: 100%;
+    height: calc(100vh - 67px);
+}
+
+.studentlist-topmargin {
+    margin-top: 20px;
+}
+
+.students-list-paddingtop {
+    position: relative;
+    padding-top: 10px;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.remaining-height-searchbar {
+    position: absolute;
+    top: 60px;
+    bottom: 0;
+}
+
+.sortby-label {
+    align-self: center;
+    font-size: 14px;
+    width: auto;
+}
+
+.dropdown-sortby {
+    border-width: 0;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: 7px;
+    background-color: var(--background-gray);
+    border-radius: 7px;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-size: 13px;
+
+}
+
+.student-list-positioning {
+    width: auto;
+    margin: 0 10pt 0;
+    padding-top: 20px;
+}
+
+.search-button {
+    align-self: center;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    margin: 7px;
+}
+
+.reset-search-button {
+    align-self: center;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+    padding: 9px;
+}
+
+.btn-group {
+    width: auto;
+}
+
+.filter-btn {
+    margin: 0 0 10pt;
+    display: flex;
+    justify-content: center;
+}
+
+.filter-btn img {
+    filter: invert(100%);
+}
+
+.filter-btn span {
+    padding-left: 10pt;
+    color: white;
+}
+
+.infinite-scroll {
+    margin-right: 0;
+}
+
+.student-listelement-icon {
+    height: 35px;
+    margin-right: 5px;
+}
+
+.icons-container > * {
+    display: inline;
+}

@@ -11,7 +11,7 @@
 }
 
 .user-button-inactive, .user-button-unapproved {
-    width: 8em;
+    width: 9em;
     margin-right: 12px;
 }
 
@@ -19,4 +19,8 @@
     width: 9em;
     background: red;
     border-color: red;
+}
+
+.invite-users-button{
+    margin-bottom: 10px;
 }

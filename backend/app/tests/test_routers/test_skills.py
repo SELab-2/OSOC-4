@@ -24,7 +24,7 @@ class TestSkills(TestBase):
 
     async def test_get_skills(self):
         path = "/skills"
-        allowed_users = await self.get_users_by([UserRole.ADMIN])
+        allowed_users = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
         # Test authorization & access-control
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)

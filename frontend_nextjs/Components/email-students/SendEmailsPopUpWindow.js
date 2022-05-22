@@ -1,7 +1,7 @@
-import { Button, Col, Modal, ModalHeader, ModalTitle, Row } from "react-bootstrap";
-import StudentFilter from "../select_students/StudentFilter";
-import { useState, useEffect } from "react";
-import { cache } from "../../utils/ApiClient";
+import { Button, Modal, ModalHeader, ModalTitle, Spinner } from "react-bootstrap";
+import { useState } from "react";
+import { api, Url } from "../../utils/ApiClient";
+import { toast, ToastContainer } from "react-toastify";
 
 /***
  * This element shows the pop up window when sending emails in the 'email students' tab.
@@ -11,73 +11,72 @@ import { cache } from "../../utils/ApiClient";
  */
 export default function SendEmailsPopUpWindow(props) {
 
-  const [defaultEmail, setDefaultEmail] = useState(true);
-
-  // defines whether or not the pop up window must be shown
-  const [popUpShow, setPopUpShow] = [props.popUpShow, props.setPopUpShow];
-
-  const [students, setStudents] = useState([])
-
-  useEffect(() => {
-    Promise.all(props.students.map(student => cache.getStudent(student, ""))).then(allstudents => {
-      setStudents([...allstudents]);
-    })
-  }, [props.students])
+  const [sending, setSending] = useState(false);
 
   /***
    * This function is called when the pop-up window is closed
    */
   function onHide() {
-    setPopUpShow(false);
+    props.setSelectedStudents([]);
+    props.setPopUpShow(false);
   }
 
   /***
    * This function is called on submitting the emails, it sends the emails and hides the pop-up window
    */
   function submitEmail() {
-    setPopUpShow(false);
+    setSending(true);
+    Url.fromName(api.sendemails).extend("/decisions").setBody({ "emails": props.selectedStudents }).post().then((res) => {
+      if (res.success){
+        onHide();
+        toast.success(`${props.selectedStudents.length} decision emails were sent succesfully!`);
+        setSending(false);
+      } else {
+        setSending(false);
+        toast.error("Something went wrong, please try again");
+        props.setPopUpShow(false); //Instead of onHide() -> To keep the original selected students selected when the request to send emails fails, otherwise al the studens get deselected
+      }
+    })
   }
 
-  // returns the html representation for the send emails pop up window
+  /**
+   * returns the html representation for the send emails pop up window
+   */
   return (
-    <Modal
-      show={popUpShow}
-      onHide={() => onHide()}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <ModalHeader closeButton>
-        <ModalTitle id="contained-modal-title-vcenter">
-          Send mails to...
-        </ModalTitle>
-      </ModalHeader>
-      <Modal.Body className="modalbody-margin">
-        <Row className="send-email-names">
-          {(students) ? students.map(student => student.mandatory["first name"] + " " +
-            student.mandatory["last name"]).join(", ") : null}
-        </Row>
-        <Row>
-          <h5 className="content-title">Content</h5>
-        </Row>
-        <StudentFilter filter_id="default-email" filter_text="Use default emails" value={defaultEmail}
-          onChange={ev => setDefaultEmail(true)} />
-        <StudentFilter filter_id="own-email" filter_text="Type your email here:" value={!defaultEmail}
-          onChange={ev => setDefaultEmail(false)} />
-        <Row>
-          <Col />
-          <Col md="auto" className={"email-help-text " + ((defaultEmail) ? "disabled-text" : null)}>
-            (Use @Name, @Firstname, @Lastname, @Decision to address the receiver)
-          </Col>
-        </Row>
-        <Row>
-          <textarea id="student-emails" className="fill_width send-emails" disabled={defaultEmail} />
-        </Row>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Cancel</Button>
-        <Button variant="primary" onClick={submitEmail}>Submit</Button>
-      </Modal.Footer>
-    </Modal>
+    <div>
+      <Modal
+        show={props.popUpShow}
+        onHide={() => onHide()}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <ModalHeader closeButton>
+          <ModalTitle id="contained-modal-title-vcenter">
+            {`Are you sure you want to send ${props.selectedStudents.length} decision emails?`}
+          </ModalTitle>
+        </ModalHeader>
+        <Modal.Footer>
+          {sending ?
+            <Button variant="primary" disabled>
+            Sending emails...
+            <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+            />
+            </Button>
+            :
+              <div>
+                <Button variant="secondary" onClick={onHide}>Cancel</Button>
+                <Button variant="primary" onClick={submitEmail} className="invite-button">Send</Button>
+              </div>
+              }
+        </Modal.Footer>
+      </Modal>
+      <ToastContainer autoClose={4000}/>
+    </div>
   );
 }

@@ -3,7 +3,7 @@
     border-style: solid;
     border-color: var(--not-selected-gray);
     border-radius: 7px;
-    margin: 7px 0 7px 0;
+    margin: 0 0 7px 0;
     padding: 10px 12px 10px 10px;
 }
 
@@ -22,7 +22,7 @@
 .name {
     font-size: 22px;
     padding: 0;
-    margin-right: 20px;
+    margin-right: 10px;
 }
 
 .info-titles {
@@ -103,7 +103,6 @@
 
 .skills {
     margin-top: 10px;
-    margin-right: 7px;
     padding: 0;
     align-self: end;
 }
@@ -114,12 +113,19 @@
 
 .info {
     margin-left: 0;
+    justify-content: space-between;
 }
 
 .upper-layer {
-    margin: 0;
+    margin: 0 5px 0 0;
 }
 
 .nomargin {
     margin: 0;
+}
+
+@media (max-width: 500pt) {
+    .suggestions {
+        display: none;
+    }
 }

@@ -1,5 +1,6 @@
-import SelectSearch, {fuzzySearch} from "react-select-search";
 import React from "react";
+import {log} from "../../utils/logger";
+import Select from "react-select";
 
 /**
  * dropdown select menu with search, that allows you to select a skill
@@ -10,18 +11,30 @@ import React from "react";
  */
 export default function SkillSelector(props){
 
+  /**
+   * This function is used to filter skills with text search.
+   * @param candidate The canditate skill.
+   * @param input The input of the text field.
+   * @returns {*|boolean} True if the candidate should be shown with te given input text, false otherwise.
+   */
+    const filterOption = (candidate, input) => {
+        return input === undefined || candidate.label.toLowerCase().includes(input.toLowerCase())
+    };
+
+    /**
+     * Return the html of the SkillSelector.
+     */
     return(
         <div>
-            {props.skills.length ?
-                <SelectSearch
-                    options={props.skills}
-                    value={props.selectedSkill === undefined ? "" : props.selectedSkill.name}
-                    search
-                    filterOptions={fuzzySearch}
-                    onChange={value => props.setSelectedSkill(value)}
-                    emptyMessage={() => <div style={{ textAlign: 'center', fontSize: '0.8em' }}>Skill not found</div>}/> : <div>
-                    The selected student does not seem to have any needed skills for the selected project
-                </div>}
+            <Select classNamePrefix="select-search"
+                    defaultValue={props.selectedSkill}
+                    onChange={async (value) => {
+                        await props.setSelectedSkill(value)
+                    }}
+                    filterOption={filterOption}
+                    noOptionsMessage={() => "No more options"}
+                    options={props.options}
+            />
         </div>
     )
 }

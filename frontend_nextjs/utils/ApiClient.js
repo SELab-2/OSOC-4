@@ -148,7 +148,7 @@ export class Url {
         try {
             await this._setupRequest(context);
             log(`API: PATCH ${this._url}`)
-            const resp = await axios.patch(this._url, this._body, { "headers": this._headers });
+            const resp = await axios.patch(this._url, this._body, { "headers": this._headers, "params": this._params });
             return { success: true, data: resp.data };
         } catch (e) {
             return { success: false, error: e };
@@ -164,7 +164,7 @@ export class Url {
         try {
             await this._setupRequest(context);
             log(`API: DELETE ${this._url}`)
-            const resp = await axios.delete(this._url, { "headers": this._headers });
+            const resp = await axios.delete(this._url, { "headers": this._headers, params: this._params });
             return { success: true, data: resp.data };
         } catch (e) {
             return { success: false, error: e };
@@ -184,9 +184,7 @@ class API {
     forgot = "forgot";
     invite = "invite";
     resetpassword = "resetpassword";
-
-    // the year of the current edition
-    year = null;
+    change = "change";
 
     // the api.[name] fields
     me = "me";
@@ -200,6 +198,9 @@ class API {
     editions_questiontags = "editions_questiontags";
     skills = "skills";
     participations = "participations";
+    emailtemplates = "emailtemplates";
+    sendemails = "sendemails";
+    myself = "myself";
 
     // the paths, the key should be the value of the api.[name]
     //            the value should be the url
@@ -209,6 +210,8 @@ class API {
         forgot: this.baseUrl + "/forgot",
         invite: this.baseUrl + "/invite",
         resetpassword: this.baseUrl + "/resetpassword",
+        change: this.baseUrl + "/change",
+
 
         me: null,
         students: null,
@@ -220,7 +223,10 @@ class API {
         editions_projects: null,
         editions_questiontags: null,
         skills: null,
-        participations: null
+        participations: null,
+        emailtemplates: null,
+        sendemails: null,
+        myself: null
     }
     _ready = false;
 
@@ -311,15 +317,18 @@ class API {
             this._paths.users = res.data[this.users];
             this._paths.skills = res.data[this.skills];
             this._paths.participations = res.data[this.participations];
-            if (this.year) {
-                this._paths.current_edition = this._paths.editions + "/" + this.year;
+            this._paths.emailtemplates = res.data[this.emailtemplates];
+            this._paths.sendemails = res.data[this.sendemails];
+            this._paths.myself = res.data[this.myself];
+            if (this.getYear()) {
+                this._paths.current_edition = this._paths.editions + "/" + this.getYear();
             } else { // get the latest edition if any
                 let res = await axios.get(this._paths.editions, config);
                 this._paths.current_edition = (res.data.length) ? res.data[0] : null;
             }
             if (this._paths.current_edition) {
                 let editionData = await axios.get(this._paths.current_edition, config);
-                this.year = editionData.data["year"];
+                this._setYear(editionData.data["year"]);
                 this._paths.editions_students = editionData.data[this.students];
                 this._paths.editions_projects = editionData.data[this.projects];
                 this._paths.editions_questiontags = editionData.data["questiontags"];
@@ -337,8 +346,16 @@ class API {
      */
     setCurrentEdition(year = null) {
         log("API: changing edition to: " + year)
-        this.year = year;
+        this._setYear(year);
         this.invalidate();
+    }
+
+    getYear() {
+        return localStorage.getItem("api_year");
+    }
+
+    _setYear(year) {
+        localStorage.setItem("api_year", year);
     }
 }
 
@@ -355,7 +372,6 @@ class Cache {
 
         student = Url.fromUrl(url).get().then(res => {
             if (res.success) {
-                console.log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
                     if (item["suggested_by_id"] === userid) {
@@ -391,13 +407,53 @@ class Cache {
             if (student) {
                 let new_student = student
                 new_student["decision"] = data["decision"]["decision"];
+                new_student["email_sent"] = false;
                 cache[data["id"]] = new_student
+            }
+        }
+        else if ("email_sent" in data) {
+            let student = cache[data["id"]]
+            if (student) {
+                let new_student = student
+                new_student["email_sent"] = data["email_sent"];
+                cache[data["id"]] = new_student;
+            }
+        } else if ("deleted_student" in data) {
+            if (data["deleted_student"] in cache) {
+                delete cache[data["deleted_student"]];
+            }
+        } else if ("participation_student" in data) {
+            const studentUrl = data["studentUrl"]
+
+            if (studentUrl in cache) {
+                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === data["participation_student"]["project"]);
+                if (index !== -1) {
+                    cache[studentUrl]["participations"][index] = data["participation_student"];
+                } else {
+                    cache[studentUrl]["participations"].push(data["participation_student"]);
+                }
+            }
+        } else if ("deleted_participation" in data) {
+            const studentUrl = data["studentUrl"]
+            const projectUrl = data["projectUrl"]
+
+            if (studentUrl in cache) {
+                let index = cache[studentUrl]["participations"].findIndex(el => el["project"] === projectUrl);
+                if (index !== -1) {
+                    cache[studentUrl]["participations"].splice(index, 1);
+                }
             }
         }
     }
 
     async clear() {
         Object.keys(cache).map(key => delete cache[key]);
+    }
+
+    async remove_student(url) {
+        if (url in cache) {
+            delete cache[url];
+        }
     }
 
 }
