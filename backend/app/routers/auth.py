@@ -23,7 +23,6 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.routers.editions import create_edition
 import datetime
 from app.models.question import Question
 from app.models.question_tag import QuestionTag
