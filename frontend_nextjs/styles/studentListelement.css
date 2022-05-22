@@ -103,7 +103,6 @@
 
 .skills {
     margin-top: 10px;
-    margin-right: 7px;
     padding: 0;
     align-self: end;
 }
@@ -114,10 +113,11 @@
 
 .info {
     margin-left: 0;
+    justify-content: space-between;
 }
 
 .upper-layer {
-    margin: 0;
+    margin: 0 5px 0 0;
 }
 
 .nomargin {

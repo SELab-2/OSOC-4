@@ -107,3 +107,7 @@
     height: 35px;
     margin-right: 5px;
 }
+
+.icons-container > * {
+    display: inline;
+}
