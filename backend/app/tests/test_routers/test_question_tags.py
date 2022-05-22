@@ -2,22 +2,14 @@ import json
 from typing import Dict, Set, List
 import uuid
 from httpx import Response
-from app.config import config
 from app.crud import read_where, update
-from app.models.project import Project
 from app.models.user import UserRole
 from app.tests.test_base import TestBase, Request, Status
-from app.tests.test_routers.test_editions import TestEditions
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
-from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
 from app.models.edition import Edition
-from app.tests.utils_for_tests.StudentGenerator import StudentGenerator
-from app.tests.utils_for_tests.ProjectGenerator import ProjectGenerator
-from app.models.participation import Participation
 from app.tests.utils_for_tests.QuestionTagGenerator import QuestionTagGenerator
 from app.models.question import Question
 from app.models.question_tag import QuestionTag
-from app.models.student import Student
 
 
 class TestQuestionTags(TestBase):
