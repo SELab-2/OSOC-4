@@ -49,6 +49,8 @@
 [8.4.2. Edition settings](#842-edition-settings) \
 [8.4.3. Question-tags](#843-question-tags) \
 [8.4.4. Managing users](#844-managing-users) \
+[8.4.5 Projects](#845-projects) \
+[8.4.6 Students](#846-students) \
 [8.5. Adding new users](#85-adding-new-users)
 
 
@@ -514,9 +516,9 @@ When you click on 'Projects' in the navigation bar, you will see the following s
 
 ![projects](screenshots/projects.png)
 
-This screen has two sides. On the left you can see the student list with their filters. To find more info on this part, see [Students](#846-students). On the right part of the screen you see the projects. They two parts are seperated by a green arrow directing to the right inside a green circle. 
+This screen has two sides. On the left you can see the student list with their filters. To find more info on this part, see [Students](#846-students). On the right part of the screen you see the projects. The two parts are seperated by a green arrow directing to the right inside a green circle. 
 
-On the right part of the screen (the projects part), you can see a searchbar, a reset button, a 'people needed' checkbox, a 'conflicts' button and a 'new project' button and a list of projects. In the searchbar you can search projects by name. The cross on the right side of the searchbar is the reset button. By pushing this button, the search bar will become empty. The 'people needed' checkbox allows you to see only the projects of which the required skills are not completely satisfied. If there is at least one required skill which is not linked to a student participation, this project will be shown when the 'people needed' checkbox is enabled.
+On the right part of the screen (the projects part), you can see a searchbar, a reset button, a 'people needed' checkbox, a 'conflicts' button, a 'new project' button and a list of projects. In the searchbar you can search projects by name. The cross on the right side of the searchbar is the reset button. By pushing this button, the search bar will become empty. The 'people needed' checkbox allows you to see only the projects of which the required skills are not completely satisfied. If there is at least one required skill which is not linked to a student participation, this project will be shown when the 'people needed' checkbox is enabled.
 The conflicts button allows you to watch all the students who are assigned to more than one project. The 'New project' button redirects to another screen where you can create a new project. In the student list all projects are shown with a project card.
 
 ##### 8.4.5.1 Resolving conflicts
@@ -530,6 +532,8 @@ This window shows a student with all the projects they are linked to. By clickin
 ##### 8.4.5.2 Create a new project
 
 When you click the 'new project' button, you will see this window.
+
+![new project](screenshots/new-project.png)
 
 Here you can fill in all the information about the new project you want to make. On the bottom (under subtitle 'Required skills') you can add different skills by pushing the '+' button. With the dropdown you can select which skill you need. You can select the needed amount in the box next to the dropdown. Deleting the skill is possible with the red cross next to the skill selector. To save your newly created project, press the 'Create new project' button.
 
