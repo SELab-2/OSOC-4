@@ -224,5 +224,5 @@ async def forgot(emailinput: EmailInput = Body(...), session: AsyncSession = Dep
         # send email to user with the reset key
         send_password_reset(user.email, reset_key)
 
-    return {
-        "msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}
+        return response(None, "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled")
+    raise InvalidEmailOrPasswordException()

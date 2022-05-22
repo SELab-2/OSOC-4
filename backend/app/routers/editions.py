@@ -4,7 +4,7 @@ import datetime
 from typing import Dict
 
 from app.config import config
-from app.crud import read_all_where, read_where, update
+from app.crud import delete, read_all_where, read_where, update
 from app.database import get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
@@ -23,7 +23,7 @@ from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
-from app.models.skill import StudentSkill
+from app.models.skill import Skill, StudentSkill
 from app.models.student import DecisionOption, Student
 from app.models.suggestion import Suggestion, SuggestionOption
 from app.models.user import UserRole
@@ -374,15 +374,15 @@ async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depen
         raise QuestionTagCantBeModified()
 
     if questiontag.question and len(questiontag.question.question_answers) == 0:
+
+        qu = questiontag.question
+
         # delete the unused question
         questiontag.question_id = None
         await update(questiontag, session=session)
+        await delete(qu, session=session)
 
-        await session.delete(questiontag.question)
-        await session.commit()
-
-    await session.delete(questiontag)
-    await session.commit()
+    await delete(questiontag, session=session)
 
 
 @router.patch("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
@@ -433,9 +433,39 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
         if question:
             questiontag.question_id = question.id
         else:
-            newquestion = Question(question=tagupdate.question, field_id="", edition=year)
-            await update(newquestion, session=session)
-            questiontag.question_id = newquestion.id
+            question = Question(question=tagupdate.question, field_id="", edition=year)
+            await update(question, session=session)
+            questiontag.question_id = question.id
 
     await update(questiontag, session=session)
+
+    # if the tag is skills => update the skills in the student object
+    if questiontag.tag == "skills":
+        students = await read_all_where(Student, Student.edition_year == year, session=session)
+        for s in students:
+
+            # remove all the studentskills
+            statement = select(StudentSkill).where(StudentSkill.student_id == s.id)
+            stat_res = await session.execute(statement)
+            stat_all = stat_res.all()
+            for (studskill,) in stat_all:
+                await session.delete(studskill)
+                await session.commit()
+
+            # get the answers for the new questions
+            query = select(Answer).select_from(QuestionAnswer).where(QuestionAnswer.question_id == questiontag.question_id).where(QuestionAnswer.student_id == s.id).join(Answer)
+            query_res = await session.execute(query)
+            query_all = query_res.all()
+
+            for (answer,) in query_all:
+                skill = await read_where(Skill, Skill.name == answer.answer, session=session)
+                if not skill:
+                    skill = Skill(name=answer.answer)
+                    await update(skill, session=session)
+
+                student_skill = await read_where(StudentSkill, StudentSkill.student_id == s.id, StudentSkill.skill_name == skill.name, session=session)
+                if not student_skill:
+                    student_skill = StudentSkill(student_id=s.id, skill_name=skill.name)
+                    await update(student_skill, session=session)
+
     return f"{config.api_url}editions/{str(year)}/questiontags/{questiontag.tag}"

@@ -8,6 +8,10 @@ import Image from 'next/image'
  */
 export default function SettingCards(props) {
     const [isOpen, setIsOpen] = useState(false)
+
+    /**
+     * The html of the SettingsCard component.
+     */
     return(
         <div className="align-content-center">
             <Card className="card">

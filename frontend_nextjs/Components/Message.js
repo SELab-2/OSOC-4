@@ -10,7 +10,9 @@ import React from "react";
  */
 export default function Message(props) {
 
-
+    /**
+     * The html that renders the Message component.
+     */
     return (
         <Card className="message">
             <Card.Body>

@@ -47,7 +47,7 @@ class TestEditions(TestBase):
     async def _create_question_tags_in_db(self, edition: Edition) -> List[QuestionTag]:
         """Helper function to add question tags to database"""
         question_tag_generator = QuestionTagGenerator(self.session)
-        question_tag_generator.generate_question_tags(self.edition.year, n=5)
+        question_tag_generator.generate_question_tags(edition.year, n=5)
         question_tag_generator.add_to_db()
         await self.session.commit()
         return question_tag_generator.data

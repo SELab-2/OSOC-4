@@ -60,6 +60,7 @@ class Status(IntEnum):
     UNAUTHORIZED = 401
     FORBIDDEN = 403
     NOT_FOUND = 404
+    CONFLICT = 409
     UNPROCESSABLE = 422
 
 
@@ -106,8 +107,6 @@ class TestBase(unittest.IsolatedAsyncioTestCase):
 
         user_generator.add_to_db()
         await self.session.commit()
-
-        self.user_admin = self.users["user_admin"]
 
     async def asyncTearDown(self) -> None:
         """

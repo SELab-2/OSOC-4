@@ -7,7 +7,6 @@ from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import QuestionTag
 from app.models.student import Student
 from app.tests.utils_for_tests.DataGenerator import DataGenerator
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -55,11 +54,7 @@ class QuestionAnswerGenerator(DataGenerator):
         ["What do/did you study?",
          "backend developer", "business management", "communication sciences",
          "computer sciences", "design", "frontend development", "marketing",
-         "photography", "videography", "other"],
-        ["Which role are you applying for?",
-         "Front-end developer", "Back-end developer", "UX / UI designer", "Graphic designer",
-         "Business Modeller", "Storyteller", "Marketer", "Copywriter", "Video editor",
-         "Photographer", "Other"]]
+         "photography", "videography", "other"]]
 
     def __init__(self, session: AsyncSession, edition: Edition):
         """
@@ -86,6 +81,7 @@ class QuestionAnswerGenerator(DataGenerator):
                                                field_id="question_nroaMN",
                                                edition=edition.year)
         self.question_phone_number = Question(question="Phone number", field_id="question_319dop", edition=edition.year)
+        self.question_skill = Question(question="Which role are you applying for?", field_id="question_mO74MR", edition=edition.year)
 
         self.questions_yes_no = \
             [Question(question=q, field_id="", edition=edition.year) for q in self.questionstrings_yes_no]
@@ -105,9 +101,8 @@ class QuestionAnswerGenerator(DataGenerator):
         self.questions_multiple_choice2 = []
         self.answers_multiple_choice2 = []
 
-        for qa in self.qa_multiple_choice2:
-            self.questions_multiple_choice2.append(Question(question=qa[0], field_id="", edition=edition.year))
-            self.answers_multiple_choice2.append([Answer(answer=answer_text) for answer_text in qa[1:]])
+        self.questions_multiple_choice2.append(Question(question=self.qa_multiple_choice2[0][0], field_id="", edition=edition.year))
+        self.answers_multiple_choice2.append([Answer(answer=answer_text) for answer_text in self.qa_multiple_choice2[0][1:]])
 
         self.question_tags = [QuestionTag(question=self.question_first_name,
                                           edition=self.edition.year, mandatory=True, tag="first name"),
@@ -128,7 +123,9 @@ class QuestionAnswerGenerator(DataGenerator):
                               QuestionTag(question=self.questions_multiple_choice2[0],
                                           edition=self.edition.year, tag="studies"),
                               QuestionTag(question=self.questions_multiple_choice[4],
-                                          edition=self.edition.year, tag="type of degree")]
+                                          edition=self.edition.year, tag="type of degree"),
+                              QuestionTag(question=self.question_skill, mandatory=True,
+                                          edition=self.edition.year, tag="skills")]
 
         self.data = [self.question_first_name, self.question_last_name, self.question_email, self.question_alumni,
                      self.question_phone_number, self.question_student_coach, *self.questions_yes_no,
@@ -192,6 +189,11 @@ class QuestionAnswerGenerator(DataGenerator):
                                   question=self.questions_multiple_choice2[i],
                                   answer=answer)
                    for answer in sample(self.answers_multiple_choice2[i], k=randrange(1, 3))]
+
+        qa += [QuestionAnswer(student=student,
+                              question=self.question_skill,
+                              answer=Answer(answer=skill.name))
+               for skill in student.skills]
 
         self.question_answers += qa
         self.data += qa

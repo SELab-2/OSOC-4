@@ -2,14 +2,14 @@
 
 from typing import List
 
-from app.crud import read_all_where, read_where, update
+from app.crud import read_all_where, read_where, update, delete
 from app.database import db, get_session
 from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
                                             PasswordsDoNotMatchException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
                                             UserNotFoundException)
-from app.models.edition import Edition, EditionCoach
+from app.models.edition import EditionCoach
 from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
                              UserCreate, UserMe, UserOut, UserOutSimple,
                              UserRole)
@@ -22,8 +22,6 @@ from app.utils.response import response
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlmodel import select
 
 router = APIRouter(prefix="/users")
 
@@ -225,6 +223,12 @@ async def delete_user(user_id: str, session: AsyncSession = Depends(get_session)
 
     user = await update(user, session=session)
 
+    # delete the EditionCoach object
+    edition = await get_current_edition(session)
+    edit_coach = await read_where(EditionCoach, EditionCoach.edition == edition.year, EditionCoach.coach_id == int(user_id), session=session)
+    if edit_coach:
+        await delete(edit_coach, session=session)
+
     return response(UserOut.parse_raw(user.json()), "User deleted successfully")
 
 
@@ -253,14 +257,6 @@ async def invite_user(id: str, session: AsyncSession = Depends(get_session)) -> 
     if user.disabled:
         user.disabled = False
         await update(user, session=session)
-
-        # get the latest edition
-        stat = select(Edition).options(selectinload(Edition.coaches)).order_by(Edition.year.desc())
-        editionres = await session.execute(stat)
-        (edition,) = editionres.first()
-        edition.coaches.append(user)
-
-        await update(edition, session=session)
 
     # create an invite key
     invite_key, invite_expires = generate_new_invite_key()

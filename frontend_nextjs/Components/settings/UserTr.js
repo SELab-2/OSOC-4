@@ -14,7 +14,7 @@ export default function UserTr(props) {
 
     /**
      * Changes the role of a user, api does patch request
-     * @param role
+     * @param role the new role.
      */
     async function changeRole(role) {
         if (props.isMe) {
@@ -79,6 +79,9 @@ export default function UserTr(props) {
         return null;
     }
 
+    /**
+     * Return the html of the UserTr component.
+     */
     return (
         <tr key={props.user.id}>
             <td>{props.user.name}</td>
