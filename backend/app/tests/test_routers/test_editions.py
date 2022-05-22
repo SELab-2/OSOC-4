@@ -18,7 +18,6 @@ from app.models.student import Student
 
 class TestEditions(TestBase):
     edition_data = {
-        "year": 2022,
         "name": "Test edition",
         "description": "Some description",
         "form_id": str(uuid.uuid1()),
@@ -30,7 +29,6 @@ class TestEditions(TestBase):
         edition_generator = EditionGenerator(self.session)
         self.edition = edition_generator.generate_edition(2022)
         await update(self.edition, self.session)
-        self.edition_data
 
     async def _create_students_in_db(self, edition: Edition, count: int = 1) -> List[Student]:
         """Helper function to add students to database"""

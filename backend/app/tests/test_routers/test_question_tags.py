@@ -152,11 +152,7 @@ class TestQuestionTags(TestBase):
         await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"))
 
     async def test_patch_editions_year_question_tag(self):
-        """Test PATCH /editions/{year}/questiontags/{tag}"""
-        # Create an edition in db
-        edition = Edition(year=2023, name='edition')
-        await update(edition, self.session)
-
+        """Test PATCH /editions/{year}/questiontags/{tag} where a question gets added"""
         # Create a question tag
         question_tag = QuestionTag(
             edition=self.edition.year,
@@ -194,7 +190,7 @@ class TestQuestionTags(TestBase):
             tag_name_in_response_url = json.loads(responses.get(user_title).content).split("/")[-1]
             self.assertEqual(tag_name_in_response_url, new_question_tag, f"Can't find question tag {new_question_tag} in respond url")
 
-        # Check questin tag field values in the database
+        # Check question tag field values in the database
         question_tag_in_db = await read_where(QuestionTag, QuestionTag.tag == new_question_tag, session=self.session)
         self.assertEqual(question_tag_in_db.tag, new_question_tag, "Question tag was not updated in database.")
         self.assertEqual(question_tag_in_db.show_in_list, updated_question_tag_request_body["show_in_list"], "show_in_list was not updated in database.")
@@ -202,7 +198,6 @@ class TestQuestionTags(TestBase):
 
     async def test_patch_editions_year_question_tag_invalid(self):
         """Test PATCH /editions/{year}/questiontags/{tag} should fail if tag doesn't exist"""
-
         # Prepare request body
         request_body = {
             "tag": "abc",
