@@ -35,7 +35,7 @@ async def valid_changekey(changekey: str, session: AsyncSession = Depends(get_se
 
 
 @router.post("/{changekey}")
-async def use_changekey(changekey: str, data: UserResetEmail = Body(...), 
+async def use_changekey(changekey: str, data: UserResetEmail = Body(...),
                         session: AsyncSession = Depends(get_session)) -> dict:
     """use_changekey uses a changekey, changes the users email
 

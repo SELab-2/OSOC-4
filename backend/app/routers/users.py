@@ -71,11 +71,11 @@ async def change_email_me(Authorize: AuthJWT = Depends(), session: AsyncSession 
     :rtype: dict
     """
     current_user_id: int = int(Authorize.get_jwt_subject())
-    
+
     # User will always be found since otherwise they can't be authorized
     # No need to check whether user exists
     user = await read_where(User, User.id == current_user_id, session=session)
-    
+
     # create an change email key
     change_key, change_expires = generate_new_change_email_key()
     # save it
