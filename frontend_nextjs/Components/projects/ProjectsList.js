@@ -5,6 +5,7 @@ import { api, Url } from "../../utils/ApiClient";
 import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import { useWebsocketContext } from "../WebsocketProvider"
+import SearchBar from "../students/SearchBar";
 
 /**
  * Lists all the projects that a user is allowed to view.
@@ -218,12 +219,14 @@ export default function ProjectsList(props) {
      * The html of the ProjectList component.
      */
     return (
-        <Col className="fill_height fill_width">
+        <Col className="fill_height fill_width" style={{paddingTop: "11px"}}>
             <Row className="center-content projects-controls">
                 <Col className="search-project">
-                    <input type="text" value={search}
-                        placeholder={"Search projects"}
-                        onChange={e => handleSearch(e)} />
+
+                    <SearchBar doSearch={handleSearch} search={search} placeholder="Search projects" reset={() => {
+                        setSearch("");
+                        changeVisibleProjects(peopleNeeded, "");
+                    }}/>
 
                 </Col>
                 <Col xs="auto">
@@ -239,7 +242,7 @@ export default function ProjectsList(props) {
                 }
 
             </Row>
-            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 137px)" }}>
+            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 147px)" }}>
                 {
                     visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
                 }
