@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
-import { useRouter } from "next/router";
-import { api, Url } from "../../utils/ApiClient";
+import React, {useEffect, useState} from "react";
+import {Button, Col, Form, Row} from "react-bootstrap";
+import {useRouter} from "next/router";
+import {api, Url} from "../../utils/ApiClient";
 import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import { useWebsocketContext } from "../WebsocketProvider"
 import SearchBar from "../students/SearchBar";
+import useWindowDimensions from "../../utils/WindowDimensions";
 
 /**
  * Lists all the projects that a user is allowed to view.
@@ -22,10 +23,11 @@ export default function ProjectsList(props) {
     const [visibleProjects, setVisibleProjects] = useState([]);
     const [me, setMe] = useState(undefined);
     const [conflicts, setConflicts] = useState([]);
+    const { height, width } = useWindowDimensions();
 
     const router = useRouter()
 
-    const { websocketConn } = useWebsocketContext();
+    const {websocketConn} = useWebsocketContext();
 
     /**
      * Gets called once after mounting the Component and gets all the projects
@@ -108,7 +110,7 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
                     new_projects[i]["participations"][studentid] = data["participation"]
-                    new_projects[i] = { ...new_projects[i] }
+                    new_projects[i] = {...new_projects[i]}
                     setVisibleProjects([...new_projects])
                 }
             })
@@ -116,13 +118,13 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...allProjects]
                     new_projects[i]["participations"][studentid] = data["participation"]
-                    new_projects[i] = { ...new_projects[i] }
+                    new_projects[i] = {...new_projects[i]}
                     setAllProjects([...new_projects])
                     return true; // stop searching
                 }
             })
 
-        // A participation has been deleted
+            // A participation has been deleted
         } else if ("deleted_participation" in data) {
             const studentid = parseInt(data["studentId"])
             const projectid = parseInt(data["projectId"])
@@ -131,7 +133,7 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...visibleProjects]
                     delete new_projects[i]["participations"][studentid]
-                    new_projects[i] = { ...new_projects[i] }
+                    new_projects[i] = {...new_projects[i]}
                     setVisibleProjects([...new_projects])
                 }
             })
@@ -139,13 +141,13 @@ export default function ProjectsList(props) {
                 if (p["id_int"] === projectid) {
                     let new_projects = [...allProjects]
                     delete new_projects[i]["participations"][studentid]
-                    new_projects[i] = { ...new_projects[i] }
+                    new_projects[i] = {...new_projects[i]}
                     setAllProjects([...new_projects])
                     return true; // stop searching
                 }
             })
 
-        // A project has been deleted.
+            // A project has been deleted.
         } else if ("deleted_project" in data) {
             const projectid = data["deleted_project"];
 
@@ -220,7 +222,8 @@ export default function ProjectsList(props) {
      */
     return (
         <Col className="fill_height fill_width" style={{paddingTop: "11px"}}>
-            <Row className="center-content projects-controls">
+            {width > 800?
+            <Row className="projects-controls">
                 <Col className="search-project">
 
                     <SearchBar doSearch={handleSearch} search={search} placeholder="Search projects" reset={() => {
@@ -231,18 +234,44 @@ export default function ProjectsList(props) {
                 </Col>
                 <Col xs="auto">
                     <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded} onChange={changePeopleNeeded} />
-                </Col >
-                <Col xs="auto" >
+                </Col>
+                <Col xs="auto">
                     <ConflictCard conflicts={conflicts} />
                 </Col>
                 {me !== undefined && me.role === 2 ?
-                    <Col xs="auto" >
+                    <Col xs="auto">
                         <Button className={"center"} onClick={handleNewProject}>New project</Button>
                     </Col> : null
                 }
 
             </Row>
-            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 147px)" }}>
+            :
+            <>
+                <Row className="responsive-projects-btns">
+                    <Col xs="auto">
+                        <ConflictCard conflicts={conflicts}/>
+                    </Col>
+                    {me !== undefined && me.role === 2 ?
+                        <Col xs="auto">
+                            <Button className={"center"} onClick={handleNewProject}>New project</Button>
+                        </Col> : null
+                    }
+                </Row>
+                <div className="projectlist-top-bar-responsive">
+                    <Row className="projects-controls projects-controls-responsive">
+                        <SearchBar doSearch={handleSearch} search={search} placeholder="Search projects" reset={() => {
+                            setSearch("");
+                            changeVisibleProjects(peopleNeeded, "");
+                        }}/>
+                        <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded}
+                                    onChange={changePeopleNeeded}/>
+                    </Row>
+                </div>
+            </>
+        }
+
+
+            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 77px)" }}>
                 {
                     visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
                 }
