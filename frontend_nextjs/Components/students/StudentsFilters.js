@@ -215,14 +215,14 @@ export default function StudentsFilters() {
                 <Col><h3>Own Suggestion</h3></Col>
             </Row>
 
-            <StudentsFilter filter_id="undecided-checkbox" filter_text="No suggestion"
+            <StudentsFilter filter_id="none-suggestion-checkbox" filter_text="No suggestion"
                 value={own_suggestion.includes("no-suggestion")}
                 onChange={(ev) => addFilter("own_suggestion", own_suggestion, "no-suggestion", ev.target.checked)} />
-            <StudentsFilter filter_id="yes-checkbox" filter_text="Yes" value={own_suggestion.includes("yes")}
+            <StudentsFilter filter_id="yes-sugguestion-checkbox" filter_text="Yes" value={own_suggestion.includes("yes")}
                 onChange={(ev) => addFilter("own_suggestion", own_suggestion, "yes", ev.target.checked)} />
-            <StudentsFilter filter_id="maybe-checkbox" filter_text="Maybe" value={own_suggestion.includes("maybe")}
+            <StudentsFilter filter_id="maybe-suggestion-checkbox" filter_text="Maybe" value={own_suggestion.includes("maybe")}
                 onChange={(ev) => addFilter("own_suggestion", own_suggestion, "maybe", ev.target.checked)} />
-            <StudentsFilter filter_id="no-checkbox" filter_text="No" value={own_suggestion.includes("no")}
+            <StudentsFilter filter_id="no-suggestion-checkbox" filter_text="No" value={own_suggestion.includes("no")}
                 onChange={(ev) => addFilter("own_suggestion", own_suggestion, "no", ev.target.checked)} />
 
         </Col>
