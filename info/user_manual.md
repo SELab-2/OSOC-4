@@ -1,4 +1,4 @@
-# User manual for OSOC Selection tool 
+# User manual for OSOC Selection tool
 #### [1. Introduction](#1-introduction-1)
 #### [2. Product information](#2-product-information-1)
 #### [3. Intended use](#3-intended-use-1)
@@ -70,14 +70,14 @@ This manual concerns the Open Summer Of Code Selection tool, version 2.
 
 
 ## 3. Intended use
-The tool is intended to be (and made to be) used by the selection-team of OSOC. With this we mean the people of OSOC itself that will supervise and conduct the selection-process (they are intended to be admins within our tool). And the people that will help the selection process by suggesting students (the coaches). These coaches will have to be invited every year, as these people mostly differ from edition to edition. 
+The tool is intended to be (and made to be) used by the selection-team of OSOC. With this we mean the people of OSOC itself that will supervise and conduct the selection-process (they are intended to be admins within our tool). And the people that will help the selection process by suggesting students (the coaches). These coaches will have to be invited every year, as these people mostly differ from edition to edition.
 
 
 
 ## 4. Installation guide
 
 ### 4.1. Configuration
-While developing or before installing you can use your own environment variables by using a .env file in the backend and/or frontend directory of the application. 
+While developing or before installing you can use your own environment variables by using a .env file in the backend and/or frontend directory of the application.
 
 An example .env file for the backend directory of the application (IP-addresses may need to be changed):
 ```
@@ -235,7 +235,7 @@ Something noticable is that the frontend can send back to the reverse proxy (whi
 ### 6.2. Directory structure
 Now follows a description of the directory structure we use
 ```
-OSOC-selection-tool/                   root of the repository   
+OSOC-selection-tool/                   root of the repository
 ├── LICENSE                            license (MIT)
 ├── docker-compose.yml                 docker-compose file for local deployment with env variables
 ├── deploy-docker-compose.yml          docker-compose file for deployment on our server
@@ -261,7 +261,7 @@ OSOC-selection-tool/                   root of the repository
 │   ├── Dockerfile                     dockerfile for the frontend
 │   ├── Components                     directory containing all components used to build pages
 │   ├── pages                          directory containing all pages (if a page has the name "settings.js" then "/settings" will be a route
-│   ├── public                         
+│   ├── public
 │   │   └── assets                     directory containing all images used in the frontend
 │   ├── styles                         directory containing all css files for the frontend
 │   ├── tests                          directory containing the tests for the frontend
@@ -273,7 +273,7 @@ OSOC-selection-tool/                   root of the repository
     ├── domain_model.svg               the domain model
     ├── architecture_and_design        images about the architecture and the design of the application
     ├── use-cases                      the usecases of the application
-    ├── interaction_diagrams           diagrams explaining how certain interactions work 
+    ├── interaction_diagrams           diagrams explaining how certain interactions work
     ├── screenshots                    screenshot of the frontend, used in user manual to to explain how to to certain tasks
     └── user_manual.md                 the user manual
 ```
@@ -321,7 +321,7 @@ _attributes:_ \
 **coach_id (FK)**: the id of the coach, primary key
 
 #### 7.1.4 Student
-A student, a representation of the tally form a student filled out with the info about them. 
+A student, a representation of the tally form a student filled out with the info about them.
 
 _attributes:_ \
 **id**: the id of the student, primary key \
@@ -459,7 +459,7 @@ The navigation bar, probably the most important part of any website. If you're l
 Clicking on any of these links will require some requests to the API as new data needs to be loaded.
 
 ### 8.4. Configuring settings
-The settings page, the place to configure (almost) everything! The page consists of multiple categories you can click on and will then open up to reveal the settings for that category. 
+The settings page, the place to configure (almost) everything! The page consists of multiple categories you can click on and will then open up to reveal the settings for that category.
 
 #### 8.4.1. Personal settings
 By default, when you arrive at the settings page, the category `personal settings` will be revealed, in here you can change you personal information like your name, email address and password. For each of these sub-categories you can find a button on the right that says "change" which opens up a window where you can change the chosen setting.
@@ -481,12 +481,12 @@ If you click on `Question tags` you'll see a list of the question tags for this 
 If you click on `Create new edition` you'll see a form that you can fill in, in order to create the new edition. You'll need to provide the year, name and description of the new edition, and then press the "create edition" button below.
 
 #### 8.4.3. Question-tags
-In this section we'll explain a bit further the usage of the question-tags. When a student fills out the tally-form, the questions and answers get send to our application. In our application we needed a way to know what meaning a question has. For example the questions "What's you name?", "First name?" or "What is your first name?" are all different questions, but they all have the name of the student as an answer, but how can we link more difficult questions to such an easy term like "name". That's exactly what question-tags are for. In the settings page under edition settings, you'll find `Question-tags`, where you can configure them. So basically all you need to do is connect a question to a tag, hence the name question-tags. 
+In this section we'll explain a bit further the usage of the question-tags. When a student fills out the tally-form, the questions and answers get send to our application. In our application we needed a way to know what meaning a question has. For example the questions "What's you name?", "First name?" or "What is your first name?" are all different questions, but they all have the name of the student as an answer, but how can we link more difficult questions to such an easy term like "name". That's exactly what question-tags are for. In the settings page under edition settings, you'll find `Question-tags`, where you can configure them. So basically all you need to do is connect a question to a tag, hence the name question-tags.
 
 What are they used for? \
 Well you select students based on different things, and these "things" might differ from year to year, For example you had a question what they study last year, but you wanted to add a question how far along they are in their studies for this year's edition. With question-tags everything becomes a lot more customizable. And also as we don't want to show all info of every student in the list of students, you would rather see the information that you value the most (which might differ from year to year). In the settings of question-tags, you can select for each question-tag whether you want to see that piece of information for each student in the list of students.
 
-We'll give you an example, right now the list of students is very empty, for every student only their name and the decision is shown. 
+We'll give you an example, right now the list of students is very empty, for every student only their name and the decision is shown.
 
 ![students list before](screenshots/students_list_before.png)
 
@@ -505,7 +505,7 @@ Below the edition settings you can find the `Manage users` settings. If you clic
 
 ![settings manageusers](screenshots/manageusers.png)
 
-The `Invite users` can be clicked on, if you do so you'll see a popup window where you can send people an invitation, so they can join the application. You simply type the email addresses of the people you want to invite in the text-area (every email address on a new line), and click the send invites button. You'll see the text change when the emails are sent. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line. 
+The `Invite users` can be clicked on, if you do so you'll see a popup window where you can send people an invitation, so they can join the application. You simply type the email addresses of the people you want to invite in the text-area (every email address on a new line), and click the send invites button. You'll see the text change when the emails are sent. Notice that you can type or copy-and-paste a list of email addresses in this text-area, please make sure that every email address is on a new line.
 
 ![invite users](screenshots/invite_users.png)
 
@@ -516,7 +516,7 @@ When you click on `Projects` in the navigation bar, you will see the following s
 
 ![projects](screenshots/projects.png)
 
-This screen has two sides. On the left you can see the student list with their filters. To find more info on this part, see [Students](#846-students). On the right part of the screen you see the projects. The two parts are seperated by a green arrow directing to the right inside a green circle. 
+This screen has two sides. On the left you can see the student list with their filters. To find more info on this part, see [Students](#846-students). On the right part of the screen you see the projects. The two parts are seperated by a green arrow directing to the right inside a green circle.
 
 On the right part of the screen (the projects part), you can see a searchbar, a reset button, a `people needed` checkbox, a `conflicts` button, a `new project` button and a list of projects. In the searchbar you can search projects by name. The cross on the right side of the searchbar is the reset button. By pushing this button, the search bar will become empty. The `people needed` checkbox allows you to see only the projects of which the required skills are not completely satisfied. If there is at least one required skill which is not linked to a student participation, this project will be shown when the `people needed` checkbox is enabled.
 The conflicts button allows you to watch all the students who are assigned to more than one project. The `New project` button redirects to another screen where you can create a new project. In the student list all projects are shown with a project card.
@@ -557,7 +557,7 @@ When you click on `Students` in the navigation bar, you will see the following s
 In this tab, you can an overview of the students and filter them, order them, watch details and send emails.
 
 ##### 8.4.6.1 Filter students
-On the left side of the screen, you can see the filters. 
+On the left side of the screen, you can see the filters.
 
 On the top, there are some general filters. The `only alumni` filter will only show students who have participated to osoc before. The `only student coach volunteers` filter will only show students who volunteered to be a student coach. The `only unmatched students` filter will only show students who are not matched to a project yet.
 
@@ -571,7 +571,7 @@ On the bottom you see the `Own suggestion` filter. Here you can filter the stude
 On the top of the screen, there is a searchbar to search through the students. Next to the searchbar, there is a reset button to make the searchbar empty. On the right, there is a dropdown to change the order of the student list. You can order the students by their name (ascending or descending) and on the newest/oldest student. The newest student is the student who filled in the tally form the most recently.
 
 ##### 8.4.6.3 Student details
-If you click on a student in the student list, you will see a screen like this. 
+If you click on a student in the student list, you will see a screen like this.
 
 ![student details](screenshots/student-details.png)
 
