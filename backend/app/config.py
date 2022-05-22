@@ -15,7 +15,7 @@ def get_api_path():
     :rtype: str
     """
     PATHPREFIX = os.getenv("PATHPREFIX", "")
-    API_BASE = (PATHPREFIX + "/api/" if PATHPREFIX else "/")
+    API_BASE = (PATHPREFIX + "/" if PATHPREFIX else "/")
     return API_BASE
 
 
