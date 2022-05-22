@@ -31,7 +31,6 @@ export default function ParticipationCard(props) {
             Url.fromUrl(props.participation.student).get().then(response => {
                 if (response.success) {
                     setStudent(response.data);
-                    console.log(response.data);
                 }
                 setLoading(false);
             })

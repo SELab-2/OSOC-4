@@ -370,8 +370,6 @@ class Cache {
 
         student = Url.fromUrl(url).get().then(res => {
             if (res.success) {
-                log("GET student was successful:")
-                log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
                     if (item["suggested_by_id"] === userid) {
