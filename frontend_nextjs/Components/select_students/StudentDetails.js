@@ -3,7 +3,7 @@ import {
     Col,
     Row,
 } from "react-bootstrap";
-import React, { useEffect, useState, useContext } from "react";
+import React, {useEffect, useState, useContext} from "react";
 import SuggestionsCount from "./SuggestionsCount";
 import Suggestion from "./Suggestion"
 import GeneralInfo from "./GeneralInfo"
@@ -12,15 +12,15 @@ import DecisionPopUpWindow from "./DecisionPopUpWindow"
 import SendEmailPopUpWindow from "./SendEmailPopUpWindow";
 import deleteIcon from '../../public/assets/delete.svg';
 import DeletePopUpWindow from "./DeletePopUpWindow";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 import closeIcon from "../../public/assets/close.svg";
 import Image from "next/image";
 
-import { Url, api } from "../../utils/ApiClient";
-import { getDecisionString } from "./StudentListelement";
-import { useSession } from "next-auth/react";
+import {Url, api} from "../../utils/ApiClient";
+import {getDecisionString} from "./StudentListelement";
+import {useSession} from "next-auth/react";
 import LoadingPage from "../LoadingPage"
-import { useWebsocketContext } from "../WebsocketProvider"
+import {useWebsocketContext} from "../WebsocketProvider"
 import Hint from "../Hint";
 
 /**
@@ -50,8 +50,8 @@ export default function StudentDetails(props) {
     const [decideField, setDecideField] = useState(-1);
     const [detailLoading, setDetailLoading] = useState(true);
 
-    const { websocketConn } = useWebsocketContext();
-    const { data: session, status } = useSession()
+    const {websocketConn} = useWebsocketContext();
+    const {data: session, status} = useSession()
     const [prevStudentid, setPrevStudentid] = useState(undefined)
 
     useEffect(() => {
@@ -102,14 +102,14 @@ export default function StudentDetails(props) {
                 if (data["suggestion"]["suggested_by_id"] === session["userid"]) {
                     new_student["own_suggestion"] = data["suggestion"];
                 }
-                setStudent({ ...new_student })
+                setStudent({...new_student})
             }
 
         } else if ("decision" in data) {
             if (student && student["id"] === data["id"]) {
                 let new_student = student
                 new_student["decision"] = data["decision"]["decision"];
-                setStudent({ ...new_student })
+                setStudent({...new_student})
                 setDecision(data["decision"]["decision"])
                 setDecideField(data["decision"]["decision"])
             }
@@ -144,8 +144,8 @@ export default function StudentDetails(props) {
             let suggestion = sortedsuggestions[i];
             let classNames = "suggestions-circle " + classes[suggestion["decision"]];
             result.push(<Suggestion key={i} suggestion={suggestion} classNames={classNames}
-                classNamesText={(suggestion["suggested_by_id"] === session["userid"]) ?
-                    "bold_text" : "null"} />)
+                                    classNamesText={(suggestion["suggested_by_id"] === session["userid"]) ?
+                                        "bold_text" : "null"}/>)
         }
 
         if (result.length > 0) {
@@ -174,7 +174,7 @@ export default function StudentDetails(props) {
         router.push({
             pathname: router.pathname,
             query: newQuery
-        }, undefined, { shallow: true })
+        }, undefined, {shallow: true})
     }
 
     /**
@@ -185,7 +185,7 @@ export default function StudentDetails(props) {
         return questionAnswers.map((questionAnswer, i) =>
             [
                 <Row key={"question" + i}
-                    className="student-details-question nomargin">{questionAnswer["question"]}</Row>,
+                     className="student-details-question nomargin">{questionAnswer["question"]}</Row>,
                 <Row key={"answer" + i} className="student-details-answer nomargin">{questionAnswer["answer"]}</Row>
             ]
         )
@@ -200,22 +200,22 @@ export default function StudentDetails(props) {
 
     if (detailLoading) {
         return (
-            <Col className="student-details-window" style={{ "position": "relative", "height": "calc(100vh - 75px)" }}>
-                <LoadingPage />
+            <Col className="student-details-window" style={{"position": "relative", "height": "calc(100vh - 75px)"}}>
+                <LoadingPage/>
             </Col>)
     }
 
     return (
-        <Col className="student-details-window" style={{ "height": "calc(100vh - 75px)" }}>
+        <Col className="student-details-window" style={{"height": "calc(100vh - 75px)"}}>
             {student["mandatory"] &&
                 <div>
                     <SuggestionPopUpWindow popUpShow={suggestionPopUpShow} setPopUpShow={setSuggestionPopUpShow}
-                        updateSuggestion={updateSuggestion} decision={suggestion} student={student} />
+                                           updateSuggestion={updateSuggestion} decision={suggestion} student={student}/>
                     <DecisionPopUpWindow popUpShow={decisionPopUpShow} setPopUpShow={setDecisionPopUpShow}
-                        decision={decideField} student={student} />
+                                         decision={decideField} student={student}/>
                     <SendEmailPopUpWindow popUpShow={emailPopUpShow} setPopUpShow={setEmailPopUpShow}
-                        decision={decision} student={student} />
-                    <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student} />
+                                          decision={decision} student={student}/>
+                    <DeletePopUpWindow popUpShow={deletePopUpShow} setPopUpShow={setDeletePopUpShow} student={student}/>
                 </div>
             }
 
@@ -229,7 +229,7 @@ export default function StudentDetails(props) {
                         <Col>
                             <Hint message="Delete the student" placement="top">
                                 <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                                    <Image src={deleteIcon} className="delete-icon" />
+                                    <Image src={deleteIcon} className="delete-icon"/>
                                 </button>
                             </Hint>
                         </Col>
@@ -237,12 +237,12 @@ export default function StudentDetails(props) {
                     <Row className="nomargin">
                         <ul className="nomargin nopadding">
                             {(student["skills"]) && student["skills"].map((skill, index) =>
-                                <li className="skill" style={{ display: "inline-block" }}
+                                <li className="skill" style={{display: "inline-block"}}
                                     key={index}>{skill["name"].toUpperCase()}</li>)}
                         </ul>
                     </Row>
                 </Col>
-                <Col />
+                <Col/>
                 <Col xs="auto" className="buttongroup-paddingtop">
                     <Row>
                         <Col xs="auto" className="nopadding">
@@ -259,14 +259,14 @@ export default function StudentDetails(props) {
                         <Col xs="auto" className="close-button">
                             <Hint message="Close the details" placement="top">
                                 <Image onClick={() => hideStudentDetails()} className="d-inline-block align-top"
-                                    src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'} />
+                                       src={closeIcon} alt="close-icon" width="42px" height="42px" objectFit={'contain'}/>
                             </Hint>
                         </Col>
                     </Row>
                     <Row>
                         <Col>
                             <select className="dropdown-decision" id="dropdown-decision"
-                                onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
+                                    onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
                                 <option value={-1}>Undecided</option>
                                 <option value={0}>No</option>
                                 <option value={1}>Maybe</option>
@@ -275,7 +275,7 @@ export default function StudentDetails(props) {
                         </Col>
                         <Col md="auto">
                             <Button className="suggest-confirm-button" disabled={decideField == decision}
-                                onClick={() => setDecisionPopUpShow(true)}>
+                                    onClick={() => setDecisionPopUpShow(true)}>
                                 Confirm
                             </Button>
                         </Col>
@@ -285,20 +285,20 @@ export default function StudentDetails(props) {
             <Row className="remaining-height-details" md="auto" style={{}}>
                 <Col className="fill_height scroll-overflow">
                     <Row md="auto" className="decision nomargin">
-                        <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)} />
+                        <GeneralInfo listelement={false} student={student} decision={getDecisionString(decision)}/>
                     </Row>
                     <Row md="auto" className="nomargin">
                         <Button className="send-email-button" disabled={decision === -1}
-                            onClick={() => setEmailPopUpShow(true)}>
+                                onClick={() => setEmailPopUpShow(true)}>
                             Send email
                         </Button>
                     </Row>
 
                     <Row md="auto" className="h2-titles student-details-suggestions-line nomargin">
                         <Col md="auto" className="suggestions-title"><h2>Suggestions</h2></Col>
-                        <SuggestionsCount ownsuggestion={student["own_suggestion"]} suggestionsYes={getSuggestionsCount(2)}
-                            suggestionsMaybe={getSuggestionsCount(1)}
-                            suggestionsNo={getSuggestionsCount(0)} />
+                        <SuggestionsCount suggestionsYes={getSuggestionsCount(2)}
+                                          suggestionsMaybe={getSuggestionsCount(1)}
+                                          suggestionsNo={getSuggestionsCount(0)}/>
                     </Row>
                     {getSuggestions()}
 

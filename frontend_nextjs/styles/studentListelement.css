@@ -52,45 +52,30 @@
 }
 
 .suggestionsYes {
-    width: 28px;
-    height: 28px;
+    width: 25px;
+    height: 25px;
     text-align: center;
-    border: 3px solid transparent;
     padding-left: 0;
     padding-right: 0;
     background-color: var(--yes_green_65);
 }
 
-.suggestionsYes.selected {
-    border: 3px solid rgb(42, 145, 49);
-}
-
 .suggestionsMaybe {
-    width: 28px;
-    height: 28px;
+    width: 25px;
+    height: 25px;
     padding-left: 0;
     padding-right: 0;
     text-align: center;
-    border: 3px solid transparent;
     background-color: var(--maybe_yellow_65);
 }
 
-.suggestionsMaybe.selected {
-    border: 3px solid rgb(208, 133, 41);
-}
-
 .suggestionsNo {
-    width: 28px;
-    height: 28px;
+    width: 25px;
+    height: 25px;
     padding-left: 0;
     padding-right: 0;
-    border: 3px solid transparent;
     text-align: center;
     background-color: var(--no_red_65);
-}
-
-.suggestionsNo.selected {
-    border: 3px solid rgb(137, 33, 33);
 }
 
 .skill {
