@@ -1,3 +1,7 @@
+.students-controls > * {
+    margin: 7pt 0;
+}
+
 .students_list {
     margin: 0 30px 0 20px;
     padding: 0;
