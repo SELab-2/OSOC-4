@@ -133,15 +133,25 @@
 
 .prevnextbutton {
     font-size: 20px;
+    cursor: pointer;
     background-color: #f1f1f1;
     color: black;
     border-radius: 50%;
     width: 40px;
     height: 40px;
     border-width: 0;
-    margin-left: 10px;
 }
 
 .prevnextbutton:hover {
     background-color: #ddd;
+}
+
+.conflict-resolve-page-col{
+    min-width: 48px;
+}
+
+.conflict-resolve-page-number{
+    margin-top: 4px;
+    margin-left: 8px;
+    margin-right: 10px;
 }
