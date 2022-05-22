@@ -99,6 +99,7 @@ SENDER_PASSWORD=Justapassword123!
 # Invite Settings
 INVITE_EXPIRE=4320 # in minutes
 PASSWORDRESET_EXPIRE=30 # in minutes
+CHANGE_EMAIL_EXPIRE=30 # in minutes
 
 # Testing
 TEST_EMAIL=osoc.groep4+test@gmail.com

@@ -15,7 +15,7 @@ from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
 from app.routers import (auth, ddd, editions, emailtemplates, participations,
                          projects, reset_password, sendemails, skills,
-                         students, suggestions, tally, user_invites, users)
+                         students, suggestions, tally, user_invites, users, change_email)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -60,6 +60,7 @@ app.include_router(tally.router)
 app.include_router(user_invites.router)
 app.include_router(reset_password.router)
 app.include_router(users.router)
+app.include_router(change_email.router)
 
 
 @app.exception_handler(BaseException)

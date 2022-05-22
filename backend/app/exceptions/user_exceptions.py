@@ -15,6 +15,17 @@ class PasswordsDoNotMatchException(BaseException):
         super().__init__(400, "Passwords do not match")
 
 
+class EmailsDoNotMatchException(BaseException):
+    """EmailsDoNotMatchException Exception when the two emails do not match when creating a user
+
+    :param BaseException: inherits from BaseException
+    """
+    def __init__(self):
+        """__init__ inits parent class with status code and message
+        """
+        super().__init__(400, "Emails do not match")
+
+
 class EmailAlreadyUsedException(BaseException):
     """EmailAlreadyUsedException Exception when trying to create user that with email that is already in use
 
