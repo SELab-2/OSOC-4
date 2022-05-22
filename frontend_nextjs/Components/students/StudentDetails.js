@@ -55,6 +55,18 @@ export default function StudentDetails(props) {
     const { websocketConn } = useWebsocketContext();
     const { data: session, status } = useSession()
     const [prevStudentid, setPrevStudentid] = useState(undefined)
+    const [me, setMe] = useState(undefined);
+
+    /**
+     * This useEffect initializes the 'me' state variable.
+     */
+    useEffect(() => {
+        Url.fromName(api.myself).get().then(res => {
+            if (res.success) {
+                setMe(res.data.data);
+            }
+        });
+    }, [])
 
     /**
      * This useEffect adds event listeners to call updateFromWebsocket when data has changed.
@@ -349,21 +361,23 @@ export default function StudentDetails(props) {
                             </Hint>
                         </Col>
                     </Row>
-                    <div>
-                        <select className="dropdown-decision" id="dropdown-decision"
-                            onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
-                            <option value={-1}>Undecided</option>
-                            <option value={0}>No</option>
-                            <option value={1}>Maybe</option>
-                            <option value={2}>Yes</option>
-                        </select>
-                        <Hint message="Confirms the decision">
-                            <Button className="suggest-confirm-button" disabled={decideField === decision}
-                                onClick={() => setDecisionPopUpShow(true)}>
-                                Confirm
-                            </Button>
-                        </Hint>
-                    </div>
+                    {(me.role === 2) &&
+                      <div>
+                          <select className="dropdown-decision" id="dropdown-decision"
+                                  onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
+                              <option value={-1}>Undecided</option>
+                              <option value={0}>No</option>
+                              <option value={1}>Maybe</option>
+                              <option value={2}>Yes</option>
+                          </select>
+                          <Hint message="Confirms the decision">
+                              <Button className="suggest-confirm-button" disabled={decideField === decision}
+                                      onClick={() => setDecisionPopUpShow(true)}>
+                                  Confirm
+                              </Button>
+                          </Hint>
+                      </div>
+                    }
                 </Col>
             </Row>
             <Row className="nomargin" md="auto" style={{}}>
