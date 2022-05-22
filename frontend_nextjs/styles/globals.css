@@ -46,3 +46,7 @@ input {
   border-color: var(--gray1) !important;
   padding-left: 7px;
 }
+
+.nopadding{
+  padding: 0;
+}
