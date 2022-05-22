@@ -8,6 +8,7 @@ from app.config import config
 from app.crud import count_where, read_where, update
 from app.database import db, get_session
 from app.exceptions.user_exceptions import InvalidEmailOrPasswordException
+from app.models.edition import Edition
 from app.models.passwordreset import EmailInput
 from app.models.tokens import TokenExtended
 from app.models.user import User, UserLogin, UserRole
@@ -22,6 +23,9 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+import datetime
+from app.models.question import Question
+from app.models.question_tag import QuestionTag
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 load_dotenv()
@@ -117,6 +121,15 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
             approved=True,
             disabled=False)
         u = await update(new_user, session)
+        year = datetime.date.today().year
+        # make the first edition
+        new_edition = await update(Edition(year=year, name="my first edition"), session=session)
+        for mand_tag in ["first name", "last name", "email", "alumni", "student-coach", "skills"]:
+            new_q = Question(edition=new_edition.year, question="please configure the question fot the tag '" + mand_tag + "'.")
+            await update(new_q, session=session)
+            new_qt = QuestionTag(edition=new_edition.year, tag=mand_tag, question=new_q, mandatory=True, show_in_list=False)
+            await update(new_qt, session=session)
+
     else:
         u = await read_where(User,
                              User.email == user.email, User.disabled == False, User.active == True,
