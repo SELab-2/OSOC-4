@@ -6,6 +6,7 @@ import ProjectCard from "./ProjectCard";
 import ConflictCard from "./ConflictCard";
 import { useWebsocketContext } from "../WebsocketProvider"
 import SearchBar from "../students/SearchBar";
+import useWindowDimensions from "../../utils/WindowDimensions";
 
 /**
  * Lists all the projects that a user is allowed to view.
@@ -22,6 +23,7 @@ export default function ProjectsList(props) {
     const [visibleProjects, setVisibleProjects] = useState([]);
     const [me, setMe] = useState(undefined);
     const [conflicts, setConflicts] = useState([]);
+    const { height, width } = useWindowDimensions();
 
     const router = useRouter()
 
@@ -220,7 +222,7 @@ export default function ProjectsList(props) {
      */
     return (
         <Col className="fill_height fill_width" style={{paddingTop: "11px"}}>
-            {props.fullview ?
+            {width > 800?
             <Row className="projects-controls">
                 <Col className="search-project">
 
@@ -257,9 +259,10 @@ export default function ProjectsList(props) {
                 </Row>
                 <div className="projectlist-top-bar-responsive">
                     <Row className="projects-controls projects-controls-responsive">
-                        <input className="search-project-small" type="text" value={search}
-                               placeholder={"Search projects"}
-                               onChange={e => handleSearch(e)}/>
+                        <SearchBar doSearch={handleSearch} search={search} placeholder="Search projects" reset={() => {
+                            setSearch("");
+                            changeVisibleProjects(peopleNeeded, "");
+                        }}/>
                         <Form.Check type={"checkbox"} label={"People needed"} id={"checkbox"} checked={peopleNeeded}
                                     onChange={changePeopleNeeded}/>
                     </Row>
@@ -268,7 +271,7 @@ export default function ProjectsList(props) {
         }
 
 
-            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 147px)" }}>
+            <Row className="nomargin scroll-overflow" style={{ "height": "calc(100vh - 77px)" }}>
                 {
                     visibleProjects.length ? (visibleProjects.map((project, index) => (<ProjectCard project={project} selectedProject={props.selectedProject} setSelectedProject={props.setSelectedProject} />))) : null
                 }

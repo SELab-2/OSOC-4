@@ -37,7 +37,7 @@ export default function Projects() {
      */
     return (
         <>
-            {! fullView ?
+            {width <= 800 ?
             <>
                 <div className="project-top-bar-responsive">
                     <Row className="nomargin">
@@ -70,10 +70,9 @@ export default function Projects() {
                     </Col>
                 </Row>
             </>
-                
                 :
             <Row className="fill_height fill_width remaining_height">
-                <StudentsFilters/>
+                {fullView? <StudentsFilters/> : null}
                 <Col>
                     <StudentListAndFilters setSelectedStudents={setSelectedStudents} selectedStudents={selectedStudents}
                                            elementType="projects" fullview={fullView}/>
