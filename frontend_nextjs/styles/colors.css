@@ -32,7 +32,7 @@
     --selection-gray: rgb(150, 150, 150);
     --not-selected-gray: rgb(200, 200, 200);
     --background-gray: #E5E9F2;
-    --conflicts-background: #DD4648;
+    --conflicts-background: #DA3437;
 
     /* toast colors*/
     --toastify-color-info: var(--dark_blue);
