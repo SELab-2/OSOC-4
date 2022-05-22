@@ -4,53 +4,53 @@
 #### [3. Intended use](#3-intended-use-1)
 #### [4. Installation guide](#4-installation-guide-1)
 
-[4.1. Configuration](#41-configuration)
-[4.2. Requirements](#42-requirements)
-[4.3. Local installation](#43-local-installation)
+[4.1. Configuration](#41-configuration) \
+[4.2. Requirements](#42-requirements) \
+[4.3. Local installation](#43-local-installation) \
 [4.4. Automatic deployment](#44-automatic-deployment)
 
 #### [5. How to further develop & test](#5-how-to-further-develop--test-1)
 
-[5.1. Further development](#51-further-development)
+[5.1. Further development](#51-further-development) \
 [5.2. Testing](#52-testing)
 
 #### [6. Architecture and Design](#6-architecture-and-design-1)
 
-[6.1. Architecture and Design](#61-architecture-and-design)
+[6.1. Architecture and Design](#61-architecture-and-design) \
 [6.2. Directory structure](#62-directory-structure)
 
 #### [7. Description of the main product elements](#7-description-of-the-main-product-elements-1)
 
-[7.1. Domain Model](#71-domain-model)
-[7.1.1. Edition](#711-edition)
-[7.1.2. User](#712-user)
-[7.1.3. EditionCoach](#713-editioncoach)
-[7.1.4. Student](#714-student)
-[7.1.5. QuestionAnswer](#715-questionanswer)
-[7.1.6. Answer](#716-answer)
-[7.1.7. Question](#717-question)
-[7.1.8. QuestionTag](#718-questiontag)
-[7.1.9. Skill](#719-skill)
-[7.1.10. StudentSkill](#7110-studentskill)
-[7.1.11. Project](#7111-project)
-[7.1.12. ProjectRequiredSkill](#7112-projectrequiredskill)
-[7.1.13. ProjectCoach](#7113-projectcoach)
-[7.1.14. Suggestion](#7114-suggestion)
-[7.1.15. Participation](#7115-participation)
+[7.1. Domain Model](#71-domain-model) \
+[7.1.1. Edition](#711-edition) \
+[7.1.2. User](#712-user) \
+[7.1.3. EditionCoach](#713-editioncoach) \
+[7.1.4. Student](#714-student) \
+[7.1.5. QuestionAnswer](#715-questionanswer) \
+[7.1.6. Answer](#716-answer) \
+[7.1.7. Question](#717-question) \
+[7.1.8. QuestionTag](#718-questiontag) \
+[7.1.9. Skill](#719-skill) \
+[7.1.10. StudentSkill](#7110-studentskill) \
+[7.1.11. Project](#7111-project) \
+[7.1.12. ProjectRequiredSkill](#7112-projectrequiredskill) \
+[7.1.13. ProjectCoach](#7113-projectcoach) \
+[7.1.14. Suggestion](#7114-suggestion) \
+[7.1.15. Participation](#7115-participation) \
 [7.1.16. DefaultEmail](#7116-defaultemail)
 
 #### [8. Interactions and use cases](#8-interactions-and-use-cases-1)
 
-[8.1. Interaction diagram](#81-interaction-diagram)
-[8.2. Logging in](#82-logging-in)
-[8.3. Navigating the application](#83-navigating-the-application)
-[8.4. Configuring settings](#84-configuring-settings)
-[8.4.1. Personal settings](#841-personal-settings)
-[8.4.2. Edition settings](#842-edition-settings)
-[8.4.3. Question-tags](#843-question-tags)
-[8.4.4. Managing users](#844-managing-users)
-[8.4.5 Projects](#845-projects)
-[8.4.6 Students](#846-students)
+[8.1. Interaction diagram](#81-interaction-diagram) \
+[8.2. Logging in](#82-logging-in) \
+[8.3. Navigating the application](#83-navigating-the-application) \
+[8.4. Configuring settings](#84-configuring-settings) \
+[8.4.1. Personal settings](#841-personal-settings) \
+[8.4.2. Edition settings](#842-edition-settings) \
+[8.4.3. Question-tags](#843-question-tags) \
+[8.4.4. Managing users](#844-managing-users) \
+[8.4.5 Projects](#845-projects) \
+[8.4.6 Students](#846-students) \
 [8.5. Adding new users](#85-adding-new-users)
 
 
