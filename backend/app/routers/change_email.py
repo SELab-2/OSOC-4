@@ -9,10 +9,10 @@ from app.utils.response import response
 from app.models.user import UserResetEmail
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.user import User, UserResetPassword
 from app.exceptions.permissions import NotPermittedException
 
 router = APIRouter(prefix="/change")
+
 
 @router.get("/{changekey}")
 async def valid_changekey(changekey: str, session: AsyncSession = Depends(get_session)) -> dict:
@@ -33,9 +33,10 @@ async def valid_changekey(changekey: str, session: AsyncSession = Depends(get_se
     else:
         raise InvalidChangeKeyException()
 
+
 @router.post("/{changekey}")
-async def use_changekey(changekey: str, data: UserResetEmail = Body(...),
-                       session: AsyncSession = Depends(get_session)) -> dict:
+async def use_changekey(changekey: str, data: UserResetEmail = Body(...), 
+                        session: AsyncSession = Depends(get_session)) -> dict:
     """use_changekey uses a changekey, changes the users email
 
     :param use_changekey: the reset key

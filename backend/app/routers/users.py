@@ -9,7 +9,7 @@ from app.exceptions.user_exceptions import (InvalidEmailOrPasswordException,
                                             UserAlreadyActiveException,
                                             UserBadStateException,
                                             UserNotFoundException)
-from app.models.edition import Edition, EditionCoach
+from app.models.edition import EditionCoach
 from app.models.user import (ChangePassword, ChangeUser, ChangeUserMe, User,
                              UserCreate, UserMe, UserOut, UserOutSimple,
                              UserRole)
@@ -24,8 +24,6 @@ from app.utils.mailsender import send_change_email_email
 from fastapi import APIRouter, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlmodel import select
 
 router = APIRouter(prefix="/users")
 
@@ -73,11 +71,12 @@ async def change_email_me(Authorize: AuthJWT = Depends(), session: AsyncSession 
     :rtype: dict
     """
     current_user_id: int = int(Authorize.get_jwt_subject())
-    user = await read_where(User, User.id == current_user_id, session=session)
+    
     # User will always be found since otherwise they can't be authorized
     # No need to check whether user exists
-
-    #create an change email key
+    user = await read_where(User, User.id == current_user_id, session=session)
+    
+    # create an change email key
     change_key, change_expires = generate_new_change_email_key()
     # save it
     db.redis.setex(change_key, change_expires, str(user.id))

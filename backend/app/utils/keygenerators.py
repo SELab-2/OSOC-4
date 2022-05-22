@@ -13,7 +13,8 @@ from dotenv import load_dotenv
 load_dotenv()
 INVITE_EXPIRE = os.getenv('INVITE_EXPIRE')
 PASSWORDRESET_EXPIRE = os.getenv('PASSWORDRESET_EXPIRE')
-CHANGE_EMAIL_EXPIRE= os.getenv("CHANGE_EMAIL_EXPIRE")
+CHANGE_EMAIL_EXPIRE = os.getenv("CHANGE_EMAIL_EXPIRE")
+
 
 def generate_random_key(length: int) -> str:
     """generate_random_key generate random string of x chars
@@ -59,7 +60,7 @@ def generate_new_reset_password_key() -> Tuple[str, int]:
     return invite_key, reset_password_expires
 
 
-def generate_new_change_email_key() ->Tuple[str, int]:
+def generate_new_change_email_key() -> Tuple[str, int]:
     """generate_new_change_email_key generate change email key
 
     :return: change email key and change email expire

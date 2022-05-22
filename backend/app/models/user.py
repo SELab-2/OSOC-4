@@ -179,11 +179,11 @@ class UserResetPassword(BaseModel):
 
 
 class UserResetEmail(BaseModel):
-    """the expected input model for a user changing his email adres
+    """the expected input model for a user changing his email address
     """
     email: str
     validateEmail: str
-    
+
     @validator('email')
     def email_lowercase_with_format(cls, v: str) -> str:
         """validates an email address and transforms it to lowercase
