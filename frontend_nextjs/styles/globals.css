@@ -47,6 +47,14 @@ input {
   padding-left: 7px;
 }
 
+.btn-primary{
+  font-weight: bold !important;
+}
+
+.btn-secondary{
+  font-weight: bold !important;
+}
+
 .nopadding{
   padding: 0;
 }

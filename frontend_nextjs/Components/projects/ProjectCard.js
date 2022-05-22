@@ -28,7 +28,6 @@ export default function ProjectCard(props) {
      */
     const toProjectDetails = () => {
         log("navigate to new project")
-        // currently hacky way to get id will be changed with updated api
         let list_id = props.project.id.split("/")
         let id = list_id[list_id.length - 1]
 
@@ -89,7 +88,6 @@ export default function ProjectCard(props) {
                         </Col>
                     </Row>
                     <div className={"partner-title"} >{props.project.partner_name}</div>
-                    {/*todo make this clickable with link to partner?*/}
                     <br />
                     <br />
                     <Row>
