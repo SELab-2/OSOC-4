@@ -17,8 +17,8 @@ export default function ConflictCard(props) {
         <div>
             <ConflictsPopUpWindow popUpShow={conflictsShow} setPopUpShow={setConflictsShow}
                                    conflicts={props.conflicts} />
-            <Button variant={"conflicts"} onClick={() => setConflictsShow(true)}
-                    disabled={props.conflicts.length === 0}>conflicts {props.conflicts.length}</Button>
+            <Button style={{backgroundColor: "var(--conflicts-background)", borderWidth: "0"}}
+                    onClick={() => setConflictsShow(true)}>conflicts {props.conflicts.length}</Button>
         </div>
     )
 }
