@@ -32,9 +32,30 @@ ul {
 .image-button,
 .image-button:hover,
 .image-button:active,
-.image-button:after {
+.image-button:after,
+.image-button:focus {
   background-color: transparent;
   border: none;
   padding: 0 0 0 0;
   margin: 0 0 0 0;
+}
+
+input {
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: var(--gray1) !important;
+  padding-left: 7px;
+}
+
+.btn-primary{
+  font-weight: bold !important;
+}
+
+.btn-secondary{
+  font-weight: bold !important;
+}
+
+.nopadding{
+  padding: 0;
 }

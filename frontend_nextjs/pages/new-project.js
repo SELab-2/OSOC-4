@@ -1,180 +1,183 @@
-import {Button, Card, Col, Form, Modal, Row} from "react-bootstrap";
+import {Button, Form, Modal, Row, Col, Alert} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import SelectSearch, {fuzzySearch} from "react-select-search";
 import {api, Url} from "../utils/ApiClient";
-import {log} from "../utils/logger";
+import RequiredSkillSelector from "../Components/projects/RequiredSkillSelector";
+import back from "/public/assets/back.svg";
+import Hint from "../Components/Hint";
+import Image from 'next/image';
+import plus from "/public/assets/plus.svg";
+import { checkProjectBody} from "../utils/inputchecker"
+import { ToastContainer, toast } from 'react-toastify';
 
-
+/**
+ * This page renders the 'new project' page. The page is used to make a new project.
+ * @returns {JSX.Element} The component that renders the 'new project' page.
+ * @constructor
+ */
 export default function NewProjects() {
     const [projectName, setProjectName] = useState("")
     const [partnerName, setPartnerName] = useState("")
     const [partnerDescription, setPartnerDescription] = useState("")
     const [projectDescription, setProjectDescription] = useState("")
-    const [briefing, setBriefing] = useState("")
 
-    const [tools, setTools] = useState("")
-    const [codeLanguages, setCodeLanguages] = useState("")
-
-    const [students, setStudents] = useState([{"skill":"", "amount":1}])
-
+    const [requiredSkills, setRequiredSkills] = useState([{"skill_name":"", "number":1}])
     const [skills, setSkills] = useState([])
     const [show, setShow] = useState(false);
-
+    const [availableSkills, setAvailableSkills] = useState([])
+    const [showError, setShowError] = useState(false);
 
     const router = useRouter()
 
-
+    /**
+     * This useEffect initializes the skills and availableSkills state variables.
+     */
     useEffect(() => {
-        if (skills.length === 0) {
-            Url.fromName(api.skills).get().then(async res => {
-                if (res.success) {
-                    res = res.data;
-                    if(res){
-                        // scuffed way to get unique skills (should be fixed in backend soon)
-                        let array = [];
-                        res.map(skill => array.push({"value":skill, "name":skill}));
-                        setSkills(array);
-                    }
+        Url.fromName(api.skills).get().then(async res => {
+            if (res.success) {
+                res = res.data;
+                if(res){
+                    // scuffed way to get unique skills (should be fixed in backend soon)
+                    let array = [];
+                    res.map(skill => array.push({"value":skill, "label":skill}));
+                    setSkills(array);
+                    setAvailableSkills(res)
                 }
-            })
+            }
+        })
+    }, [])
 
-        }
-    })
-
-    async function DeleteStudent(index) {
-        if (students.length > 1) {
-            await setStudents(students.filter((_, i) => i !== index))
-        }
+    /**
+     * This function adds a required skill to the project.
+     */
+    function addRequiredSkill(){
+        event.preventDefault()
+        setRequiredSkills(prevState => [...prevState, {"number": 1, "skill_name": ""}])
     }
 
-    function changeSkillStudent(index, value){
-        let newArr = [...students]
-        newArr[index].skill = value
-        setStudents(newArr)
-    }
-
-    function AddToStudent(index, amount){
-        if (0 < (students[index].amount + amount) &&  (students[index].amount + amount) < 100){
-            let newArr = [...students]
-            newArr[index]["amount"] += amount
-            setStudents(newArr)
+    /**
+     * This function changes a required skill by changing the label or the amount needed.
+     * @param value The new required skill.
+     * @param index The index of hte required skill in the requiredSkills list.
+     */
+    function changeRequiredSkill(value, index){
+        if(requiredSkills[index].label !== ""){
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label)), requiredSkills[index].skill_name])
+        } else {
+            setAvailableSkills(prevState => [...(prevState.filter(skill => skill !== value.label))])
         }
+        let newArray = [...requiredSkills]
+        newArray[index].skill_name = value.value
+        setRequiredSkills(newArray)
     }
 
-    function AddStudent(){
-        // can't have more different type of students then amount of skills
-        if (students.length <= skills.length){
-            setStudents(prevState => [...prevState, {"skill": "", "amount": 1}])
-        }
-    }
-
+    /**
+     * This function handles the submit button of the new project. First, it checks if the inputted fields are valid.
+     * If so, it posts the inputted fields to the database. If not, it shows an error message.
+     * @param event
+     * @returns {Promise<void>}
+     */
     async function handleSubmitChange(event){
         event.preventDefault()
-        // TODO check forms
         let body = {
             "name":projectName,
             "description":projectDescription,
-            "goals": "",
-            "required_skills": [],
+            "required_skills": requiredSkills,
             "partner_name":partnerName,
             "partner_description": partnerDescription,
-            "edition": api.year,
-            "users": []
+            "edition": api.getYear()
         }
-        log(body)
-        // TODO add skills to project
-        await Url.fromName(api.projects).extend("/create").setBody(body).post();
+        let response = checkProjectBody(body)
+        if(response.correct){
+            let res = await Url.fromName(api.projects).extend("/create").setBody(body).post();
+            if(res.success){
+                router.push("/projects")
+                toast.done("Project created succesfully!")
+            } else {
+                toast.error("Could not create new project")
+            }
+        }  else {
+            toast.error("You have given an incorrect " + response.problem)
+        }
+
     }
 
+    /**
+     * Returns the html of the 'new project' page.
+     */
+    return(
+        <div className={"add-project-body"}>
+            <Row className={"project-top-bar nomargin"}>
+                <Col xs={"auto"}>
+                    <Hint message="Go back" placement="top">
+                        <Image alt={"back button"} onClick={() => setShow(true)} src={back} width={100} height={33}/>
+                    </Hint>
 
-        return(
-        <div>
-            <Button onClick={() => setShow(true)}>Go back to projects</Button>
+                    <Modal show={show} onHide={() => setShow(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Leave page?</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>Doing so will lose all your current progress.</Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => {
+                                setShow(false)
+                                router.push("/projects")
+                            }}>
+                                Leave page
+                            </Button>
+                            <Button variant="primary" onClick={() => setShow(false)}>
+                                Stay on page
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                </Col>
 
-            <Modal show={show} onHide={() => setShow(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Leave page?</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Doing so will lose all your current progress.</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
-                        setShow(false)
-                        router.push("/projects")
-                    }}>
-                        Leave page
-                    </Button>
-                    <Button variant="primary" onClick={() => setShow(false)}>
-                        Stay on page
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+                <Col>
+                    <div className={"project-details-project-title"}>New project</div>
+                </Col>
+            </Row>
+            <div className={"project-details-page"}>
+                <Form onSubmit={handleSubmitChange}>
+                    <h5 className={"add-project-label"}>Project name:</h5>
+                    <Form.Control type="text" value={projectName} placeholder={"Project name"} onChange={e => setProjectName(e.target.value)} />
 
-            <h1>New project</h1>
-            <Form onSubmit={handleSubmitChange}>
-                <Form.Label>Project name:</Form.Label>
-                <Form.Control type="text" value={projectName} placeholder={"Project name"} onChange={e => setProjectName(e.target.value)} />
+                    <h5 className={"add-project-label"}>Partner name:</h5>
+                    <Form.Control type="text" value={partnerName} placeholder={"Partner name"} onChange={e => setPartnerName(e.target.value)} />
 
-                <Form.Label>Partner name:</Form.Label>
-                <Form.Control type="text" value={partnerName} placeholder={"Partner name"} onChange={e => setPartnerName(e.target.value)} />
+                    <h5 className={"add-project-label"}>About partner:</h5>
+                    <Form.Control as="textarea" rows={3} value={partnerDescription} placeholder={"Short bio about the partner, website, ..."} onChange={e => setPartnerDescription(e.target.value)} />
 
-                <Form.Label>About partner:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={partnerDescription} placeholder={"Short bio about the partner, website, ..."} onChange={e => setPartnerDescription(e.target.value)} />
-
-                <Form.Label>About project:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={projectDescription} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectDescription(e.target.value)} />
-
-                <Form.Label>Briefing:</Form.Label>
-                <Form.Control as="textarea" rows={3} value={briefing} placeholder={"Link to the project page"} onChange={e => setBriefing(e.target.value)} />
-
-                <h3>Resources</h3>
-
-                <Form.Label>Tooling:</Form.Label>
-                <Form.Control type="text" value={tools} placeholder={"What tools will be used in the project"} onChange={e => setTools(e.target.value)} />
-
-                <Form.Label>Code languages:</Form.Label>
-                <Form.Control type="text" value={codeLanguages} placeholder={"What code languages will be used in the project"} onChange={e => setCodeLanguages(e.target.value)} />
-
-                <Form.Label>Students:</Form.Label>
-
-                {(students.length) ? (students.map((student,index) => (
-                    <Row key={index}>
+                    <h5 className={"add-project-label"}>About project:</h5>
+                    <Form.Control as="textarea" rows={3} value={projectDescription} placeholder={"Short explanation about the project, what it does, how it works, ..."} onChange={e => setProjectDescription(e.target.value)} />
+                    <Row>
                         <Col>
+                            <h5 className={"add-project-label"}>Required skills:</h5>
 
-                            <SelectSearch
-                                options={skills}
-                                value={student.skill}
-                                search
-                                filterOptions={fuzzySearch}
-                                onChange={value => changeSkillStudent(index, value)}
-                                emptyMessage={() => <div style={{ textAlign: 'center', fontSize: '0.8em' }}>Skill not found</div>}
-                                placeholder="Select the required skill"
-                            />
+                            {(requiredSkills.length) ? (requiredSkills.map((requiredSkill, index) => (
+                                <RequiredSkillSelector className={"add-project-required-skill-selector-row"}
+                                                       availableSkills={availableSkills} setAvailableSkills={setAvailableSkills}
+                                                       changeRequiredSkill={changeRequiredSkill} key={index}
+                                                       index={index} skills={skills} requiredSkill={requiredSkill}
+                                                       setRequiredSkills={setRequiredSkills} requiredSkills={requiredSkills}
+                                />
+                            ))) : null}
 
-                        </Col>
-                        <Col>
-                            <Card>
-                                <Row>
-                                    <Col>
-                                        {student.amount}
-                                    </Col>
-                                    <Col>
-                                        <p onClick={() => AddToStudent(index, 1)}>+</p>
-                                        <p onClick={() => AddToStudent(index, -1)}>-</p>
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </Col>
-                        <Col>
-                            <Button onClick={() => DeleteStudent(index)}>Remove student role</Button>
+                            <Hint message={"Add new required skill"} placement="top">
+                                <div className={"project-details-plus-skill"} >
+                                    <Image width={33} height={33} alt={"Add new coach / admin to the project"} src={plus} onClick={(e) => addRequiredSkill(e)} />
+                                </div>
+                            </Hint>
                         </Col>
                     </Row>
-                ))) : null}
 
-                <Button onClick={AddStudent}> Add extra student role</Button>
-                <Button type="submit">Create new project</Button>
-            </Form>
 
+                    <div>
+                        <Button type="submit">Create new project</Button>
+
+                    </div>
+                </Form>
+            </div>
+            <ToastContainer />
         </div>
     )
 }

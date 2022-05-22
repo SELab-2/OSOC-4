@@ -1,31 +1,27 @@
-import React, {useState} from "react";
-import {Button, Dropdown} from "react-bootstrap";
-import {api, Url} from "../../utils/ApiClient";
+import React, { useState } from "react";
+import { Button, Dropdown } from "react-bootstrap";
+import { api, Url } from "../../utils/ApiClient";
 
 /**
  * This component displays a row of the ManageUsers settings-screen, this component represents a single user in the list
  * @returns {JSX.Element}
  */
 export default function UserTr(props) {
-    const [role, setRole] = useState(props.user.role)
-    const roles = ["No role", "Coach", "Admin"]
+    const [role, setRole] = useState(props.user.role);
     const [active, setActive] = useState(props.user.active);
     const [approved, setApproved] = useState(props.user.approved);
     const [disabled, setDisabled] = useState(props.user.disabled);
 
     /**
      * Changes the role of a user, api does patch request
-     * @param role
+     * @param role the new role.
      */
     async function changeRole(role) {
-        if(props.isMe){
+        if (props.isMe) {
             return
         }
-        let json = props.user
-        json.disabled = role === 0;
-        json.role = role
-        let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody(json).patch();
-        if (response.success){setRole(role)}
+        let response = await Url.fromName(api.users).extend("/" + props.user.id).setBody({"role": role}).patch();
+        if (response.success) { setRole(role); }
     }
 
     /**
@@ -67,13 +63,12 @@ export default function UserTr(props) {
         return (
             <Dropdown className={"dropdown-button"}>
                 <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
-                    {roles[role]}
+                    {(role == 2)? "Admin" : "Coach"}
                 </Dropdown.Toggle>
                 {props.isMe ? null :
                     <Dropdown.Menu aria-disabled className={"dropdown-button"} >
                         <Dropdown.Item active={role === 2} onClick={() => changeRole(2)}>Admin</Dropdown.Item>
                         <Dropdown.Item active={role === 1} onClick={() => changeRole(1)}>Coach</Dropdown.Item>
-                        <Dropdown.Item active={role === 0} onClick={() => changeRole(0)}>No role</Dropdown.Item>
                     </Dropdown.Menu>
                 }
             </Dropdown>)
@@ -84,6 +79,9 @@ export default function UserTr(props) {
         return null;
     }
 
+    /**
+     * Return the html of the UserTr component.
+     */
     return (
         <tr key={props.user.id}>
             <td>{props.user.name}</td>

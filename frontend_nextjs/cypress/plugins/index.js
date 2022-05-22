@@ -21,5 +21,9 @@ module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
     config.baseUrl = process.env.BASE_URL;
+    console.log(config.testingType)
+
+    require('@cypress/react/plugins/next')(on, config)
+    require('@cypress/code-coverage/task')(on, config)
     return config;
 }

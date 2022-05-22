@@ -9,14 +9,12 @@ class TestAuth(TestBase):
 
     async def post_login_success(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
-        response = await self.do_request(Request.POST, "/login", name, Status.SUCCESS,
-                                         json_body=body, use_access_token=False)
+        response = await self.do_request(Request.POST, "/login", expected_status=Status.SUCCESS, json_body=body)
         self.assertTrue("id" in response.json()["data"])
 
     async def post_login_fail(self, email, name, password):
         body: Dict[str, str] = {"email": email, "password": password}
-        response = await self.do_request(Request.POST, "/login", name, Status.UNAUTHORIZED,
-                                         json_body=body, use_access_token=False)
+        response = await self.do_request(Request.POST, "/login", expected_status=Status.UNAUTHORIZED, json_body=body)
         self.assertTrue("message" in response.json())
 
     async def test_post_login(self):

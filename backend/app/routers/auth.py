@@ -1,5 +1,8 @@
+""" This module includes the authentication endpoints """
+
 import os
 from datetime import timedelta
+from typing import Dict
 
 from app.config import config
 from app.crud import count_where, read_where, update
@@ -25,6 +28,10 @@ load_dotenv()
 
 
 class Settings(BaseModel):
+    """Settings settings used for authjwt
+
+    :param BaseModel: inherits from BaseModel
+    """
     authjwt_secret_key: str = 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0'
     authjwt_denylist_enabled: bool = True
     authjwt_denylist_token_checks: set = {"access", "refresh"}
@@ -64,12 +71,23 @@ def check_if_token_in_denylist(decrypted_token: str) -> bool:
 
 
 @router.get('/')
-def root(role: RoleChecker(UserRole.COACH) = Depends()):
+def root(role: RoleChecker(UserRole.COACH) = Depends()) -> Dict[str, str]:
+    """root give back the urls of the routers
+
+    :param role: the checked role
+    :type role: RoleChecker, optional
+    :return: the urls of the routers
+    :rtype:
+    """
     paths = {"editions": f"{config.api_url}editions",
              "students": f"{config.api_url}students",
              "projects": f"{config.api_url}projects",
              "skills": f"{config.api_url}skills",
-             "participations": f"{config.api_url}participations"}
+             "participations": f"{config.api_url}participations",
+             "emailtemplates": f"{config.api_url}emailtemplates",
+             "sendemails": f"{config.api_url}sendemails",
+             "myself": f"{config.api_url}users/me"
+             }
     if role == UserRole.ADMIN:
         paths["users"] = f"{config.api_url}users"
     return paths
@@ -110,9 +128,6 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends(), session: AsyncS
         access_token = Authorize.create_access_token(subject=u.id, expires_time=settings.access_expires)
         refresh_token = Authorize.create_refresh_token(subject=u.id, expires_time=settings.refresh_expires)
 
-        # Authorize.set_access_cookies(access_token)
-        # Authorize.set_refresh_cookies(refresh_token)
-
         # return response(UserOutSimple.parse_raw(u.json()), "Login successful")
         return response(
             TokenExtended(id=str(u.id), accessToken=access_token, accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
@@ -136,8 +151,6 @@ def refresh(Authorize: AuthJWT = Depends()):
 
     current_user_id = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user_id, expires_time=settings.access_expires)
-    # Authorize.set_access_cookies(new_access_token)
-    # return {"access_token": new_access_token}
     return TokenExtended(accessToken=new_access_token, id=current_user_id,
                          accessTokenExpiry=int(os.getenv('ACCESS_EXPIRE', 15)),
                          refreshToken=Authorize.get_raw_jwt()['jti'])
@@ -211,5 +224,5 @@ async def forgot(emailinput: EmailInput = Body(...), session: AsyncSession = Dep
         # send email to user with the reset key
         send_password_reset(user.email, reset_key)
 
-    return {
-        "msg": "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled"}
+        return response(None, "Check your inbox for a mail to reset your password. If you didn't receive an email the user with the entered email doesn't exist or is disabled")
+    raise InvalidEmailOrPasswordException()

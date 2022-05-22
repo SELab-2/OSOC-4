@@ -1,9 +1,12 @@
-from typing import Any, List
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class DataGenerator:
+    """
+    A common base for all generators of testdata
+    """
     first_names = ["Eva", "Mark", "Jonathan", "Christine", "Sebatian", "Ava",
                    "Blake", "Andrea", "Joanne", "Frank", "Emma", "Ruth", "Leah",
                    "Jacob", "Megan", "Richard", "Piers", "Felicity", "Melanie",
@@ -16,9 +19,19 @@ class DataGenerator:
     emails = ["gmail.com", "outlook.com", "yahoo.com", "hotmail.com"]
 
     def __init__(self, session: AsyncSession):
-        self.data: List[Any] = []
+        """
+        Initializes the data list and assigns the session to use.
+
+        :param session: The session to use to add the data to the database
+        :type session: AsyncSession
+        """
+        self.data: list[Any] = []
         self.session: AsyncSession = session
 
-    def add_to_db(self):
-        for d in self.data:
-            self.session.add(d)
+    def add_to_db(self) -> None:
+        """
+        Adds the entirety of the data list to the database. No commit is done.
+
+        :return: None
+        """
+        self.session.add_all(self.data)

@@ -1,13 +1,19 @@
+""" This module includes all the participation endpoints """
+
 from app.config import config
 from app.crud import read_where, update
-from app.database import get_session
-from app.models.student import Student
+from app.database import get_session, websocketManager
+from app.exceptions.participation_exceptions import (
+    InvalidParticipationException, ParticipationNotFoundException)
+from app.models.participation import (Participation, ParticipationCreate,
+                                      ParticipationOutProject,
+                                      ParticipationOutStudent)
 from app.models.project import Project
-from app.models.participation import Participation, ParticipationCreate
+from app.models.student import Student
 from app.models.user import UserRole
-from app.exceptions.participation_exceptions import ParticipationNotFoundException, InvalidParticipationException
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,12 +23,17 @@ router = APIRouter(prefix="/participations")
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Participation created")
 async def create_participation(participation: ParticipationCreate,
                                session: AsyncSession = Depends(get_session),
-                               Authorize: AuthJWT = Depends()):
+                               Authorize: AuthJWT = Depends()) -> str:
     """create_participation add a new participation
 
-    :param participation: defaults to Body(...)
-    :type user: ParticipationCreate
-    :return: url of the student of the created participation
+    :param participation: the participation data
+    :type participation: ParticipationCreate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises InvalidParticipationException: raised when the participation is not possible
+    :return: the url to the student of the participation
     :rtype: str
     """
 
@@ -55,36 +66,42 @@ async def create_participation(participation: ParticipationCreate,
 
     await update(old_participation, session)
 
+    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json())), "participation_student": jsonable_encoder(ParticipationOutStudent.parse_raw(old_participation.json()))})
+
     return f"{config.api_url}students/{old_participation.student_id}"
 
 
 @router.delete("", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Participation deleted")
-async def delete_participation(student_id: int,
-                               project_id: int,
+async def delete_participation(student_id: str,
+                               project_id: str,
                                session: AsyncSession = Depends(get_session),
-                               Authorize: AuthJWT = Depends()):
+                               Authorize: AuthJWT = Depends()) -> None:
     """delete_participations remove a participation
 
     :param student_id: the student id of the participation
-    :type student_id: int
+    :type student_id: str
     :param project_id: the project id of the participation
-    :type project_id: int
+    :type project_id: str
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises ParticipationNotFoundException: raised when the participation isn't found
     """
 
     # check if participation exists
-    participation = await read_where(Participation, Participation.project_id == project_id, Participation.student_id == student_id, session=session)
+    participation = await read_where(Participation, Participation.project_id == int(project_id), Participation.student_id == int(student_id), session=session)
 
     if not participation:
         raise ParticipationNotFoundException()
 
     # check edition
-    student = await read_where(Student, Student.id == student_id, session=session)
-    if not student:
-        raise ParticipationNotFoundException()
+    student = await read_where(Student, Student.id == int(student_id), session=session)
     await EditionChecker(update=True)(student.edition_year, Authorize, session)
 
     await session.delete(participation)
     await session.commit()
+    await websocketManager.broadcast({"projectId": project_id, "projectUrl": f"{config.api_url}projects/{str(project_id)}", "studentId": student_id, "studentUrl": config.api_url + "students/" + str(student.id), "deleted_participation": True})
 
 
 @router.patch("", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Participation edited")
@@ -92,16 +109,22 @@ async def edit_participation(student_id: int,
                              project_id: int,
                              new_participation: ParticipationCreate,
                              session: AsyncSession = Depends(get_session),
-                             Authorize: AuthJWT = Depends()):
+                             Authorize: AuthJWT = Depends()) -> str:
     """edit_participation edit a participation
 
-    :param student_id: the student id of the participation
+    :param student_id:  the student id of the participation
     :type student_id: int
     :param project_id: the project id of the participation
     :type project_id: int
-    :param participation: defaults to Body(...)
-    :type user: ParticipationCreate
-    :return: url of the student of the changed participation
+    :param new_participation: the participation data
+    :type new_participation: ParticipationCreate
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who requested this, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    :raises ParticipationNotFoundException: raised when the participation isn't found
+    :raises InvalidParticipationException: raised when the participation isn't valid
+    :return: the url of the student from the participation
     :rtype: str
     """
 
@@ -133,5 +156,7 @@ async def edit_participation(student_id: int,
         setattr(old_participation, key, value)
 
     await update(old_participation, session)
+
+    await websocketManager.broadcast({"projectId": project.id, "studentId": student.id, "studentUrl": config.api_url + "students/" + str(student.id), "participation_student": jsonable_encoder(ParticipationOutStudent.parse_raw(old_participation.json())), "participation": jsonable_encoder(ParticipationOutProject.parse_raw(old_participation.json()))})
 
     return f"{config.api_url}students/{old_participation.student_id}"

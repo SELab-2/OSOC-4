@@ -1,3 +1,5 @@
+""" This module includes the suggestion endpoints """
+
 from app.crud import read_where, update
 from app.database import get_session, websocketManager
 from app.exceptions.suggestion_exception import SuggestionNotFound
@@ -15,7 +17,18 @@ router = APIRouter(prefix="/suggestions")
 
 
 @router.post("/create", response_description="Suggestion created")
-async def create_suggestion(suggestion: SuggestionCreate, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+async def create_suggestion(suggestion: SuggestionCreate, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()) -> None:
+    """create_suggestion creates a new suggestion
+
+    :param suggestion: the suggestion data
+    :type suggestion: SuggestionCreate
+    :param role: the role of the user making the suggestion, defaults to Depends()
+    :type role: RoleChecker, optional
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :param Authorize: needed to know who made the suggestion, defaults to Depends()
+    :type Authorize: AuthJWT, optional
+    """
 
     # check edition
     student = await read_where(Student, Student.id == suggestion.student_id, session=session)
@@ -36,7 +49,17 @@ async def create_suggestion(suggestion: SuggestionCreate, role: RoleChecker(User
 
 
 @router.get("/{id}", dependencies=[Depends(EditionChecker())], response_description="Suggestion with id retrieved")
-async def get_suggestion_with_id(id: int, session: AsyncSession = Depends(get_session)):
+async def get_suggestion_with_id(id: int, session: AsyncSession = Depends(get_session)) -> dict:
+    """get_suggestion_with_id gets a suggestion based on its id
+
+    :param id: the id of the suggestion
+    :type id: int
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises SuggestionNotFound: raised when the suggestion was not found
+    :return: SuggestionOutExtended
+    :rtype: dict
+    """
     suggestion = await read_where(Suggestion, Suggestion.id == id, session=session)
 
     if suggestion is None:

@@ -1,3 +1,5 @@
+""" This module includes the api main """
+
 import inspect
 import re
 
@@ -11,8 +13,9 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from app.config import config
 from app.database import disconnect_db, init_db, websocketManager
 from app.exceptions.base_exception import BaseException
-from app.routers import (auth, ddd, editions, projects, reset_password, skills,
-                         students, suggestions, participations, tally, user_invites, users)
+from app.routers import (auth, ddd, editions, emailtemplates, participations,
+                         projects, reset_password, sendemails, skills,
+                         students, suggestions, tally, user_invites, users, change_email)
 
 app = FastAPI(root_path=config.api_path)
 
@@ -32,43 +35,69 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
+    """startup and connect database
+    """
     await init_db()
 
 
 @app.on_event("shutdown")
 async def shutdown():
+    """shutdown and disconnect database
+    """
     await disconnect_db()
 
 app.include_router(ddd.router)
-# app.include_router(answers.router)
+app.include_router(sendemails.router)
+app.include_router(emailtemplates.router)
 app.include_router(auth.router)
 app.include_router(editions.router)
 app.include_router(projects.router)
-# app.include_router(question_answers.router)
-# app.include_router(questions.router)
 app.include_router(skills.router)
 app.include_router(students.router)
 app.include_router(suggestions.router)
 app.include_router(participations.router)
 app.include_router(tally.router)
-# app.include_router(user_invites.router)
 app.include_router(user_invites.router)
 app.include_router(reset_password.router)
 app.include_router(users.router)
+app.include_router(change_email.router)
 
 
 @app.exception_handler(BaseException)
 async def my_exception_handler(request: Request, exception: BaseException):
+    """my_exception_handler handler for the raised exceptions
+
+    :param request: the request
+    :type request: Request
+    :param exception: the raised exception
+    :type exception: BaseException
+    :return: the exception in json format
+    :rtype: JSONResponse
+    """
     return exception.json()
 
 
 @app.exception_handler(AuthJWTException)
 async def auth_exception_handler(request: Request, exception: AuthJWTException):
+    """auth_exception_handler handler for the raised exceptions
+
+    :param request: the request
+    :type request: Request
+    :param exception: the raised exception
+    :type exception: AuthJWTException
+    :return: the exception in json format
+    :rtype: JSONResponse
+    """
     return JSONResponse(status_code=exception.status_code, content={"message": exception.message})
 
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    """websocket_endpoint the endpoint used to create a websocket connection
+
+    :param websocket: the websocket connection
+    :type websocket: WebSocket
+    """
     await websocketManager.connect(websocket)
     try:
         while True:
@@ -79,6 +108,12 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 def custom_openapi():
+    """custom_openapi generate the custom swagger api documentation
+
+    :return: custom openapi_schema
+    :rtype: openapi_schema
+    """
+
     if app.openapi_schema:
         return app.openapi_schema
 

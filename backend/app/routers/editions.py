@@ -1,7 +1,10 @@
+""" This module includes all the edition endpoints """
+
 import datetime
+from typing import Dict
 
 from app.config import config
-from app.crud import read_all_where, read_where, update
+from app.crud import delete, read_all_where, read_where, update
 from app.database import get_session
 from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
                                                EditionNotFound,
@@ -10,31 +13,39 @@ from app.exceptions.edition_exceptions import (AlreadyEditionWithYearException,
 from app.exceptions.permissions import NotPermittedException
 from app.exceptions.questiontag_exceptions import (
     QuestionTagAlreadyExists, QuestionTagCantBeModified,
-    QuestionTagNotFoundException)
+    QuestionTagInvalidMandatory, QuestionTagNotFoundException)
 from app.models.answer import Answer
 from app.models.edition import (Edition, EditionCoach, EditionOutExtended,
                                 EditionOutSimple)
-from app.models.project import Project, ProjectCoach, ProjectOutSimple
+from app.models.participation import Participation
+from app.models.project import Project, ProjectOutSimple
 from app.models.question import Question
 from app.models.question_answer import QuestionAnswer
 from app.models.question_tag import (QuestionTag, QuestionTagCreate,
                                      QuestionTagSimpleOut, QuestionTagUpdate)
-from app.models.skill import StudentSkill
+from app.models.skill import Skill, StudentSkill
 from app.models.student import DecisionOption, Student
 from app.models.suggestion import Suggestion, SuggestionOption
-from app.models.user import User, UserRole
+from app.models.user import UserRole
 from app.utils.checkers import EditionChecker, RoleChecker
 from fastapi import APIRouter, Body, Depends
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, selectinload
-from sqlmodel import select
+from sqlmodel import func, select
 
 router = APIRouter(prefix="/editions")
 
 
-def get_sorting(sortstr: str):
+def get_sorting(sortstr: str) -> Dict[str, bool]:
+    """get_sorting generate the sorting dict from the sort string
+
+    :param sortstr: the sort string
+    :type sortstr: str
+    :return: dict with sorting directions
+    :rtype: Dict[str, bool]
+    """
     sorting = [t.split("+") if "+" in t else [t, "asc"] for t in sortstr.split(",")]
     return {t[0]: False if t[1] == "asc" else True for t in sorting}
 
@@ -54,6 +65,20 @@ async def get_editions(session: AsyncSession = Depends(get_session), role: RoleC
         return [results[0].uri] if results else []
 
 
+@router.get("/current_edition", response_description="Edition retrieved", dependencies=[Depends(RoleChecker(UserRole.COACH))])
+async def get_current_edition(session: AsyncSession = Depends(get_session)) -> dict:
+    """get_current_edition get the current edition
+
+    :param session: the session object, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :return: the edition
+    :rtype: dict
+    """
+    stmnt = select(Edition).order_by(Edition.year.desc())
+    result = await session.execute(stmnt)
+    return EditionOutExtended.parse_raw(result.one()[0].json())
+
+
 @router.post("/create", dependencies=[Depends(RoleChecker(UserRole.ADMIN))], response_description="Created a new edition")
 async def create_edition(edition: Edition = Body(...), session: AsyncSession = Depends(get_session)):
     """create_edition creates a new edition in the database
@@ -69,7 +94,26 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
     if await read_where(Edition, Edition.year == edition.year, session=session):
         raise AlreadyEditionWithYearException(edition.year)
 
+    # get the previous edition, we need it to transfer some information to the new edition for convenience
+    prev_edition = await read_all_where(Edition, session=session)
+
+    # make the new edition
     new_edition = await update(Edition.parse_obj(edition), session=session)
+
+    if prev_edition:
+        prev_edition = sorted(prev_edition, key=lambda x: x.year, reverse=True)[0]
+        # make prev edition read-only
+        prev_edition.read_only = True
+        await update(prev_edition, session=session)
+        # add the questiontags (and corresponding questions) from last edition
+        qts = await read_all_where(QuestionTag, QuestionTag.edition == prev_edition.year, session=session)
+        for qt in qts:
+            q = await read_where(Question, Question.id == qt.question_id, session=session)
+            new_q = Question(edition=new_edition.year, question=q.question)
+            await update(new_q, session=session)
+            new_qt = QuestionTag(edition=new_edition.year, tag=qt.tag, question=new_q, mandatory=qt.mandatory, show_in_list=qt.show_in_list)
+            await update(new_qt, session=session)
+
     return EditionOutSimple.parse_raw(new_edition.json()).uri
 
 
@@ -77,7 +121,7 @@ async def create_edition(edition: Edition = Body(...), session: AsyncSession = D
 async def get_edition(year: int, edition: EditionChecker() = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition get the Edition instance with given year
 
-    :return: list of editions
+    :return: the edition with that year
     :rtype: dict
     """
 
@@ -99,7 +143,7 @@ async def update_edition(year: int, edition: Edition = Body(...), role: RoleChec
         raise EditionNotFound()
 
     # check that the coach has access to that edition
-    if not role != UserRole.ADMIN:
+    if role != UserRole.ADMIN:
         edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
         user_ids = [coach.coach_id for coach in edition_coaches]
         if not Authorize.get_jwt_subject() in user_ids:
@@ -112,30 +156,15 @@ async def update_edition(year: int, edition: Edition = Body(...), role: RoleChec
     return EditionOutSimple.parse_raw(result.json()).uri
 
 
-@router.get("/{year}/users", response_description="Users retrieved")
-async def get_edition_users(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session)):
-    """get_users get all the User instances from the database in edition with given year
-
-    :return: list of users
-    :rtype: dict
-    """
-
-    edition_coaches = await read_all_where(EditionCoach, EditionCoach.edition == year, session=session)
-    user_ids = [coach.coach_id for coach in edition_coaches]
-    # get the admins
-    admins = await read_all_where(User, User.role == UserRole.ADMIN, session=session)
-    user_ids += [admin.id for admin in admins]
-    return [f"{config.api_url}users/{str(id)}" for id in user_ids]
-
-
 @router.get("/{year}/students", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Students retrieved")
-async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
+async def get_edition_students(year: int, orderby: str = "", search: str = "", skills: str = "", decision: str = "", own_suggestion: str = "", filters: str = "", unmatched: str = "", Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)):
     """get_edition_students get all the students in the edition with given year
 
     :return: list of all the students in the edition with given year
     :rtype: dict
     """
 
+    student_alias = Student
     student_query = select(Student).where(Student.edition_year == year)
     if own_suggestion:
 
@@ -150,12 +179,22 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
             suggestion_sub_query = aliased(Suggestion, suggestion_sub_query.distinct().subquery())
             student_query = student_query.join(suggestion_sub_query)
 
-        own_suggsetion_students = aliased(Student, student_query.distinct().subquery())
-        student_query = select(own_suggsetion_students)
+        student_alias = aliased(Student, student_query.distinct().subquery())
+        student_query = select(student_alias)
+
+    if filters:
+        for filter in filters.split(","):
+            student_query = student_query.join(QuestionAnswer, student_alias.id == QuestionAnswer.student_id).join(QuestionTag, QuestionAnswer.question_id == QuestionTag.question_id).where(QuestionTag.tag == filter).join(Answer).where(Answer.answer == "yes")
+            student_alias = aliased(student_alias, student_query.subquery())
+            student_query = select(student_alias)
     if decision:
-        student_query = student_query.where(Student.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
+        student_query = student_query.where(student_alias.decision.in_([DecisionOption[d] for d in decision.upper().split(",")]))
     if skills:
         student_query = student_query.join(StudentSkill).where(StudentSkill.skill_name.in_(skills.split(",")))
+    if unmatched == "true":
+        student_query = student_query.outerjoin(Participation, Participation.student_id == student_alias.id).where(Participation.student_id.is_(None))
+        student_alias = aliased(student_alias, student_query.distinct().subquery())
+        student_query = select(student_alias)
     if search:
         student_query = student_query.join(QuestionAnswer).join(Answer)
         student_query = student_query.where(Answer.answer.ilike("%" + search.replace(" ", "%") + "%"))
@@ -165,6 +204,14 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     res = res.all()
 
     students = [r for (r,) in res]
+
+    # if there are students check if all mandatory tags are correct
+    if len(students) != 0:
+        query = select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.mandatory == True).join(Question).outerjoin(QuestionAnswer, QuestionAnswer.question_id == Question.id).where(QuestionAnswer.question_id.is_(None))
+        res = await session.execute(query)
+        resall = res.all()
+        if len(resall) != 0:
+            raise QuestionTagInvalidMandatory([tag.tag for (tag,) in resall])
 
     if orderby:
         sorting = get_sorting(orderby).items()
@@ -185,21 +232,16 @@ async def get_edition_students(year: int, orderby: str = "", search: str = "", s
     return [config.api_url + "students/" + str(id) for id in students]
 
 
-@router.get("/{year}/projects", response_description="Projects retrieved")
-async def get_edition_projects(year: int, role: RoleChecker(UserRole.COACH) = Depends(), session: AsyncSession = Depends(get_session), Authorize: AuthJWT = Depends()):
+@router.get("/{year}/projects", dependencies=[Depends(RoleChecker(UserRole.COACH))], response_description="Projects retrieved")
+async def get_edition_projects(year: int, session: AsyncSession = Depends(get_session)):
     """get_projects get all the Project instances from the database
 
     :return: list of projects
     :rtype: dict
     """
-    if role == UserRole.ADMIN:
-        results = await read_all_where(Project, Project.edition == year, session=session)
-    else:
-        Authorize.jwt_required()
-        current_user_id = Authorize.get_jwt_subject()
-        stat = select(Project).select_from(ProjectCoach).where(ProjectCoach.coach_id == int(current_user_id)).join(Project).where(Project.edition == int(year))
-        res = await session.execute(stat)
-        results = [r for (r,) in res.all()]
+    stat = select(Project).where(Project.edition == int(year))
+    res = await session.execute(stat)
+    results = [r for (r,) in res.all()]
     return [ProjectOutSimple.parse_raw(r.json()).id for r in results]
 
 
@@ -224,7 +266,7 @@ async def get_conflicting_students(year: int, session: AsyncSession = Depends(ge
         """
     )
 
-    return [f"{config.api_url}/students/{id}" for (id,) in student_ids]
+    return [f"{config.api_url}students/{id}" for (id,) in student_ids]
 
 
 # Question Tag Endpoints
@@ -246,35 +288,45 @@ async def get_question_tags(year: int, session: AsyncSession = Depends(get_sessi
 
 
 @router.get("/{year}/questiontags/{tag}")
-async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)):
+async def get_question_tag(year: int, tag: str, session: AsyncSession = Depends(get_session)) -> QuestionTagSimpleOut:
+    """get_question_tag get a questiontag by name
+
+    :param year: the edition year
+    :type year: int
+    :param tag: the tag name
+    :type tag: str
+    :param session: session used to perform database operations, defaults to Depends(get_session)
+    :type session: AsyncSession, optional
+    :raises QuestionTagNotFoundException: _description_
+    :return: the questiontag information
+    :rtype: QuestionTagSimpleOut
+    """
     try:
         res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.tag == tag).options(selectinload(QuestionTag.question)))
         (qtag,) = res.one()
     except Exception:
         raise QuestionTagNotFoundException()
 
+    error = False
     if qtag.question:
         q = qtag.question.question
+
+        # check if there are students and if the question is valid
+        student_query = select(func.count(Student.id)).where(Student.edition_year == year)
+        student_res = await session.execute(student_query)
+        (count,) = student_res.one()
+        if count > 0:
+            # check if there are answers for the question
+            query = select(Question).where(Question.id == qtag.question.id).outerjoin(QuestionAnswer, Question.id == QuestionAnswer.question_id).where(QuestionAnswer.question_id.is_(None))
+            query_res = await session.execute(query)
+            query_all = query_res.all()
+
+            if (len(query_all)) > 0:
+                error = True
     else:
         q = ""
 
-    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, showInList=qtag.showInList, question=q)
-
-
-@router.get("/{year}/questiontags/showinlist", dependencies=[Depends(RoleChecker(UserRole.COACH)), Depends(EditionChecker(update=True))], response_description="Tags retrieved")
-async def get_showinlist_question_tags(year: int, session: AsyncSession = Depends(get_session)):
-    """get_showinlist_question_tags return list of qusetiontags that must be shown in the listview
-
-    :param year: edition year
-    :type year: int
-    :param session: _description_, defaults to Depends(get_session)
-    :type session: AsyncSession, optional
-    :return: list of QuestionTags
-    :rtype: list of QuestionTags
-    """
-    res = await session.execute(select(QuestionTag).where(QuestionTag.edition == year).where(QuestionTag.question_id is not None).where(QuestionTag.showInList == True).order_by(QuestionTag.tag))
-    tags = res.all()
-    return [tag.tag for (tag,) in tags]
+    return QuestionTagSimpleOut(tag=qtag.tag, mandatory=qtag.mandatory, show_in_list=qtag.show_in_list, question=q, error=error)
 
 
 @router.post("/{year}/questiontags", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))], response_description="Added question tag")
@@ -322,15 +374,15 @@ async def delete_question_tag(year: int, tag: str, session: AsyncSession = Depen
         raise QuestionTagCantBeModified()
 
     if questiontag.question and len(questiontag.question.question_answers) == 0:
+
+        qu = questiontag.question
+
         # delete the unused question
         questiontag.question_id = None
         await update(questiontag, session=session)
+        await delete(qu, session=session)
 
-        await session.delete(questiontag.question)
-        await session.commit()
-
-    await session.delete(questiontag)
-    await session.commit()
+    await delete(questiontag, session=session)
 
 
 @router.patch("/{year}/questiontags/{tag}", dependencies=[Depends(RoleChecker(UserRole.ADMIN)), Depends(EditionChecker(update=True))])
@@ -354,12 +406,11 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     except Exception:
         raise QuestionTagNotFoundException()
 
-    if not questiontag.mandatory:
-        questiontag.tag = tagupdate.tag
-    else:
+    if questiontag.mandatory and tagupdate.tag != tag:
         raise QuestionTagCantBeModified()
 
-    questiontag.showInList = tagupdate.showInList
+    questiontag.tag = tagupdate.tag
+    questiontag.show_in_list = tagupdate.show_in_list
 
     if questiontag.question and questiontag.question.question != tagupdate.question:
 
@@ -382,9 +433,39 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
         if question:
             questiontag.question_id = question.id
         else:
-            newquestion = Question(question=tagupdate.question, field_id="", edition=year)
-            await update(newquestion, session=session)
-            questiontag.question_id = newquestion.id
+            question = Question(question=tagupdate.question, field_id="", edition=year)
+            await update(question, session=session)
+            questiontag.question_id = question.id
 
     await update(questiontag, session=session)
+
+    # if the tag is skills => update the skills in the student object
+    if questiontag.tag == "skills":
+        students = await read_all_where(Student, Student.edition_year == year, session=session)
+        for s in students:
+
+            # remove all the studentskills
+            statement = select(StudentSkill).where(StudentSkill.student_id == s.id)
+            stat_res = await session.execute(statement)
+            stat_all = stat_res.all()
+            for (studskill,) in stat_all:
+                await session.delete(studskill)
+                await session.commit()
+
+            # get the answers for the new questions
+            query = select(Answer).select_from(QuestionAnswer).where(QuestionAnswer.question_id == questiontag.question_id).where(QuestionAnswer.student_id == s.id).join(Answer)
+            query_res = await session.execute(query)
+            query_all = query_res.all()
+
+            for (answer,) in query_all:
+                skill = await read_where(Skill, Skill.name == answer.answer, session=session)
+                if not skill:
+                    skill = Skill(name=answer.answer)
+                    await update(skill, session=session)
+
+                student_skill = await read_where(StudentSkill, StudentSkill.student_id == s.id, StudentSkill.skill_name == skill.name, session=session)
+                if not student_skill:
+                    student_skill = StudentSkill(student_id=s.id, skill_name=skill.name)
+                    await update(student_skill, session=session)
+
     return f"{config.api_url}editions/{str(year)}/questiontags/{questiontag.tag}"

@@ -19,11 +19,12 @@ class TestSkills(TestBase):
 
         skill_generator = SkillGenerator(self.session)
         skill_generator.generate_skills()
-        await skill_generator.add_to_db()
+        skill_generator.add_to_db()
+        await self.session.commit()
 
     async def test_get_skills(self):
         path = "/skills"
-        allowed_users = await self.get_users_by([UserRole.ADMIN])
+        allowed_users = await self.get_users_by([UserRole.ADMIN, UserRole.COACH])
 
         # Test authorization & access-control
         responses: Dict[str, Response] = await self.auth_access_request_test(Request.GET, path, allowed_users)

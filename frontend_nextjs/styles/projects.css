@@ -1,10 +1,11 @@
+.projects-controls > * {
+    margin: 7pt 0;
+}
+
 .btn-conflicts{
     color:white;
     background-color: red;
     font-weight: bold;
-}
-
-.project-card{
 }
 
 .project-card-selected{
@@ -16,7 +17,7 @@
 
 .project-card-div{
     padding: 0;
-    margin-top: 15px;
+    margin-bottom: 7px;
 }
 
 .center-component{
@@ -38,7 +39,6 @@
 .project-card-title{
     font-weight: bold;
     font-size: 23px;
-    margin-left: 10px;
 }
 
 .card-body{
@@ -56,13 +56,28 @@
     margin-top: 20px;
 }
 
-.project-people-needed{
-    margin-top: 5px;
+.search-project {
+    min-width: 120pt;
+}
+
+.center-content {
+    display: flex;
+    justify-content: center;
+}
+
+.center-content > * {
+    align-self: center;
 }
 
 .project-empty-list{
     margin-top: 15px;
-    margin-left: 15px;
+    margin-left: 0;
+    font-size: 18px;
+}
+
+.project-empty-list-col{
+    margin-top: 15px;
+    margin-left: 11px;
     font-size: 18px;
 }
 
@@ -70,7 +85,73 @@
     cursor: pointer;
 }
 
-.button-match-student-project {
-     cursor: pointer;
+.select-search__options {
+    list-style: none;
+    width: 250px;
+    padding: 0;
+    background-color: white;
+}
+
+.select-search__option,
+.select-search__not-found {
+    display: block;
+    height: 36px;
+    width: 100%;
+    padding: 0 16px;
+    background: #fff;
     border: none;
+    outline: none;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.select-search__row:not(:first-child) {
+    border-top: 1px solid #eee;
+}
+
+.select-search__input{
+    display: block;
+    width: 100%;
+    padding: 0 40px 0 16px;
+    background: #fff;
+    border: 1px solid darkgray;
+    box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.15);
+    border-radius: 7px;
+    outline: none;
+    font-size: 14px;
+    text-align: left;
+    text-overflow: ellipsis;
+    line-height: 36px;
+    -webkit-appearance: none;
+    height: 20px;
+}
+
+.projects-positioning {
+    padding-top: 20px;
+}
+
+.prevnextbutton {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    color: black;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border-width: 0;
+}
+
+.prevnextbutton:hover {
+    background-color: #ddd;
+}
+
+.conflict-resolve-page-col{
+    min-width: 48px;
+}
+
+.conflict-resolve-page-number{
+    margin-top: 4px;
+    margin-left: 8px;
+    margin-right: 10px;
 }

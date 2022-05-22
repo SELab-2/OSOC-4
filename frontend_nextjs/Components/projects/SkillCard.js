@@ -6,9 +6,12 @@
  */
 export default function SkillCard(props){
 
+    /**
+     * Return the html of the SkillCard component.
+     */
     return (
         <div className={"skills-card"} key={`${props.amount}${props.name}`}>
-            {(props.amount > 0) ? `${props.amount}X` : null} {props.name}
+            {(props.number > 0) ? `${props.number}X` : null} {(props.skill_name === null) ? "None" : props.skill_name}
         </div>
     )
 }

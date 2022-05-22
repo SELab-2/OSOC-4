@@ -1,0 +1,16 @@
+.required-skill-selector-row{
+    max-width: 500px;
+    margin-left: 5px;
+    margin-bottom: 10px;
+}
+
+.required-skill-amount{
+    border-width: 1px;
+    border-color: darkgray;
+    max-width: 70px;
+}
+
+.add-project-required-skill-selector-row{
+    max-width: 500px;
+    margin-bottom: 10px;
+}
