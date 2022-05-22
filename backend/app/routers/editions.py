@@ -65,7 +65,7 @@ async def get_editions(session: AsyncSession = Depends(get_session), role: RoleC
         return [results[0].uri] if results else []
 
 
-@router.get("/current_edition", response_description="Edition retrieved")
+@router.get("/current_edition", response_description="Edition retrieved", dependencies=[Depends(RoleChecker(UserRole.COACH))])
 async def get_current_edition(session: AsyncSession = Depends(get_session)) -> dict:
     """get_current_edition get the current edition
 
