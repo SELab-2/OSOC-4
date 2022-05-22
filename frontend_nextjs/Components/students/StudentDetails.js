@@ -361,7 +361,7 @@ export default function StudentDetails(props) {
                             </Hint>
                         </Col>
                     </Row>
-                    {(me.role === 2) &&
+                    {(me && me.role === 2) &&
                       <div>
                           <select className="dropdown-decision" id="dropdown-decision"
                                   onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
