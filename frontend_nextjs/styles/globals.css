@@ -32,7 +32,8 @@ ul {
 .image-button,
 .image-button:hover,
 .image-button:active,
-.image-button:after {
+.image-button:after,
+.image-button:focus {
   background-color: transparent;
   border: none;
   padding: 0 0 0 0;
