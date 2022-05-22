@@ -23,9 +23,6 @@ export default function RequiredSkillSelector(props){
       if (props.requiredSkills[props.index].skill_name !== "") {
         props.setAvailableSkills(prevState => [...prevState, props.requiredSkills[props.index].skill_name])
       }
-      // console.log(props.index)
-      // log(props.requiredSkills.filter((_, i) => i !== props.index))
-      // log(props.requiredSkills[props.index])
       if (props.requiredSkills.length > 1) {
         await props.setRequiredSkills(props.requiredSkills.filter((_, i) => i !== props.index))
       }
