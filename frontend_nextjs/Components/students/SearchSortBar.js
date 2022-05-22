@@ -1,10 +1,7 @@
-import { ButtonGroup, Col, Form, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import Image from "next/image";
-import resetSearchIcon from "../../public/assets/reset-search.svg";
-import searchIcon from "../../public/assets/search.svg";
-import Hint from "../Hint";
+import SearchBar from "./SearchBar";
 
 /**
  * This component displays the searchbar and sort dropdown in the 'select students' tab and the 'email students' tab.
@@ -69,19 +66,13 @@ export default function SearchSortBar() {
    * return html representation of the SearchSortBar.
    */
   return (
-    <Row className="nomargin">
-      <ButtonGroup className="nopadding">
-            <input type="text" value={search} placeholder={"Search students"} style={{ paddingLeft: "15px"}}
-              onChange={searchChanged}/>
-        <button className="reset-search-button" onClick={() => {
+    <Row className="nomargin" style={{marginBottom: "10px"}}>
+      <Col md="auto">
+        <SearchBar doSearch={searchChanged} search={search} placeholder="Search students" reset={() => {
           setSearch("")
           doSearch("")
-        }}>
-          <Hint message="Clear the search-bar">
-            <Image src={resetSearchIcon} />
-          </Hint>
-        </button>
-      </ButtonGroup>
+        }}/>
+      </Col>
       <Col />
       <div className="sortby-label nopadding">
         Sort by:

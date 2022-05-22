@@ -184,6 +184,7 @@ class API {
     forgot = "forgot";
     invite = "invite";
     resetpassword = "resetpassword";
+    change = "change";
 
     // the api.[name] fields
     me = "me";
@@ -209,6 +210,7 @@ class API {
         forgot: this.baseUrl + "/forgot",
         invite: this.baseUrl + "/invite",
         resetpassword: this.baseUrl + "/resetpassword",
+        change: this.baseUrl + "/change",
 
 
         me: null,
@@ -370,8 +372,6 @@ class Cache {
 
         student = Url.fromUrl(url).get().then(res => {
             if (res.success) {
-                log("GET student was successful:")
-                log(res)
                 res = res.data;
                 Object.values(res["suggestions"]).forEach((item, index) => {
                     if (item["suggested_by_id"] === userid) {

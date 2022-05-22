@@ -91,9 +91,14 @@ export default function ConflictsPopUpWindow(props) {
         </ModalTitle>
       </ModalHeader>
       <Modal.Body className="modalbody-margin">
-        <p>
-          Some students were assigned to two or more projects, please make sure every student is assigned to only one project.
-        </p>
+        {(props.conflicts.length > 0) ?
+          <p>
+            Some students were assigned to two or more projects, please make sure every student is assigned to only one project.
+          </p> :
+          <p>
+            There are no students with conflicts found.
+          </p>
+        }
 
         <Row style={{height: "300px"}}>
           {(loading)? <LoadingPage /> :
@@ -128,9 +133,11 @@ export default function ConflictsPopUpWindow(props) {
               null
             }    
           </Col>
-          <Col className="conflict-resolve-page-number">
-            <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
-          </Col>
+          {props.conflicts.length > 0 &&
+            <Col className="conflict-resolve-page-number">
+              <h4>{currentStudentIndex + 1} / {props.conflicts.length}</h4>
+            </Col>
+          }
           <Col className="conflict-resolve-page-col">
             {currentStudentIndex + 1 < props.conflicts.length ?
               <Hint message="Next conflict">

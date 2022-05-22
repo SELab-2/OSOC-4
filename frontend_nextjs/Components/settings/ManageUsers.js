@@ -112,7 +112,7 @@ export default function ManageUsers(props) {
         );
         if (! fail){
             handleClose();
-            toast.success("Send invite emails have been sent successfully");
+            toast.success("Invite emails have been sent successfully");
         }
     }
 

@@ -1,5 +1,5 @@
 .projects-controls > * {
-    margin: 12pt 0;
+    margin: 7pt 0;
 }
 
 .btn-conflicts{
@@ -17,7 +17,7 @@
 
 .project-card-div{
     padding: 0;
-    margin-top: 7px;
+    margin-bottom: 7px;
 }
 
 .center-component{

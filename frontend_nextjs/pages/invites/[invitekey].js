@@ -71,6 +71,7 @@ const Invite = () => {
         } else {
             toast.error("Something went wrong, please try again");
         }
+        setSaving(false);
     }
 
     /**

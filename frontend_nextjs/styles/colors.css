@@ -26,12 +26,14 @@
     /* other colors */
     --btn_blue: dodgerblue;
     --white: #fff;
+    --gray1: #111;
     --gray2: #222;
     --gray3: #333;
     --gray4: #444;
     --selection-gray: rgb(150, 150, 150);
     --not-selected-gray: rgb(200, 200, 200);
     --background-gray: #E5E9F2;
+    --conflicts-background: #DA3437;
 
     /* toast colors*/
     --toastify-color-info: var(--dark_blue);

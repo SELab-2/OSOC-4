@@ -178,6 +178,27 @@ class UserResetPassword(BaseModel):
         return v
 
 
+class UserResetEmail(BaseModel):
+    """the expected input model for a user changing his email address
+    """
+    email: str
+    validateEmail: str
+
+    @validator('email')
+    def email_lowercase_with_format(cls, v: str) -> str:
+        """validates an email address and transforms it to lowercase
+
+        :param v: the value (the email address)
+        :type v: str
+        :raises InvalidEmailException: if the email address is invalid, this exception will be raised
+        :return: the email address transformed to lowercase
+        :rtype: str
+        """
+        if not valid_email(v):
+            raise InvalidEmailException()
+        return v.lower()
+
+
 class ChangeUser(BaseModel):
     """the expected input model for editing a User
     """

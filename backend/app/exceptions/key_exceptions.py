@@ -24,3 +24,14 @@ class InvalidResetKeyException(BaseException):
         """__init__ inits parent class with status code and message
         """
         super().__init__(400, "The reset key is invalid or has expired")
+
+
+class InvalidChangeKeyException(BaseException):
+    """InvalidChangeKeyException exception for invalid change key
+
+    :param BaseException: inherits from BaseException
+    """
+    def __init__(self):
+        """__init__ inits parent class with status code and message
+        """
+        super().__init__(400, "The change key is invalid or has expired")
