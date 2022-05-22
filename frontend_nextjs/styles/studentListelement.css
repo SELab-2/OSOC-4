@@ -117,8 +117,7 @@
 }
 
 .upper-layer {
-    margin: 0;
-    margin-right: 5px;
+    margin: 0 5px 0 0;
 }
 
 .nomargin {
