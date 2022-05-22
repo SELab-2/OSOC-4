@@ -509,33 +509,33 @@ The `Invite users` can be clicked on, if you do so you'll see a popup window whe
 
 ![invite users](screenshots/invite_users.png)
 
-Below the "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. This is the place you need to be if you want to make a coach an admin (or the other way around), revoke a user his access to the application, or approve them to the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invitation but hasn't yet activated the account. 
+Below "Invite new users" you can see `Manage users`. In here you have a table with all the users in the application. This is the place you need to be if you want to make a coach an admin (or the other way around), revoke a user his access to the application, or approve them to the application. The table can be filtered as you like, or search on name. For each user you can see his/her name, email address, account status and a revoke access if you want the user to no longer have access to the application. The status of the user can be "approved" which means that the user has access to the tool, "not yet approved" which means that the user has activated the account but wasn't yet approved, "not yet active" which means that the user has received an invitation but hasn't yet activated the account.
 
 #### 8.4.5 Projects
-When you click on 'Projects' in the navigation bar, you will see the following screen.
+When you click on `Projects` in the navigation bar, you will see the following screen.
 
 ![projects](screenshots/projects.png)
 
 This screen has two sides. On the left you can see the student list with their filters. To find more info on this part, see [Students](#846-students). On the right part of the screen you see the projects. The two parts are seperated by a green arrow directing to the right inside a green circle. 
 
-On the right part of the screen (the projects part), you can see a searchbar, a reset button, a 'people needed' checkbox, a 'conflicts' button, a 'new project' button and a list of projects. In the searchbar you can search projects by name. The cross on the right side of the searchbar is the reset button. By pushing this button, the search bar will become empty. The 'people needed' checkbox allows you to see only the projects of which the required skills are not completely satisfied. If there is at least one required skill which is not linked to a student participation, this project will be shown when the 'people needed' checkbox is enabled.
-The conflicts button allows you to watch all the students who are assigned to more than one project. The 'New project' button redirects to another screen where you can create a new project. In the student list all projects are shown with a project card.
+On the right part of the screen (the projects part), you can see a searchbar, a reset button, a `people needed` checkbox, a `conflicts` button, a `new project` button and a list of projects. In the searchbar you can search projects by name. The cross on the right side of the searchbar is the reset button. By pushing this button, the search bar will become empty. The `people needed` checkbox allows you to see only the projects of which the required skills are not completely satisfied. If there is at least one required skill which is not linked to a student participation, this project will be shown when the `people needed` checkbox is enabled.
+The conflicts button allows you to watch all the students who are assigned to more than one project. The `New project` button redirects to another screen where you can create a new project. In the student list all projects are shown with a project card.
 
 ##### 8.4.5.1 Resolving conflicts
 
-When you click the 'conflicts' button, you will see this window.
+When you click the `conflicts` button, you will see this window.
 
 ![resolve conflicts](screenshots/resolve-conflicts.png)
 
-This window shows a student with all the projects they are linked to. By clicking on the red cross of a participation, you can delete it and solve the conflicts. If there are multiple conflicts, you can scroll through them with 'next' and 'previous' buttons.
+This window shows a student with all the projects they are linked to. By clicking on the red cross of a participation, you can delete it and solve the conflicts. If there are multiple conflicts, you can scroll through them with `next` and `previous` buttons.
 
 ##### 8.4.5.2 Create a new project
 
-When you click the 'new project' button, you will see this window.
+When you click the `new project` button, you will see this window.
 
 ![new project](screenshots/new-project.png)
 
-Here you can fill in all the information about the new project you want to make. On the bottom (under subtitle 'Required skills') you can add different skills by pushing the '+' button. With the dropdown you can select which skill you need. You can select the needed amount in the box next to the dropdown. Deleting the skill is possible with the red cross next to the skill selector. To save your newly created project, press the 'Create new project' button.
+Here you can fill in all the information about the new project you want to make. On the bottom (under subtitle `Required skills`) you can add different skills by pushing the `+` button. With the dropdown you can select which skill you need. You can select the needed amount in the box next to the dropdown. Deleting the skill is possible with the red cross next to the skill selector. To save your newly created project, press the `Create new project` button.
 
 ##### 8.4.5.3 Add a student to a project
 
@@ -550,7 +550,7 @@ To continue adding the selected student to the selected project, click the green
 In the upper text field you can write a reason why you want to add the selected student to the selected project, but it is not required. In the dropdown you can select the required skill that the student will fill in the project.
 
 #### 8.4.6 Students
-When you click on 'Students' in the navigation bar, you will see the following screen.
+When you click on `Students` in the navigation bar, you will see the following screen.
 
 ![students](screenshots/students.png)
 
@@ -559,33 +559,33 @@ In this tab, you can an overview of the students and filter them, order them, wa
 ##### 8.4.6.1 Filter students
 On the left side of the screen, you can see the filters. 
 
-On the top, there are some general filters. The 'only alumni' filter will only show students who have participated to osoc before. The 'only student coach volunteers' will only show students who are volunteer to be a student coach. The 'only unmatched students' filter will only show students who are not matched to a project yet.
+On the top, there are some general filters. The `only alumni` filter will only show students who have participated to osoc before. The `only student coach volunteers` filter will only show students who volunteered to be a student coach. The `only unmatched students` filter will only show students who are not matched to a project yet.
 
-Under the general filters you see the skills filter. You can search skills in the searchbar and choose how many skills you want to see with the 'More' or 'Less' button. If you select skills in this filters, you will see only student who have at least one of these selected skills.
+Under the general filters you see the skills filter. You can search skills in the searchbar and choose how many skills you want to see with the `More` or `Less` buttons. If you select skills in this filters, you will see only student who have at least one of these selected skills.
 
 Under the skills filter you see the decision filter. If you select decisions in this filter, only students whose decision match the selected decisions will be shown.
 
-On the bottom you see the 'Own suggestion' filter. Here you can filter the students on the suggestion you did about them. If you enable 'yes', you will only see students who you suggested 'yes' for.
+On the bottom you see the `Own suggestion` filter. Here you can filter the students on the suggestion you did about them. If you enable `yes`, you will only see students who you suggested `yes` for.
 
 ##### 8.4.6.2 Search/order students
-On the top of the screen, there is a searchbar to search through the students. Next to the searchbar, there is a reset button to make the searchbar empty. On the right, there is a dropdown to change the order of the student list. You can order the students on their name (A-Z or Z-A) and on the newest/oldest student. The newest student is the student who filled in the tally form the most recent.
+On the top of the screen, there is a searchbar to search through the students. Next to the searchbar, there is a reset button to make the searchbar empty. On the right, there is a dropdown to change the order of the student list. You can order the students by their name (ascending or descending) and on the newest/oldest student. The newest student is the student who filled in the tally form the most recently.
 
 ##### 8.4.6.3 Student details
 If you click on a student in the student list, you will see a screen like this. 
 
 ![student details](screenshots/student-details.png)
 
-On the right side of the screen, you can see the details about this student. In this screen, you can make suggestion about this student with the 'Yes', 'Maybe' and 'No' buttons. If you are an administrator, you can also send an email to the student with the 'Send email' button. As an administrator it is also possible to make a decision about this student or to delete the student.
-Deleting the student is done by clicking the red garbage can next to the name of the student. Making a decision is possible by first editing the dropdown on the right to the desired decision, than you confirm the decision by clicking on 'Confirm'.
+On the right side of the screen, you can see the details about this student. In this screen, you can make suggestion about this student with the `Yes`, `Maybe` and `No` buttons. If you are an administrator, you can also send an email to the student with the `Send email` button. As an administrator it is also possible to make a decision about this student or to delete the student.
+Deleting the student is done by clicking the red garbage can next to the name of the student. Making a decision is possible by first editing the dropdown on the right to the desired decision, than you confirm the decision by clicking on `Confirm`.
 You can close the student details by clicking the cross in the top right corner of the student details window.
 
 ##### 8.4.6.4 Send emails
-In the 'students' tab, you can send emails to students in bulk if you are an administrator.
-You start by opening the 'send emails' pop-over. If this is opened, you can select students to send an email to by clicking them in the students list. Your screen will now look like this:
+In the `students` tab, you can send emails to students in bulk if you are an administrator.
+You start by opening the `send emails` popover. If this is opened, you can select students to send an email to by clicking them in the students list. Your screen will now look like this:
 
 ![send emails](screenshots/send-emails.png)
 
-By clicking the 'Select all' button you can select all the students in the student list. By clicking the 'Send emails' button all the selected students will receive a default email about their decision.
+By clicking the `Select all` button you can select all the students in the student list. By clicking the `Send emails` button all the selected students will receive a default email about their decision.
 
 ### 8.5. Adding new users
 We've chosen not to go with a classic register and login type of access-control for the application. Instead, we work with an invite-system, where an admin must invite new coaches. The invite process goes as follows.
