@@ -58,22 +58,21 @@ export default function RequiredSkillSelector(props){
      * Return the html of the RequiredSkillSelector.
      */
     return(
-        <Row className={"required-skill-selector-row"}>
-            <Col>
-                <Select classNamePrefix="select-search"
-                        value={props.requiredSkills[props.index].skill_name !== "" ?
-                            {"label": props.requiredSkills[props.index].skill_name, "value": props.requiredSkills[props.index].skill_name}
-                        :
-                            {"label": "no skill selected", "value":"no skill selected"}
-                        }
-                        onChange={async (value) => {
-                            log(value)
-                            await props.changeRequiredSkill(value, props.index)
-                        }}
-                        filterOption={filterOption}
-                        noOptionsMessage={() => "No more options"}
-                        options={props.skills}
-                />
+            <Row className={"required-skill-selector-row"}>
+                <Col>
+                    <Select classNamePrefix="select-search"
+                            value={props.requiredSkills[props.index].skill_name !== "" ?
+                                {"label": props.requiredSkills[props.index].skill_name, "value": props.requiredSkills[props.index].skill_name}
+                            :
+                                {"label": "no skill selected", "value":"no skill selected"}
+                            }
+                            onChange={async (value) => {
+                                await props.changeRequiredSkill(value, props.index)
+                            }}
+                            filterOption={filterOption}
+                            noOptionsMessage={() => "No more options"}
+                            options={props.skills}
+                    />
 
             </Col>
             <Col xs="auto">

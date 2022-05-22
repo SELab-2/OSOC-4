@@ -54,3 +54,7 @@ input {
 .btn-secondary{
   font-weight: bold !important;
 }
+
+.nopadding{
+  padding: 0;
+}
