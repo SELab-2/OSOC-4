@@ -6,7 +6,7 @@ from app.config import config
 from app.crud import read_where, update
 from app.models.project import Project
 from app.models.user import UserRole
-from app.tests.test_base import TestBase, Request
+from app.tests.test_base import TestBase, Request, Status
 from app.tests.test_routers.test_editions import TestEditions
 from app.tests.utils_for_tests.EditionGenerator import EditionGenerator
 from app.tests.utils_for_tests.SkillGenerator import SkillGenerator
@@ -77,12 +77,14 @@ class TestQuestionTags(TestBase):
         self.assertEqual(question_tag_detail_from_response["mandatory"], True)
         self.assertEqual(question_tag_detail_from_response["show_in_list"], True)
 
+    async def test_get_edition_question_tags_tag_invalid(self):
+        """Test GET /editions/{year}/questiontags/{tag} with an invalid tag"""
+
+        path = f'/editions/{self.edition.year}/questiontags/abc'
+        await self.do_request(Request.GET, path, "user_admin", expected_status=Status.BAD_REQUEST, access_token=await self.get_access_token("user_admin"))
+
     async def test_post_create_editions_year_question_tag(self):
         """Test POST /editions/{year}/questiontags should create a new QuestionTag for edition"""
-        # Create an edition in db
-        edition = Edition(year=2023, name='edition')
-        await update(edition, self.session)
-
         # Prepare a new question tag
         new_question_tag_name = str(uuid.uuid1())
         post_body = {
@@ -108,6 +110,16 @@ class TestQuestionTags(TestBase):
         self.assertEqual(question_tag_in_db.edition, self.edition.year, f"'{self.edition.year}' was not found in the database.")
         self.assertEqual(question_tag_in_db.tag, new_question_tag_name, f"'{new_question_tag_name}' was not found in the database.")
 
+    async def test_post_create_editions_year_question_tag_existing(self):
+        """Test POST /editions/{year}/questiontags should fail if tag already exists"""
+        question_tags = await self._create_question_tags_in_db(self.edition)
+
+        post_body = {
+            "tag": question_tags[0].tag
+        }
+        path = f"/editions/{self.edition.year}/questiontags"
+        await self.do_request(Request.POST, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=post_body)
+
     async def test_delete_editions_year_question_tag(self):
         """Test DELETE /editions/{year}/questiontags/{tag}"""
         # Create an edition in db
@@ -129,6 +141,23 @@ class TestQuestionTags(TestBase):
         # Test whether question tag is deleted in the database
         question_tag_in_db = await read_where(QuestionTag, QuestionTag.tag == question_tag.tag, session=self.session)
         self.assertIsNone(question_tag_in_db, f"'{question_tag.tag}' was not deleted in the database.")
+
+    async def test_delete_editions_year_question_tag_invalid(self):
+        """Test DELETE /editions/{year}/questiontags/{tag} should fail if tag doesn't exist"""
+
+        path = f"/editions/{self.edition.year}/questiontags/abc"
+        await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.BAD_REQUEST, access_token=await self.get_access_token("user_admin"))
+
+    async def test_delete_editions_year_question_tag_mandatory(self):
+        """Test DELETE /editions/{year}/questiontags/{tag} should fail if tag is mandatory"""
+        # Add mandatory tag to db
+        tag = QuestionTag(tag="abc",
+                          edition=self.edition.year,
+                          mandatory=True)
+        await update(tag, self.session)
+
+        path = f"/editions/{self.edition.year}/questiontags/{tag.tag}"
+        await self.do_request(Request.DELETE, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"))
 
     async def test_patch_editions_year_question_tag(self):
         """Test PATCH /editions/{year}/questiontags/{tag}"""
@@ -178,3 +207,35 @@ class TestQuestionTags(TestBase):
         self.assertEqual(question_tag_in_db.tag, new_question_tag, "Question tag was not updated in database.")
         self.assertEqual(question_tag_in_db.show_in_list, updated_question_tag_request_body["show_in_list"], "show_in_list was not updated in database.")
         self.assertEqual(question_tag_in_db.question_id, question.id, "Question id was not updated in database.")
+
+    async def test_patch_editions_year_question_tag_invalid(self):
+        """Test PATCH /editions/{year}/questiontags/{tag} should fail if tag doesn't exist"""
+
+        # Prepare request body
+        request_body = {
+            "tag": "abc",
+            "question": "question",
+            "show_in_list": False,
+            "mandatory": False
+        }
+
+        path = f"/editions/{self.edition.year}/questiontags/abc"
+        await self.do_request(Request.PATCH, path, "user_admin", expected_status=Status.BAD_REQUEST, access_token=await self.get_access_token("user_admin"), json_body=request_body)
+
+    async def test_patch_editions_year_question_tag_mandatory(self):
+        """Test PATCH /editions/{year}/questiontags/{tag} should fail if tag is mandatory"""
+        # Add mandatory tag to db
+        tag = QuestionTag(tag="abc",
+                          edition=self.edition.year,
+                          mandatory=True)
+        await update(tag, self.session)
+
+        request_body = {
+            "tag": "def",
+            "question": "",
+            "show_in_list": False,
+            "mandatory": True
+        }
+
+        path = f"/editions/{self.edition.year}/questiontags/{tag.tag}"
+        await self.do_request(Request.PATCH, path, "user_admin", expected_status=Status.CONFLICT, access_token=await self.get_access_token("user_admin"), json_body=request_body)

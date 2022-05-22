@@ -406,7 +406,7 @@ async def modify_question_tag(year: int, tag: str, tagupdate: QuestionTagUpdate,
     except Exception:
         raise QuestionTagNotFoundException()
 
-    if questiontag.mandatory and questiontag.tag != tag:
+    if questiontag.mandatory and tagupdate.tag != tag:
         raise QuestionTagCantBeModified()
 
     questiontag.tag = tagupdate.tag
