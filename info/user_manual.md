@@ -164,15 +164,10 @@ If you want to stop all services you can use
 docker-compose down
 ```
 
-### 4.4. Automatic deployment
-GitHub Actions are used to automatically deploy the new codebase from the master or development branch to the server. A seperate docker-compose file is used by the GitHub Actions to deploy the application to the production server. This docker-compose file is made so the frontend and backend use the correct paths. This is needed because subdomains can't be used in the UGent network. Instead, we use an extra prefixpath (/frontend and /api).
+### 4.4. Deployment
+GitHub Actions are used to automatically deploy the new codebase from the master or development branch to the server. A separate docker-compose file is used by the GitHub Actions to deploy the application to the production server.
 
-These branch versions of the application can be accessed by:
-```
-frontend: https://sel2-4.ugent.be/{branchname}/frontend
-backend-api: https://sel2-4.ugent.be/{branchname}/api
-```
-
+The application can be accessed at <https://sel2-4.ugent.be>.
 
 
 ## 5. How to further develop & test
@@ -185,7 +180,7 @@ If you find yourself in doubt where to find something, take a look at the [direc
 
 ### 5.2. Testing
 
-(Backend) Tests will run automatically with GitHub actions but can be run locally too. There is a seperate docker-compose file for the test containers, so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine, so they can't be accessed by the internet for security.
+(Backend) Tests will run automatically with GitHub actions but can be run locally too. There is a separate docker-compose file for the test containers, so they won't interfere with the running containers for the development or production. The containers used for testing don't map there ports to the host machine, so they can't be accessed by the internet for security.
 
 #### 5.2.1 Backend tests
 
@@ -210,7 +205,7 @@ Integration tests can be run using `yarn cypress:headless` or with `yarn cypress
 Now we're going to describe the architecture and design of the OSOC selection tool.
 
 In order to deploy everything, we use Docker. Using containers allows us to have
-an easily reproducible deployment. We have a seperate container for the
+an easily reproducible deployment. We have a separate container for the
 database (PostgreSQL), the Redis, the backend (FastAPI) and the frontend (Next.js). This allows us to develop and scale
 each part of our application separately.
 
@@ -516,7 +511,7 @@ When you click on `Projects` in the navigation bar, you will see the following s
 
 ![projects](screenshots/projects.png)
 
-This screen has two sides. On the left you can see the student list with their filters. To find more info on this part, see [Students](#846-students). On the right part of the screen you see the projects. The two parts are seperated by a green arrow directing to the right inside a green circle.
+This screen has two sides. On the left you can see the student list with their filters. To find more info on this part, see [Students](#846-students). On the right part of the screen you see the projects. The two parts are separated by a green arrow directing to the right inside a green circle.
 
 On the right part of the screen (the projects part), you can see a searchbar, a reset button, a `people needed` checkbox, a `conflicts` button, a `new project` button and a list of projects. In the searchbar you can search projects by name. The cross on the right side of the searchbar is the reset button. By pushing this button, the search bar will become empty. The `people needed` checkbox allows you to see only the projects of which the required skills are not completely satisfied. If there is at least one required skill which is not linked to a student participation, this project will be shown when the `people needed` checkbox is enabled.
 The conflicts button allows you to watch all the students who are assigned to more than one project. The `New project` button redirects to another screen where you can create a new project. In the student list all projects are shown with a project card.
@@ -591,7 +586,7 @@ By clicking the `Select all` button you can select all the students in the stude
 We've chosen not to go with a classic register and login type of access-control for the application. Instead, we work with an invite-system, where an admin must invite new coaches. The invite process goes as follows.
 
 Let's say Alice is an admin wishing to invite Bob. First Alice has to go to `settings` and then to `manage users`, where she clicks on the `Invite new users` button. In the popup window that showed up Alice types the `email address of Bob`, and clicks on `invite users`. Right now Bob will receive an email with a link he can click on. Bob will now be listed in manage users as unactivated. \
-If `Bob clicks on the link`, he sees a page where he's asked to `fill out` his `name` (can be a nickname) and `password`, and click `submit`. Bob's account is now activited, he must now wait on Alice to approve him. \
+If `Bob clicks on the link`, he sees a page where he's asked to `fill out` his `name` (can be a nickname) and `password`, and click `submit`. Bob's account is now activated, he must now wait on Alice to approve him. \
 Alice can go to the `manage users` again in settings, and for her convenience she clicks on the filter `not yet approved` to see a list of users that have activated their account and wish to be approved. In this filtered list she finds Bob (recognised by the email address since he could have typed any name he wants), and clicks on `approve` to give him access to the application. \
 Now Bob has an approved account, and is able to log in.
 
