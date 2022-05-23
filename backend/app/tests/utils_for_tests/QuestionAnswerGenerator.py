@@ -38,7 +38,7 @@ class QuestionAnswerGenerator(DataGenerator):
          "No, I won't be able to work as a student, as a volunteer or for free."],
         ["What is your gender?", "female", "male", "transgender", "rather not say"],
         ["What language are you most fluent in?", "dutch", "english", "french", "german", "other"],
-        ["How would you rate your English",
+        ["How would you rate your English?",
          "1 I can understand form, but it is hard for me to reply.",
          "2 I can have simple conversations.",
          "3 I can express myself, understand people and get a point across.",

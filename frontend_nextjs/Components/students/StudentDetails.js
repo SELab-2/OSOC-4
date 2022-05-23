@@ -133,7 +133,7 @@ export default function StudentDetails(props) {
                 setStudent({ ...new_student })
             }
 
-        // A new decision has been made about a student.
+            // A new decision has been made about a student.
         } else if ("decision" in data) {
             if (student && student["id"] === data["id"]) {
                 let new_student = student
@@ -144,7 +144,7 @@ export default function StudentDetails(props) {
                 setDecideField(data["decision"]["decision"])
             }
 
-        // A new email is sent to a student.
+            // A new email is sent to a student.
         } else if ("email_sent" in data) {
 
             if (student && student["id"] === data["id"]) {
@@ -290,37 +290,39 @@ export default function StudentDetails(props) {
             <Row className="details-upper-layer nomargin">
                 <Col>
                     <Row className="nomargin">
-                        <Col md="auto" style={{marginRight: "10px"}}>
+                        <Col md="auto" style={{ marginRight: "10px" }}>
                             <h1>{student["mandatory"] ? student["mandatory"]["first name"] : ""} {student["mandatory"] ?
-                              student["mandatory"]["last name"] : ""}</h1>
+                                student["mandatory"]["last name"] : ""}</h1>
                         </Col>
                         <Col md="auto" className="student-details-icon">
                             {(student["mandatory"]["alumni"] === "yes") &&
-                              <Hint message="Student claims to be an alumni">
-                                  <Image src={alumniIcon} width="35pt" height="35pt" />
-                              </Hint>
+                                <Hint message="Student claims to be an alumni">
+                                    <Image src={alumniIcon} width="35pt" height="35pt" />
+                                </Hint>
                             }
                         </Col>
                         <Col md="auto" className="student-details-icon">
                             {(student["mandatory"]["student-coach"] === "yes") &&
-                              <Hint message="applied to be student coach">
-                                  <Image src={studCoachIcon} width="35px" height="35px"/>
-                              </Hint>
+                                <Hint message="applied to be student coach">
+                                    <Image src={studCoachIcon} width="35px" height="35px" />
+                                </Hint>
                             }
                         </Col>
-                        <Col md="auto" className="student-details-icon">
-                            <Hint message="Delete the student">
-                                <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
-                                    <Image src={deleteIcon} className="delete-icon" />
-                                </button>
-                            </Hint>
-                        </Col>
+                        {(me && me.role === 2) &&
+                            <Col md="auto" className="student-details-icon">
+                                <Hint message="Delete the student">
+                                    <button className="delete-button" onClick={() => setDeletePopUpShow(true)}>
+                                        <Image src={deleteIcon} className="delete-icon" />
+                                    </button>
+                                </Hint>
+                            </Col>
+                        }
                     </Row>
                     <Row>
                         <ul className="nomargin nopadding">
                             {(student["skills"]) && student["skills"].map((skill, index) =>
-                              <li className="skill" style={{ display: "inline-block" }}
-                                  key={index}>{skill["name"].toUpperCase()}</li>)}
+                                <li className="skill" style={{ display: "inline-block" }}
+                                    key={index}>{skill["name"].toUpperCase()}</li>)}
                         </ul>
                     </Row>
                 </Col>
@@ -362,21 +364,21 @@ export default function StudentDetails(props) {
                         </Col>
                     </Row>
                     {(me && me.role === 2) &&
-                      <div>
-                          <select className="dropdown-decision" id="dropdown-decision"
-                                  onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
-                              <option value={-1}>Undecided</option>
-                              <option value={0}>No</option>
-                              <option value={1}>Maybe</option>
-                              <option value={2}>Yes</option>
-                          </select>
-                          <Hint message="Confirms the decision">
-                              <Button className="suggest-confirm-button" disabled={decideField === decision}
-                                      onClick={() => setDecisionPopUpShow(true)}>
-                                  Confirm
-                              </Button>
-                          </Hint>
-                      </div>
+                        <div>
+                            <select className="dropdown-decision" id="dropdown-decision"
+                                onChange={(ev) => setDecideField(ev.target.value)} value={decideField}>
+                                <option value={-1}>Undecided</option>
+                                <option value={0}>No</option>
+                                <option value={1}>Maybe</option>
+                                <option value={2}>Yes</option>
+                            </select>
+                            <Hint message="Confirms the decision">
+                                <Button className="suggest-confirm-button" disabled={decideField === decision}
+                                    onClick={() => setDecisionPopUpShow(true)}>
+                                    Confirm
+                                </Button>
+                            </Hint>
+                        </div>
                     }
                 </Col>
             </Row>
