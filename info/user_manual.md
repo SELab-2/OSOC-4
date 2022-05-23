@@ -7,7 +7,7 @@
 [4.1. Configuration](#41-configuration) \
 [4.2. Requirements](#42-requirements) \
 [4.3. Local installation](#43-local-installation) \
-[4.4. Automatic deployment](#44-automatic-deployment)
+[4.4. Deployment](#44-deployment)
 
 #### [5. How to further develop & test](#5-how-to-further-develop--test-1)
 
@@ -168,6 +168,7 @@ docker-compose down
 GitHub Actions are used to automatically deploy the new codebase from the master or development branch to the server. A separate docker-compose file is used by the GitHub Actions to deploy the application to the production server.
 
 The application can be accessed at <https://sel2-4.ugent.be>.
+
 
 
 ## 5. How to further develop & test
