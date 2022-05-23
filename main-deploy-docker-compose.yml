@@ -1,0 +1,103 @@
+version: "3.7"
+
+services:
+
+  osoc-frontend:
+    build:
+      context: ./frontend_nextjs
+      args:
+        NEXT_BASE_PATH: ""
+        NEXT_INTERNAL_API_URL: http://${PATHPREFIX}-osoc-backend:8000
+        NEXT_API_URL: https://sel2-4.ugent.be/v1api
+        NEXTAUTH_URL: https://sel2-4.ugent.be/api/auth
+        NODE_ENV: production
+    ports:
+      - 3000
+    environment:
+      - NEXTAUTH_URL=https://sel2-4.ugent.be/api/auth
+      - NEXTAUTH_URL_INTERNAL=http://localhost:3000/api/auth
+    networks:
+        - proxynet
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${PATHPREFIX}-osoc-frontend.rule=Host(`sel2-4.ugent.be`)
+      - traefik.http.routers.${PATHPREFIX}-osoc-frontend.tls=true
+      - traefik.http.routers.${PATHPREFIX}-osoc-frontend.tls.certresolver=le
+      - traefik.http.routers.${PATHPREFIX}-osoc-frontend.entrypoints=websecure
+      # - traefik.http.routers.osoc-frontend.middlewares=osocfrontendpathstrip
+      # - traefik.http.middlewares.osocfrontendpathstrip.stripprefix.prefixes=${PATHPREFIX}/frontend
+      - traefik.port=3000
+    user: "1000:1000"
+    depends_on:
+      - osoc-backend
+
+
+  osoc-backend:
+    build: ./backend
+    hostname: ${PATHPREFIX}-osoc-backend
+    ports:
+      - 8000
+    environment:
+      POSTGRES_URL: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: justapassword
+      POSTGRES_DATABASE: OSOC
+      REDIS_URL: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: justapassword
+      # SMTP Mail
+      SMTP_SERVER: smtp.gmail.com
+      SMTP_SSL_PORT: 465
+      SENDER_EMAIL: osoc.groep4@gmail.com
+      SENDER_PASSWORD: abcPasswordOSOC-group4
+      # Invite Settings
+      INVITE_EXPIRE: 4320 #in minutes
+      PASSWORDRESET_EXPIRE: 30 # in minutes
+      CHANGE_EMAIL_EXPIRE: 30 # in minutes
+      PATHPREFIX: "/v1api"
+      DOMAIN: https://sel2-4.ugent.be
+      FRONTEND_URL: https://sel2-4.ugent.be
+
+    networks:
+      - proxynet
+      - default
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${PATHPREFIX}-osoc-backend.rule=Host(`sel2-4.ugent.be`) && PathPrefix(`/v1api`)
+      - traefik.http.routers.${PATHPREFIX}-osoc-backend.tls=true
+      - traefik.http.routers.${PATHPREFIX}-osoc-backend.tls.certresolver=le
+      - traefik.http.routers.${PATHPREFIX}-osoc-backend.entrypoints=websecure
+      - traefik.http.routers.${PATHPREFIX}-osoc-backend.middlewares=${PATHPREFIX}-osocbackendpathstrip
+      - traefik.http.middlewares.${PATHPREFIX}-osocbackendpathstrip.stripprefix.prefixes=/v1api
+      - traefik.port=8000
+    user: "1000:1000"
+    depends_on:
+      - postgres
+      - redis
+    
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    ports:
+      - 5432
+    environment:
+      - POSTGRES_PASSWORD=justapassword
+      - POSTGRES_DB=OSOC
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data/
+ 
+  redis:
+    image: redis:latest
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass justapassword
+    ports:
+      - 6379
+    volumes:
+      - ./data/redis:/data
+    user: "1000:1000"
+
+networks:
+  proxynet:
+    external:
+      name: proxy_network

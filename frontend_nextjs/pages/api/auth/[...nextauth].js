@@ -73,6 +73,8 @@ const callbacks = {
             return Promise.resolve(token);
         }
 
+        console.log("yeah facking mong")
+
         // If the call arrives after 23 hours have passed, we allow to refresh the token.
         token = refreshAccessToken(token);
         return Promise.resolve(token);
@@ -109,18 +111,7 @@ export const options = (process.env.NODE_ENV === "development") ? {
     pages: {
         signIn: '/login',
     },
-    secret: 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0',
-    cookies: {
-        sessionToken: {
-            name: `__Secure-next-auth.session-token`,
-            options: {
-                httpOnly: true,
-                sameSite: 'lax',
-                path: process.env.NEXT_BASE_PATH,
-                secure: true
-            }
-        },
-    },
+    secret: 'e8ae5c5d5cd7f0f1bec2303ad04a7c80f09f759d480a7a5faff5a6bbaa4078d0'
 }
 
 
