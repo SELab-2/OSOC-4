@@ -26,7 +26,8 @@ export default function ProjectCard(props) {
     /**
      * Navigates to the detail page of props.project
      */
-    const toProjectDetails = () => {
+    const toProjectDetails = (ev) => {
+        ev.stopPropagation();
         let list_id = props.project.id.split("/")
         let id = list_id[list_id.length - 1]
 
