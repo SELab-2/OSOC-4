@@ -1,6 +1,7 @@
 """ This module includes the student endpoints """
 
 from typing import List
+from collections import defaultdict
 
 from app.config import config
 from app.crud import read_all_where, read_where, update
@@ -66,12 +67,20 @@ async def get_student(student_id: int, session: AsyncSession = Depends(get_sessi
     student_info = r.all()
 
     mandatory = {k: v for (k, mandatory, _, v) in student_info if mandatory}
-    listTags = {k: v for (k, mandatory, show_in_list, v) in student_info if show_in_list and not mandatory}
-    detailTags = {k: v for (k, mandatory, show_in_list, v) in student_info if not show_in_list and not mandatory}
+
+    listTags = defaultdict(list)
+    for tag, mandatory, show_in_list, val in student_info:
+        if show_in_list and not mandatory:
+            listTags[tag].append(val)
+
+    detailTags = defaultdict(list)
+    for tag, mandatory, show_in_list, val in student_info:
+        if not mandatory:
+            detailTags[tag].append(val)
 
     info["mandatory"] = mandatory
-    info["listtags"] = listTags
-    info["detailtags"] = detailTags
+    info["listtags"] = {k: ', '.join(v) for k, v in listTags.items()}
+    info["listtags"] = {k: ', '.join(v) for k, v in detailTags.items()}
 
     # student participations
     r = await session.execute(select(Participation)
