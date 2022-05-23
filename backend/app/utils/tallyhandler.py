@@ -92,8 +92,15 @@ async def process_tally(data: dict[str, str], edition: int, session: AsyncSessio
                         await update(QuestionAnswer(student=student, number=number, question=q, answer=a), session=session)
                         number += 1
 
-        elif field["type"] in ["TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_PHONE_NUMBER", "INPUT_EMAIL", "INPUT_LINK", "FILE_UPLOAD"]:
+        elif field["type"] in ["TEXTAREA", "INPUT_TEXT", "INPUT_NUMBER", "INPUT_PHONE_NUMBER", "INPUT_EMAIL", "INPUT_LINK"]:
             if field["value"] is not None:
                 a = await get_save_answer(str(field["value"]), session)
+                await update(QuestionAnswer(student=student, number=number, question=q, answer=a), session=session)
+                number += 1
+
+        elif field["type"] in ["FILE_UPLOAD"]:
+            if field["value"] is not None:
+                url = field["value"][0]["url"]
+                a = await get_save_answer(str(url), session)
                 await update(QuestionAnswer(student=student, number=number, question=q, answer=a), session=session)
                 number += 1
